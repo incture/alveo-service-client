@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/incture/cw-service-client/issues"
   },
-  "homepage": "https://github.com/incture/cw-service-client"
+  "homepage": "https://github.com/incture/cw-service-client",
+  "dependencies": {
+    "mqclient": "0.0.4"
+  }
 }
