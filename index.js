@@ -23,22 +23,32 @@ module.exports = function (clientSignature) {
 
       //console.log('LISTENING: ', channel)
 
-      mqclient.sub(channel, function (err, msg) {
+      var collectors = channels.collectors || []
+      var processors = channels.processors || []
 
-        var result
+      var concatenatedChannels = collectors.concat(processors)
 
-        try {
-          result = JSON.parse(msg)
-        }
-        catch (err) {
-          result = msg
-        }
+      concatenatedChannels.forEach(function (channel) {
 
-        callback(err, result)
+        mqclient.sub(channel, function (err, msg) {
+
+          var result
+
+          try {
+            result = JSON.parse(msg)
+          }
+          catch (err) {
+            result = msg
+          }
+
+          callback(err, result)
+
+        })
 
       })
 
     }
+
 
   }
 
