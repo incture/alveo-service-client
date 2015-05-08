@@ -1,0 +1,19 @@
+{
+  "name": "cw-service-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/incture/cw-service-client.git"
+  },
+  "author": "",
+  "license": "Private",
+  "bugs": {
+    "url": "https://github.com/incture/cw-service-client/issues"
+  },
+  "homepage": "https://github.com/incture/cw-service-client"
+}
