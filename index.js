@@ -1,20 +1,31 @@
 
 var mqclient = require('mqclient/amqp')
 
+function refreshCollector(collectorName, params, callback) {
+  var refreshRequestChannel = 'collector:' + collectorName + ':refresh:'
+  //console.log('REFRESH: ', refreshRequestChannel, params)
+  mqclient.pub(refreshRequestChannel, params, function () {
+    //console.log('REQUESTED')
+    return callback && callback()
+  })
+}
+
 // TODO: need a client signature to be able to trigger refresh requests
 module.exports = function (clientSignature) {
 
   return {
 
-    // used for sending refresh requests
-    refresh: function (collectorName, params, callback) {
+    // used for sending refresh requests - can accept a single name or an array of names
+    refresh: function (collectorNames, params, callback) {
 
-      var refreshRequestChannel = 'collector:' + collectorName + ':refresh:'
-      //console.log('REFRESH: ', refreshRequestChannel, params)
-      mqclient.pub(refreshRequestChannel, params, function () {
-        //console.log('REQUESTED')
-        return callback && callback()
-      })
+      if (Array.isArray(collectorNames)) {
+        collectorNames.forEach(function (collectorName) {
+          refreshCollector(collectorName, params, callback)
+        })
+      }
+      else {
+        refreshCollector(collectorNames, params, callback)
+      }
 
     },
 
