@@ -2,7 +2,7 @@
 var mqclient = require('mqclient/amqp')
 
 function refreshCollector(collectorName, params, callback) {
-  var refreshRequestChannel = 'collector:' + collectorName + ':refresh:'
+  var refreshRequestChannel = 'collector:' + collectorName + ':refresh'
   //console.log('REFRESH: ', refreshRequestChannel, params)
   mqclient.pub(refreshRequestChannel, params, function () {
     //console.log('REQUESTED')
@@ -34,14 +34,16 @@ module.exports = function (clientSignature) {
 
       //console.log('LISTENING: ', channel)
 
-      var collectors = channels.collectors || []
-      var processors = channels.processors || []
+      var collectors = (channels.collectors && channels.collectors.map(function (cname) { return 'collector:' + cname })) || []
+      var processors = (channels.processors && channels.processors.map(function (pname) { return 'processor:' + pname })) || []
 
       var concatenatedChannels = collectors.concat(processors)
 
       concatenatedChannels.forEach(function (channel) {
-
+        //console.log(channel)
         mqclient.sub(channel, function (err, msg) {
+
+          //console.log(err, msg)
 
           var result
 
