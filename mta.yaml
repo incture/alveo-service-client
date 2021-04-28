@@ -34,6 +34,15 @@ modules:
         - npm run build
       supported-platforms: []
       build-result: dist
+
+  - name: UserDetail
+    type: nodejs
+    path: UserDetail
+    provides:
+     - name: UserDetail_api
+       properties:
+          url: ${default-url}
+
 resources:
   - name: APWorkbench_html5_repo_runtime
     parameters:
