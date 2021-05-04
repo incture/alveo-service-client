@@ -5,6 +5,5 @@
     <artifactId>menabev</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>menabev-abbyy</groupId>
   <artifactId>menabev-abbyy</artifactId>
 </project>
