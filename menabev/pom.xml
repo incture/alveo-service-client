@@ -4,4 +4,13 @@
   <artifactId>menabev</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <modules>
+  	<module>menabev-abbyy</module>
+  	<module>menabev-web</module>
+  	<module>menabev-util</module>
+  	<module>menabev-configuration</module>
+  	<module>menabev-services</module>
+  	<module>menabev-repository</module>
+  	<module>menabev-documentmanagement</module>
+  </modules>
 </project>
