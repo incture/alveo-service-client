@@ -9,9 +9,10 @@ modules:
     path: apworkbench-approuter
     parameters:
       disk-quota: 256M
-      memory: 256M
+      memory: 100M
     requires:
       - name: APWorkbench_html5_repo_runtime
+      - name: dest_APWorkbench
       - name: uaa_APWorkbench
   - name: APWorkbench_ui_deployer
     type: com.sap.html5.application-content

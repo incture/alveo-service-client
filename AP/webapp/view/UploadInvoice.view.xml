@@ -2,8 +2,10 @@
 	<Shell id="shell">
 		<App id="app">
 			<pages>
-				<Page id="page" title="{i18n>title}">
-					<content></content>
+				<Page id="page" title="{i18n>title}" class="sapUiSizeCompact">
+					<content>
+						<Button text="{i18n>uploadInvoice}" press="onPressUploadInvoice" class="SecondaryBtn"/>
+					</content>
 				</Page>
 			</pages>
 		</App>
