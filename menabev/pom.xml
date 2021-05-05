@@ -26,6 +26,7 @@
 		<module>menabev-documentmanagement</module>
 		<module>menabev-services</module>
 		<module>menabev-repository</module>
+		<module>menabev-entity</module>
 	</modules>
 	<dependencies>
 		<dependency>
