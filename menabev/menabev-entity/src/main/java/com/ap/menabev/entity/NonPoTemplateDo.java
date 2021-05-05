@@ -17,6 +17,7 @@ public @Data class NonPoTemplateDo {
 
 	@Id
 	@Column(name="UUID")
+	
 	private String uuid;
 	
 	@Column(name="REQUEST_ID")
