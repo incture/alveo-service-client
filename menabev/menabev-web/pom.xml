@@ -15,6 +15,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ap.menabev</groupId>
+			<artifactId>menabev-entity</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ap.menabev</groupId>
 			<artifactId>menabev-services</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -36,11 +41,6 @@
 		<dependency>
 			<groupId>com.ap.menabev</groupId>
 			<artifactId>menabev-documentmanagement</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.ap.menabev</groupId>
-			<artifactId>menabev-repository</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
