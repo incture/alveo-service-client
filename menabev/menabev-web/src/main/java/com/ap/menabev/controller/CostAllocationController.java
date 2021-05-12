@@ -39,7 +39,7 @@ public class CostAllocationController {
 		
 	}
 	
-	@GetMapping("/getCostAllocationForTemplate")
+	@PostMapping("/getCostAllocationForTemplate")
 	public List<AllocationForTemplateDto> getCostAllocationForTemplate(@RequestBody List<AllocationDto> allocateTemp){
 		
 		return costAllocationService.getCostAllocationForTemplate(allocateTemp);
