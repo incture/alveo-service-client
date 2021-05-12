@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ap.menabev.dto.AllocationDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
 import com.ap.menabev.service.NonPoTemplateService;
@@ -44,14 +45,19 @@ public class NonPoTemplateController {
 	public List<NonPoTemplateHIDto> get(@PathVariable int limit,@PathVariable int offset) {
 		return nonPoTemplateService.get(limit,offset);
 	}
-	@DeleteMapping("/delete/{templateId}")
-	public ResponseDto delete(@PathVariable String templateId ){
+	@DeleteMapping("/delete")
+	public ResponseDto delete(@RequestBody List<String> templateId ){
 		return nonPoTemplateService.delete(templateId);
 		
 	}
 	@GetMapping("/getItemsByTemplateId/{templateId}")
 	public List<NonPoTemplateItemsDto> getItems(@PathVariable String templateId){
 		return nonPoTemplateService.getNonPoTemplateItems(templateId);
+	}
+	
+	@GetMapping("/selectNonPoTemplate")
+	public List<AllocationDto> selectNonPoTemplate(){
+		return nonPoTemplateService.selectNonPoTemplate();
 	}
     
 }

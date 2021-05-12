@@ -4,6 +4,7 @@ package com.ap.menabev.dto;
 
 import java.math.BigDecimal;
 
+
 import lombok.Data;
 
 
@@ -23,5 +24,7 @@ public @Data class NonPoTemplateItemsDto {
 	private String itemText;
 	private String companyCode;
 	private Boolean isNonPo;
+    private String accountNo;
+	private String allocationPercent;
 	
 }

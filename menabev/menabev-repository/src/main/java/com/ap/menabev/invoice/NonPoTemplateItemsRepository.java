@@ -33,9 +33,17 @@ public interface NonPoTemplateItemsRepository extends JpaRepository<NonPoTemplat
 	public Integer deleteNonPoTemplateItemsDo(@Param("templateId") String templateId,
 			@Param("itemId") String itemId);
 	
+//	@Modifying
+//	@Query("Delete from NonPoTemplateItemsDo id where  id.templateId=:templateId")
+//	public Integer deleteNonPoTemplateItemsDo(@Param("templateId") String templateId);
+	
 	@Modifying
-	@Query("Delete from NonPoTemplateItemsDo id where  id.templateId=:templateId")
-	public Integer deleteNonPoTemplateItemsDo(@Param("templateId") String templateId);
+	@Query("Delete from NonPoTemplateItemsDo npd where  npd.templateId in ?1")
+	Integer deleteNonPoTemplateItemsDo(List<String> templateId);
+
+	@Query("select distinct templateId,accountNo from NonPoTemplateItemsDo")
+	public List<Object[]> selectNonPoTemplate();
+
 	
 	//	public default NonPoTemplateItemsDo importDo(NonPoTemplateItemsDto dto) {
 //		NonPoTemplateItemsDo nonPoTemplateItemsDo = new NonPoTemplateItemsDo();

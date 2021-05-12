@@ -1,7 +1,5 @@
 package com.ap.menabev.serviceimpl;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +51,8 @@ public class NonPoTemplateItemsServiceImpl implements NonPoTemplateItemsService 
 		 nonPoTemplateItemsDo.setAssetNo(dto.getAssetNo());
 		 nonPoTemplateItemsDo.setSubNumber(dto.getSubNumber());
 		 nonPoTemplateItemsDo.setWbsElement(dto.getWbsElement());
+		 nonPoTemplateItemsDo.setAllocationPercent(dto.getAllocationPercent());
+		nonPoTemplateItemsDo.setAccountNo(dto.getAccountNo());
 		ResponseDto response = new ResponseDto();
 		if (nonPoTemplateItemsRepository.fetchNonPoTemplateItemsDo(dto.getTemplateId(),
 				nonPoTemplateItemsDo.getItemId()) == null) {
@@ -127,6 +127,8 @@ public class NonPoTemplateItemsServiceImpl implements NonPoTemplateItemsService 
 		 nonPoTemplateItemsDo.setAssetNo(dto.getAssetNo());
 		 nonPoTemplateItemsDo.setSubNumber(dto.getSubNumber());
 		 nonPoTemplateItemsDo.setWbsElement(dto.getWbsElement());
+		 nonPoTemplateItemsDo.setAllocationPercent(dto.getAllocationPercent());
+		nonPoTemplateItemsDo.setAccountNo(dto.getAccountNo());
 		
 		try {
 
@@ -162,6 +164,8 @@ public class NonPoTemplateItemsServiceImpl implements NonPoTemplateItemsService 
 		 nonPoTemplateItemsDo.setAssetNo(dto.getAssetNo());
 		 nonPoTemplateItemsDo.setSubNumber(dto.getSubNumber());
 		 nonPoTemplateItemsDo.setWbsElement(dto.getWbsElement());
+		 nonPoTemplateItemsDo.setAllocationPercent(dto.getAllocationPercent());
+			nonPoTemplateItemsDo.setAccountNo(dto.getAccountNo());
 
 		try {
 

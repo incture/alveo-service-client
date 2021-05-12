@@ -56,8 +56,8 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	@Autowired
 	InvoiceItemRepository invoiceItemRepository;
 
-	@Autowired
-	PurchaseDocumentItemService purchaseDocumentItemService;
+//	@Autowired(required=true)
+//	PurchaseDocumentItemService purchaseDocumentItemService;
 
 	@Autowired
 	InvoiceHeaderServiceImpl invoiceHeaderServiceImpl;

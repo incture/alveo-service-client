@@ -1,7 +1,6 @@
 package com.ap.menabev.serviceimpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ap.menabev.dto.AllocationDto;
 import com.ap.menabev.dto.NonPoTemplateDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
@@ -39,6 +39,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 
 	@Autowired
 	NonPoTemplateItemsRepository nonPoTemplateItemsRepository;
+	
 
 	@Autowired
 	NonPoTemplateItemsService nonPoTemplateItemsService;
@@ -50,22 +51,30 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		// TODO Auto-generated method stub
 		ResponseDto response = new ResponseDto();
 		try {
-			dto.getNonPoTemplate().setCreatedAt(new Date());
-			ModelMapper mapper = new ModelMapper();
-			dto.getNonPoTemplate().setTemplateId(getTemplateId());
-			NonPoTemplateDo re = nonPoTemplateRepository
-					.save(mapper.map(dto.getNonPoTemplate(), NonPoTemplateDo.class));
-			logger.error("Printing");
-			if (!ServiceUtil.isEmpty(re)) {
-				for (int i = 0; i < dto.getNonPoTemplateItems().size(); i++) {
-					dto.getNonPoTemplateItems().get(i).setTemplateId(dto.getNonPoTemplate().getTemplateId());
-					nonPoTemplateItemsService.saveNonPoTemplateItems(dto.getNonPoTemplateItems().get(i));
+			String duplicateTemplate = nonPoTemplateRepository.getByName(dto.getNonPoTemplate().getTemplateName());
+			if(ServiceUtil.isEmpty(duplicateTemplate)){
+				dto.getNonPoTemplate().setCreatedAt(new Date());
+				ModelMapper mapper = new ModelMapper();
+				dto.getNonPoTemplate().setTemplateId(getTemplateId());
+				NonPoTemplateDo re = nonPoTemplateRepository
+						.save(mapper.map(dto.getNonPoTemplate(), NonPoTemplateDo.class));
+				logger.error("Printing");
+				if (!ServiceUtil.isEmpty(re)) {
+					for (int i = 0; i < dto.getNonPoTemplateItems().size(); i++) {
+						dto.getNonPoTemplateItems().get(i).setTemplateId(dto.getNonPoTemplate().getTemplateId());
+						nonPoTemplateItemsService.saveNonPoTemplateItems(dto.getNonPoTemplateItems().get(i));
+					}
 				}
+				response.setCode(ApplicationConstants.CODE_SUCCESS);
+				response.setStatus(ApplicationConstants.SUCCESS);
+				response.setMessage(dto.getNonPoTemplate().getTemplateName() + " " + ApplicationConstants.CREATED_SUCCESS);
+				return response;
+			}else{
+				response.setCode(ApplicationConstants.CODE_FAILURE);
+				response.setStatus(ApplicationConstants.FAILURE);
+				response.setMessage(dto.getNonPoTemplate().getTemplateName() + " already exists.");
+				return response;
 			}
-			response.setCode(ApplicationConstants.CODE_SUCCESS);
-			response.setStatus(ApplicationConstants.SUCCESS);
-			response.setMessage(dto.getNonPoTemplate().getTemplateName() + " " + ApplicationConstants.CREATED_SUCCESS);
-			return response;
 		} catch (Exception e) {
 			response.setCode(ApplicationConstants.CODE_FAILURE);
 			response.setStatus(ApplicationConstants.FAILURE);
@@ -75,33 +84,9 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	}
 
 	public String getTemplateId() {
-		List<NonPoTemplateDo> nd = nonPoTemplateRepository.fetchTemplateId();
-		String templateId = "";
-		if (ServiceUtil.isEmpty(nd)) {
-			templateId = "TEMP-000000";
-		} else {
-			logger.error("templateId old  "+templateId);
-			templateId =templateId+ nd.get(0).getTemplateId();
-			logger.error("templateId new  "+templateId);
-		}
-		int size = Integer.parseInt(templateId.replaceAll("TEMP-", "")) + 1;
-		String tempId = "TEMP-";
-		char[] id = new char[6];
-		Arrays.fill(id, '0');
-		String digitstring = Integer.toString(size);
-		int length = digitstring.length();
-
-		int fillsize = 6 - length;
-
-		for (int i = fillsize, j = 0; i < 6 && j < length; ++i, ++j) {
-			id[i] = digitstring.charAt(j);
-		}
-		for (char c : id) {
-			tempId = tempId + c;
-		}
-		logger.error("Template Id "+tempId);
-
-		return tempId;
+		
+		String tempId = nonPoTemplateRepository.fetchTemplateId();
+		return "TEMP-" + String.format("%06d", Integer.parseInt(tempId));
 	}
 
 	@Override
@@ -192,7 +177,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 
 	@Override
 	@Transactional
-	public ResponseDto delete(String templateId) {
+	public ResponseDto delete(List<String> templateId) {
 		// TODO Auto-generated method stub
 		ResponseDto response = new ResponseDto();
 		// NonPoTemplateDo nonPoTemplateDo=new NonPoTemplateDo();
@@ -223,8 +208,8 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		NonPoTemplateDo nonPoTemplateDo = nonPoTemplateRepository.fetchNonPoTemplateDo(dto.getTemplateId());
 		nonPoTemplateDo.setAccClerkId(dto.getAccClerkId());
 		nonPoTemplateDo.setBasecoderId(dto.getBasecoderId());
-		nonPoTemplateDo.setCreatedAt(dto.getCreatedAt());
-		nonPoTemplateDo.setCreatedBy(dto.getCreatedBy());
+//		nonPoTemplateDo.setCreatedAt(dto.getCreatedAt());
+//		nonPoTemplateDo.setCreatedBy(dto.getCreatedBy());
 		nonPoTemplateDo.setUpdatedAt(new Date());
 		nonPoTemplateDo.setUpdatedBy(dto.getUpdatedBy());
 		nonPoTemplateDo.setVendorId(dto.getVendorId());
@@ -277,6 +262,42 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 			list.add(modelMapper.map(NonPoTemplateItemsDo, NonPoTemplateItemsDto.class));
 		}
 		return list;
+	}
+	@Override
+	public List<AllocationDto> selectNonPoTemplate() {
+		// TODO Auto-generated method stub
+
+		List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplate();
+
+		List<AllocationDto> res = new ArrayList<AllocationDto>();
+		Object obj1[]=is.get(0);
+		String templateId=(String)obj1[0];
+		String accNumber=(String)obj1[1];
+		String acNumber=accNumber;
+		for(int i=1;i<is.size();i++){
+			Object iObj1[]=is.get(i);
+			String iTemplateId=(String)iObj1[0];
+			String iAccNumber=(String)iObj1[1];
+			
+
+			if(iTemplateId.equalsIgnoreCase(templateId)&&(!acNumber.equalsIgnoreCase("*"))){
+				if(!accNumber.equalsIgnoreCase(iAccNumber)){
+					acNumber="*";
+				}
+			}
+			else if(!iTemplateId.equalsIgnoreCase(templateId)){
+				String templateName = nonPoTemplateRepository.getById(templateId);
+				res.add(new AllocationDto(templateName,templateId,acNumber));
+				acNumber=iAccNumber;
+				accNumber=iAccNumber;
+				templateId=iTemplateId;
+			}
+		}
+		String templateName = nonPoTemplateRepository.getById(templateId);
+		res.add(new AllocationDto(templateName,templateId,acNumber));
+		
+		return res;
+	
 	}
 
 }

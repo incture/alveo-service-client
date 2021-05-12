@@ -26,4 +26,5 @@ public class CostAllocationDto {
 	private String wbsElement;
 	private String crDbIndicator;
 	private String itemText;
+	private String allocationPercent;
 }

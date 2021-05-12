@@ -10,10 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ap.menabev.dto.AllocationDto;
+import com.ap.menabev.dto.AllocationForTemplateDto;
 import com.ap.menabev.dto.CostAllocationDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.entity.CostAllocationDo;
+import com.ap.menabev.entity.NonPoTemplateItemsDo;
 import com.ap.menabev.invoice.CostAllocationRepository;
+import com.ap.menabev.invoice.NonPoTemplateItemsRepository;
 import com.ap.menabev.service.CostAllocationService;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
@@ -24,6 +28,9 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 
 	@Autowired
 	CostAllocationRepository costAllocationRepository;
+	
+	@Autowired
+	NonPoTemplateItemsRepository nonPoTemplateItemsRepository;
 
 	private static final Logger logger = LoggerFactory.getLogger(CostAllocationServiceImpl.class);
 
@@ -87,6 +94,38 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 			response.setMessage(ApplicationConstants.DELETE_FAILURE);
 			return response;
 		}
+	}
+	
+	@Override
+	public List<AllocationForTemplateDto> getCostAllocationForTemplate(List<AllocationDto> allocateTemp) {
+		// TODO Auto-generated method stub
+		
+		List<AllocationForTemplateDto> allTempDtoList= new ArrayList<AllocationForTemplateDto>();
+		ModelMapper m= new ModelMapper();
+		for (AllocationDto dto :allocateTemp ){
+			AllocationForTemplateDto  allTempDto= new AllocationForTemplateDto();
+			List<CostAllocationDto> costAllocationList=new ArrayList<CostAllocationDto>();
+			Double amount=ServiceUtil.stringToDouble(dto.getAmount());
+			List<NonPoTemplateItemsDo> itemList=nonPoTemplateItemsRepository.fetchNonPoTemplateItemsDo(dto.getTemplateId());
+			for(NonPoTemplateItemsDo item:itemList){
+				CostAllocationDto costAllocationDto= new CostAllocationDto();
+				costAllocationDto=m.map(item,CostAllocationDto.class);
+				Double per=ServiceUtil.stringToDouble(item.getAllocationPercent());
+				Double netValue=(amount*per)/100;
+				costAllocationDto.setNetValue(String.format("%.3f", netValue));
+				costAllocationDto.setAllocationPercent(item.getAllocationPercent());
+				costAllocationList.add(costAllocationDto);
+				
+				
+			}
+			allTempDto.setTemplateId(dto.getTemplateId());
+		//	allTempDto.setTemplateName(dto.getTemplateName());
+			allTempDto.setCostAllocationList(costAllocationList);
+			allTempDtoList.add(allTempDto);
+		}
+		
+		
+		return allTempDtoList;
 	}
 
 }

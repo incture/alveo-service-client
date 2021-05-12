@@ -4,6 +4,7 @@ package com.ap.menabev.service;
 
 import java.util.List;
 
+import com.ap.menabev.dto.AllocationDto;
 import com.ap.menabev.dto.NonPoTemplateDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
@@ -22,6 +23,8 @@ public interface NonPoTemplateService {
 	List<NonPoTemplateItemsDto>getNonPoTemplateItems(String templateId);
 	ResponseDto updateNonPoTemplateHI(NonPoTemplateHIDto dto);
 
-	ResponseDto delete(String templateId);
+	ResponseDto delete(List<String> templateId);
+
+	List<AllocationDto> selectNonPoTemplate();
 
 }

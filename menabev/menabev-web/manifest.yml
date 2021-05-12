@@ -1,5 +1,5 @@
 applications:
--  name: ap-menabev-test
+-  name: ap-menabev-dev
    memory: 768M
    path: target/ap-menabev-dev.jar
    random-route: false

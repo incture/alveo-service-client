@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ap.menabev.dto.AllocationDto;
+import com.ap.menabev.dto.AllocationForTemplateDto;
 import com.ap.menabev.dto.CostAllocationDto;
 import com.ap.menabev.service.CostAllocationService;
 import com.ap.menabev.dto.ResponseDto;
@@ -35,5 +37,11 @@ public class CostAllocationController {
 	public ResponseDto delete(@PathVariable Integer id){
 		return costAllocationService.delete(id);
 		
+	}
+	
+	@GetMapping("/getCostAllocationForTemplate")
+	public List<AllocationForTemplateDto> getCostAllocationForTemplate(@RequestBody List<AllocationDto> allocateTemp){
+		
+		return costAllocationService.getCostAllocationForTemplate(allocateTemp);
 	}
 }

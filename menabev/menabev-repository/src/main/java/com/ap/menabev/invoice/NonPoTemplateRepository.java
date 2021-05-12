@@ -20,13 +20,25 @@ public interface NonPoTemplateRepository extends JpaRepository<NonPoTemplateDo, 
 	
 	//@Query(value = "select * from APAUTOMATION.NON_PO_TEMPLATE order by created_At desc limit :limit offset :offset", nativeQuery = true)
 //	public List<NonPoTemplateDo> fetchAll(@Param("limit")int limit,@Param("offset") int offset);
-	@Query(value = "select * from APAUTOMATION.NON_PO_TEMPLATE order by created_At desc", nativeQuery = true)
+	@Query(value = "select * from MENABEVD.NON_PO_TEMPLATE order by created_At desc", nativeQuery = true)
 	public List<NonPoTemplateDo> fetchAll();
 	
-	@Query(value = "select * from APAUTOMATION.NON_PO_TEMPLATE order by template_id desc", nativeQuery = true)
-	public List<NonPoTemplateDo> fetchTemplateId();
+//	@Query(value = "select * from APAUTOMATION.NON_PO_TEMPLATE order by template_id desc", nativeQuery = true)
+//	public List<NonPoTemplateDo> fetchTemplateId();
 
+	@Query(value = "select \"MENABEVD\".\" NON_PO_TEMPLATE_ITEMS_ID\".NEXTVAL from dummy", nativeQuery = true)
+    public String fetchTemplateId();
+	
+//	@Modifying
+//	@Query("Delete from NonPoTemplateDo npd where  npd.templateId=:templateId")
+//	public Integer deleteNonPoTemplateDo(@Param("templateId") String templateId);
 	@Modifying
-	@Query("Delete from NonPoTemplateDo npd where  npd.templateId=:templateId")
-	public Integer deleteNonPoTemplateDo(@Param("templateId") String templateId);
+	@Query("Delete from NonPoTemplateDo npd where  npd.templateId in ?1")
+	Integer deleteNonPoTemplateDo(List<String> templateId);
+
+	@Query("select templateName from NonPoTemplateDo where  templateId=:templateId")
+	public String getById(@Param("templateId") String templateId);
+
+	@Query("select templateName from NonPoTemplateDo where  templateName=:templateName")
+	public String getByName(@Param("templateName") String templateName);
 }
