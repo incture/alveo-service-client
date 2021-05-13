@@ -31,17 +31,6 @@ public class MenaBevApplication {
 		return dataSourceBuilder.build();
 	}
 
-	// @Bean
-	// @Primary
-	// public DataSource dataSource() {
-	// DataSource dataSource =
-	// DataSourceBuilder.create().type(DriverManagerDataSource.class)
-	// .driverClassName(com.sap.db.jdbc.Driver.class.getName())
-	// .url("jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true")
-	// .username("MENABEVD")
-	// .password("menBHDev2021")
-	// .build();
-	// return dataSource;
-	// }
+	
 
 }

@@ -15,8 +15,6 @@ public class TestController {
 	@Autowired
 	TestService testService;
 	
-
-	
 	@GetMapping("/testService")
 	public String test(){
 
