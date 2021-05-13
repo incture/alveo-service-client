@@ -1,0 +1,72 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.UserManagement"
+	xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page>
+		<content>
+			<IconTabBar >
+				<items>
+					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo">
+						<Table  inset="false" items="{oUserDetailModel>/supplierList}" alternateRowColors="true"
+							mode="SingleSelectMaster" growing="true" growingThreshold="20" id="USERMANAGEMENT">
+							<headerToolbar>
+								<Toolbar>
+									<ToolbarSpacer/>
+									<SearchField  liveChange="onFreeSearchUsers"></SearchField>
+								</Toolbar>
+							</headerToolbar>
+							<columns>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>USERID}" tooltip="{i18n>USERID}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>USERNAME}" tooltip="{i18n>USERNAME}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>EMAIL}" tooltip="{i18n>EMAIL}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>CONTACT}" tooltip="{i18n>CONTACT}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>RESETPASSWORD}" tooltip="{i18n>RESETPASSWORD}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>MANAGEUSERDETAILS}" tooltip="{i18n>MANAGEUSERDETAILS}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>ACTION}" tooltip="{i18n>ACTION}"/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{oUserDetailModel>loginId}"/>
+										<Text text="{oUserDetailModel>rosVendorNumber}"/>
+										<HBox>
+											<Text text="{oUserDetailModel>email}"
+												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setNonEditableMode'}"/>
+											<Input value="{oUserDetailModel>emailNew}" valueState="{oUserDetailModel>emailNewState}"
+												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setEditableMode'}"></Input>
+										</HBox>
+										<HBox>
+											<Text text="{oUserDetailModel>supplierName}"
+												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setNonEditableMode'}"/>
+											<Input value="{oUserDetailModel>supplierNameNew}" valueState="{oUserDetailModel>supplerIdState}"
+												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setEditableMode'}"></Input>
+										</HBox>
+										<Button text="{i18n>RESET}"></Button>
+										<HBox>
+										<Button text="{i18n>VIEWASSIGNEDGROUPS}"></Button>
+										<Button text="{i18n>EDITUSER}"></Button>
+										</HBox>
+										<Button icon="sap-icon://delete"></Button>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</IconTabFilter>
+					<IconTabFilter text="{i18n>GROUPLIST}" key="HeaderInfo"></IconTabFilter>
+				</items>
+			</IconTabBar>
+		</content>
+	</Page>
+</mvc:View>
