@@ -95,24 +95,16 @@
 					"target": [
 						"CreateUser"
 					]
-				}
+				
 			],
 			"targets": {
 				"UploadInvoice": {
 					"viewType": "XML",
 					"viewName": "UploadInvoice"
 				},
-				"App": {
+				"NonPOInvoice": {
 					"viewType": "XML",
-					"viewName": "App"
-				},
-				"UserManagement": {
-					"viewType": "XML",
-					"viewName": "UserManagement"
-				},
-				"CreateUser": {
-					"viewType": "XML",
-					"viewName": "CreateUser"
+					"viewName": "NonPOInvoice"
 				}
 			}
 		}

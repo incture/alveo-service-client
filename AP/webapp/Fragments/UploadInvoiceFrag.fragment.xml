@@ -1,0 +1,33 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:form="sap.ui.layout.form" xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified">
+	<Dialog title="{i18n>uploadInvoice}" class="sapUiSizeCompact" contentWidth="100%">
+		<content>
+			<l:ResponsiveSplitter height="100%" class="pdfViewClass">
+				<l:PaneContainer >
+					<l:SplitPane id="default">
+						<VBox>
+							<Toolbar>
+								<ToolbarSpacer/>
+								<u:FileUploader id="fileUploader" value="{pdfModel>/fileName}" buttonOnly="true" uploadComplete="" maximumFileSize="10" fileType="pdf" 
+									change="handleUploadChange" fileSizeExceed="onFileSizeExceed"/>
+							</Toolbar>
+							<form:SimpleForm editable="true">
+								<Label text="{i18n>porder}" required="true"/>
+								<Input value="{pdfModel>/pOrder}" width="15rem" valueState="{pdfModel>/vstate/pOrder}" type="Number" change="inputErrorHandler"/>
+								<Label text="{i18n>deliveryNote}" required="true"/>
+								<Input value="{pdfModel>/deliveryNote}" width="15rem" valueState="{pdfModel>/vstate/deliveryNote}" change="inputErrorHandler"/>
+							</form:SimpleForm>
+						</VBox>
+					</l:SplitPane>
+					<l:SplitPane requiredParentWidth="600px">
+						<PDFViewer title="{pdfModel>/fileName}" source="{pdfModel>/Source}" displayType="Embedded" showDownloadButton="false" width="auto" height="100%"/>
+					</l:SplitPane>
+				</l:PaneContainer>
+			</l:ResponsiveSplitter>
+		</content>
+		<buttons>
+			<Button text="{i18n>cancel}" press="onUploadInvoiceFragCancel" class="SecondaryBtn" tooltip="{i18n>cancel}"/>
+			<Button text="{i18n>submit}" press="onSubmitUploadInvoice" class="PrimaryBtn" tooltip="{i18n>submit}"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>
