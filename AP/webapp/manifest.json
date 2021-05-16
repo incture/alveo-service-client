@@ -55,6 +55,9 @@
 				"settings": {
 					"bundleName": "com.menabev.AP.i18n.i18n"
 				}
+			},
+			"StaticDataModel": {
+				"type": "sap.ui.model.json.JSONModel"
 			}
 		},
 		"resources": {
@@ -84,7 +87,7 @@
 				},
 				{
 					"name": "UserManagement",
-					"pattern": "UserManagement",
+					"pattern": "",
 					"target": [
 						"UserManagement"
 					]
@@ -95,6 +98,7 @@
 					"target": [
 						"CreateUser"
 					]
+				}
 				
 			],
 			"targets": {
@@ -105,6 +109,14 @@
 				"NonPOInvoice": {
 					"viewType": "XML",
 					"viewName": "NonPOInvoice"
+				},
+				"CreateUser": {
+					"viewType": "XML",
+					"viewName": "CreateUser"
+				},
+				"UserManagement": {
+					"viewType": "XML",
+					"viewName": "UserManagement"
 				}
 			}
 		}

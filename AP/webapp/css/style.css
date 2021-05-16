@@ -1,4 +1,116 @@
-/* Enter your custom styles here */
+.gridContainer {
+    display: grid;
+    height: "100%";
+    width: "100%";
+    grid-template-columns: 1fr 16fr;
+    grid-template-areas: "nav main";
+    position: relative;
+}
+
+
+
+.sideNav {
+    grid-area: nav;
+    width: 96px;
+    background-color: #0053A7;
+    justify-content: normal;
+    align-items: normal;
+    height: 100vh;
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+}
+
+
+
+.sideNavItems {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 6px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: white;
+    /*font-size: 1em;*/
+    align-Items: normal;
+    width: -webkit-fill-available;
+
+}
+
+
+
+.sideNavItems .sapMLabel {
+    color: white;
+}
+
+
+
+.sideNavItemSelected {
+    color: white;
+    background-color: #214265;
+}
+
+
+
+.sideNavItemSelected .sapMLabel {
+    color: white;
+}
+
+
+
+.navContainer {
+    /*background-color: yellow;*/
+    /*height: 90vh; old*/
+    height: 97vh;
+    margin: 9px;
+    width: calc(100% - 10px) !important;
+}
+
+
+
+.navContainer.sapMNav {
+    border-radius: 8px;
+}
+
+
+
+.navContainerPage {
+    background-color: white;
+    /*padding:8px;*/
+}
+
+.sapMIBar.sapMHeader-CTX {
+    color: #32363a;
+    background-color: #0053a7 !important;
+    filter: none;
+    background-image: none;
+}
+
+.sapMBar {
+    display: block;
+    width: 100%;
+    text-shadow: none;
+    box-shadow: none !important;
+}
+
+
+
+.sapMTBStandard {
+    border-bottom: none;
+}
+
+.IconTabBG .sapMITBContent {
+    padding: 1rem;
+    position: relative;
+    background-color: white;
+}
+
+.GridBG {
+    background-color: white;
+}
+
+:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon, :not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon, :not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {
+    color: #fff;
+}/* Enter your custom styles here */
 
 :root {
     --primary-color: #00499c;

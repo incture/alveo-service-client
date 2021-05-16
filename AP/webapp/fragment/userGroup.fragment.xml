@@ -1,0 +1,17 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+	<Dialog class="sapUiSizeCompact" showHeader="false">
+		<Bar>
+			<contentMiddle>
+				<Label text="{i18n>ASSIGNEDGROUPS}"></Label>
+			</contentMiddle>
+			<contentRight>
+				<Button icon="sap-icon://decline" type="Transparent"></Button>
+			</contentRight>
+		</Bar>
+		<List items="{}">
+			<items>
+				<StandardListItem title="{Name}"/>
+			</items>
+		</List>
+	</Dialog>
+</core:FragmentDefinition>

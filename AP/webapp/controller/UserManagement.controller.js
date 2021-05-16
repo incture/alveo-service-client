@@ -11,8 +11,14 @@ sap.ui.define([
 		 * @memberOf com.menabev.AP.view.UserManagement
 		 */
 		onInit: function () {
-
+			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+			this.oRouter.attachRoutePatternMatched(function (oEvent) {
+				if (oEvent.getParameter("name") === "UserManagement") {}
+			});
 		},
+		onAddNewUser: function () {
+			this.oRouter.navTo("CreateUser");
+		}
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered

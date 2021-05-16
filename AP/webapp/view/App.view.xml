@@ -1,5 +1,27 @@
-<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" 
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.App" xmlns:vc="com.menabev.AP.customControl"
 	xmlns:html="http://www.w3.org/1999/xhtml">
-	<App id="AppId">
+		<App>
+		<Page>
+			<customHeader>
+				<OverflowToolbar>
+					<ToolbarSpacer/>
+					<Button icon="sap-icon://customer" type="Transparent" class= "UserIcon" tooltip="{i18n>PROFILE}" press="onUserDetailPressed"></Button>
+				</OverflowToolbar>
+			</customHeader>
+			<content>
+				<VBox class="gridContainer">
+					<VBox id="sideNav" class="sideNav" items="{StaticDataModel>/leftPane}">
+						<vc:VBoxCC class="sideNavItems" key="{StaticDataModel>key}" press="onSideNavItemSelection">
+							<!--<core:Icon src="sap-icon://activity-items"></core:Icon>-->
+							<Label text="{StaticDataModel>label}" wrapping="true"></Label>
+						</vc:VBoxCC>
+					</VBox>
+					<VBox class="mainContainer">
+						<!--<OverflowToolbar id="idHeaderToolbar" class="headerToolbar"></OverflowToolbar>-->
+						<NavContainer id="AppId" class="navContainer"></NavContainer>
+					</VBox>
+				</VBox>
+			</content>
+		</Page>
 	</App>
 </mvc:View>

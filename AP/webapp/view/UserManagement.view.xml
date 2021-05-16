@@ -1,17 +1,20 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.UserManagement"
 	xmlns:html="http://www.w3.org/1999/xhtml">
-	<Page>
+	<Page showHeader="false">
 		<content>
 			<IconTabBar >
 				<items>
-					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo">
-						<Table  inset="false" items="{oUserDetailModel>/supplierList}" alternateRowColors="true"
-							mode="SingleSelectMaster" growing="true" growingThreshold="20" id="USERMANAGEMENT">
+					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo" class="IconTabBG">
+						<Table items="{oUserDetailModel>/supplierList}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
+							id="USERMANAGEMENT">
 							<headerToolbar>
-								<Toolbar>
+								<OverflowToolbar>
 									<ToolbarSpacer/>
-									<SearchField  liveChange="onFreeSearchUsers"></SearchField>
-								</Toolbar>
+									<SearchField liveChange="onFreeSearchUsers" width="20%"></SearchField>
+									<Button text="{i18n>ADDNEWUSER}" press="onAddNewUser"></Button>
+									<Button icon="sap-icon://download"></Button>
+									<Button icon="sap-icon://action-settings"></Button>
+								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
@@ -55,8 +58,8 @@
 										</HBox>
 										<Button text="{i18n>RESET}"></Button>
 										<HBox>
-										<Button text="{i18n>VIEWASSIGNEDGROUPS}"></Button>
-										<Button text="{i18n>EDITUSER}"></Button>
+											<Button text="{i18n>VIEWASSIGNEDGROUPS}"></Button>
+											<Button text="{i18n>EDITUSER}"></Button>
 										</HBox>
 										<Button icon="sap-icon://delete"></Button>
 									</cells>
@@ -64,7 +67,42 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>GROUPLIST}" key="HeaderInfo"></IconTabFilter>
+					<IconTabFilter text="{i18n>GROUPLIST}" key="HeaderInfo">
+						<Table items="{oUserDetailModel>/groupList}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
+							id="USERGROUPS">
+							<headerToolbar>
+								<OverflowToolbar>
+									<ToolbarSpacer/>
+									<SearchField liveChange="onFreeSearchUsers" width="20%"></SearchField>
+									<Button text="{i18n>ADDNEWGROUP}" press="onAddNewUser"></Button>
+								</OverflowToolbar>
+							</headerToolbar>
+							<columns>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>GROUPNAME}" tooltip="{i18n>USERID}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>GROUPDESCRIPTION}" tooltip="{i18n>USERNAME}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>ASSIGNEDUSER}" tooltip="{i18n>EMAIL}"/>
+								</Column>
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+									<Label design="Bold" text="{i18n>MANAGEGROUP}" tooltip="{i18n>ACTION}"/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{oUserDetailModel>loginId}"/>
+										<Text text="{oUserDetailModel>rosVendorNumber}"/>
+										<Text text="{oUserDetailModel>rosVendorNumber}"/>
+										<Button icon="sap-icon://delete"></Button>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</IconTabFilter>
 				</items>
 			</IconTabBar>
 		</content>

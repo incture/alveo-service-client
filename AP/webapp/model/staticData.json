@@ -1,0 +1,26 @@
+{
+	"mandatoryFields": {
+		"userDetail": []
+	},
+	"leftPane": [{
+		"label": "Upload Invoice",
+		"key": "UploadInvoice",
+		"icon": ""
+	}, {
+		"label": "User management",
+		"key": "UserManagement",
+		"icon": ""
+	}, {
+		"label": "Dashboard",
+		"key": "Dashboard",
+		"icon": ""
+	}, {
+		"label": "AP Workbench",
+		"key": "TaskManagement",
+		"icon": ""
+	}, {
+		"label": "Purchase Order",
+		"key": "PurchaseOrder",
+		"icon": ""
+	}]
+}

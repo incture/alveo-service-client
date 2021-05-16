@@ -11,8 +11,27 @@ sap.ui.define([
 		 * @memberOf com.menabev.AP.view.App
 		 */
 		onInit: function () {
+			var that = this;
+			var StaticDataModel = this.getOwnerComponent().getModel("StaticDataModel");
+			StaticDataModel.loadData("model/staticData.json");
+			StaticDataModel.attachRequestCompleted(function (oEvent) {
+				// that.getView().byId("sideNav").getItems().setSelectedKey("UserManagement");
+				that.getView().byId("sideNav").getItems()[1].addStyleClass("sideNavItemSelected");
+			});
+			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+			this.oRouter.attachRoutePatternMatched(function (oEvent) {
+				if (oEvent.getParameter("name") === "App") {}
+			});
 
 		},
+		onSideNavItemSelection: function(oEvent){
+			var  items = oEvent.getSource().getParent().getItems();
+			for (var i=0;i<items.length;i++){
+				items[i].removeStyleClass("sideNavItemSelected");
+			}
+			oEvent.getSource().addStyleClass("sideNavItemSelected");
+			var key = oEvent.getSource().getKey();
+		}
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
