@@ -31,24 +31,27 @@ import com.ap.menabev.util.ServiceUtil;
 public class Email {
 
 	private static final Logger logger = LoggerFactory.getLogger(Email.class);
+	
 
 	public String sendmailTOCSU(String emailTo, String subject, String content, File file) {
 		try {
+
 			Properties props = new Properties();
-			props.put("mail.smtp.auth", "true");
-			props.put("mail.smtp.starttls.enable", "true");
-			props.put("mail.smtp.host", "outlook.office365.com");
-			props.put("mail.smtp.port", "587");
+			props.put(ApplicationConstants.SMTP_AUTH, "true");
+			props.put(ApplicationConstants.SMTP_TTLS, "true");
+			props.put(ApplicationConstants.MAIL_HOST, "outlook.office365.com");
+			props.put(ApplicationConstants.SMTP_PORT, "587");
+			props.put(ApplicationConstants.TRANSPORT_PROTOCOL, "smtp");
 
 			Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(ApplicationConstants.EMAIL_FROM,
-							ApplicationConstants.EMAIL_FROM_PASSWORD);
+					return new PasswordAuthentication(ApplicationConstants.ACCPAY_EMAIL_ID,
+							ApplicationConstants.ACCPAY_EMAIL_PASSWORD);
 				}
 			});
 			Message msg = new MimeMessage(session);
 			//
-			msg.setFrom(new InternetAddress(ApplicationConstants.EMAIL_FROM, false));
+			msg.setFrom(new InternetAddress(ApplicationConstants.ACCPAY_EMAIL_ID, false));
 
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailTo));
 

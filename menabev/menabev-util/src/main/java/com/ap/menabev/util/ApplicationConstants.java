@@ -2,11 +2,21 @@ package com.ap.menabev.util;
 
 public interface ApplicationConstants {
 
-	String EMAIL_FROM = "dipanjan.baidya@incture.com";
-	String EMAIL_FROM_PASSWORD = "Jaiburakali@123";
+	String ACCPAY_EMAIL_ID = "accpay@menabev.com";
+	String ACCPAY_EMAIL_PASSWORD = "MenaBev@123";
+	
 	// String CSU_EMAIL = "csu@menabev.com";
-	String CSU_EMAIL = "prashanth.shekar@incture.com";
+	String CSU_EMAIL = "dipanjan.baidya@incture.com";
 	String UPLOAD_INVOICE_TO_CSU_SUBJECT = "TEST UPLOAD INVOICE";
+	
+	
+	//
+	String SMTP_AUTH = "mail.smtp.auth";
+    String SMTP_TTLS = "mail.smtp.starttls.enable";
+    String MAIL_HOST = "mail.smtp.host";
+    String SMTP_PORT = "mail.smtp.port";
+    String TRANSPORT_PROTOCOL = "mail.transport.protocol";
+    String BOUNCER_PORT = "mail.smtp.from";
 
 	// DEV DataBase Details
 	String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";

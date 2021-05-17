@@ -23,8 +23,8 @@ public class EmailServiceImpl implements EmailServices {
 		try {
 			if (!ServiceUtil.isEmpty(content)) {
 				JSONObject json = new JSONObject(content);
-				emailBody = "Hi,\nAdded by User:\n" + "1.PO Number:" + json.getString("PO_Number") + "\n2.Delivery Note"
-						+ json.getString("Delivery_Note") + "\nThanks,\nTeam AP";
+				emailBody = "Hi,\nAdded by User:\n" + "1.PO Number: " + json.getString("PO_Number") + "\n2.Delivery Note: "
+						+ json.getString("Delivery_Note") + "\nThanks,\nTeam AccPayable Automation";
 				message = email.sendmailTOCSU(ApplicationConstants.CSU_EMAIL,
 						ApplicationConstants.UPLOAD_INVOICE_TO_CSU_SUBJECT, emailBody, file);
 			} else {
