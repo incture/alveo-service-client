@@ -11,13 +11,30 @@ sap.ui.define([
 		 * @memberOf com.menabev.AP.view.UserManagement
 		 */
 		onInit: function () {
+
+			this.oHeader = {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			};
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
 				if (oEvent.getParameter("name") === "UserManagement") {}
 			});
+			this.getUserDetails();
 		},
 		onAddNewUser: function () {
 			this.oRouter.navTo("CreateUser");
+		},
+		getUserDetails: function () {
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var sUrl = "/IDPDEST/service/scim/Users";
+			var busy = new sap.m.BusyDialog();
+			oServiceModel.loadData(sUrl, "", true, "GET", false, false, this.oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				var data = oEvent.getSource().getData();
+				if (data) {
+				}
+			});
 		}
 
 		/**

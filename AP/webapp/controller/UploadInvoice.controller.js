@@ -51,7 +51,7 @@ sap.ui.define([
 				this.getView().getModel("pdfModel").setProperty("/fileName", this.fileName);
 				// encode the file using the FileReader API
 				var reader = new FileReader();
-				reader.onloadend = () => {
+				reader.onloadend = function() {
 					var base64String = reader.result
 						.replace("data:", "")
 						.replace(/^.+,/, "");

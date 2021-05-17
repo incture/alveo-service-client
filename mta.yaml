@@ -12,7 +12,14 @@ modules:
       memory: 100M
     requires:
       - name: APWorkbench_html5_repo_runtime
+      - name: UserDetail_api
+        group: destinations
+        properties:
+          name: UserDetail_api
+          url: '~{url}'
+          forwardAuthToken: true
       - name: dest_APWorkbench
+      - name: conn_APWorkbench
       - name: uaa_APWorkbench
   - name: APWorkbench_ui_deployer
     type: com.sap.html5.application-content
@@ -42,8 +49,11 @@ modules:
     provides:
      - name: UserDetail_api
        properties:
-          url: ${default-url}
-
+          url: '${default-url}'
+    properties:
+      UAA_SERVICE_NAME: uaa_APWorkbench
+    requires:
+      - name: uaa_APWorkbench   
 resources:
   - name: APWorkbench_html5_repo_runtime
     parameters:
@@ -65,4 +75,9 @@ resources:
     parameters:
       service-plan: lite
       service: destination
+    type: org.cloudfoundry.managed-service
+  - name: conn_APWorkbench
+    parameters:
+      service-plan: lite
+      service: connectivity
     type: org.cloudfoundry.managed-service
