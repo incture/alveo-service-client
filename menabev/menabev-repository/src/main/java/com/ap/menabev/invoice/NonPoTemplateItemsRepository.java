@@ -4,6 +4,8 @@ package com.ap.menabev.invoice;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +16,7 @@ import com.ap.menabev.entity.NonPoTemplateItemsDo;
 
 
 
+@Transactional
 @Repository
 public interface NonPoTemplateItemsRepository extends JpaRepository<NonPoTemplateItemsDo, Integer> {
 	@Query("select id from NonPoTemplateItemsDo id where  id.templateId=:templateId and id.itemId=:itemId")
@@ -41,9 +44,40 @@ public interface NonPoTemplateItemsRepository extends JpaRepository<NonPoTemplat
 	@Query("Delete from NonPoTemplateItemsDo npd where  npd.templateId in ?1")
 	Integer deleteNonPoTemplateItemsDo(List<String> templateId);
 
-	@Query("select distinct templateId,accountNo from NonPoTemplateItemsDo")
+	
+	String selectNonPoTemplateQuery = "select distinct  t.TEMPLATE_ID, "
+            + "case when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS t2 where "
+            + "t2.TEMPLATE_ID =t.TEMPLATE_ID) =1 then  (t.ACCOUNT_NO) "
+            + "when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS "
+            + "t2 where t2.TEMPLATE_ID =t.TEMPLATE_ID) >1 then '*' "
+            + " end as accountNo, "
+            + "(select TEMPLATE_NAME from NON_PO_TEMPLATE where TEMPLATE_ID =t.TEMPLATE_ID) "
+            + " as TemplateName "
+            + "from NON_PO_TEMPLATE_ITEMS t "
+            + "order by t.TEMPLATE_ID desc";
+	
+//	@Query(value="select DISTINCT TEMPLATE_ID,ACCOUNT_NO from "
+//			+ "MENABEVD.NON_PO_TEMPLATE_ITEMS ORDER BY TEMPLATE_ID DESC",nativeQuery=true)
+	@Query(value=selectNonPoTemplateQuery,nativeQuery=true)
 	public List<Object[]> selectNonPoTemplate();
 
+	
+//	String getAccountQuery = "select "
+//            + "case when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS t2 where "
+//            + "t2.TEMPLATE_ID =?1) =1 then  (t.ACCOUNT_NO) "
+//            + "when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS "
+//            + "t2 where t2.TEMPLATE_ID =?1) >1 then '*' "
+//            + " end as accountNo, "
+//            + " "
+//            + ""
+//            + "from NON_PO_TEMPLATE_ITEMS t "
+//            + " where t.TEMPLATE_ID = ?1 ";
+//	
+//	@Query(value=getAccountQuery,nativeQuery=true)
+//	public String getAccountNo(String templateId);
+
+	
+	
 	
 	//	public default NonPoTemplateItemsDo importDo(NonPoTemplateItemsDto dto) {
 //		NonPoTemplateItemsDo nonPoTemplateItemsDo = new NonPoTemplateItemsDo();

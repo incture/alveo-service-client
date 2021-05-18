@@ -41,4 +41,7 @@ public interface NonPoTemplateRepository extends JpaRepository<NonPoTemplateDo, 
 
 	@Query("select templateName from NonPoTemplateDo where  templateName=:templateName")
 	public String getByName(@Param("templateName") String templateName);
+
+	@Query("select templateName from NonPoTemplateDo where  templateName=?1 and templateId <> ?2 ")
+	public String checkTemplateNameIsAvaible(String templateName, String templateId);
 }

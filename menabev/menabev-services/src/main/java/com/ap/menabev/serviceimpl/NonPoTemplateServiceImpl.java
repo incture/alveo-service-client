@@ -2,6 +2,7 @@ package com.ap.menabev.serviceimpl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -99,6 +100,11 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 
 			List<NonPoTemplateDo> doList = nonPoTemplateRepository.fetchAll();
 			NonPoTemplateHIDto nonPoTemplateHIDto;
+			List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplate();
+			HashMap<String , String> accountNo = new HashMap<>();
+			for(Object[] obj : is){
+				accountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
+			}
 
 			for (NonPoTemplateDo nonPoTemplateDo : doList) {
 				NonPoTemplateDto nonPoTemplateDto = new NonPoTemplateDto();
@@ -120,6 +126,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				}
 
 				nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+				nonPoTemplateHIDto.setAccountNo(accountNo.get(nonPoTemplateDto.getTemplateId()));
 				list.add(nonPoTemplateHIDto);
 				// nonPoTemplateItemsDtoList.clear();
 
@@ -203,11 +210,19 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	@Override
 	public ResponseDto updateNonPoTemplate(NonPoTemplateDto dto) {
 
-		// TODO Auto-generated method stub
 		ResponseDto response = new ResponseDto();
+		String checkTemplateNameIsAvaible = nonPoTemplateRepository.checkTemplateNameIsAvaible(dto.getTemplateName(),dto.getTemplateId());
+		if(!ServiceUtil.isEmpty(checkTemplateNameIsAvaible)){
+			response.setCode(ApplicationConstants.CODE_FAILURE);
+			response.setStatus(ApplicationConstants.FAILURE);
+			response.setMessage(dto.getTemplateName() + " " + ApplicationConstants.UPDATE_FAILURE);
+			return response;
+		}
+		
 		NonPoTemplateDo nonPoTemplateDo = nonPoTemplateRepository.fetchNonPoTemplateDo(dto.getTemplateId());
 		nonPoTemplateDo.setAccClerkId(dto.getAccClerkId());
 		nonPoTemplateDo.setBasecoderId(dto.getBasecoderId());
+		nonPoTemplateDo.setTemplateName(dto.getTemplateName());
 //		nonPoTemplateDo.setCreatedAt(dto.getCreatedAt());
 //		nonPoTemplateDo.setCreatedBy(dto.getCreatedBy());
 		nonPoTemplateDo.setUpdatedAt(new Date());
@@ -235,9 +250,22 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		ResponseDto response = new ResponseDto();
 		try {
 
-			updateNonPoTemplate(dto.getNonPoTemplate());
-			for (NonPoTemplateItemsDto nonPoTemplateItemsDto : dto.getNonPoTemplateItems()) {
-				nonPoTemplateItemsService.updateNonPoTemplateItems(nonPoTemplateItemsDto);
+			ResponseDto getResponse = updateNonPoTemplate(dto.getNonPoTemplate());
+			if(getResponse.getCode().equals(ApplicationConstants.CODE_FAILURE)){
+				response.setCode(ApplicationConstants.CODE_FAILURE);
+				response.setStatus(ApplicationConstants.FAILURE);
+				response.setMessage(dto.getNonPoTemplate().getTemplateName() + " already exists.");
+				return response;
+			}
+			List<String> templateId = new ArrayList<String>();
+			templateId.add(dto.getNonPoTemplate().getTemplateId());
+			Integer delTemplateItems = nonPoTemplateItemsRepository.deleteNonPoTemplateItemsDo(templateId);
+//			for (NonPoTemplateItemsDto nonPoTemplateItemsDto : dto.getNonPoTemplateItems()) {
+//				nonPoTemplateItemsService.updateNonPoTemplateItems(nonPoTemplateItemsDto);
+//			}
+			for (NonPoTemplateItemsDto item : dto.getNonPoTemplateItems()) {
+				item.setTemplateId(dto.getNonPoTemplate().getTemplateId());
+				nonPoTemplateItemsService.saveNonPoTemplateItems(item);
 			}
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
@@ -246,7 +274,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		} catch (Exception e) {
 			response.setCode(ApplicationConstants.CODE_FAILURE);
 			response.setStatus(ApplicationConstants.FAILURE);
-			response.setMessage(dto.getNonPoTemplate().getTemplateName() + " " + ApplicationConstants.UPDATE_FAILURE);
+			response.setMessage(dto.getNonPoTemplate().getTemplateName() + " " + ApplicationConstants.UPDATE_FAILURE+ " due to " + e.getMessage());
 			return response;
 		}
 
@@ -270,31 +298,34 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplate();
 
 		List<AllocationDto> res = new ArrayList<AllocationDto>();
-		Object obj1[]=is.get(0);
-		String templateId=(String)obj1[0];
-		String accNumber=(String)obj1[1];
-		String acNumber=accNumber;
-		for(int i=1;i<is.size();i++){
-			Object iObj1[]=is.get(i);
-			String iTemplateId=(String)iObj1[0];
-			String iAccNumber=(String)iObj1[1];
-			
-
-			if(iTemplateId.equalsIgnoreCase(templateId)&&(!acNumber.equalsIgnoreCase("*"))){
-				if(!accNumber.equalsIgnoreCase(iAccNumber)){
-					acNumber="*";
-				}
-			}
-			else if(!iTemplateId.equalsIgnoreCase(templateId)){
-				String templateName = nonPoTemplateRepository.getById(templateId);
-				res.add(new AllocationDto(templateName,templateId,acNumber));
-				acNumber=iAccNumber;
-				accNumber=iAccNumber;
-				templateId=iTemplateId;
-			}
+//		Object obj1[]=is.get(0);
+//		String templateId=(String)obj1[0];
+//		String accNumber=(String)obj1[1];
+//		String acNumber=accNumber;
+//		for(int i=1;i<is.size();i++){
+//			Object iObj1[]=is.get(i);
+//			String iTemplateId=(String)iObj1[0];
+//			String iAccNumber=(String)iObj1[1];
+//			
+//
+//			if(iTemplateId.equalsIgnoreCase(templateId)&&(!acNumber.equalsIgnoreCase("*"))){
+//				if(!accNumber.equalsIgnoreCase(iAccNumber)){
+//					acNumber="*";
+//				}
+//			}
+//			else if(!iTemplateId.equalsIgnoreCase(templateId)){
+//				String templateName = nonPoTemplateRepository.getById(templateId);
+//				res.add(new AllocationDto(templateName,templateId,acNumber));
+//				acNumber=iAccNumber;
+//				accNumber=iAccNumber;
+//				templateId=iTemplateId;
+//			}
+//		}
+//		String templateName = nonPoTemplateRepository.getById(templateId);
+//		res.add(new AllocationDto(templateName,templateId,acNumber));
+		for(Object[] obj : is){
+			res.add(new AllocationDto(String.valueOf(obj[2]), String.valueOf(obj[0]), String.valueOf(obj[1])));
 		}
-		String templateName = nonPoTemplateRepository.getById(templateId);
-		res.add(new AllocationDto(templateName,templateId,acNumber));
 		
 		return res;
 	

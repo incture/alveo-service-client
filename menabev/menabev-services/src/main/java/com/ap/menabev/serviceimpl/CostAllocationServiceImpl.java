@@ -118,8 +118,9 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 				
 				
 			}
+			allTempDto.setAmount(dto.getAmount());
 			allTempDto.setTemplateId(dto.getTemplateId());
-		//	allTempDto.setTemplateName(dto.getTemplateName());
+			allTempDto.setTemplateName(dto.getTemplateName());
 			allTempDto.setCostAllocationList(costAllocationList);
 			allTempDtoList.add(allTempDto);
 		}

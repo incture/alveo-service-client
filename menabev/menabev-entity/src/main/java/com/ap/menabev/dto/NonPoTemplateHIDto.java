@@ -8,6 +8,7 @@ import lombok.Data;
 
 public @Data class NonPoTemplateHIDto {
 	NonPoTemplateDto  nonPoTemplate;
+	String accountNo;
 	List<NonPoTemplateItemsDto> nonPoTemplateItems;
 
 	public NonPoTemplateHIDto(NonPoTemplateDto nonPoTemplate, List<NonPoTemplateItemsDto> nonPoTemplateItems) {
