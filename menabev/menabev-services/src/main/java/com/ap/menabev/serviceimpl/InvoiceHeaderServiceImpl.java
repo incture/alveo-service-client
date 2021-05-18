@@ -1,26 +1,47 @@
-package com.ap.menabev.serviceimpl;
+  package com.ap.menabev.serviceimpl;
 
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.ap.menabev.dto.AttachmentDto;
-import com.ap.menabev.dto.CommentDto;
+import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
+import com.ap.menabev.dto.CostAllocationDto;
+import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
@@ -28,15 +49,17 @@ import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
-import com.ap.menabev.dto.InvoiceItemDashBoardDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.MasterResponseDto;
-import com.ap.menabev.dto.MessageDto;
 import com.ap.menabev.dto.ResponseDto;
+import com.ap.menabev.dto.RuleInputDto;
+import com.ap.menabev.dto.RuleInputProcessLeadDto;
 import com.ap.menabev.dto.StatusCountDto;
-import com.ap.menabev.entity.AttachmentDo;
-import com.ap.menabev.entity.CommentDo;
+import com.ap.menabev.dto.TriggerWorkflowContext;
+import com.ap.menabev.dto.WorkflowContextDto;
+import com.ap.menabev.entity.CostAllocationDo;
 import com.ap.menabev.entity.InvoiceHeaderDo;
+import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
 import com.ap.menabev.entity.InvoiceItemDo;
 import com.ap.menabev.entity.StatusConfigDo;
 import com.ap.menabev.invoice.AttachmentRepository;
@@ -49,8 +72,14 @@ import com.ap.menabev.invoice.ReasonForRejectionRepository;
 import com.ap.menabev.invoice.StatusConfigRepository;
 import com.ap.menabev.service.InvoiceHeaderService;
 import com.ap.menabev.service.InvoiceItemService;
+import com.ap.menabev.service.RuleConstants;
 import com.ap.menabev.util.ApplicationConstants;
+import com.ap.menabev.util.DestinationReaderUtil;
+import com.ap.menabev.util.HelperClass;
+import com.ap.menabev.util.MenabevApplicationConstant;
+import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.ServiceUtil;
+import com.ap.menabev.util.ResponseStatus;
 
 @Service
 public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
@@ -67,6 +96,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	InvoiceHeaderRepository invoiceHeaderRepository;
 	@Autowired
 	InvoiceItemRepository invoiceItemRepository;
+	@Autowired
+	CostAllocationRepository costAllocationRepository;
 
 	@Autowired
 	EmailServiceImpl emailServiceImpl;
@@ -107,6 +138,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	@Autowired
 	InvoiceItemAcctAssignmentServiceImpl invoiceItemAcctAssignmentServiceImpl;
 
+	
+	public static final String CONTENT_TYPE = "Content-Type";
+	public static final String AUTHORIZATION = "Authorization";
 
 	public InvoiceHeaderDo save(InvoiceHeaderDto dto) {
 		InvoiceHeaderDo invoiceHeader = new InvoiceHeaderDo();
@@ -140,6 +174,111 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 	}
 
+	
+	
+	// create invoice for PO/NON po 
+	@Override
+	public ResponseEntity<?> save(CreateInvoiceHeaderDto invoiceDto){
+		try{
+		// save invoice Header 
+	    InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
+	   // non po than false
+	    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
+		// save invoice item 
+		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemDto(), InvoiceItemDo.class);
+		itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		 invoiceItemRepository.saveAll(itemlists);
+		// save invoice Account Assingment 
+		List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
+		listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
+		// save cost allocation
+		List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
+		listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		costAllocationRepository.saveAll(listCostAllocation);
+		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
+		}catch (Exception e){
+			
+			return new ResponseEntity<String>("Failed due to "+e.toString(),HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	//Submit invoice 
+	@Override
+	public ResponseEntity<?> submitForNonPo(CreateInvoiceHeaderDto invoiceDto){
+		try{
+			// Flow is for Non PO Accountant created invoice 
+			// Determine RUle for Process lead 
+			AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
+			determination.setCompCode(invoiceDto.getInvoiceHeaderDto().getCompCode());
+			determination.setProcessLeadCheck("Process Lead");
+			determination.setVednorId(invoiceDto.getInvoiceHeaderDto().getVendorId());
+			//triggerRuleService(determination);
+			// save invoice header
+			
+    			// Trigger worklfow , which will direct to process lead 
+			TriggerWorkflowContext context = new TriggerWorkflowContext();
+			context.setRequestId("APA0001");
+			context.setInvoiceReferenceNumber("5420001");
+			context.setNonPo(true);
+			context.setManualNonPo(true);
+			context.setAccountantGroup("APADev@incture.com");
+			context.setAccountantUser("arun.gauda@incture.com");
+			context.setProcessLead("arun.gauda@incture.com");
+		ResponseEntity<?> response  = triggerWorkflow((WorkflowContextDto)context,"triggerresolutionworkflow.triggerresolutionworkflow");
+		System.err.println("response of workflow Trigger "+response);
+		
+		 InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
+		    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
+		// save invoice item 
+		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemDto(), InvoiceItemDo.class);
+		itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		 invoiceItemRepository.saveAll(itemlists);
+		// save invoice Account Assingment 
+		List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
+		listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
+		// save cost allocation
+		List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
+		listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		costAllocationRepository.saveAll(listCostAllocation);
+		// Update the Activity Log table 
+		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
+		}catch (Exception e){
+			
+			return new ResponseEntity<String>("Failed due to "+e.toString(),HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	// getInvoiceDetails based on requestId
+	public ResponseEntity<?> getInvoiceDetails(String requestId){
+		try {
+			CreateInvoiceHeaderDto invoiceHeadDto =new  CreateInvoiceHeaderDto();
+		   // get InvoiceHeader
+		  InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
+		  InvoiceHeaderDto invoiceHeaderDto  =  ObjectMapperUtils.map(invoiceHeaderDo,InvoiceHeaderDto.class);   
+		  // get InvoiceItem
+		   List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
+		   List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
+	      // get AccountAssignment
+		   List<InvoiceItemAcctAssignmentDo>  invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository.getByRequestId(requestId); 
+		     List<InvoiceItemAcctAssignmentDto>    invoiceItemAcctAssignmentdtoList = ObjectMapperUtils.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
+		   // get CostAllocation
+		   List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
+		        List<CostAllocationDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
+		  
+		        invoiceHeadDto.setInvoiceHeaderDto(invoiceHeaderDto);
+		        invoiceHeadDto.setInvoiceItemDto(invoiceItemDtoList);
+		        invoiceHeadDto.setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
+		        invoiceHeadDto.setCostAllocationDto(costAllocationDto);
+		    return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceHeadDto,HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<String>("Failed due to "+e,HttpStatus.INTERNAL_SERVER_ERROR);
+			
+		}
+		        
+	}
 	@Override
 	public List<InvoiceHeaderDto> getAll() {
 		List<InvoiceHeaderDto> list = new ArrayList<>();
@@ -187,8 +326,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 	}
 
-	@Autowired
-	CostAllocationRepository costAllocationRepository;
+	
 
 	@Override
 	public InboxDto findPaginated(int pageNo, int limit) {
@@ -822,6 +960,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	}
 
 	
+	
 
 //	 public static void main(String[] args) {
 //	 InvoiceHeaderDto obj = new InvoiceHeaderDto();
@@ -831,4 +970,220 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //	 obj2=m.map(obj, EInvoiceHeaderDto.class);
 //	 System.out.println(obj2.getSapInvoiceNumber());
 //	 }
+	
+	
+	// ----------   
+	
+public ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination) throws ClientProtocolException, IOException, URISyntaxException{
+		
+		RuleInputProcessLeadDto ruleInput = new RuleInputProcessLeadDto();
+		
+		ruleInput.setCompCode(determination.getCompCode());
+		ruleInput.setProcessLeadCheck(determination.getProcessLeadCheck());
+		ruleInput.setVendorId(determination.getVednorId());
+		
+		
+		String outPut = execute((RuleInputDto) ruleInput ,RuleConstants.menaBevRuleService);
+		
+		
+	   // call convert statement and than get the ouput and return it .
+		
+	
+		
+		
+		
+		return null;
+		
+	}
+
+/*@Override
+public List<RuleOutputDto> convertFromJSonNodeRo(String node){
+	List<ApproverDataOutputDto> approverList = new ArrayList<>();
+	JSONObject jObj = new JSONObject(node);
+	JSONArray arr = jObj.getJSONArray("Result");
+	JSONArray innerArray = null;
+	if(!arr.isNull(0))
+		innerArray = arr.getJSONObject(0).getJSONArray("ReturnOrderRuleOutput");
+	
+	if(innerArray!=null) {
+	for (int i = 0; i < innerArray.length(); i++) {
+		Map<String,String> userMap = new HashMap<String,String>();
+		 form map to add userDetails
+
+	}
+	return approverList;
+	}
+
+return null;
+}*/
+	
+	
+	protected String execute(RuleInputDto input, String rulesServiceId) throws ClientProtocolException, IOException, URISyntaxException {
+
+		HttpContext httpContext = new BasicHttpContext();
+		httpContext.setAttribute(HttpClientContext.COOKIE_STORE, new BasicCookieStore());
+		HttpPost httpPost = null;
+		CloseableHttpResponse response = null;
+		CloseableHttpClient httpClient = null;
+		httpClient = getHTTPClient();
+		
+		// need to set still the ruleServiceId and than , process the output.
+		
+		String jwToken = getJwtTokenForAuthenticationForRulesSapApi();
+		System.err.println("map for rulesToken : " +jwToken);
+		httpPost = new HttpPost(RuleConstants.RULE_BASE_URL);
+		httpPost.addHeader(CONTENT_TYPE, "application/json");
+
+		httpPost.addHeader(AUTHORIZATION, "Bearer " +jwToken); // header
+
+		String ruleInputString = input.toRuleInputString(rulesServiceId);
+		StringEntity stringEntity = new StringEntity(ruleInputString);
+
+		httpPost.setEntity(stringEntity);
+
+		response = httpClient.execute(httpPost);
+		System.err.println("response : " +response);
+
+		// process your response here
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		InputStream inputStream = response.getEntity().getContent();
+		byte[] data = new byte[1024];
+		int length = 0;
+		while ((length = inputStream.read(data)) > 0) {
+			bytes.write(data, 0, length);
+		}
+		String respBody = new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+		// clean-up sessions
+		if (httpPost != null) {
+			httpPost.releaseConnection();
+		}
+		if (response != null) {
+			response.close();
+		}
+		if (httpClient != null) {
+			httpClient.close();
+		}
+		return respBody;
+	}
+	
+	public static String getJwtTokenForAuthenticationForRulesSapApi() throws URISyntaxException, IOException {
+		System.err.println("77 destination");
+		HttpClient client = HttpClientBuilder.create().build();
+		HttpPost httpPost = new HttpPost(RuleConstants.RULE_BASE_URL);
+		httpPost.addHeader("Content-Type", "application/json");
+		// Encoding username and password
+		String auth = HelperClass.encodeUsernameAndPassword(RuleConstants.RULE_CLIENT_ID,
+				RuleConstants.RULE_CLIENT_SECRETE);
+		httpPost.addHeader("Authorization", auth);
+		HttpResponse res = client.execute(httpPost);
+		System.err.println( " 92 rest" + res);
+		String data = HelperClass.getDataFromStream(res.getEntity().getContent());
+		if (res.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+			String jwtToken = new JSONObject(data).getString("access_token");
+			System.err.println("jwtProxyToken "+jwtToken);
+				return jwtToken;
+			}
+		return null;
+	}
+	
+	private static CloseableHttpClient getHTTPClient() {
+		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+		CloseableHttpClient httpClient = clientBuilder.build();
+		return httpClient;
+	}
+
+	// Trigger Workflow
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId){
+		try {
+			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+
+			HttpClient client = HttpClientBuilder.create().build();
+			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL +"/v1/workflow-instances";
+			HttpPost httpPost = new HttpPost(url);
+			httpPost.addHeader("Authorization", "Bearer " + token);
+			httpPost.addHeader("Content-Type", "application/json");
+			try {
+				String worklfowInputString = dto.toRuleInputString(definitionId);
+				StringEntity entity = new StringEntity(worklfowInputString);
+				entity.setContentType("application/json");
+				httpPost.setEntity(entity);
+				HttpResponse response = client.execute(httpPost);
+				System.err.println("WorkflowTriggerResponse ="+response);
+				if (response.getStatusLine().getStatusCode() == HttpStatus.ACCEPTED.value()) {
+					return new ResponseEntity(response, HttpStatus.ACCEPTED);
+				} else {
+					return new ResponseEntity(getDataFromStream(response.getEntity().getContent()),
+							HttpStatus.BAD_REQUEST);
+				}
+
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				return new ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR
+						);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	public static String getDataFromStream(InputStream stream) throws IOException {
+		StringBuilder dataBuffer = new StringBuilder();
+		BufferedReader inStream = new BufferedReader(new InputStreamReader(stream));
+		String data = "";
+
+		while ((data = inStream.readLine()) != null) {
+			dataBuffer.append(data);
+		}
+		inStream.close();
+		return dataBuffer.toString();
+	}
+
+	/*public ResponseEntity cancellingWorkflowUsingOauthClient(String workflowId) {
+
+		try {
+			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+
+			HttpClient client = HttpClientBuilder.create().build();
+
+			Map<String, Object> map = DestinationReaderUtil
+					.getDestination(DkshConstants.WORKFLOW_CLOSE_TASK_DESTINATION);
+			
+			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/workflow-instances/" + workflowId;
+			String payload = "{\"context\": {},\"status\":\"CANCELED\"}";
+
+			HttpPatch httpPatch = new HttpPatch(url);
+			httpPatch.addHeader("Authorization", "Bearer " + token);
+			httpPatch.addHeader("Content-Type", "application/json");
+
+			try {
+				StringEntity entity = new StringEntity(payload);
+				entity.setContentType("application/json");
+				httpPatch.setEntity(entity);
+				HttpResponse response = client.execute(httpPatch);
+
+				if (response.getStatusLine().getStatusCode() == HttpStatus.NO_CONTENT.value()) {
+					return new ResponseEntity("", HttpStatus.NO_CONTENT, "Workflow Task is cancelled",
+							ResponseStatus.SUCCESS);
+				} else {
+					return new ResponseEntity(getDataFromStream(response.getEntity().getContent()),
+							HttpStatus.BAD_REQUEST, "Task updating is failed", ResponseStatus.FAILED);
+				}
+
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				return new ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR,
+						DkshConstants.EXCEPTION_FAILED + e.getCause().getCause().getLocalizedMessage(),
+						ResponseStatus.FAILED);
+			}
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ResponseEntity("", HttpStatus.INTERNAL_SERVER_ERROR, DkshConstants.EXCEPTION_FAILED + e,
+					ResponseStatus.FAILED);
+		}
+
+	}*/
+	
 }

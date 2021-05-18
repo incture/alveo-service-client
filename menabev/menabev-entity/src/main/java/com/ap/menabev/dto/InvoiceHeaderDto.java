@@ -88,19 +88,14 @@ public class InvoiceHeaderDto {
 	private String balance;
 	private String reasonForRejection;//R1,R2,R3
 	private String rejectionText;//Duplicate Invoice,Vendor Id mismatch
-
 	private String createdByInDb;
 	private Long createdAtInDB;
 	private String updatedBy;
 	private Long updatedAt;
 	private Long postingDate;
-	
 	private String assignedTo;
-
 	private String accountNumber;
-	
 	private String disAmt;
-	
 	private String deposit;
 	private String subTotal;
 	private String clearingAccountingDocument;
@@ -109,22 +104,19 @@ public class InvoiceHeaderDto {
 	private String paymentBlock;
 	private String paymentBlockDesc;
 	private String accountingDoc;
-	
 	private String invoiceDateFrom;
 	private String invoiceDateTo;
-	
 	private Long postingDateFrom;
 	private Long postingDateTo;
-	
 	private String docStatus;
-	
 	private String filterFor;
 	private Boolean balanceCheck;
-
+	private  String validationStatus; /// Exception Status 
+	private String taskOwner;
+	private String forwaredTaskOwner;
+	private boolean isNonPoOrPo;
 	private List<InvoiceItemDto> invoiceItems;
-	
 	private List<AttachmentDto> attachments;
-	
 	private List<CommentDto> comments;
 	private String manualpaymentBlock;
 

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
+import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
@@ -64,5 +65,9 @@ public interface InvoiceHeaderService {
 	ResponseDto odataPaymentStatus(String sapInvoiceNumber);
 
 	InboxDto findNonDraftPaginated(int pageNo, int limit);
+	
+	ResponseEntity<?> save(CreateInvoiceHeaderDto invoiceDto);
+	
+	ResponseEntity<?> submitForNonPo(CreateInvoiceHeaderDto invoiceDto);
 
 }

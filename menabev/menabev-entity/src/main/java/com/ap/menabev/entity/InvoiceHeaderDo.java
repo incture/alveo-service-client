@@ -6,13 +6,19 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+import com.ap.menabev.sequences.InvoiceHeaderSequenceGenerator;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import com.ap.menabev.sequences.InvoiceItemSequenceGenerator;
 
 @ToString
 @Entity
@@ -25,18 +31,19 @@ public class InvoiceHeaderDo {
 	@Column(name = "ID")
 	private String id = UUID.randomUUID().toString();
 
-	// @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-	// "InvoiceHeader")
-	// @GenericGenerator(name = "InvoiceHeader", strategy =
-	// "com.incture.ap.sequences.InvoiceHeaderSequenceGenerator", parameters = {
-	// @Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value =
-	// "1"),
-	// @Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER,
-	// value = "APA-"),
-	// @Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER,
-	// value = "%06d"),
-	// @Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value =
-	// "INVOICE_HEADER_SEQ") })
+	 
+	 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
+        "InvoiceHeader")
+	 @GenericGenerator(name = "InvoiceHeader", strategy =
+	 "com.incture.ap.sequences.InvoiceHeaderSequenceGenerator", parameters = {
+	 @Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value =
+	  "1"),
+	 @Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER,
+     value = "APA-"),
+	 @Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER,
+	 value = "%06d"),
+	 @Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value =
+	 "INVOICE_HEADER_SEQ") })
 	@Column(name = "REQUEST_ID", nullable = false)
 	private String requestId; //0
 
@@ -52,7 +59,7 @@ public class InvoiceHeaderDo {
 	@Column(name = "COMP_CODE")
 	private String compCode;//7
 	@Column(name = "REF_DOC_NUM")
-	private Long refDocNum;//8
+	private Long refDocNum;//invoice ref number
 	@Column(name = "EXT_INV_NUM")
 	private String extInvNum;//1
 
@@ -155,12 +162,30 @@ public class InvoiceHeaderDo {
 	
 	@Column(name="BALANCE_CHECK")
 	private Boolean balanceCheck;
-
-	@Column(name="DOC_STATUS")
-	private String docStatus;
 	
 	@Column(name="MANUAL_PAYMENT_BLOCK")
 	private String manualpaymentBlock;
+	
+	@Column(name = "WORkFLOW_ID")
+	private String workflowId;
+	
+	@Column(name = "VALIDATION_STATUS")
+	private  String validationStatus; /// Exception Status 
+	
+	@Column(name ="TASK_OWNER")
+	private String taskOwner;
+	
+	@Column(name = "FORWARDED_TASK_OWNER")
+	private String forwaredTaskOwner;
+	
+	@Column(name = "IS_NON-PO_OR_PO")
+	private boolean isNonPoOrPo;
+	
+
+	
+	@Column(name="DOC_STATUS") // is Draft or Active 
+	private String docStatus;
+	
 
 	
 }

@@ -3,6 +3,7 @@ package com.ap.menabev.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
@@ -117,6 +119,18 @@ public class InvoiceHeaderController {
 	public ResponseDto odataPaymentStatus(@RequestBody String sapInvoiceNumber){
 		return headerService.odataPaymentStatus(sapInvoiceNumber);
 	}
+	
+	@PostMapping("/accountantSubmit")
+	public ResponseEntity<?> onAccountantNonPoSubmit(@RequestBody CreateInvoiceHeaderDto create){
+		return headerService.submitForNonPo(create);
+	}
+	
+	@PostMapping("/accountantSave")
+	public ResponseEntity<?> onAccountantNonPoSave(@RequestBody CreateInvoiceHeaderDto create){
+		return headerService.save(create);
+	}
+	
+	
 	
 
 

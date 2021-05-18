@@ -25,6 +25,10 @@ public interface InvoiceItemAcctAssignmentRepository extends JpaRepository<Invoi
 			+ "and iDo.itemId=:itemId and iDo.isDeleted=false")
 	List<InvoiceItemAcctAssignmentDo> get(@Param("requestId") String requestId,
 			@Param("itemId") String itemId);
+	
+	@Query(value = "select iDo from InvoiceItemAcctAssignmentDo iDo where  iDo.requestId=:requestId "
+			+" and iDo.isDeleted=false")
+	List<InvoiceItemAcctAssignmentDo> getByRequestId(@Param("requestId") String requestId);
 	@Transactional
 	@Modifying(clearAutomatically=true)
 	@Query(value="Delete from InvoiceItemAcctAssignmentDo iDo where iDo.requestId=:requestId and iDo.itemId=:itemId")
