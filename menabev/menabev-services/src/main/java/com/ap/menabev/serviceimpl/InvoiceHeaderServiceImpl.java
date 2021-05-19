@@ -185,7 +185,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	   // non po than false
 	    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
 		// save invoice item 
-		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemDto(), InvoiceItemDo.class);
+		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
 		itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
 		 invoiceItemRepository.saveAll(itemlists);
 		// save invoice Account Assingment 
@@ -232,7 +232,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		 InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
 		    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
 		// save invoice item 
-		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemDto(), InvoiceItemDo.class);
+		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
 		itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
 		 invoiceItemRepository.saveAll(itemlists);
 		// save invoice Account Assingment 
@@ -267,9 +267,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		   // get CostAllocation
 		   List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
 		        List<CostAllocationDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
-		  
 		        invoiceHeadDto.setInvoiceHeaderDto(invoiceHeaderDto);
-		        invoiceHeadDto.setInvoiceItemDto(invoiceItemDtoList);
+		        invoiceHeadDto.getInvoiceHeaderDto().setInvoiceItems(invoiceItemDtoList);
 		        invoiceHeadDto.setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
 		        invoiceHeadDto.setCostAllocationDto(costAllocationDto);
 		    return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceHeadDto,HttpStatus.OK);
