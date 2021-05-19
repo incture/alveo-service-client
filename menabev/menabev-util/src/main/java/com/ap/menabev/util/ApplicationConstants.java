@@ -5,7 +5,7 @@ public interface ApplicationConstants {
 	String ACCPAY_EMAIL_ID = "accpay@menabev.com";
 	String ACCPAY_EMAIL_PASSWORD = "MenaBev@123";
 	
-	// String CSU_EMAIL = "csu@menabev.com";
+	String CSU_SHARED_MAILBOX_ID = "csu@menabev.com";
 	String CSU_EMAIL = "dipanjan.baidya@incture.com";
 	String UPLOAD_INVOICE_TO_CSU_SUBJECT = "TEST UPLOAD INVOICE";
 	
