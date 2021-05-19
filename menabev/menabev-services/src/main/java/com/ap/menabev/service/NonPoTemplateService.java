@@ -2,6 +2,7 @@ package com.ap.menabev.service;
 
 
 
+import java.io.IOException;
 import java.util.List;
 
 import com.ap.menabev.dto.AllocationDto;
@@ -26,5 +27,7 @@ public interface NonPoTemplateService {
 	ResponseDto delete(List<String> templateId);
 
 	List<AllocationDto> selectNonPoTemplate();
+
+	ResponseDto postNonPoItemsToSAP() throws IOException;
 
 }

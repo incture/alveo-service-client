@@ -1,5 +1,6 @@
 package com.ap.menabev.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,11 @@ public class NonPoTemplateController {
 	@GetMapping("/selectNonPoTemplate")
 	public List<AllocationDto> selectNonPoTemplate(){
 		return nonPoTemplateService.selectNonPoTemplate();
+	}
+	
+	@PostMapping("/postNonPoItemsToSap")
+	public ResponseDto postNonPoItemsToSAP() throws IOException{
+		return nonPoTemplateService.postNonPoItemsToSAP();
 	}
     
 }

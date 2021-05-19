@@ -19,4 +19,5 @@ public @Data class NonPoTemplateDto {
 	private Date createdAt;
 	private String updatedBy;
 	private Date updatedAt;
+	private String accountNo;
 }
