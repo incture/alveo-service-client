@@ -3,6 +3,7 @@ package com.ap.menabev.service;
 
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import com.ap.menabev.dto.AllocationDto;
@@ -28,6 +29,6 @@ public interface NonPoTemplateService {
 
 	List<AllocationDto> selectNonPoTemplate();
 
-	ResponseDto postNonPoItemsToSAP() throws IOException;
+	ResponseDto postNonPoItemsToSAP() throws IOException, URISyntaxException;
 
 }

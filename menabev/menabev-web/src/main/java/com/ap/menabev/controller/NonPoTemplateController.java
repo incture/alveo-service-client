@@ -1,6 +1,7 @@
 package com.ap.menabev.controller;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class NonPoTemplateController {
 	}
 	
 	@PostMapping("/postNonPoItemsToSap")
-	public ResponseDto postNonPoItemsToSAP() throws IOException{
+	public ResponseDto postNonPoItemsToSAP() throws IOException, URISyntaxException{
 		return nonPoTemplateService.postNonPoItemsToSAP();
 	}
     
