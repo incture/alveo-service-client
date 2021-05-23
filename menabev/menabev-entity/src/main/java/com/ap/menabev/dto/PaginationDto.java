@@ -7,9 +7,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NonPoTemplateFilterDto {
+public class PaginationDto {
 
-	String templateId;
-	String accountNo;
-	PaginationDto pagination;
+	int limit;
+	int offset;
 }

@@ -18,7 +18,7 @@ public interface NonPoTemplateService {
 	ResponseDto saveNonPoTemplate(NonPoTemplateHIDto dto);
 
 	List<NonPoTemplateHIDto> get(int limit,int offset);
-	List<NonPoTemplateHIDto> get(String templateId, String accountNo);
+	List<NonPoTemplateHIDto> get(String templateId, String accountNo,int limit,int offset);
 //	ResponseDto delete(Integer id);
 	ResponseDto updateNonPoTemplate(NonPoTemplateDto dto);
 //	NonPoTemplateHIDto get
