@@ -56,4 +56,8 @@ public interface NonPoTemplateRepository extends JpaRepository<NonPoTemplateDo, 
 
 	@Query(value = "select count(*) from MENABEVD.NON_PO_TEMPLATE  " ,nativeQuery = true )
 	public Integer getCount();
+
+	@Query(value = "select * from MENABEVD.NON_PO_TEMPLATE where Template_Name in ?1 order by created_At desc limit ?2 offset ?3", nativeQuery = true)
+	public List<NonPoTemplateDo> fetchAllByTemplateIdWithLimitandOffsetandtemplateName(List<String> getTemplateId,
+			Integer limit, Integer offset);
 }

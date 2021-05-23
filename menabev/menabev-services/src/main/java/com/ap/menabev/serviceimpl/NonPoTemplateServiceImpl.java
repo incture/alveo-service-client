@@ -197,10 +197,10 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				System.out.println("template Id::::"+getTemplateId);
 				List<NonPoTemplateDo> doList =new ArrayList<>();
 				if(!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)){
-					doList = nonPoTemplateRepository.fetchAllByTemplateIdWithLimitandOffset(getTemplateId,limit,offset);
+					doList = nonPoTemplateRepository.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(getTemplateId,limit,offset);
 				}
 				else{
-					doList = nonPoTemplateRepository.fetchAllByTemplateId(getTemplateId);
+					doList = nonPoTemplateRepository.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(getTemplateId,100,0);
 				}
 				NonPoTemplateHIDto nonPoTemplateHIDto;
 				List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(getTemplateId);
