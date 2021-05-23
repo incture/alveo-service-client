@@ -1,36 +1,15 @@
 package com.ap.menabev.serviceimpl;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.xml.bind.DatatypeConverter;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,29 +30,6 @@ import com.ap.menabev.service.NonPoTemplateItemsService;
 import com.ap.menabev.service.NonPoTemplateService;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 @Service
 public class NonPoTemplateServiceImpl implements NonPoTemplateService {
@@ -137,44 +93,125 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	}
 
 	@Override
-	public List<NonPoTemplateHIDto> get() {
+	public List<NonPoTemplateHIDto> get(String templateId, String accountNo) {
 		// TODO Auto-generated method stub
 		List<NonPoTemplateHIDto> list = new ArrayList<NonPoTemplateHIDto>();
 
 		ModelMapper modelMapper = new ModelMapper();
 		try {
 
-			List<NonPoTemplateDo> doList = nonPoTemplateRepository.fetchAll();
-			NonPoTemplateHIDto nonPoTemplateHIDto;
-			List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplate();
-			HashMap<String , String> accountNo = new HashMap<>();
-			for(Object[] obj : is){
-				accountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
-			}
-
-			for (NonPoTemplateDo nonPoTemplateDo : doList) {
-				NonPoTemplateDto nonPoTemplateDto = new NonPoTemplateDto();
-				nonPoTemplateDto = modelMapper.map(nonPoTemplateDo, NonPoTemplateDto.class);
-				List<NonPoTemplateItemsDo> nonPoTemplateItemsDoList = nonPoTemplateItemsRepository
-						.fetchNonPoTemplateItemsDo(nonPoTemplateDto.getTemplateId());
-				logger.error("[ApAutomation][NonPoTemplateServiceImpl][FetchNonPoData][Output] = "
-						+ nonPoTemplateItemsDoList.toString());
-
-				List<NonPoTemplateItemsDto> nonPoTemplateItemsDtoList = new ArrayList<NonPoTemplateItemsDto>();
-				for (NonPoTemplateItemsDo nonPoTemplateItemsDo : nonPoTemplateItemsDoList) {
-
-					NonPoTemplateItemsDto nonPoTemplateItemsDto = new NonPoTemplateItemsDto();
-					nonPoTemplateItemsDto = modelMapper.map(nonPoTemplateItemsDo, NonPoTemplateItemsDto.class);
-
-					// nonPoTemplateItemsDtoList.add(modelMapper.map(nonPoTemplateItemsDo,
-					// NonPoTemplateItemsDto.class));
-					nonPoTemplateItemsDtoList.add(nonPoTemplateItemsDto);
+			if(ServiceUtil.isEmpty(templateId) && ServiceUtil.isEmpty(accountNo)){
+				System.out.println("Both Null");
+				List<NonPoTemplateDo> doList = nonPoTemplateRepository.fetchAll();
+				NonPoTemplateHIDto nonPoTemplateHIDto;
+				List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplate();
+				HashMap<String , String> getAccountNo = new HashMap<>();
+				for(Object[] obj : is){
+					getAccountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
 				}
-                nonPoTemplateDto.setAccountNo(accountNo.get(nonPoTemplateDto.getTemplateId()));
-				nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
-				list.add(nonPoTemplateHIDto);
-				// nonPoTemplateItemsDtoList.clear();
 
+				for (NonPoTemplateDo nonPoTemplateDo : doList) {
+					NonPoTemplateDto nonPoTemplateDto = new NonPoTemplateDto();
+					nonPoTemplateDto = modelMapper.map(nonPoTemplateDo, NonPoTemplateDto.class);
+					List<NonPoTemplateItemsDo> nonPoTemplateItemsDoList = nonPoTemplateItemsRepository
+							.fetchNonPoTemplateItemsDo(nonPoTemplateDto.getTemplateId());
+					logger.error("[ApAutomation][NonPoTemplateServiceImpl][FetchNonPoData][Output] = "
+							+ nonPoTemplateItemsDoList.toString());
+
+					List<NonPoTemplateItemsDto> nonPoTemplateItemsDtoList = new ArrayList<NonPoTemplateItemsDto>();
+					for (NonPoTemplateItemsDo nonPoTemplateItemsDo : nonPoTemplateItemsDoList) {
+
+						NonPoTemplateItemsDto nonPoTemplateItemsDto = new NonPoTemplateItemsDto();
+						nonPoTemplateItemsDto = modelMapper.map(nonPoTemplateItemsDo, NonPoTemplateItemsDto.class);
+
+						// nonPoTemplateItemsDtoList.add(modelMapper.map(nonPoTemplateItemsDo,
+						// NonPoTemplateItemsDto.class));
+						nonPoTemplateItemsDtoList.add(nonPoTemplateItemsDto);
+					}
+	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
+					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					list.add(nonPoTemplateHIDto);
+					// nonPoTemplateItemsDtoList.clear();
+				}
+				
+			}
+			else if(ServiceUtil.isEmpty(templateId)){
+				System.out.println("templateId is null");
+				List<String> getTemplateId = nonPoTemplateItemsRepository.getTemplateId(accountNo);
+				System.out.println("List of template Id:::::" +getTemplateId);
+				List<NonPoTemplateDo> doList = nonPoTemplateRepository.fetchAllByTemplateId(getTemplateId);
+				NonPoTemplateHIDto nonPoTemplateHIDto;
+				List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(getTemplateId);
+				HashMap<String , String> getAccountNo = new HashMap<>();
+				for(Object[] obj : is){
+					getAccountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
+				}
+
+				for (NonPoTemplateDo nonPoTemplateDo : doList) {
+					NonPoTemplateDto nonPoTemplateDto = new NonPoTemplateDto();
+					nonPoTemplateDto = modelMapper.map(nonPoTemplateDo, NonPoTemplateDto.class);
+					List<NonPoTemplateItemsDo> nonPoTemplateItemsDoList = nonPoTemplateItemsRepository
+							.fetchNonPoTemplateItemsDo(nonPoTemplateDto.getTemplateId());
+					logger.error("[ApAutomation][NonPoTemplateServiceImpl][FetchNonPoData][Output] = "
+							+ nonPoTemplateItemsDoList.toString());
+
+					List<NonPoTemplateItemsDto> nonPoTemplateItemsDtoList = new ArrayList<NonPoTemplateItemsDto>();
+					for (NonPoTemplateItemsDo nonPoTemplateItemsDo : nonPoTemplateItemsDoList) {
+
+						NonPoTemplateItemsDto nonPoTemplateItemsDto = new NonPoTemplateItemsDto();
+						nonPoTemplateItemsDto = modelMapper.map(nonPoTemplateItemsDo, NonPoTemplateItemsDto.class);
+
+						// nonPoTemplateItemsDtoList.add(modelMapper.map(nonPoTemplateItemsDo,
+						// NonPoTemplateItemsDto.class));
+						nonPoTemplateItemsDtoList.add(nonPoTemplateItemsDto);
+					}
+	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
+					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					list.add(nonPoTemplateHIDto);
+					// nonPoTemplateItemsDtoList.clear();
+				}
+				
+			
+			}
+			else{
+                System.out.println("Account no is null");
+				List<String> getTemplateId = new ArrayList<>();
+				getTemplateId.add(templateId);
+				System.out.println("template Id::::"+getTemplateId);
+				List<NonPoTemplateDo> doList = nonPoTemplateRepository.fetchAllByTemplateId(getTemplateId);
+				NonPoTemplateHIDto nonPoTemplateHIDto;
+				List<Object[]>is=nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(getTemplateId);
+				HashMap<String , String> getAccountNo = new HashMap<>();
+				for(Object[] obj : is){
+					getAccountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
+				}
+
+				for (NonPoTemplateDo nonPoTemplateDo : doList) {
+					NonPoTemplateDto nonPoTemplateDto = new NonPoTemplateDto();
+					nonPoTemplateDto = modelMapper.map(nonPoTemplateDo, NonPoTemplateDto.class);
+					List<NonPoTemplateItemsDo> nonPoTemplateItemsDoList = nonPoTemplateItemsRepository
+							.fetchNonPoTemplateItemsDo(nonPoTemplateDto.getTemplateId());
+					logger.error("[ApAutomation][NonPoTemplateServiceImpl][FetchNonPoData][Output] = "
+							+ nonPoTemplateItemsDoList.toString());
+
+					List<NonPoTemplateItemsDto> nonPoTemplateItemsDtoList = new ArrayList<NonPoTemplateItemsDto>();
+					for (NonPoTemplateItemsDo nonPoTemplateItemsDo : nonPoTemplateItemsDoList) {
+
+						NonPoTemplateItemsDto nonPoTemplateItemsDto = new NonPoTemplateItemsDto();
+						nonPoTemplateItemsDto = modelMapper.map(nonPoTemplateItemsDo, NonPoTemplateItemsDto.class);
+
+						// nonPoTemplateItemsDtoList.add(modelMapper.map(nonPoTemplateItemsDo,
+						// NonPoTemplateItemsDto.class));
+						nonPoTemplateItemsDtoList.add(nonPoTemplateItemsDto);
+					}
+	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
+					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					list.add(nonPoTemplateHIDto);
+					// nonPoTemplateItemsDtoList.clear();
+				}
+				
+			
+			
 			}
 		} catch (Exception e) {
 			System.err.println("Exception :" + e.getMessage());

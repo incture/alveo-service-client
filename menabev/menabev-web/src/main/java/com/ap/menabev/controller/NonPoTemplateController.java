@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ap.menabev.dto.AllocationDto;
+import com.ap.menabev.dto.NonPoTemplateFilterDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
 import com.ap.menabev.service.NonPoTemplateService;
@@ -39,9 +40,9 @@ public class NonPoTemplateController {
 //    @GetMapping("/getTemplate/{templateId}")
 //    public NonPoTemplateHIDto
     
-	@GetMapping("/getAll")
-	public List<NonPoTemplateHIDto> get() {
-		return nonPoTemplateService.get();
+	@PostMapping("/getAll")
+	public List<NonPoTemplateHIDto> get(@RequestBody NonPoTemplateFilterDto filterDto) {
+		return nonPoTemplateService.get(filterDto.getTemplateId(),filterDto.getAccountNo());
 	}
 	@GetMapping("/getAll/{limit}/{offset}")
 	public List<NonPoTemplateHIDto> get(@PathVariable int limit,@PathVariable int offset) {

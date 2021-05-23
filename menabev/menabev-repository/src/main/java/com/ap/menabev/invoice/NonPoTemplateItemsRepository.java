@@ -61,6 +61,22 @@ public interface NonPoTemplateItemsRepository extends JpaRepository<NonPoTemplat
 	@Query(value=selectNonPoTemplateQuery,nativeQuery=true)
 	public List<Object[]> selectNonPoTemplate();
 
+	@Query("select distinct id.templateId from NonPoTemplateItemsDo id where  id.accountNo =?1")
+	public List<String> getTemplateId(String accountNo);
+
+	String selectNonPoTemplateQueryById = "select distinct  t.TEMPLATE_ID, "
+            + "case when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS t2 where "
+            + "t2.TEMPLATE_ID =t.TEMPLATE_ID) =1 then  (t.ACCOUNT_NO) "
+            + "when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS "
+            + "t2 where t2.TEMPLATE_ID =t.TEMPLATE_ID) >1 then '*' "
+            + " end as accountNo, "
+            + "(select TEMPLATE_NAME from NON_PO_TEMPLATE where TEMPLATE_ID =t.TEMPLATE_ID) "
+            + " as TemplateName "
+            + "from NON_PO_TEMPLATE_ITEMS t where t.TEMPLATE_ID in ?1 "
+            + "order by t.TEMPLATE_ID desc";
+	@Query(value=selectNonPoTemplateQueryById,nativeQuery=true)
+	public List<Object[]> selectNonPoTemplateByTemplateId(List<String> getTemplateId);
+
 	
 //	String getAccountQuery = "select "
 //            + "case when (select count(distinct(t2.ACCOUNT_NO))  from NON_PO_TEMPLATE_ITEMS t2 where "
