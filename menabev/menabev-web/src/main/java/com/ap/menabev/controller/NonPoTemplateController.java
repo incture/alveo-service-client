@@ -42,7 +42,7 @@ public class NonPoTemplateController {
     
 	@PostMapping("/getAll")
 	public List<NonPoTemplateHIDto> get(@RequestBody NonPoTemplateFilterDto filterDto) {
-		return nonPoTemplateService.get(filterDto.getTemplateId(),filterDto.getAccountNo(),filterDto.getPagination().getLimit(),filterDto.getPagination().getOffset());
+		return nonPoTemplateService.get(filterDto.getTemplateName(),filterDto.getAccountNo(),filterDto.getPagination().getLimit(),filterDto.getPagination().getOffset());
 	}
 	@GetMapping("/getAll/{limit}/{offset}")
 	public List<NonPoTemplateHIDto> get(@PathVariable int limit,@PathVariable int offset) {

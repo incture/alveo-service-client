@@ -93,14 +93,15 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	}
 
 	@Override
-	public List<NonPoTemplateHIDto> get(String templateId, String accountNo,int limit,int offset) {
+	public List<NonPoTemplateHIDto> get(String templateName, String accountNo,Integer limit,Integer offset) {
 		// TODO Auto-generated method stub
+		Integer count  = nonPoTemplateRepository.getCount();
 		List<NonPoTemplateHIDto> list = new ArrayList<NonPoTemplateHIDto>();
 
 		ModelMapper modelMapper = new ModelMapper();
 		try {
 
-			if(ServiceUtil.isEmpty(templateId) && ServiceUtil.isEmpty(accountNo)){
+			if(ServiceUtil.isEmpty(templateName) && ServiceUtil.isEmpty(accountNo)){
 				System.out.println("Both Null");
 				List<NonPoTemplateDo> doList =new ArrayList<>();
 				if(!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)){
@@ -137,12 +138,13 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 					}
 	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
 					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					nonPoTemplateHIDto.setCount(count);
 					list.add(nonPoTemplateHIDto);
 					// nonPoTemplateItemsDtoList.clear();
 				}
 				
 			}
-			else if(ServiceUtil.isEmpty(templateId)){
+			else if(ServiceUtil.isEmpty(templateName)){
 				System.out.println("templateId is null");
 				List<String> getTemplateId = nonPoTemplateItemsRepository.getTemplateId(accountNo);
 				System.out.println("List of template Id:::::" +getTemplateId);
@@ -181,6 +183,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 					}
 	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
 					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					nonPoTemplateHIDto.setCount(count);
 					list.add(nonPoTemplateHIDto);
 					// nonPoTemplateItemsDtoList.clear();
 				}
@@ -190,7 +193,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 			else if(ServiceUtil.isEmpty(accountNo)){
                 System.out.println("Account no is null");
 				List<String> getTemplateId = new ArrayList<>();
-				getTemplateId.add(templateId);
+				getTemplateId.add(templateName);
 				System.out.println("template Id::::"+getTemplateId);
 				List<NonPoTemplateDo> doList =new ArrayList<>();
 				if(!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)){
@@ -226,6 +229,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 					}
 	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
 					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					nonPoTemplateHIDto.setCount(count);
 					list.add(nonPoTemplateHIDto);
 					// nonPoTemplateItemsDtoList.clear();
 				}
@@ -233,7 +237,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 			else{
 
                 System.out.println("Both Are Present");
-				List<String> getTemplateId = nonPoTemplateItemsRepository.gettemplateIdByAccountNo(templateId,accountNo);
+				List<String> getTemplateId = nonPoTemplateItemsRepository.gettemplateIdByAccountNo(templateName,accountNo);
 				System.out.println("template Id::::"+getTemplateId);
 				List<NonPoTemplateDo> doList =new ArrayList<>();
 				if(!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)){
@@ -269,6 +273,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 					}
 	                nonPoTemplateDto.setAccountNo(getAccountNo.get(nonPoTemplateDto.getTemplateId()));
 					nonPoTemplateHIDto = new NonPoTemplateHIDto(nonPoTemplateDto, nonPoTemplateItemsDtoList);
+					nonPoTemplateHIDto.setCount(count);
 					list.add(nonPoTemplateHIDto);
 					// nonPoTemplateItemsDtoList.clear();
 				}

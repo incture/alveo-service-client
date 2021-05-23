@@ -9,6 +9,8 @@ import lombok.Data;
 public @Data class NonPoTemplateHIDto {
 	NonPoTemplateDto  nonPoTemplate;
 	List<NonPoTemplateItemsDto> nonPoTemplateItems;
+	Integer count;
+	
 
 	public NonPoTemplateHIDto(NonPoTemplateDto nonPoTemplate, List<NonPoTemplateItemsDto> nonPoTemplateItems) {
 		super();

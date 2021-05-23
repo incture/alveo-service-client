@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class PaginationDto {
 
-	int limit;
-	int offset;
+	Integer limit;
+	Integer offset;
 }
