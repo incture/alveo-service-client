@@ -1,5 +1,8 @@
 package com.ap.menabev.serviceimpl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -10,6 +13,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -484,6 +491,67 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	public ResponseDto postNonPoItemsToSAP() throws IOException, URISyntaxException {
 	 return null;
 
+	}
+	
+	@Override
+	public List<NonPoTemplateItemsDto> uploadExcel(File file) throws IOException {
+		List<NonPoTemplateItemsDto> dto = new ArrayList<>();
+		FileInputStream fis = new FileInputStream(file);
+		XSSFWorkbook wb = new XSSFWorkbook(fis);
+		XSSFSheet sheet = wb.getSheetAt(0);
+		int i = 0;
+		
+		for(Row row : sheet) {
+			NonPoTemplateItemsDto newDto = new NonPoTemplateItemsDto();
+			
+			   for(int cn=0; cn<row.getLastCellNum(); cn++) {
+			       // If the cell is missing from the file, generate a blank one
+			       // (Works by specifying a MissingCellPolicy)
+			       Cell cell = row.getCell(cn, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+			       // Print the cell for debugging
+			       System.out.println("CELL: " + cn + " --> " + cell.toString());
+			       if(i!=0){
+			    	   if(cn==0){
+				    	   newDto.setGlAccount(cell.toString());
+				       }
+				       else if(cn==1){
+				    	   newDto.setAccountNo((cell.toString()));
+				       }
+				       else  if(cn==2){
+				    	   newDto.setCostCenter((cell.toString()));
+				       }
+				       else if(cn==3){
+				    	   newDto.setMaterialDescription((cell.toString()));
+				       }
+				       else if(cn==4){
+				    	   newDto.setCrDbIndicator((cell.toString()));
+				       }
+				       else if(cn==5){
+				    	   newDto.setItemText((cell.toString()));
+				       }
+				       else if(cn==6){
+				    	   newDto.setProfitCenter((cell.toString()));
+				       }
+				       else if(cn==5){
+				    	   newDto.setCompanyCode((cell.toString()));
+				       }
+				       else if(cn==7){
+				    	   newDto.setAllocationPercent((cell.toString()));
+				       }
+			    	   
+			    	   
+			       }
+			       
+			   }
+			   if(i!=0){
+				   dto.add(newDto);
+			   }
+			   i = i+1;
+			}
+
+		System.out.println(dto);
+
+		return dto;
 	}
 	
 }

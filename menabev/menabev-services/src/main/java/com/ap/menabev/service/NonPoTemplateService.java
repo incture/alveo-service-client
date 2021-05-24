@@ -2,6 +2,8 @@ package com.ap.menabev.service;
 
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -30,5 +32,7 @@ public interface NonPoTemplateService {
 	List<AllocationDto> selectNonPoTemplate();
 
 	ResponseDto postNonPoItemsToSAP() throws IOException, URISyntaxException;
+
+	List<NonPoTemplateItemsDto> uploadExcel(File file) throws FileNotFoundException, IOException;
 
 }

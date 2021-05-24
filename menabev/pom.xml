@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -27,6 +28,7 @@
 		<module>menabev-services</module>
 		<module>menabev-repository</module>
 		<module>menabev-entity</module>
+		<module>menabev-soap</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -146,22 +148,91 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore-nio</artifactId>
 		</dependency>
-		
+
 		<dependency>
-    <groupId>io.springfox</groupId>
-    <artifactId>springfox-swagger2</artifactId>
-    <version>2.6.1</version>
-    <scope>compile</scope>
-</dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.6.1</version>
+			<scope>compile</scope>
+		</dependency>
 
-<dependency>
-    <groupId>io.springfox</groupId>
-    <artifactId>springfox-swagger-ui</artifactId>
-    <version>2.6.1</version>
-    <scope>compile</scope>
-</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.6.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web-services</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.ws/spring-ws-core -->
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
+			<version>2.2.0.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-security</artifactId>
+			<version>3.0.9.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-support</artifactId>
+			<version>3.0.9.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wss4j</groupId>
+			<artifactId>wss4j-parent</artifactId>
+			<version>2.3.0</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.17</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.17</version>
+		</dependency>
 	</dependencies>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.13.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<!--<configuration> <generatePackage>com.ap.menabev.soap.journalcreatebinding</generatePackage> 
+					<generateDirectory>${project.basedir}/menabev-soap/src/main/java</generateDirectory> 
+					<schemaDirectory>${project.basedir}/menabev-soap/src/main/resources/wsdl</schemaDirectory> 
+					<schemaIncludes> <include>*.wsdl</include> </schemaIncludes> </configuration> -->
+			</plugin>
+		</plugins>
+	</build>
 
 
 
