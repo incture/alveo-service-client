@@ -14,6 +14,7 @@ public class SoapConfiguration {
 		Jaxb2Marshaller marshaller=new Jaxb2Marshaller();
 		marshaller.setPackagesToScan("com.ap.menabev.soap.journalcreatebinding");
 		return marshaller;
+		
 	}
 	
 	@Bean
