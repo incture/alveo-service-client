@@ -246,4 +246,11 @@ public class HelperClass {
 		return response.getAllHeaders();
 
 	}
+	
+	public static boolean checkString(String s) {
+		if (s == null || s.equals("") || s.trim().isEmpty() || s.matches("") || s.equals(null)) {
+			return true;
+		}
+		return false;
+	}
 }

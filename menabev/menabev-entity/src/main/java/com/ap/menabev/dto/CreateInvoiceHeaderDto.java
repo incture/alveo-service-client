@@ -10,5 +10,6 @@ public class CreateInvoiceHeaderDto {
 	private InvoiceHeaderDto invoiceHeaderDto;
 	private List<InvoiceItemAcctAssignmentDto> invoiceItemAcctAssignmentDto;
 	private List<CostAllocationDto> costAllocationDto;
+	private String responseStatus;
 
 }

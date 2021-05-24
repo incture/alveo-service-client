@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ap.menabev.dto.ClaimAndReleaseDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
+import com.ap.menabev.dto.FilterHeaderDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
@@ -46,6 +48,11 @@ public class InvoiceHeaderController {
 	public List<InvoiceHeaderDto> getAll() {
 		return headerService.getAll();
 	}
+	@GetMapping("/getInvoiceByRequestId/{requestId}")
+	public ResponseEntity<?> getByInvoiceRequestId(@PathVariable String requestId) {
+		return headerService.getInvoiceDetails(requestId);
+	}
+
 
 	@DeleteMapping("/delete/{id}")
 	public ResponseDto delete(@PathVariable Integer id) {
@@ -70,10 +77,14 @@ public class InvoiceHeaderController {
 		return headerService.findNonDraftPaginated(pageNo, limit);
 	}
 
-	@GetMapping("/eInvoice/{pageNo}/{limit}")
-	public InboxDto getEinvoiceByPageNo(@PathVariable  int pageNo,
-			@PathVariable  int limit) {
-		return headerService.findEinvoicePaginated(pageNo, limit);
+	@PostMapping("/inbox")
+	public ResponseEntity<?> getinboxTaskByPageNo(@RequestBody FilterHeaderDto dto) {
+		return headerService.getInboxTask(dto);
+	}
+	
+	@PostMapping("/claimOrRelease")
+	public ResponseEntity<?> claimAndRelease(@RequestBody ClaimAndReleaseDto dto){
+		return headerService.claimTaskOfUser(dto.getTaskID(),dto.getUserId(),dto.isClaim());
 	}
 
 
@@ -128,6 +139,7 @@ public class InvoiceHeaderController {
 	@PostMapping("/accountantSave")
 	public ResponseEntity<?> onAccountantNonPoSave(@RequestBody CreateInvoiceHeaderDto create){
 		return headerService.save(create);
+		
 	}
 	
 	

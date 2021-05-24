@@ -2,6 +2,8 @@ package com.ap.menabev.entity;
 
 
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,14 +25,13 @@ import lombok.Setter;
 public @Data class CostAllocationDo {
 
 	@Id
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CostDistribution")
-//	@GenericGenerator(name = "CostDistribution", strategy = "com.incture.ap.sequences.CostDistributionSequenceGenerator", parameters = {
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value = "1"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER, value = "CD-"),
+	/*@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CostDistribution")
+	@GenericGenerator(name = "CostDistribution", strategy = "com.incture.ap.sequences.CostDistributionSequenceGenerator", parameters = {
+			@Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value = "1"),			@Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER, value = "CD-"),
 //			@Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER, value = "%06d"),
 //			@Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value = "Cost_Distribution_SEQ") })
-	@Column(name = "COST_ALLOCATION_ID")
-	private String costAllocationId;
+*/	@Column(name = "COST_ALLOCATION_ID")
+	private String costAllocationId = UUID.randomUUID().toString();
 	
 	@Column(name = "REQUEST_ID", nullable = false)
     private String requestId; // (FK)
@@ -79,4 +80,7 @@ public @Data class CostAllocationDo {
 	
 	@Column(name="ITEM_TEXT")
 	private String itemText;
+	
+	@Column(name = "TAX_C0DE")
+	private String taxCode;
 }

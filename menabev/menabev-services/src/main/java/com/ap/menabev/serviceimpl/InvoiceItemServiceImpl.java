@@ -539,7 +539,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	                }
 	            
 	             
-	                newDo.setClearingDate(s);
+	                newDo.setClearingDate(new Long(s));
 	                newDo.setPaymentBlock(resultsArray.getJSONObject(i).getString("PaymentBlock"));
 	                newDo.setPaymentBlockDesc( resultsArray.getJSONObject(i).getString("PaymentBlockDesc"));
 	                newDo.setClearingAccountingDocument(resultsArray.getJSONObject(i).getString("ClearingAccountingDoc"));

@@ -1,5 +1,6 @@
 package com.ap.menabev.dto;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +16,6 @@ import lombok.ToString;
 @Setter
 public class InvoiceHeaderDto {
 
-	private String id = UUID.randomUUID().toString();
 
 	private String requestId;
 
@@ -31,9 +31,9 @@ public class InvoiceHeaderDto {
 
 	private String extInvNum;
 	// added for the tag in xml _InvoiceDate as discussed
-	private String invoiceDate;
+	private Long invoiceDate;
 	
-	private String dueDate;
+	private Long dueDate;
 
 	private String createdAt;
 
@@ -80,7 +80,9 @@ public class InvoiceHeaderDto {
 
 	private String createdAtTo;
 	
-	private String dueDateFrom;
+	private BigInteger createdOn;
+	
+	private Long dueDateFrom;
 	
 	private String dueDateTo;
 	
@@ -90,7 +92,7 @@ public class InvoiceHeaderDto {
 	private String rejectionText;//Duplicate Invoice,Vendor Id mismatch
 	private String createdByInDb;
 	private Long createdAtInDB;
-	private String updatedBy;
+	private Long updatedBy;
 	private Long updatedAt;
 	private Long postingDate;
 	private String assignedTo;
@@ -99,7 +101,7 @@ public class InvoiceHeaderDto {
 	private String deposit;
 	private String subTotal;
 	private String clearingAccountingDocument;
-	private String clearingDate;
+	private Long clearingDate;
 	private String paymentStatus;
 	private String paymentBlock;
 	private String paymentBlockDesc;
@@ -115,6 +117,8 @@ public class InvoiceHeaderDto {
 	private String taskOwner;
 	private String forwaredTaskOwner;
 	private boolean isNonPoOrPo;
+	private boolean isClaimed;
+	private String claimedUser;
 	private List<InvoiceItemDto> invoiceItems;
 	private List<AttachmentDto> attachments;
 	private List<CommentDto> comments;

@@ -18,7 +18,7 @@ import com.ap.menabev.entity.InvoiceHeaderDo;
 
 
 @Repository
-public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, Integer> {
+public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo,String> {
 
 	List<InvoiceHeaderDo> findByInvoiceDateBetween(String from, String to);
 
@@ -51,6 +51,12 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, 
 
 	@Query(value = "select ih from InvoiceHeaderDo ih where ih.requestId=:requestId")
 	InvoiceHeaderDo fetchInvoiceHeader(@Param("requestId") String requestId);
+	
+	 @Query("select e FROM InvoiceHeaderDo e WHERE e.requestId IN (:requestIds)")  
+	 List<InvoiceHeaderDo> findByRequestIdIn(@Param("requestIds")List<String> requestIds);
+	 
+	/*  @Query("SELECT e FROM INVOICE_HEADER e WHERE e. IN (:names)")     // 2. Spring JPA In cause using @Query
+	    List<Employee> findByEmployeeNames(@Param("names")List<String> names);*/
 
 	@Query(value = "select i from InvoiceHeaderDo i where i.requestId=:requestId")
 	InvoiceHeaderDo getInvoiceHeader(@Param("requestId") String requestId);
@@ -152,4 +158,6 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, 
 
 	@Query(value = "select rDo from InvoiceHeaderDo rDo where rDo.id =:id")
 	InvoiceHeaderDo getAllById(@Param("id")String id);
+
+	
 }

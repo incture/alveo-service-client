@@ -26,16 +26,11 @@ import lombok.ToString;
 @Getter
 @Setter
 public class InvoiceHeaderDo {
-
-	@Id
-	@Column(name = "ID")
-	private String id = UUID.randomUUID().toString();
-
-	 
+	 @Id
 	 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
         "InvoiceHeader")
 	 @GenericGenerator(name = "InvoiceHeader", strategy =
-	 "com.incture.ap.sequences.InvoiceHeaderSequenceGenerator", parameters = {
+	 "com.ap.menabev.sequences.InvoiceHeaderSequenceGenerator", parameters = {
 	 @Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value =
 	  "1"),
 	 @Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER,
@@ -61,14 +56,14 @@ public class InvoiceHeaderDo {
 	@Column(name = "REF_DOC_NUM")
 	private Long refDocNum;//invoice ref number
 	@Column(name = "EXT_INV_NUM")
-	private String extInvNum;//1
+	private String extInvNum;//  Invoice Number for NON po 
 
 	@Column(name = "DUE_DATE")
-	private String dueDate;//22
+	private Long dueDate;//22
 	
 	// added for the tag in xml _InvoiceDate as discussed.
 	@Column(name = "INVOICE_DATE")
-	private String invoiceDate;//23
+	private Long invoiceDate;//23
 	@Column(name = "CREATED_AT")
 	private String createdAt;//6
 	@Column(name = "VENDOR_ID")
@@ -127,7 +122,7 @@ public class InvoiceHeaderDo {
 	private Long createdAtInDB;
 
 	@Column(name = "UPDATED_BY")
-	private String updatedBy;
+	private Long updatedBy;
 
 	@Column(name = "UPDATED_AT")
 	private Long updatedAt;
@@ -149,7 +144,7 @@ public class InvoiceHeaderDo {
 	private String clearingAccountingDocument;
 	
 	@Column(name="CLEARING_DATE")
-	private String clearingDate;
+	private Long clearingDate;
 	
 	@Column(name="PAYMENT_STATUS")
 	private String paymentStatus;
@@ -180,8 +175,6 @@ public class InvoiceHeaderDo {
 	
 	@Column(name = "IS_NON-PO_OR_PO")
 	private boolean isNonPoOrPo;
-	
-
 	
 	@Column(name="DOC_STATUS") // is Draft or Active 
 	private String docStatus;

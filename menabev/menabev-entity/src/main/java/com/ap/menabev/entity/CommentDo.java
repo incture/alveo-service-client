@@ -2,6 +2,8 @@ package com.ap.menabev.entity;
 
 
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ public @Data class CommentDo {
 	
 	@Id
 	@Column(name="COMMENT_ID")
-	private String commentId;
+	private String commentId = UUID.randomUUID().toString();
 	
 	@Column(name = "REQUEST_ID",nullable=false)
 	private String requestId;

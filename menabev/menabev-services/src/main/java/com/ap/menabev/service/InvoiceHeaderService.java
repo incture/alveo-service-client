@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
+import com.ap.menabev.dto.FilterHeaderDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
@@ -69,5 +70,13 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> save(CreateInvoiceHeaderDto invoiceDto);
 	
 	ResponseEntity<?> submitForNonPo(CreateInvoiceHeaderDto invoiceDto);
+
+	ResponseEntity<?> getInvoiceDetails(String requestId);
+
+	ResponseEntity<?> getInboxTask(FilterHeaderDto filterDto);
+
+	ResponseEntity<?> claimTaskOfUser(String taskId, String userId, boolean isClaim);
+
+	ResponseDto delete(String id);
 
 }

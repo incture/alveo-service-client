@@ -9,9 +9,12 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,6 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -29,6 +33,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -43,8 +48,10 @@ import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
 import com.ap.menabev.dto.CostAllocationDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
+import com.ap.menabev.dto.FilterHeaderDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
+import com.ap.menabev.dto.InboxOutputDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
@@ -57,6 +64,7 @@ import com.ap.menabev.dto.RuleInputProcessLeadDto;
 import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.dto.TriggerWorkflowContext;
 import com.ap.menabev.dto.WorkflowContextDto;
+import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.entity.CostAllocationDo;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
@@ -65,6 +73,7 @@ import com.ap.menabev.entity.StatusConfigDo;
 import com.ap.menabev.invoice.AttachmentRepository;
 import com.ap.menabev.invoice.CommentRepository;
 import com.ap.menabev.invoice.CostAllocationRepository;
+import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.invoice.InvoiceItemAcctAssignmentRepository;
 import com.ap.menabev.invoice.InvoiceItemRepository;
@@ -79,15 +88,18 @@ import com.ap.menabev.util.HelperClass;
 import com.ap.menabev.util.MenabevApplicationConstant;
 import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.ServiceUtil;
+import com.ap.menabev.util.WorkflowConstants;
+import com.google.gson.Gson;
 import com.ap.menabev.util.ResponseStatus;
 
 @Service
 public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InvoiceHeaderServiceImpl.class);
-	@PersistenceContext
-	private EntityManager entityManager;
-
+	
+	
+	@Autowired
+	InvoiceHeaderRepoFilter invoiceHeaderRepoFilter;
 	// @Autowired
 	// EmailRepository emailRepository;
 
@@ -180,24 +192,30 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	@Override
 	public ResponseEntity<?> save(CreateInvoiceHeaderDto invoiceDto){
 		try{
-		// save invoice Header 
-	    InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
-	   // non po than false
-	    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
-		// save invoice item 
-		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
-		itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-		 invoiceItemRepository.saveAll(itemlists);
-		// save invoice Account Assingment 
-		List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
-		listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-		invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
-		// save cost allocation
-		List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
-		listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-		costAllocationRepository.saveAll(listCostAllocation);
+			 InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
+			    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
+			
+			    // save invoice item
+			    if(invoiceDto.getInvoiceHeaderDto().getInvoiceItems()!=null && invoiceDto.getInvoiceHeaderDto().getInvoiceItems().isEmpty()==true){
+			List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
+			itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+			 invoiceItemRepository.saveAll(itemlists);
+			    }
+			    if(invoiceDto.getInvoiceItemAcctAssignmentDto()!=null && invoiceDto.getInvoiceItemAcctAssignmentDto().isEmpty()==true){
+			// save invoice Account Assingment 
+			List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
+			listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+			invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
+			    }
+			    if(invoiceDto.getCostAllocationDto()!=null && invoiceDto.getCostAllocationDto().isEmpty()==true){
+			// save cost allocation
+			List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
+			listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+			costAllocationRepository.saveAll(listCostAllocation);
+			    }
+			    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId() +" saved as draft");
 		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
-		}catch (Exception e){
+		} catch (Exception e){
 			
 			return new ResponseEntity<String>("Failed due to "+e.toString(),HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -216,34 +234,44 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			determination.setVednorId(invoiceDto.getInvoiceHeaderDto().getVendorId());
 			//triggerRuleService(determination);
 			// save invoice header
-			
+			 InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
+			    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
     			// Trigger worklfow , which will direct to process lead 
 			TriggerWorkflowContext context = new TriggerWorkflowContext();
-			context.setRequestId("APA0001");
-			context.setInvoiceReferenceNumber("5420001");
+			context.setRequestId(invoiceSavedDo.getRequestId());
+			context.setInvoiceReferenceNumber(invoiceSavedDo.getExtInvNum());
 			context.setNonPo(true);
 			context.setManualNonPo(true);
 			context.setAccountantGroup("APADev@incture.com");
 			context.setAccountantUser("arun.gauda@incture.com");
-			context.setProcessLead("arun.gauda@incture.com");
+			context.setProcessLead("P000022");
 		ResponseEntity<?> response  = triggerWorkflow((WorkflowContextDto)context,"triggerresolutionworkflow.triggerresolutionworkflow");
 		System.err.println("response of workflow Trigger "+response);
 		
-		 InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
-		    InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
-		// save invoice item 
+		
+		
+		    // save invoice item
+		    if(invoiceDto.getInvoiceHeaderDto().getInvoiceItems()!=null && invoiceDto.getInvoiceHeaderDto().getInvoiceItems().isEmpty()==true){
 		List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
 		itemlists.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
 		 invoiceItemRepository.saveAll(itemlists);
+		    }
+		    if(invoiceDto.getInvoiceItemAcctAssignmentDto()!=null && invoiceDto.getInvoiceItemAcctAssignmentDto().isEmpty()==true){
 		// save invoice Account Assingment 
 		List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
 		listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
 		invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
+		    }
+		    if(invoiceDto.getCostAllocationDto()!=null && invoiceDto.getCostAllocationDto().isEmpty()==true){
 		// save cost allocation
 		List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
 		listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
 		costAllocationRepository.saveAll(listCostAllocation);
+		    }
 		// Update the Activity Log table 
+		    updateActivityLog();
+		    
+		    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created");
 		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
 		}catch (Exception e){
 			
@@ -251,7 +279,321 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 	}
 	
+	
+	public ResponseEntity<?> updateActivityLog(){
+		
+
+		return null;
+	}
+	
+	@Override
+	public ResponseEntity<?>  getInboxTask(FilterHeaderDto filterDto){
+		
+
+		try {
+			if (filterDto.getIndexNum() != null && filterDto.getCount() != null && filterDto.getIndexNum() != 0 && filterDto.getCount() != 0) {
+
+				if (!HelperClass.checkString(filterDto.getUserId())) {
+						ResponseEntity<?> responseFromSapApi = fetchWorkflowUserTaksList(
+								filterDto.getUserId(),filterDto.isMyTask(), null,null);
+						if (responseFromSapApi.getStatusCodeValue() == HttpStatus.OK.value()) {
+							@SuppressWarnings("unchecked")
+							List<WorkflowTaskOutputDto> listOfWorkflowTasks = (List<WorkflowTaskOutputDto>) responseFromSapApi
+									.getBody();
+							logger.error("listOfWorkflowTasks : " + listOfWorkflowTasks);
+							if (!listOfWorkflowTasks.isEmpty()) {
+								long min = (filterDto.getIndexNum()  * filterDto.getCount()) - filterDto.getCount();
+								long max = (filterDto.getIndexNum()  * filterDto.getCount());
+								if (min < listOfWorkflowTasks.size()) {
+									if (max > listOfWorkflowTasks.size()) {
+										max = listOfWorkflowTasks.size();
+									}
+									
+									return new ResponseEntity<>(fetchInvoiceDocHeaderDtoListFromRequestNumber(
+											listOfWorkflowTasks.stream().skip(min).limit(max)
+													.collect(Collectors.toList()),filterDto),
+											HttpStatus.OK);
+								} else {
+									return new ResponseEntity<String>(
+											"DATA_NOT_FOUND"
+													+ " Select different Index number or Change the count number.",
+											HttpStatus.OK);
+								}
+							} else {
+								return new ResponseEntity<String>("No tasks are available with Customer Po for user : "
+										+ filterDto.getUserId(), HttpStatus.OK);
+							}
+						} else {
+							return responseFromSapApi;
+						}
+				} else {
+					return new ResponseEntity<>(
+							"INVALID_INPUT" + "Please provide login in user id and project code",
+							HttpStatus.BAD_REQUEST);
+				}
+			} else {
+				return new ResponseEntity<>("INVALID_INPUT" + " Provide valid index num and count.",
+						HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+	public ResponseEntity<?> fetchWorkflowUserTaksList(String userId,boolean myTask, String isBuyerTask,String isgrnTeamTask){
+		try {
+			if (!checkString(userId)) {
+				String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+				
+				HttpClient client = HttpClientBuilder.create().build();
+				
+				StringBuilder url = new StringBuilder();
+				
+				
+				appendParamInUrl(url, WorkflowConstants.WORKFLOW_DEFINATION_ID_KEY,
+						WorkflowConstants.WORKFLOW_DEFINATION_ID_VALUE);
+				if(myTask){
+					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
+							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_RESERVED_VALUE);
+					appendParamInUrl(url, WorkflowConstants.PROCESSOR_KEY, userId);
+					
+				}else{
+					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
+							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE);
+				appendParamInUrl(url, WorkflowConstants.RECIPIENT_USER_KEY, userId);
+				appendParamInUrl(url, WorkflowConstants.PROCESSOR_KEY, "");
+				}
+				appendParamInUrl(url, WorkflowConstants.FIND_COUNT_OF_TASKS_KEY,
+						WorkflowConstants.FIND_COUNT_OF_TASKS_VALUE);
+				appendParamInUrl(url, WorkflowConstants.TOP_KEY, WorkflowConstants.TOP_VALUE);
+				
+				url.insert(0, (MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances?"));
+
+				System.err.println("URL : " + url);
+
+				HttpGet httpGet = new HttpGet(url.toString());
+				
+				httpGet.addHeader("Content-Type", "application/json");
+				// Encoding username and password
+				//String auth = encodeUsernameAndPassword((String) map.get("User"), (String) map.get("Password"));
+				httpGet.addHeader("Authorization", "Bearer "+jwToken);
+
+				HttpResponse response = client.execute(httpGet);
+				String dataFromStream = getDataFromStream(response.getEntity().getContent());
+				if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+
+					JSONArray jsonArray = new JSONArray(dataFromStream);
+
+					List<WorkflowTaskOutputDto> listOfWorkflowTasks = new ArrayList<>();
+
+					jsonArray.forEach(jsonObject -> {
+						WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
+								WorkflowTaskOutputDto.class);
+						taskDto.setRequestIds(taskDto.getDescription());
+						//taskDto.setRoType(taskDto.getDescription().split("\\|")[8]);
+						listOfWorkflowTasks.add(taskDto);
+
+					});
+					if (!listOfWorkflowTasks.isEmpty()) {
+						return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
+					} else {
+						return new ResponseEntity<String>("No tasks are available for user : " + userId,
+								HttpStatus.NO_CONTENT);
+					}
+				} else {
+					return new ResponseEntity<String>("FETCHING FAILED", HttpStatus.CONFLICT);
+
+				}
+			
+		}
+			else {
+				return new ResponseEntity<>("INVALID_INPUT_PLEASE_RETRY" + " with provide USER ID.",
+						HttpStatus.BAD_REQUEST);
+			}
+			}catch (Exception e) {
+				return new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(),
+						HttpStatus.INTERNAL_SERVER_ERROR);
+
+			}
+	}
+	
+	
+	// add to this Helper Class 
+	public static boolean checkString(String s) {
+		if (s == null || s.equals("") || s.trim().isEmpty() || s.matches("") || s.equals(null)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static void appendParamInUrl(StringBuilder url, String key, String value) {
+		if (url.length() > 0) {
+			url.append("&" + key + "=" + value);
+		} else {
+			url.append(key + "=" + value);
+		}
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ResponseEntity<?> fetchInvoiceDocHeaderDtoListFromRequestNumber(
+			List<WorkflowTaskOutputDto> invoiceRequestIdListPaginated,FilterHeaderDto filterDto) {
+		
+		List<InvoiceHeaderDo> listOfInvoiceOrders = null;
+		ResponseEntity<?> responseFromFilter = null;
+		// workflowResponse with list of requestIds
+        List<String> requestIds =  invoiceRequestIdListPaginated.stream().map(WorkflowTaskOutputDto::getSubject).collect(Collectors.toList());
+        System.err.println("requestId "+requestIds);
+        
+       /* List<InvoiceHeaderDo> listOfInvoiceOrders = invoiceHeaderRepository
+				.findByRequestIdIn(requestId);*/
+        // all task method no filters 
+        if(filterDto.getRequestId() != null && !filterDto.getRequestId().isEmpty()){
+        	if( requestIds.contains(filterDto.getRequestId())){
+        		requestIds.clear();
+        		requestIds.add(filterDto.getRequestId());
+        		   responseFromFilter = filterInvoices(requestIds,filterDto);
+        	}else{
+        		// if search for requestId 
+        		responseFromFilter = new ResponseEntity<String>("No Data Found For Searched Criteria",HttpStatus.NO_CONTENT);
+        	}
+        }else{
+        	 // No filter Parameter at all 
+           responseFromFilter = filterInvoices(requestIds,filterDto);
+                 }
+          
+          if(responseFromFilter.getStatusCodeValue()==200){
+        	 listOfInvoiceOrders=  (List<InvoiceHeaderDo>) responseFromFilter.getBody();
+		System.err.println("lisOFInvoice by requestIds "+listOfInvoiceOrders);
+		// check for claim 
+		Map<String,WorkflowTaskOutputDto> map = checkForClaim(invoiceRequestIdListPaginated);
+		// filter of the invoice. create a method at night for filter of invoice
+		List<InvoiceHeaderDto> invoiceHeaderList  = ObjectMapperUtils.mapAll(listOfInvoiceOrders, InvoiceHeaderDto.class);
+		logger.error("Before sorting : " + invoiceHeaderList);
+		invoiceHeaderList.sort(Comparator.comparing(InvoiceHeaderDto::getCreatedOn,
+				Comparator.nullsLast((d1, d2) -> d2.compareTo(d1))));
+		logger.error("After sorting : " + invoiceHeaderList);
+		List<InboxOutputDto> inboxOutputList = new ArrayList<InboxOutputDto>();
+		 for(int i = 0 ; i<invoiceHeaderList.size();i++){
+			 InboxOutputDto inbox = new InboxOutputDto();
+			 inbox = ObjectMapperUtils.map(invoiceHeaderList.get(i),InboxOutputDto.class);
+			 WorkflowTaskOutputDto workflowOutPut  = map.get(inbox.getRequestId());
+		// if process exist or not null for the filtered requestid 
+		if(workflowOutPut.getProcessor() != null  && !workflowOutPut.getProcessor().isEmpty()){
+			inbox.setClaimed(true);
+		}else {
+			inbox.setClaimed(false); 
+		}
+		
+		inbox.setTaskStatus(workflowOutPut.getStatus());
+		inbox.setTaskId(workflowOutPut.getId());
+			 inboxOutputList.add(inbox);
+		 }
+		 
+		return  new ResponseEntity<List<InboxOutputDto>>(inboxOutputList,HttpStatus.OK);
+		
+          } else {
+        	  return new ResponseEntity<String>("No Data Found For the Filter Query ",HttpStatus.NO_CONTENT); 
+          }
+	}
+
+	
+	
+	private ResponseEntity<?> filterInvoices(List<String> requestId,FilterHeaderDto dto){
+		List<InvoiceHeaderDo> invoiceOrderList = null;
+		StringBuffer query = new StringBuffer();
+		Map<String, String> filterQueryMap = new HashMap<String, String>();
+
+		query.append("SELECT * FROM INVOICE_HEADER RR WHERE");
+		if (requestId != null && !requestId.isEmpty()) {
+			StringBuffer rqstId = new StringBuffer();
+			for (int i = 0; i < requestId.size(); i++) {
+				if (i < requestId.size() - 1) {
+					rqstId.append("'" + requestId.get(i) + "'" + ",");
+				} else {
+					rqstId.append("'" + requestId.get(i) + "'");
+				}
+			}
+			filterQueryMap.put(" RR.REQUEST_ID IN", "(" + rqstId + ")");
+		}
+		if (dto.getVendorName() != null && !dto.getVendorName().isEmpty()) {
+			filterQueryMap.put(" RR.VENDOR_NAME =", "'" + dto.getVendorName()+ "'");
+		}
+		if (dto.getVendorId() != null && !dto.getVendorId().isEmpty()) {
+			filterQueryMap.put(" RR.VENDOR_ID =", "'" + dto.getVendorId()+ "'");
+		}
+		if (dto.getRefDocNum() != null) {
+			filterQueryMap.put(" RR.REF_DOC_NUM =", "'" + dto.getRefDocNum() + "'");
+		}
+		if (dto.getDueDateFrom() != null && dto.getDueDateTo()!=null) {
+			filterQueryMap.put(" RR.DUE_DATE BETWEEN ",  + dto.getDueDateFrom() + " AND "+ dto.getDueDateTo());
+		}
+		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateTo()!=null) {
+			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getInvoiceDateFrom() + " AND "+ dto.getInvoiceDateTo());
+		}
+		if (dto.getInvoiceType() != null && !dto.getInvoiceType().isEmpty()) {
+			filterQueryMap.put(" RR.INVOICE_TYPE =", "'" + dto.getInvoiceType() + "'");
+		}
+		
+		if (dto.getAssignedTo() != null && !dto.getAssignedTo().isEmpty()) {
+			filterQueryMap.put(" RR.ASSIGNED_TO =", "'" + dto.getAssignedTo() + "'");
+		}
+		if (dto.getValidationStatus() != null && !dto.getValidationStatus().isEmpty()) {
+			filterQueryMap.put(" RR.VALIDATION_STATUS =", "'" + dto.getValidationStatus() + "'");
+		}
+		if (dto.getExtInvNum() != null && !dto.getExtInvNum().isEmpty()) {
+			filterQueryMap.put(" RR.EXT_INV_NUM =", "'" + dto.getExtInvNum() + "'");
+		}
+		/*if (dto.getUserId() != null && !dto.getUserId().isEmpty()) {
+			filterQueryMap.put(" RR.TASK_OWNER =", "'" + dto.getUserId() + "'");
+		}*/
+		int lastAppendingAndIndex = filterQueryMap.size() - 1;
+
+		AtomicInteger count = new AtomicInteger(0);
+		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
+
+		filterQueryMap.forEach((k, v) -> {
+			System.out.println("label : " + k + " value : " + v);
+			query.append(k);
+			query.append(v);
+			if (filterQueryMap.size() > 1) {
+				if (count.getAndIncrement() < filterQueryMap.size() - 1) {
+					query.append(" AND ");
+				}
+			} else {
+				query.append(" ORDER BY RR.INVOICE_DATE DESC");
+				query.append(";");
+			}
+		});
+		if (filterQueryMap.size() > 1) {
+			query.append(" ORDER BY RR.INVOICE_DATE DESC");
+			query.append(";");
+		}
+		System.err.println("Query : Check " + query.toString());
+		invoiceOrderList = invoiceHeaderRepoFilter.getFilterDetails(query.toString());
+		if (invoiceOrderList != null && !invoiceOrderList.isEmpty()) {
+			return new ResponseEntity<List<InvoiceHeaderDo>>(invoiceOrderList, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("No Data Found For Searched Criteria", HttpStatus.NO_CONTENT);
+		}
+	}
+	private Map<String, WorkflowTaskOutputDto> checkForClaim(
+			List<WorkflowTaskOutputDto> invoiceRequestIdListPaginated) {
+		 Map<String, WorkflowTaskOutputDto> map = new HashMap<String , WorkflowTaskOutputDto>();
+
+		    for(WorkflowTaskOutputDto w : invoiceRequestIdListPaginated)
+		    {
+		        map.put(w.getSubject(), w);
+		    }
+
+		    return map;
+	}
+
+
+
 	// getInvoiceDetails based on requestId
+	@Override
 	public ResponseEntity<?> getInvoiceDetails(String requestId){
 		try {
 			CreateInvoiceHeaderDto invoiceHeadDto =new  CreateInvoiceHeaderDto();
@@ -271,8 +613,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		        invoiceHeadDto.getInvoiceHeaderDto().setInvoiceItems(invoiceItemDtoList);
 		        invoiceHeadDto.setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
 		        invoiceHeadDto.setCostAllocationDto(costAllocationDto);
+		        invoiceHeadDto.setResponseStatus("Success");
 		    return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceHeadDto,HttpStatus.OK);
 		}catch(Exception e){
+			
 			return new ResponseEntity<String>("Failed due to "+e,HttpStatus.INTERNAL_SERVER_ERROR);
 			
 		}
@@ -309,7 +653,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	}
 
 	@Override
-	public ResponseDto delete(Integer id) {
+	public ResponseDto delete(String id) {
 		ResponseDto response = new ResponseDto();
 		try {
 			invoiceHeaderRepository.deleteById(id);
@@ -397,7 +741,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					dto.setRefDocCat(headerDto.getRefDocCat());
 					dto.setRefDocNum(headerDto.getRefDocNum());
 					dto.setRequestId(headerDto.getRequestId());
-					dto.setId(headerDto.getId());
 					dto.setSapInvoiceNumber(headerDto.getSapInvoiceNumber());
 					dto.setShippingCost(headerDto.getShippingCost());
 					dto.setTaskStatus(headerDto.getTaskStatus());
@@ -1097,6 +1440,7 @@ return null;
 		try {
 			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
 
+			System.err.println("1125 "+token);
 			HttpClient client = HttpClientBuilder.create().build();
 			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL +"/v1/workflow-instances";
 			HttpPost httpPost = new HttpPost(url);
@@ -1109,8 +1453,8 @@ return null;
 				httpPost.setEntity(entity);
 				HttpResponse response = client.execute(httpPost);
 				System.err.println("WorkflowTriggerResponse ="+response);
-				if (response.getStatusLine().getStatusCode() == HttpStatus.ACCEPTED.value()) {
-					return new ResponseEntity(response, HttpStatus.ACCEPTED);
+				if (response.getStatusLine().getStatusCode() == HttpStatus.CREATED.value()) {
+					return new ResponseEntity(response, HttpStatus.CREATED);
 				} else {
 					return new ResponseEntity(getDataFromStream(response.getEntity().getContent()),
 							HttpStatus.BAD_REQUEST);
@@ -1139,18 +1483,26 @@ return null;
 		return dataBuffer.toString();
 	}
 
-	/*public ResponseEntity cancellingWorkflowUsingOauthClient(String workflowId) {
+	@SuppressWarnings("unchecked")
+	@Override
+	public ResponseEntity<?> claimTaskOfUser(String taskId,String userId,boolean isClaim) {
 
 		try {
 			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
 
 			HttpClient client = HttpClientBuilder.create().build();
 
-			Map<String, Object> map = DestinationReaderUtil
-					.getDestination(DkshConstants.WORKFLOW_CLOSE_TASK_DESTINATION);
+			/*Map<String, Object> map = DestinationReaderUtil
+					.getDestination(DkshConstants.WORKFLOW_CLOSE_TASK_DESTINATION);*/
 			
-			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/workflow-instances/" + workflowId;
-			String payload = "{\"context\": {},\"status\":\"CANCELED\"}";
+			String payload =null;
+			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances/" + taskId;
+			if(isClaim){
+			 payload = "{\"processor\":\""+userId+"\"}";
+			}else{
+				payload = "{\"processor\":\""+""+"\"}";
+				 System.err.println("payload "+payload);
+			}
 
 			HttpPatch httpPatch = new HttpPatch(url);
 			httpPatch.addHeader("Authorization", "Bearer " + token);
@@ -1158,31 +1510,42 @@ return null;
 
 			try {
 				StringEntity entity = new StringEntity(payload);
+				System.err.println("inputEntity "+entity );
 				entity.setContentType("application/json");
 				httpPatch.setEntity(entity);
 				HttpResponse response = client.execute(httpPatch);
 
+				
 				if (response.getStatusLine().getStatusCode() == HttpStatus.NO_CONTENT.value()) {
-					return new ResponseEntity("", HttpStatus.NO_CONTENT, "Workflow Task is cancelled",
-							ResponseStatus.SUCCESS);
-				} else {
-					return new ResponseEntity(getDataFromStream(response.getEntity().getContent()),
-							HttpStatus.BAD_REQUEST, "Task updating is failed", ResponseStatus.FAILED);
+					if(isClaim){
+					return new ResponseEntity<String>("Task has been claimed by user "+userId, HttpStatus.CREATED);
+					}else {
+						return new ResponseEntity<String>("Task has been released by user "+userId, HttpStatus.CREATED);
+						} 
+				}else {
+					
+					return new ResponseEntity<String>("Failed due "+getDataFromStream(response.getEntity().getContent()),
+							HttpStatus.BAD_REQUEST);
 				}
 
 			} catch (IOException e) {
 				logger.error(e.getMessage());
-				return new ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR,
-						DkshConstants.EXCEPTION_FAILED + e.getCause().getCause().getLocalizedMessage(),
-						ResponseStatus.FAILED);
+				return new ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR
+						);
 			}
-
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ResponseEntity("", HttpStatus.INTERNAL_SERVER_ERROR, DkshConstants.EXCEPTION_FAILED + e,
-					ResponseStatus.FAILED);
+			return new ResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+			
+	}
 
-	}*/
+
+
+	@Override
+	public ResponseDto delete(Integer id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

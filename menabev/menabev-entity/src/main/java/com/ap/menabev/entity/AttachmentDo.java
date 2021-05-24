@@ -2,6 +2,8 @@ package com.ap.menabev.entity;
 
 
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,7 +18,7 @@ public @Data class AttachmentDo {
 	
 	@Id
 	@Column(name = "ATTACHMENT_ID")
-	private String attachmentId;
+	private String attachmentId = UUID.randomUUID().toString();
 	
 	@Column(name = "REQUEST_ID",nullable=false)
 	private String requestId;

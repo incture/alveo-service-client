@@ -58,7 +58,7 @@ public class InvoiceItemDto {
 	private Long updatedAt;
 	private Boolean isSelected;
 	private String isAccAssigned;
-	private List<InvoiceItemAcctAssignmentDo> invItemAcctDtoList;
+	//private List<InvoiceItemAcctAssignmentDo> invItemAcctDtoList;
 
 	/* PO Calculations */
 
