@@ -9,7 +9,7 @@
 		"path": "^0.12.7",
 		"request": "*"
 	},
-	"description": "my description",
+	"description": "Node Module",
 	"devDependencies": {
 		"jest": "^23.6.0",
 		"jest-junit": "^5.2.0"

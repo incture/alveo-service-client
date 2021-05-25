@@ -1,0 +1,41 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<Dialog title="{i18n>SelectTemplateTitle}" class="sapUiSizeCompact" contentWidth="30%">
+		<content>
+			<VBox>
+				<Table inset="false" items="{templateModel>/aNonPoTemplate}" id="templateSelectId" itemPress="onDialogFilterConfirm" mode="MultiSelect"
+					selectionChange="onSelectionChangeTemplate" growing="true" growingThreshold="10" noDataText="{i18n>NoTemplatesFound}"
+					sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+					<headerToolbar>
+						<Toolbar>
+							<SearchField width="100%" search="handleTemplateSearch"/>
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>TemplateName}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>AccountNumber}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>Amount}"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{templateModel>templateName}"/>
+								<Text text="{templateModel>accountNumber}"/>
+								<Input value="{templateModel>amount}" valueState="{templateModel>amountError}" change="errorHandler"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</content>
+		<buttons>
+			<Button text="{i18n>Cancel}" press="onSelectTempDialogClose" type="Reject"/>
+			<Button text="{i18n>Allocate}" press="onClickPreviewTemplate" enabled="{templateModel>/allocateTempBtnEnabled}"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,51 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core"
+	controllerName="com.inc.ApWorkbench.controller.baseCoder">
+	<Dialog title="Preview" class="sapUiSizeCompact" contentWidth="50%">
+		<content>
+			<VBox items="{postDataModel>/previewListNonPoItem}" class="sapUiSmallMargin">
+				<Table id="idNonPo" class="invTabScroll" items="{ path: 'postDataModel>costAllocationList', templateShareable : true }"
+					sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+					<headerToolbar>
+						<Toolbar>
+							<Label text="{postDataModel>templateName}" design="Bold"/>
+							<ToolbarSpacer/>
+							<Input value="{postDataModel>amount}" placeholder="{i18n>EnterAmount}" liveChange="onChangePreviewTotalAmt" type="Number" width="25%"/>
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/0/status}" hAlign="Center" id="glaccountCol"
+							minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
+						</Column>
+						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/4/status}" hAlign="Center" id="costcenterCol"
+							minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
+						</Column>
+						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/3/status}" hAlign="Center" minScreenWidth="Small"
+							demandPopin="true">
+							<Label text="{i18n>percentageAllocation}" design="Bold" required="true" wrapping="true"/>
+						</Column>
+						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/3/status}" hAlign="Center" id="amountCol" minScreenWidth="Small"
+							demandPopin="true">
+							<Label text="{i18n>Amount}" design="Bold" required="true"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{postDataModel>glAccount}"/>
+								<Text text="{postDataModel>costCenter}"/>
+								<Text text="{postDataModel>allocationPercent}"/>
+								<Text text="{postDataModel>netValue}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</content>
+		<buttons>
+			<Button text="{i18n>Back}" press="onPreviewBack"></Button>
+			<Button text="{i18n>Ok}" press="onOkSelectTemplate"></Button>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

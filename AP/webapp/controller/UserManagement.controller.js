@@ -1,6 +1,7 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function (Controller) {
+	"sap/ui/core/mvc/Controller",
+	"sap/m/MessageBox"
+], function (Controller, MessageBox) {
 	"use strict";
 
 	return Controller.extend("com.menabev.AP.controller.UserManagement", {
@@ -11,31 +12,208 @@ sap.ui.define([
 		 * @memberOf com.menabev.AP.view.UserManagement
 		 */
 		onInit: function () {
-
+			var that = this;
 			this.oHeader = {
 				"Accept": "application/json",
 				"Content-Type": "application/json",
 			};
+			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+			this.oUserDetailModel = oUserDetailModel;
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
-				if (oEvent.getParameter("name") === "UserManagement") {}
+				if (oEvent.getParameter("name") === "UserManagement") {
+					that.getUserDetails();
+					that.fetchAllGroups();
+				}
 			});
-			this.getUserDetails();
+
 		},
 		onAddNewUser: function () {
-			this.oRouter.navTo("CreateUser");
+			this.oRouter.navTo("CreateUser", {
+				id: "new"
+			});
+		},
+		onEditUserDetails: function (oEvent) {
+			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
+			var oUserId = oContextObj.id;
+			this.oRouter.navTo("CreateUser", {
+				id: oUserId
+			});
+		},
+		onAddNewGroup: function () {
+			this.oRouter.navTo("CreateGroup", {
+				id: "new"
+			});
+		},
+		onEditGroupDetails: function (oEvent) {
+			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
+			var oUserId = oContextObj.id;
+			this.oRouter.navTo("CreateGroup", {
+				id: oUserId
+			});
 		},
 		getUserDetails: function () {
+			var oUserDetailModel = this.oUserDetailModel;
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var sUrl = "/IDPDEST/service/scim/Users";
 			var busy = new sap.m.BusyDialog();
-			oServiceModel.loadData(sUrl, "", true, "GET", false, false, this.oHeader);
+			var oHeader = {
+				"Content-Type": "application/scim+json"
+			};
+			busy.open();
+			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
+				busy.close();
 				var data = oEvent.getSource().getData();
-				if (data) {
+				if (data.Resources) {
+					oUserDetailModel.setProperty("/users", data.Resources);
 				}
 			});
-		}
+		},
+		fetchAllGroups: function () {
+			var oUserDetailModel = this.oUserDetailModel;
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var sUrl = "/IDPDEST/service/scim/Groups";
+			var busy = new sap.m.BusyDialog();
+			var oHeader = {
+				"Content-Type": "application/scim+json"
+			};
+			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				var data = oEvent.getSource().getData();
+				if (data.Resources) {
+					oUserDetailModel.setProperty("/groupList", data.Resources);
+				}
+			});
+		},
+
+		onResetPwd: function (oEvent) {
+			var that = this;
+			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
+			var oName = oContextObj.name.givenName + " " + oContextObj.name.familyName;
+			var oUserId = oContextObj.id;
+			var oEmailId = oContextObj.emails[0].value;
+			var oMsg = "Are you sure you want to reset password for : " + oName + " (" + oUserId + ") ?";
+			sap.m.MessageBox.confirm(oMsg, {
+				styleClass: "sapUiSizeCompact",
+				actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+				onClose: function (oAction) {
+					if (oAction === "YES") {
+						that.triggerResetPwdServ(oName, oUserId, oEmailId);
+					}
+				}
+			});
+		},
+
+		//function to send reset password link to the Email ID
+		triggerResetPwdServ: function (oName, oUserId, oEmailId) {
+			var sUrl = "/IDPDEST/service/users/forgotPassword";
+			var oPayload = {
+				"identifier": oEmailId
+			};
+			var oHeader = {
+				"Content-Type": "application/json; charset=utf-8"
+			};
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var oBusyDialog = new sap.m.BusyDialog();
+			oBusyDialog.open();
+			oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				oBusyDialog.close();
+				sap.m.MessageBox.success("Reset Password link has been sent to the Email ID -  " + oEmailId);
+			});
+			oServiceModel.attachRequestFailed(function (oEvent) {
+				oBusyDialog.close();
+				sap.m.MessageBox.error(oEvent.getParameters().errorobject.responseText);
+			});
+		},
+
+		onDeleteUser: function (oEvent) {
+			var that = this;
+			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
+			var oUserId = oContextObj.id;
+			var oName = oContextObj.name.givenName + " " + oContextObj.name.familyName;
+			sap.m.MessageBox.confirm("Are you sure you want to delete - " + oName + " (" + oUserId + ")", {
+				styleClass: "sapUiSizeCompact",
+				actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+				onClose: function (oAction) {
+					if (oAction === "YES") {
+						that.triggerDeleteUserServ(oName, oUserId, oContextObj);
+					}
+				}
+			});
+		},
+
+		//function to delete User
+		triggerDeleteUserServ: function (oName, oUserId, oUserData) {
+			var that = this;
+			var oUrl = "/IDPDEST/service/scim/Users/" + oUserId;
+			var oBusyDialog = new sap.m.BusyDialog();
+			oBusyDialog.open();
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			oServiceModel.loadData(oUrl, null, true, "DELETE", false, false);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				oBusyDialog.close();
+				if (oEvent.getParameter("success")) {
+					that.getUserDetails();
+					sap.m.MessageToast.show(oName + " (" + oUserId + ")" + " is deleted successfully");
+				} else {
+					var oMsg = oEvent.getParameters().errorobject.responseText;
+					sap.m.MessageBox.error(oMsg);
+				}
+			});
+			oServiceModel.attachRequestFailed(function (oEvent) {
+				var sStatus = oEvent.getParameters();
+				var oMsg = sStatus.errorobject.responseText;
+				oBusyDialog.close();
+				sap.m.MessageBox.error(oMsg);
+			});
+		},
+
+		onViewGroups: function (oEvent) {
+			var that = this;
+			var oUserDetailModel = this.oUserDetailModel;
+			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
+			if (oContextObj.groups) {
+				oUserDetailModel.setProperty("/groups", oContextObj.groups);
+				oUserDetailModel.refresh();
+				this.userGroup = sap.ui.xmlfragment("com.menabev.AP.fragment.userGroup", this);
+				this.getView().addDependent(this.userGroup);
+				this.userGroup.open();
+			} else {
+				var msg = "No Groups Assigned for this user";
+				sap.m.MessageToast.show(msg);
+			}
+		},
+
+		onCloseGroupFragment: function () {
+			this.userGroup.close();
+		},
+
+		onSearchUserList: function (oEvent) {
+			var that = this;
+			var value = oEvent.getSource().getValue();
+			var filters = [];
+			var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("id", sap.ui.model.FilterOperator.Contains, value),
+				new sap.ui.model.Filter("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/description", sap.ui.model.FilterOperator.Contains,
+					value)
+			]);
+			filters.push(oFilter);
+			var oBinding = this.getView().byId("USERMANAGEMENT").getBinding("items");
+			oBinding.filter(filters);
+		},
+		onSearchGroupList: function (oEvent) {
+			var that = this;
+			var value = oEvent.getSource().getValue();
+			var filters = [];
+			var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("id", sap.ui.model.FilterOperator.Contains, value),
+				new sap.ui.model.Filter("displayName", sap.ui.model.FilterOperator.Contains, value),
+				new sap.ui.model.Filter("emails/0/value", sap.ui.model.FilterOperator.Contains, value)
+			]);
+			filters.push(oFilter);
+			var oBinding = this.getView().byId("USERGROUPS").getBinding("items");
+			oBinding.filter(filters);
+		},
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered

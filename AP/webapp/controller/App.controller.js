@@ -20,7 +20,9 @@ sap.ui.define([
 			});
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
-				if (oEvent.getParameter("name") === "App") {}
+				if (oEvent.getParameter("name") === "App") {
+					this.oRouter.navTo("Inbox");
+				}
 			});
 
 		},
@@ -31,7 +33,10 @@ sap.ui.define([
 			}
 			oEvent.getSource().addStyleClass("sideNavItemSelected");
 			var key = oEvent.getSource().getKey();
-		}
+			this.oRouter.navTo(key);
+		},
+		
+		
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered

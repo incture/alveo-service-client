@@ -1,23 +1,23 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.UserManagement"
 	xmlns:html="http://www.w3.org/1999/xhtml">
-	<Page showHeader="false">
+	<Page showHeader="false" class="sapUiSizeCompact PageHeader">
 		<content>
 			<IconTabBar >
 				<items>
 					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo" class="IconTabBG">
-						<Table items="{oUserDetailModel>/supplierList}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
+						<Table items="{oUserDetailModel>/users}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
 							id="USERMANAGEMENT">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer/>
-									<SearchField liveChange="onFreeSearchUsers" width="20%"></SearchField>
+									<SearchField liveChange="onSearchUserList" width="20%"></SearchField>
 									<Button text="{i18n>ADDNEWUSER}" press="onAddNewUser"></Button>
 									<Button icon="sap-icon://download"></Button>
 									<Button icon="sap-icon://action-settings"></Button>
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%">
 									<Label design="Bold" text="{i18n>USERID}" tooltip="{i18n>USERID}"/>
 								</Column>
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
@@ -29,7 +29,7 @@
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
 									<Label design="Bold" text="{i18n>CONTACT}" tooltip="{i18n>CONTACT}"/>
 								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%">
 									<Label design="Bold" text="{i18n>RESETPASSWORD}" tooltip="{i18n>RESETPASSWORD}"/>
 								</Column>
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
@@ -42,26 +42,16 @@
 							<items>
 								<ColumnListItem>
 									<cells>
-										<Text text="{oUserDetailModel>loginId}"/>
-										<Text text="{oUserDetailModel>rosVendorNumber}"/>
+										<Text text="{oUserDetailModel>id}"/>
+										<Text text="{oUserDetailModel>displayName}"/>
+										<Text text="{oUserDetailModel>oUserDetailModel>emails/0/value}"/>
+										<Text text="{oUserDetailModel>contact}"/>
+										<Button text="{i18n>RESET}" press="onResetPwd"></Button>
+										<Button text="{i18n>VIEWASSIGNEDGROUPS}" press="onViewGroups"></Button>
 										<HBox>
-											<Text text="{oUserDetailModel>email}"
-												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setNonEditableMode'}"/>
-											<Input value="{oUserDetailModel>emailNew}" valueState="{oUserDetailModel>emailNewState}"
-												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setEditableMode'}"></Input>
+											<Button icon="sap-icon://delete" press="onDeleteUser"></Button>
+											<Button icon="sap-icon://edit" press="onEditUserDetails"></Button>
 										</HBox>
-										<HBox>
-											<Text text="{oUserDetailModel>supplierName}"
-												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setNonEditableMode'}"/>
-											<Input value="{oUserDetailModel>supplierNameNew}" valueState="{oUserDetailModel>supplerIdState}"
-												visible="{path:'oUserDetailModel>isEditable',formatter:'com.sinarmas.UserAdmin.formatter.formatter.setEditableMode'}"></Input>
-										</HBox>
-										<Button text="{i18n>RESET}"></Button>
-										<HBox>
-											<Button text="{i18n>VIEWASSIGNEDGROUPS}"></Button>
-											<Button text="{i18n>EDITUSER}"></Button>
-										</HBox>
-										<Button icon="sap-icon://delete"></Button>
 									</cells>
 								</ColumnListItem>
 							</items>
@@ -73,8 +63,8 @@
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer/>
-									<SearchField liveChange="onFreeSearchUsers" width="20%"></SearchField>
-									<Button text="{i18n>ADDNEWGROUP}" press="onAddNewUser"></Button>
+									<SearchField liveChange="onSearchGroupList" width="20%"></SearchField>
+									<Button text="{i18n>ADDNEWGROUP}" press="onAddNewGroup"></Button>
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
@@ -85,19 +75,22 @@
 									<Label design="Bold" text="{i18n>GROUPDESCRIPTION}" tooltip="{i18n>USERNAME}"/>
 								</Column>
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>ASSIGNEDUSER}" tooltip="{i18n>EMAIL}"/>
+									<Label design="Bold" text="{i18n>GROUPID}" tooltip="{i18n>EMAIL}"/>
 								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" visible="false">
 									<Label design="Bold" text="{i18n>MANAGEGROUP}" tooltip="{i18n>ACTION}"/>
 								</Column>
 							</columns>
 							<items>
 								<ColumnListItem>
 									<cells>
-										<Text text="{oUserDetailModel>loginId}"/>
-										<Text text="{oUserDetailModel>rosVendorNumber}"/>
-										<Text text="{oUserDetailModel>rosVendorNumber}"/>
-										<Button icon="sap-icon://delete"></Button>
+										<Text text="{oUserDetailModel>displayName}"/>
+										<Text text="{oUserDetailModel>urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/description}"/>
+										<Text text="{oUserDetailModel>urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/groupId}"/>
+										<HBox>
+											<Button icon="sap-icon://delete" press="onDeleteGroup"></Button>
+											<Button icon="sap-icon://edit" press="onEditGroupDetails"></Button>
+										</HBox>
 									</cells>
 								</ColumnListItem>
 							</items>

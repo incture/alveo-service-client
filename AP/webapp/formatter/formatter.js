@@ -26,8 +26,8 @@ com.menabev.AP.formatter.formatter = {
 		var date1 = dd + "/" + mm + "/" + yyyy;
 		return date1;
 	},
-	
-		formatDateTime: function (date) {
+
+	formatDateTime: function (date) {
 		if (!date) {
 			return;
 		}
@@ -67,5 +67,44 @@ com.menabev.AP.formatter.formatter = {
 
 		var date1 = dd + "/" + mm + "/" + yyyy + " " + tt + ":" + min;
 		return date1;
+	},
+	returnNot: function (value) {
+		if (value)
+			return false;
+		else
+			return true;
+	},
+	getMessageColor: function (sMessageType) {
+		"use strict";
+
+		var sColorValue = "#3498db";
+
+		if (sMessageType) {
+			switch (sMessageType) {
+			case "Warning":
+				sColorValue = "#f39c12";
+				break;
+			case "Error":
+				sColorValue = "#c0392b";
+				break;
+			case "Success":
+				sColorValue = "#27ae60";
+				break;
+			case "Default":
+				sColorValue = "#3498db";
+				break;
+			}
+		}
+
+		return sColorValue;
+
+	},
+
+	/** Visibility of PO and Invoice Toggle Button in the Invoice Line Item */
+	reverseThirdMsg: function (vendor, thirdParty) {
+		if (vendor == "true" && thirdParty == "true") {
+			return false;
+		}
+		return true;
 	},
 };

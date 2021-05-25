@@ -17,7 +17,7 @@ sap.ui.define([
 		//To open Uplaod Invoice Fragment:UploadInvoiceFrag 
 		onPressUploadInvoice: function (oEvent) {
 			if (!this.UploadInvoice) {
-				this.UploadInvoice = sap.ui.xmlfragment("com.menabev.AP.Fragments.UploadInvoiceFrag", this);
+				this.UploadInvoice = sap.ui.xmlfragment("com.menabev.AP.fragment.UploadInvoiceFrag", this);
 				this.getView().addDependent(this.UploadInvoice);
 			}
 			var pdfModel = new JSONModel();
@@ -45,6 +45,7 @@ sap.ui.define([
 
 		//File Uploader
 		handleUploadChange: function (oEvent) {
+			var that = this;
 			if (oEvent.getParameter("newValue")) {
 				this.file = oEvent.mParameters.files[0];
 				this.fileName = this.file.name;
@@ -56,7 +57,7 @@ sap.ui.define([
 						.replace("data:", "")
 						.replace(/^.+,/, "");
 					var decodedPdfContent = atob(base64String);
-					var byteArray = new Uint8Array(decodedPdfContent.length)
+					var byteArray = new Uint8Array(decodedPdfContent.length);
 					for (var i = 0; i < decodedPdfContent.length; i++) {
 						byteArray[i] = decodedPdfContent.charCodeAt(i);
 					}
@@ -65,7 +66,7 @@ sap.ui.define([
 					});
 					jQuery.sap.addUrlWhitelist("blob");
 					var _pdfurl = URL.createObjectURL(blob);
-					var pdfModel = this.getView().getModel("pdfModel");
+					var pdfModel = that.getView().getModel("pdfModel");
 					pdfModel.setProperty("/Source", _pdfurl);
 					pdfModel.refresh();
 				};

@@ -1,0 +1,23 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<Dialog class="sapUiSizeCompact" draggable="true" showHeader="false">
+		<content>
+			<Toolbar>
+				<Label text="{i18n>confirmRejectMsg}" design="Bold"/>
+				<ToolbarSpacer/>
+			</Toolbar>
+			<HBox>
+				<Label text="{i18n>selectReasonCode}" class="sapUiTinyMarginTop"/>
+				<Select items="{mRejectModel>/items}" selectedKey="{mRejectModel>/selectedKey}" class="sapUiTinyMarginBegin" change="onRejectCombo"
+					forceSelection="false" width="14rem" valueStateText="{mRejectModel>/rejectReasonVState}">
+					<core:Item text="{mRejectModel>rejectionText}" key="{mRejectModel>reasonforRej}"/>
+				</Select>
+			</HBox>
+		</content>
+		<beginButton>
+			<Button text="{i18n>REJECT}" press="onNonPoRejectConfirm"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>Cancel}" press="onNonPoRejectCancel"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

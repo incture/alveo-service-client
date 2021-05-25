@@ -1,0 +1,39 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.CreateGroup"
+	xmlns:l="sap.ui.layout" xmlns:html="http://www.w3.org/1999/xhtml">
+	<Page showHeader="false">
+		<content>
+			<OverflowToolbar>
+				<Button icon="sap-icon://nav-back" press="onNavBack"></Button>
+				<Text text="Add New Group"></Text>
+			</OverflowToolbar>
+			<l:Grid defaultSpan="XL4 L4 M6 S12" vSpacing="0.5" class="GridBG">
+				<l:content>
+					<VBox>
+						<Label text="{i18n>DISPLAYNAME}"></Label>
+						<Input value="{oUserDetailModel>/createGroup/displayName}" valueStateText=" " valueState="{oMandatoryModel>/createGroup/displayNameState}"></Input>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>DESCRIPTION}"></Label>
+						<Input value="{oUserDetailModel>/createGroup/description}" valueStateText=" " valueState="{oMandatoryModel>/createGroup/descriptionState}"></Input>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>GROUPNAME}"></Label>
+						<Input value="{oUserDetailModel>/createGroup/groupName}" valueStateText=" " valueState="{oMandatoryModel>/createGroup/groupNameState}"></Input>
+					</VBox>
+					<!--<VBox>-->
+					<!--	<Label text="{i18n>GROUPMEMBERS}"></Label>-->
+					<!--	<Input value="{oUserDetailModel>/createGroup/members}" valueStateText=" " valueState="{oMandatoryModel>/createUser/membersState}"></Input>-->
+					<!--</VBox>-->
+				</l:content>
+			</l:Grid>
+		</content>
+		<footer>
+			<OverflowToolbar class="footerClass">
+				<ToolbarSpacer/>
+				<Button type="Emphasized" text="{i18n>CANCEL}"></Button>
+				<Button type="Emphasized" text="{i18n>ADDGROUP}" press="onCreateGroup"  visible="{oVisibilityModel>/createGroup/editable}"></Button>
+				<Button type="Emphasized" text="{i18n>UPDATEGROUP}" press="onCreateGroup"  visible="{path:'oVisibilityModel>/createGroup/editable', formatter:'com.menabev.AP.formatter.formatter.returnNot'}"></Button>
+			</OverflowToolbar>
+		</footer>
+	</Page>
+</mvc:View>

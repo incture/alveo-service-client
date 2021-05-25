@@ -1,5 +1,5 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.CreateUser"
-	xmlns:html="http://www.w3.org/1999/xhtml" 	xmlns:l="sap.ui.layout">
+	xmlns:l="sap.ui.layout" xmlns:html="http://www.w3.org/1999/xhtml">
 	<Page showHeader="false" class="sapUiSizeCompact PageHeader">
 		<content>
 			<OverflowToolbar>
@@ -10,39 +10,47 @@
 				<l:content>
 					<VBox>
 						<Label text="{i18n>GROUP}"></Label>
-						<Input value="{}"></Input>
+						<!--<Input value="{oUserDetailModel>/createUser/userGroup}" valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}"></Input>-->
+						<Select forceSelection="false" width="100%" items="{StaticDataModel>/userGroups}" selectedKey="{oUserDetailModel>/createUser/userGroup}"
+							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect">
+							<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+						</Select>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>FIRSTNAME}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/firstName}" valueStateText=" " valueState="{oMandatoryModel>/createUser/firstNameState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>LASTNAME}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/lastName}" valueStateText=" " valueState="{oMandatoryModel>/createUser/lastNameState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>EMAIL}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/Email}" valueStateText=" " valueState="{oMandatoryModel>/createUser/EmailState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>PHONENO}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/phoneNum}" valueStateText=" " valueState="{oMandatoryModel>/createUser/phoneNumState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>COUNTRY}"></Label>
-						<Input value="{}"></Input>
+						<!--<Input value="{oUserDetailModel>/createUser/country}" valueStateText=" " valueState="{oMandatoryModel>/createUser/countryState}"></Input>-->
+						<Select forceSelection="false" width="100%" items="{oDropDownModel>/country}" selectedKey="{oUserDetailModel>/createUser/country}"
+							valueStateText=" " valueState="{oMandatoryModel>/createUser/countryState}">
+							<core:ListItem key="{oDropDownModel>key}" text="{oDropDownModel>value}"/>
+						</Select>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>VENDORID}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/vendorId}" valueStateText=" " valueState="{oMandatoryModel>/createUser/vendorIdState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>COMPANYCODE}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/createUser/companyCodeState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>PURCHASEORGANISATION}"></Label>
-						<Input value="{}"></Input>
+						<Input value="{oUserDetailModel>/createUser/purchaseOrg}" valueStateText=" " valueState="{oMandatoryModel>/createUser/purchaseOrgState}"></Input>
 					</VBox>
 				</l:content>
 			</l:Grid>
@@ -51,7 +59,9 @@
 			<OverflowToolbar class="footerClass">
 				<ToolbarSpacer/>
 				<Button type="Emphasized" text="{i18n>CANCEL}"></Button>
-					<Button type="Emphasized" text="{i18n>ADDUSER}"></Button>
+				<Button type="Emphasized" text="{i18n>ADDUSER}" press="onCreateUser" visible="{oVisibilityModel>/createUser/editable}"></Button>
+				<Button type="Emphasized" text="{i18n>UPDATEUSER}" press="onCreateUser"
+					visible="{path:'oVisibilityModel>/createUser/editable', formatter:'com.menabev.AP.formatter.formatter.returnNot'}"></Button>
 			</OverflowToolbar>
 		</footer>
 	</Page>

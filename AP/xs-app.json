@@ -4,12 +4,7 @@
 	"logout": {
 		"logoutEndpoint": "/do/logout"
 	},
-	"routes": [{
-		"source": "^/menabev-dev",
-		"target": "/",
-		"destination": "menabev-dev",
-		"csrfProtection": false
-	}, {
+	"routes":  [{
 		"source": "^(.*)$",
 		"target": "$1",
 		"service": "html5-apps-repo-rt",

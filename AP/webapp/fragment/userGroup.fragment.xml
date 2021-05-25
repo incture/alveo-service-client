@@ -5,12 +5,12 @@
 				<Label text="{i18n>ASSIGNEDGROUPS}"></Label>
 			</contentMiddle>
 			<contentRight>
-				<Button icon="sap-icon://decline" type="Transparent"></Button>
+				<Button icon="sap-icon://decline" type="Transparent" press="onCloseGroupFragment"></Button>
 			</contentRight>
 		</Bar>
-		<List items="{}">
+		<List items="{oUserDetailModel>/groups}">
 			<items>
-				<StandardListItem title="{Name}"/>
+				<StandardListItem title="{oUserDetailModel>value}"/>
 			</items>
 		</List>
 	</Dialog>

@@ -17,15 +17,8 @@ app.use(passport.authenticate("JWT", {
 }));
 
 app.get("/user", function (req, res, next) {
-	var user = {
-		"userId": req.user.id,
-		"name": req.user.name,
-		"emails": req.user.emails,
-		"scopes": req.authInfo.scopes,
-		"identity": req.authInfo.identityZone,
-		"AuthInfo": req.authInfo
-	};
-	return res.type("application/json").status(200).json(user);
+	var user = req.user;
+	res.send(user);
 });
 
 const port = process.env.PORT || 3000;

@@ -1,3 +1,85 @@
+.simpleForm1 {
+    padding-right: 8%;
+    padding-top: 0rem;
+}
+
+.simpleForm1 .sapUiFormResGrid>div {
+    padding: 0 0;
+}
+
+.mainPage.sapMFlexBox {
+    border: 1px solid lightgrey;
+    padding: 0.5rem;
+}
+
+.emailConfigSection.sapMFlexBox {
+    margin-bottom: 0.5rem;
+    border: 1px solid lightgrey;
+}
+
+.emailConfigTitle .sapMFlexItemAlignAuto {
+    align-self: center;
+}
+
+.emailConfigTitle {
+    margin: 0.5rem 0 0 1rem;
+}
+
+.durationTitle .sapMFlexItemAlignAuto {
+    align-self: center;
+}
+
+.emailConfigBox {
+    padding: 0.5rem;
+    margin: 0.2rem;
+    background-color: #d8daeb;
+}
+
+.MailTemplate {
+    padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
+    width: 100%;
+    background-color: #d8daeb;
+}
+
+.ocrRadioBtnClass {
+    margin-left: 8%;
+}
+
+.textAreaBox .sapMFlexItem {
+    width: 100%;
+
+}
+
+.sapMListTbl {
+    border-right: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+}
+
+.sapMPanelWrappingDiv {
+    border: 1px solid lightgray;
+}
+
+.borderlessBox .sapMInputBaseContentWrapper {
+    border: none;
+}
+
+.sapMTableTH {
+    background-color: #d8daeb;
+
+}
+
+.TaskPage.sapMPage .sapMPageHeader {
+    background-color: #0053A7 !important;
+}
+
+.TaskPage .sapMIBar-CTX .sapMTitle {
+    color: #fff;
+    font-size: larger;
+}
+
+
+
 .gridContainer {
     display: grid;
     height: "100%";
@@ -15,7 +97,7 @@
     background-color: #0053A7;
     justify-content: normal;
     align-items: normal;
-    height: 100vh;
+    height: 93vh;
     overflow: hidden;
     position: sticky;
     top: 0;
@@ -60,7 +142,7 @@
 .navContainer {
     /*background-color: yellow;*/
     /*height: 90vh; old*/
-    height: 97vh;
+    height: 93vh;
     margin: 9px;
     width: calc(100% - 10px) !important;
 }
@@ -90,9 +172,18 @@
     width: 100%;
     text-shadow: none;
     box-shadow: none !important;
+    background-color: #0053a7 !important;
+    ;
 }
 
+.sapMIBar-CTX .sapMLabel {
+    color: #ffffff;
+}
 
+.sapMIBar-CTX .sapMTitle {
+    color: #ffffff;
+    text-shadow: none;
+}
 
 .sapMTBStandard {
     border-bottom: none;
@@ -108,14 +199,70 @@
     background-color: white;
 }
 
-:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon, :not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon, :not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {
+:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon,
+:not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon,
+:not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {
     color: #fff;
-}/* Enter your custom styles here */
+}
+
+.sapMPage>.sapMPageHeader+section,
+.sapMPage>.sapMPageSubHeader+section,
+.sapMPage>.sapMPageHeader+.sapUiHiddenPlaceholder+section {
+    top: 2.75rem;
+    height: min-content;
+}
+
+.simpleForm1 {
+    padding-right: 8%;
+    padding-top: 0rem;
+}
+
+.simpleForm1 .sapUiFormResGrid>div {
+    padding: 0 0;
+}
+
+.mainPage.sapMFlexBox {
+    border: 1px solid lightgrey;
+    padding: 0.5rem;
+}
+
+.emailConfigSection.sapMFlexBox {
+    margin-bottom: 0.5rem;
+    border: 1px solid lightgrey;
+}
+
+.emailConfigTitle .sapMFlexItemAlignAuto {
+    align-self: center;
+}
+
+.emailConfigTitle {
+    margin: 0.5rem 0 0 1rem;
+}
+
+.durationTitle .sapMFlexItemAlignAuto {
+    align-self: center;
+}
+
+.emailConfigBox {
+    padding: 0.5rem;
+    margin: 0.2rem;
+    background-color: #d8daeb;
+}
+
+.MailTemplate {
+    padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
+    width: 100%;
+    background-color: #d8daeb;
+}
+
+
+/* Enter your custom styles here */
 
 :root {
     --primary-color: #00499c;
     /*Added by PS*/
-    --inputFill-color: white;
+    --inputFill-color: #f9f9f9;
     --navBar: #00499c;
     --primary-BG: #eaeaec;
     --white: #ffffff;
@@ -123,24 +270,28 @@
     --secondary-button: #c5d0df;
     --label: #4f4f4f;
     --font-family: 'Roboto', sans-serif;
-    
+
     --filterBox-BG: #e6edf5;
     --secondary-btn-BG: #d5e0ee;
-    --secondary-btn-BG-hs: rgba(213,224,238,255);
+    --secondary-btn-BG-hs: rgba(213, 224, 238, 255);
     --secondary-btn-color: #4980b9;
-    
+    --page-BG: #eaeaec;
+
     --input-border: #dadde1;
-    
+
     --grey-1: #f9f9f9;
     --grey-2: #e6e6e6;
 }
 
+.page {
+    background-color: var(--page-BG);
+}
 
 /*Purchase Order View*/
 .filterBox {
-	background: var(--filterBox-BG);
-	border-radius: 10px;
-	box-shadow: 0px 0px 10px #888888;
+    background: var(--filterBox-BG);
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #888888;
 }
 
 .filterBox .sapMPanelWrappingDiv {
@@ -152,7 +303,7 @@
     background-color: var(--inputFill-color);
     border-color: var(--input-border);
     border-radius: 5px;
-    
+
 }
 
 .filterInput .sapMFocus .sapMInputBaseContentWrapper {
@@ -212,18 +363,18 @@
 }
 
 .SecondaryBtn:not(.sapMBtnDisabled).sapMBtn:hover .sapMBtnContent {
-    color: rgba(var(--primary-button),1);
+    color: rgba(var(--primary-button), 1);
 }
 
 .SecondaryBtn:not(.sapMBtnDisabled).sapMBtn:hover .sapMBtnIcon {
-    color: rgba(var(--primary-button),1);
+    color: rgba(var(--primary-button), 1);
 }
 
 /*Table Content*/
 .tableBox {
-	background: var(--white);
-	border-radius: 10px;
-	box-shadow: 0px 0px 10px #888888;
+    background: var(--white);
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px #888888;
 }
 
 .MNBTable .sapMTableTH {
@@ -259,7 +410,7 @@
 
 /*search bar */
 .MNBSearch .sapMSFF {
-	background-color: var(--grey-1);
+    background-color: var(--grey-1);
     border: 1px solid var(--grey-2);
     border-radius: 5px;
 }
@@ -271,3 +422,22 @@
     vertical-align: top;
     height: 30rem;
 }
+
+.nonPOHeader {
+    background: var(--white);
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px #9999;
+}
+
+.headerTitle {
+    font-weight: bold;
+}
+
+.btnEmphasized span.sapMBtnInner.sapMBtnEmphasized {
+    background-image: none;
+    background-color: #00499c;
+    border-color: #00499c;
+    color: #fff;
+    text-shadow: 0 0 0.125rem transparent;
+}
+

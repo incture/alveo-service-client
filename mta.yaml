@@ -9,7 +9,7 @@ modules:
     path: apworkbench-approuter
     parameters:
       disk-quota: 256M
-      memory: 100M
+      memory: 256M
     requires:
       - name: APWorkbench_html5_repo_runtime
       - name: UserDetail_api

@@ -1,0 +1,78 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core"
+	controllerName="com.menabev.AP.controller.TemplateManagement">
+	<Dialog title="{postDataModel>/templateTitle}" class="sapUiSizeCompact" contentWidth="75%" titleAlignment="Center">
+		<content>
+			<VBox class="sapUiSmallMargin">
+				<Table id="idNonPo" class="invTabScroll" items="{postDataModel>/nonPoTemplateItems}" sticky="ColumnHeaders">
+					<headerToolbar>
+						<Toolbar>
+							<Label text="{i18n>TemplateName}" design="Bold"/>
+							<Input id="TemplateNameID" value="{postDataModel>/nonPoTemplate/templateName}" placeholder="{i18n>EnterTemplateName}" width="25%"/>
+							<ToolbarSpacer/>
+							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
+						</Toolbar>
+					</headerToolbar>
+					<infoToolbar>
+						<OverflowToolbar>
+							<Label text="{i18n>TemplateInfoMsg}"/>
+						</OverflowToolbar>
+					</infoToolbar>
+					<columns>
+						<Column hAlign="Center" id="accountNoCol" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>AccountNo}" design="Bold" required="true"/>
+						</Column>
+						<Column hAlign="Center" id="glaccountCol" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>Description}" design="Bold"/>
+						</Column>
+						<Column hAlign="Center" id="costcenterCol" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>percentageAllocation}" design="Bold" required="true" wrapping="true"/>
+						</Column>
+						<Column hAlign="Center" id="amountCol" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>Text}" design="Bold"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true"></Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Input value="{postDataModel>accountNo}" valueState="{postDataModel>accountNoError}" change="onChangeAccountNo"/>
+								<Input value="{postDataModel>glAccount}" filterSuggests="false"
+									suggestionItems="{path:'glAccountModel>/d/results', templateShareable : true }" tooltip="{postDataModel>glCode}"
+									suggestionItemSelected="glDescription" showSuggestion="true" suggest="glAccountSuggest" change="errorHandler"
+									valueState="{postDataModel>glError}">
+									<suggestionItems>
+										<core:ListItem text="{path:'glAccountModel>GLAccounts',formatter:'com.menabev.AP.util.formatter.removeZero'}"
+											additionalText="{glAccountModel>GLAccDesc}"/>
+									</suggestionItems>
+								</Input>
+								<Text class="sapUiTinyMarginEnd" text="{postDataModel>materialDescription}"/>
+								<Input value="{postDataModel>costCenter}" tooltip="{postDataModel>costCenter}"
+									suggestionItems="{ path:'costCenterModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
+									suggest="costCenterSuggest" liveChange="handlecostCentreInput" change="errorHandler" valueState="{postDataModel>costCenterError}">
+									<suggestionItems>
+										<core:ListItem text="{costCenterModel>CostCenters}" additionalText="{costCenterModel>CostCenterDesc}"/>
+									</suggestionItems>
+								</Input>
+								<Input value="{postDataModel>allocationPercent}" valueState="{postDataModel>allocationPercentError}" type="Number" change="errorHandler"/>
+								<Input class="sapUiTinyMarginEnd" width="100%" value="{postDataModel>itemText}" tooltip="{postDataModel>text}" change="onChangeText"/>
+								<Button type="Reject" icon="sap-icon://delete" tooltip="{i18n>Delete}" press="deleteNonPoItemData"
+									class="tableBtnAlignMent tableSelectionChkBox dynamicCls sapUiTinyMarginEnd"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</content>
+		<buttons>
+			<Button text="{i18n>Cancel}" press="onCancelCreateEditTemp"/>
+			<Button text="{i18n>Update}" press="onOkSaveTemplate" visible="{postDataModel>/updateBtnVisible}"/>
+			<Button text="{i18n>Create}" id="btnUpdateSavetemplate" press="onOkSaveTemplate" visible="{postDataModel>/createBtnVisible}"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

@@ -58,14 +58,24 @@
 			},
 			"StaticDataModel": {
 				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oUserDetailModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oMandatoryModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oVisibilityModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oDropDownModel": {
+				"type": "sap.ui.model.json.JSONModel"
 			}
 		},
 		"resources": {
-			"css": [
-				{
-					"uri": "css/style.css"
-				}
-			]
+			"css": [{
+				"uri": "css/style.css"
+			}]
 		},
 		"routing": {
 			"config": {
@@ -77,30 +87,56 @@
 				"controlId": "AppId",
 				"clearControlAggregation": false
 			},
-			"routes": [
-				{
-					"name": "UploadInvoice",
-					"pattern": "UploadInvoice",
-					"target": [
-						"UploadInvoice"
-					]
-				},
-				{
-					"name": "UserManagement",
-					"pattern": "",
-					"target": [
-						"UserManagement"
-					]
-				},
-				{
-					"name": "CreateUser",
-					"pattern": "CreateUser",
-					"target": [
-						"CreateUser"
-					]
-				}
-				
-			],
+			"routes": [{
+				"name": "UploadInvoice",
+				"pattern": "UploadInvoice",
+				"target": [
+					"UploadInvoice"
+				]
+			}, {
+				"name": "UserManagement",
+				"pattern": "",
+				"target": [
+					"UserManagement"
+				]
+			}, {
+				"name": "Inbox",
+				"pattern": "Inbox",
+				"target": [
+					"Inbox"
+				]
+			}, {
+				"name": "CreateUser",
+				"pattern": "CreateUser/{id}",
+				"target": [
+					"CreateUser"
+				]
+			}, {
+				"name": "CreateGroup",
+				"pattern": "CreateGroup/{id}",
+				"target": [
+					"CreateGroup"
+				]
+			}, {
+				"name": "ConfigCockpit",
+				"pattern": "ConfigCockpit",
+				"target": [
+					"ConfigCockpit"
+				]
+			}, {
+				"name": "TemplateMangement",
+				"pattern": "TemplateMangement",
+				"target": [
+					"TemplateMangement"
+				]
+			},
+			{
+				"name": "NonPOInvoice",
+				"pattern": "NonPOInvoice/:id:/:status:",
+				"target": [
+					"NonPOInvoice"
+				]
+			}],
 			"targets": {
 				"UploadInvoice": {
 					"viewType": "XML",
@@ -117,6 +153,22 @@
 				"UserManagement": {
 					"viewType": "XML",
 					"viewName": "UserManagement"
+				},
+				"Inbox":{
+					"viewType": "XML",
+					"viewName": "Inbox"
+				},
+				"CreateGroup": {
+					"viewType": "XML",
+					"viewName": "CreateGroup"
+				},
+				"ConfigCockpit": {
+					"viewType": "XML",
+					"viewName": "ConfigCockpit"
+				},
+				"TemplateMangement": {
+					"viewType": "XML",
+					"viewName": "ConfigCockpit"
 				}
 			}
 		}

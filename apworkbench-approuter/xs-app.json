@@ -1,14 +1,18 @@
 {
-  "authenticationMethod": "route",
-  "routes": [{
+	"authenticationMethod": "route",
+	"routes": [{
 		"source": "^/IDPDEST",
 		"target": "/",
 		"destination": "IDP-DEST",
 		"csrfProtection": false
 	}, {
-		"source": "^/menabev-dev",
+		"source": "^/menabevdev",
 		"target": "/",
 		"destination": "menabev-dev",
 		"csrfProtection": false
+	}, {
+		"source": "^/(.*)$",
+		"target": "$1",
+		"destination": "UserDetail_api"
 	}]
 }

@@ -1,6 +1,7 @@
 {
 	"mandatoryFields": {
-		"userDetail": []
+		"userDetail": ["userGroup","firstName","lastName","Email","country","vendorId","companyCode","purchaseOrg"],
+		"createGroup":["displayName","description","groupName"]
 	},
 	"leftPane": [{
 		"label": "Upload Invoice",
@@ -11,16 +12,25 @@
 		"key": "UserManagement",
 		"icon": ""
 	}, {
-		"label": "Dashboard",
-		"key": "Dashboard",
+		"label": "Template Mangement",
+		"key": "TemplateMangement",
 		"icon": ""
 	}, {
+		"label": "Config Cockpit",
+		"key": "ConfigCockpit",
+		"icon": ""
+	},
+	{
 		"label": "AP Workbench",
-		"key": "TaskManagement",
+		"key": "Inbox",
 		"icon": ""
-	}, {
-		"label": "Purchase Order",
-		"key": "PurchaseOrder",
-		"icon": ""
+	}],
+	"userGroups":[{
+		"key":"IT_Admin",
+		"value":"IT_Admin"
+	},
+	{
+		"key":"Supplier_Admin",
+		"value":"Supplier_Admin"
 	}]
 }

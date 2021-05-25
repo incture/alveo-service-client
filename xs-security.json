@@ -1,14 +1,69 @@
 {
-  "xsappname": "APWorkbench",
-  "tenant-mode": "dedicated",
-  "description": "Security profile of called application",
-  "role-templates": [
-    {
-      "name": "Token_Exchange",
-      "description": "UAA",
-      "scope-references": [
-        "uaa.user"
-      ]
-    }
-  ]
+	"xsappname": "APWorkbench",
+	"tenant-mode": "dedicated",
+	"description": "Security profile of called application",
+	"role-templates": [{
+		"name": "Token_Exchange",
+		"description": "UAA",
+		"scope-references": [
+			"uaa.user"
+		]
+	}, {
+		"name": "Accountant",
+		"description": "UAA Accountant",
+		"scope-references": [
+			"$XSAPPNAME.Accountant"
+		]
+	}, {
+		"name": "Process_Lead",
+		"description": "UAA Process_Lead",
+		"scope-references": [
+			"$XSAPPNAME.Process_Lead"
+		]
+	}, {
+		"name": "Buyer",
+		"description": "UAA Buyer",
+		"scope-references": [
+			"$XSAPPNAME.Buyer"
+		]
+	}, {
+		"name": "IT_Admin",
+		"description": "UAA IT_Admin",
+		"scope-references": [
+			"$XSAPPNAME.IT_Admin"
+		]
+	}, {
+		"name": "Supplier_Admin",
+		"description": "UAA Supplier_Admin",
+		"scope-references": [
+			"$XSAPPNAME.Supplier_Admin"
+		]
+	}, {
+		"name": "Supplier_Executive",
+		"description": "UAA Supplier_Executive",
+		"scope-references": [
+			"$XSAPPNAME.Supplier_Executive"
+		]
+	}],
+	"scopes": [{
+		"name": "$XSAPPNAME.Accountant",
+		"description": "UAA Accountant"
+	}, {
+		"name": "$XSAPPNAME.Process_Lead",
+		"description": "UAA Process_Lead"
+	},
+	{
+		"name": "$XSAPPNAME.Buyer",
+		"description": "UAA Buyer"
+	}, {
+		"name": "$XSAPPNAME.IT_Admin",
+		"description": "UAA IT_Admin"
+	},
+	{
+		"name": "$XSAPPNAME.Supplier_Admin",
+		"description": "UAA Supplier_Admin"
+	}, {
+		"name": "$XSAPPNAME.Supplier_Executive",
+		"description": "UAA Supplier_Executive"
+	}]
 }
