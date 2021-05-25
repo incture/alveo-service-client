@@ -8,7 +8,7 @@
 	}, {
 		"source": "^/menabevdev",
 		"target": "/",
-		"destination": "menabev-dev",
+		"destination": "/menabev-dev",
 		"csrfProtection": false
 	}, {
 		"source": "^/(.*)$",

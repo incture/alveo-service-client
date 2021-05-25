@@ -199,11 +199,11 @@
     background-color: white;
 }
 
-:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon,
-:not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon,
-:not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {
-    color: #fff;
-}
+/*:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon,*/
+/*:not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon,*/
+/*:not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {*/
+/*    color: #fff;*/
+/*}*/
 
 .sapMPage>.sapMPageHeader+section,
 .sapMPage>.sapMPageSubHeader+section,
@@ -255,7 +255,12 @@
     width: 100%;
     background-color: #d8daeb;
 }
-
+.labelwrapTable .sapMListTbl .sapMText, .sapMListTbl .sapMLabel {
+    font-size: .875rem;
+    color: #32363a;
+    white-space: pre-wrap;
+    font-weight: normal;
+}
 
 /* Enter your custom styles here */
 

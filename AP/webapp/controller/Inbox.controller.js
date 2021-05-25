@@ -48,7 +48,7 @@ sap.ui.define([
 				var oInboxModel = new sap.ui.model.json.JSONModel();
 				this.getView().setModel(oInboxModel, "oInboxModel");
 				var taskDataFilterModelData = this.getView().getModel("taskDataFilterModel").getData(),
-					url = "menabev-dev/invoiceHeader/inbox",
+					url = "/menabevdev/invoiceHeader/inbox",
 					that = this;
 				taskDataFilterModelData.userId = "P000022";
 				taskDataFilterModelData.indexNum = scroll ? pageNo : 1;
@@ -246,7 +246,7 @@ sap.ui.define([
 					obj.claim = false;
 				jQuery
 					.ajax({
-						url: "menabev-dev/invoiceHeader/claimOrRelease",
+						url: "/menabevdev/invoiceHeader/claimOrRelease",
 						dataType: "json",
 						data: JSON.stringify(obj),
 						contentType: "application/json",

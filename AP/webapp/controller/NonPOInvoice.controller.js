@@ -140,8 +140,8 @@ sap.ui.define([
 		//Service call to load Non PO data
 		//Parameter: requestId
 		getNonPOData: function (requestId) {
-			// var sUrl = "menabev-dev/invoiceHeader?requestId=" + requestId;
-			var sUrl = "menabev-dev/invoiceHeader/getInvoiceByRequestId/" + requestId;
+			// var sUrl = "/menabevdev/invoiceHeader?requestId=" + requestId;
+			var sUrl = "/menabevdev/invoiceHeader/getInvoiceByRequestId/" + requestId;
 
 			jQuery.ajax({
 				method: "GET",
@@ -469,7 +469,7 @@ sap.ui.define([
 			//	var pageNo = 0;
 			//	var url = "InctureApDest/NonPoTemplate/getAll/50/" + pageNo;
 			templateModel.setProperty("/allocateTempBtnEnabled", false);
-			var url = "menabev-dev/NonPoTemplate/selectNonPoTemplate";
+			var url = "/menabevdev/NonPoTemplate/selectNonPoTemplate";
 			this.busyDialog.open();
 			jQuery.ajax({
 				type: "GET",
@@ -585,7 +585,7 @@ sap.ui.define([
 			}
 
 			//service call to preview the cost allocation
-			var sUrl = "menabev-dev/costAllocation/getCostAllocationForTemplate";
+			var sUrl = "/menabevdev/costAllocation/getCostAllocationForTemplate";
 			jQuery.ajax({
 				method: "POST",
 				contentType: "application/json",
@@ -679,7 +679,7 @@ sap.ui.define([
 				var arrLength = arr.length;
 				for (var j = 0; j < arrLength; j++) {
 					var tempid = aNonPoTemplate[arr[j]].templateId;
-					var sUrl = "menabev-dev/NonPoTemplate/getItemsByTemplateId/" + tempid;
+					var sUrl = "/menabevdev/NonPoTemplate/getItemsByTemplateId/" + tempid;
 					jQuery.ajax({
 						type: "GET",
 						contentType: "application/json",
@@ -1353,7 +1353,7 @@ sap.ui.define([
 			var postingDate = oSaveData.invoiceHeaderDto.postingDate;
 			if (postingDate) {
 				var that = this;
-				var url = "menabev-dev/invoiceHeader/accountantSave";
+				var url = "/menabevdev/invoiceHeader/accountantSave";
 				$.ajax({
 					url: url,
 					method: "POST",
@@ -1555,7 +1555,7 @@ sap.ui.define([
 					if (postingDate) {
 						jsonData = JSON.stringify(jsonData);
 						var that = this;
-						var url = "menabev-dev/invoiceHeader/accountantSubmit";
+						var url = "/menabevdev/invoiceHeader/accountantSubmit";
 						$.ajax({
 							url: url,
 							method: "POST",

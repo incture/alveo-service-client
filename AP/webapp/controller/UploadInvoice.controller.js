@@ -149,7 +149,7 @@ sap.ui.define([
 					// jQuery.sap.domById(oFileUploader.getId() + "-fu").setAttribute("type", "file");
 					// oFormData.set("file", jQuery.sap.domById(oFileUploader.getId() + "-fu").files[0]);
 					oFormData.set("file", this.file);
-					var url = "menabev-dev/uploadInvoice";
+					var url = "/menabevdev/uploadInvoice";
 					this.busyDialog.open();
 					jQuery.ajax({
 						url: url,

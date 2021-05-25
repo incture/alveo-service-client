@@ -45,7 +45,7 @@ sap.ui.define([
 					"offset": pageNo
 				}
 			};
-			var url = "menabev-dev/NonPoTemplate/getAll";
+			var url = "/menabevdev/NonPoTemplate/getAll";
 			this.busyDialog.open();
 			jQuery.ajax({
 				type: "POST",
@@ -86,7 +86,7 @@ sap.ui.define([
 			//	var url = "InctureApDest/NonPoTemplate/getAll/50/" + pageNo;
 			this.getView().byId("templateTableId").removeSelections();
 			templateModel.setProperty("/tempBtnEnabled", false);
-			var url = "menabev-dev/NonPoTemplate/getAll";
+			var url = "/menabevdev/NonPoTemplate/getAll";
 			this.busyDialog.open();
 			jQuery.ajax({
 				type: "GET",
@@ -180,7 +180,7 @@ sap.ui.define([
 
 		deleteTemplateServiceCall: function (payload) {
 			var aNonPoTemplate = this.getModel("templateModel").getProperty("/aNonPoTemplate");
-			var sUrl = "menabev-dev/NonPoTemplate/delete";
+			var sUrl = "/menabevdev/NonPoTemplate/delete";
 			var that = this;
 			jQuery.ajax({
 				method: "DELETE",
@@ -392,10 +392,10 @@ sap.ui.define([
 					jsonData = JSON.stringify(jsonData);
 					var sUrl, sType;
 					if (this.cFalg === "Create") {
-						sUrl = "menabev-dev/NonPoTemplate/save";
+						sUrl = "/menabevdev/NonPoTemplate/save";
 						sType = "POST";
 					} else {
-						sUrl = "menabev-dev/NonPoTemplate/update";
+						sUrl = "/menabevdev/NonPoTemplate/update";
 						sType = "PUT";
 					}
 					var that = this;
@@ -572,7 +572,7 @@ sap.ui.define([
 					"offset": offset
 				}
 			};
-			var url = "menabev-dev/NonPoTemplate/getAll";
+			var url = "/menabevdev/NonPoTemplate/getAll";
 			this.busyDialog.open();
 			jQuery.ajax({
 				type: "POST",

@@ -127,7 +127,7 @@
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
 					<IconTabFilter text="{i18n>OPENTASK}" key="openTask">
-						<Table items="{oInboxModel>/openResult}" mode="None">
+						<Table items="{oInboxModel>/openResult}" mode="None" class="labelwrapTable">
 							<columns>
 								<Column width="11%" hAlign="Center">
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
