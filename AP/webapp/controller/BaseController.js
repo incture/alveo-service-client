@@ -183,6 +183,19 @@ sap.ui.define([
 				oEvent.getSource().setValueState("None");
 			}
 		},
+		
+		//Support function to display error message
+		errorMsg: function (errorMsg) {
+			sap.m.MessageBox.show(
+				errorMsg, {
+					styleClass: 'sapUiSizeCompact',
+					icon: sap.m.MessageBox.Icon.ERROR,
+					title: "Error",
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (oAction) {}
+				}
+			);
+		},
 
 	});
 

@@ -1,74 +1,70 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.TemplateManagement"
 	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout">
-	<App>
-		<pages>
-			<Page title="{i18n>TemplateManagement}" showNavButton="true" navButtonPress="onNavBack" class="sapUiSizeCompact">
-				<content>
+	<Page title="{i18n>TemplateManagement}" showNavButton="true" navButtonPress="onNavBack" class="sapUiSizeCompact">
+		<content>
+			<VBox>
+				<l:Grid defaultSpan="L3 M6 S12" width="100%">
 					<VBox>
-						<l:Grid defaultSpan="L3 M6 S12" width="100%">
-							<VBox>
-								<Label text="{i18n>TempalateName}" design="Bold"/>
-								<Input value="{templateModel>/inputTempName}" width="80%"/>
-							</VBox>
-							<VBox>
-								<Label text="{i18n>AccountNumber}" design="Bold"/>
-								<Input value="{templateModel>/inputAccountNumber}" width="80%"/>
-							</VBox>
-							<VBox>
-								<Label/>
-								<HBox>
-									<Button text="{i18n>Clear}" type="Reject" press="onCLickClearInputTemp" class="sapUiTinyMarginEnd"/>
-									<Button text="{i18n>Search}" press="onClickSearchTemplate"/>
-								</HBox>
-							</VBox>
-						</l:Grid>
+						<Label text="{i18n>TempalateName}" design="Bold"/>
+						<Input value="{templateModel>/inputTempName}" width="80%"/>
 					</VBox>
-					<Table items="{templateModel>/aNonPoTemplate}" id="templateTableId" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders"
-						selectionChange="onSelectionChangeTemplate" growing="true" growingThreshold="10" noDataText="{i18n>NoTemplatesFound}">
-						<columns>
-							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>TemplateName}" class="selectTemp"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>AccountNumber}" class="selectTemp"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>CreatedBy}" class="selectTemp"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>UpdatedBy}" class="selectTemp"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>Edit}" class="selectTemp"/>
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem>
-								<cells>
-									<Text text="{templateModel>nonPoTemplate/templateName}" class="selectTemp"/>
-									<Text text="{templateModel>nonPoTemplate/accountNo}" class="selectTemp"/>
-									<Text text="{templateModel>nonPoTemplate/createdBy}" class="selectTemp"/>
-									<Text text="{path:'templateModel>nonPoTemplate/updatedBy',formatter: 'com.menabev.AP.util.formatter.getUpdatedBy'}" class="selectTemp"/>
-									<Button icon="sap-icon://edit" press="onClickEditTemplate" tooltip="{i18n>Edit}"/>
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-					<HBox justifyContent="Center">
-						<Button id="btnPrevious" text="{i18n>Previous}" press="onClickPrevious"/>
-						<Button id="btnNext" text="{i18n>Next}" press="onClickNext"/>
-					</HBox>
-				</content>
-				<footer>
-					<Toolbar>
-						<ToolbarSpacer/>
-						<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Save}" press="onClickCancelTemplate" class="sapUiTinyMarginEnd" visible="false"/>
-						<Button text="{i18n>DELETETEMP}" press="onDeleteofNonpoTemplate" tooltip="{i18n>Delete}" type="Reject"
-						enabled="{templateModel>/tempBtnEnabled}"/>
-						<Button text="{i18n>CreateTemplate}" type="Emphasized" tooltip="{i18n>Submit}" press="onClickCreateTemplate" class="sapUiTinyMarginEnd"/>
-					</Toolbar>
-				</footer>
-			</Page>
-		</pages>
-	</App>
+					<VBox>
+						<Label text="{i18n>AccountNumber}" design="Bold"/>
+						<Input value="{templateModel>/inputAccountNumber}" width="80%"/>
+					</VBox>
+					<VBox>
+						<Label/>
+						<HBox>
+							<Button text="{i18n>Clear}" type="Reject" press="onCLickClearInputTemp" class="sapUiTinyMarginEnd"/>
+							<Button text="{i18n>Search}" press="onClickSearchTemplate"/>
+						</HBox>
+					</VBox>
+				</l:Grid>
+			</VBox>
+			<Table items="{templateModel>/aNonPoTemplate}" id="templateTableId" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders"
+				selectionChange="onSelectionChangeTemplate" growing="true" growingThreshold="10" noDataText="{i18n>NoTemplatesFound}">
+				<columns>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>TemplateName}" class="selectTemp"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>AccountNumber}" class="selectTemp"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>CreatedBy}" class="selectTemp"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>UpdatedBy}" class="selectTemp"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>Edit}" class="selectTemp"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{templateModel>nonPoTemplate/templateName}" class="selectTemp"/>
+							<Text text="{templateModel>nonPoTemplate/accountNo}" class="selectTemp"/>
+							<Text text="{templateModel>nonPoTemplate/createdBy}" class="selectTemp"/>
+							<Text text="{path:'templateModel>nonPoTemplate/updatedBy',formatter: 'com.menabev.AP.util.formatter.getUpdatedBy'}" class="selectTemp"/>
+							<Button icon="sap-icon://edit" press="onClickEditTemplate" tooltip="{i18n>Edit}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+			<HBox justifyContent="Center">
+				<Button id="btnPrevious" text="{i18n>Previous}" press="onClickPrevious"/>
+				<Button id="btnNext" text="{i18n>Next}" press="onClickNext"/>
+			</HBox>
+		</content>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Save}" press="onClickCancelTemplate" class="sapUiTinyMarginEnd" visible="false"/>
+				<Button text="{i18n>DELETETEMP}" press="onDeleteofNonpoTemplate" tooltip="{i18n>Delete}" type="Reject"
+					enabled="{templateModel>/tempBtnEnabled}"/>
+				<Button text="{i18n>CreateTemplate}" type="Emphasized" tooltip="{i18n>Submit}" press="onClickCreateTemplate" class="sapUiTinyMarginEnd"/>
+			</Toolbar>
+		</footer>
+	</Page>
 </mvc:View>

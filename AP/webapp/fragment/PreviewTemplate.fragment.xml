@@ -1,5 +1,4 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core"
-	controllerName="com.inc.ApWorkbench.controller.baseCoder">
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<Dialog title="Preview" class="sapUiSizeCompact" contentWidth="50%">
 		<content>
 			<VBox items="{postDataModel>/previewListNonPoItem}" class="sapUiSmallMargin">
@@ -13,20 +12,16 @@
 						</Toolbar>
 					</headerToolbar>
 					<columns>
-						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/0/status}" hAlign="Center" id="glaccountCol"
-							minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" id="glaccountCol" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
 						</Column>
-						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/4/status}" hAlign="Center" id="costcenterCol"
-							minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" id="costcenterCol" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
 						</Column>
-						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/3/status}" hAlign="Center" minScreenWidth="Small"
-							demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>percentageAllocation}" design="Bold" required="true" wrapping="true"/>
 						</Column>
-						<Column visible="{PersonalizationModel>/personalizationData/userPersonaDto/3/status}" hAlign="Center" id="amountCol" minScreenWidth="Small"
-							demandPopin="true">
+						<Column hAlign="Center" id="amountCol" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>Amount}" design="Bold" required="true"/>
 						</Column>
 					</columns>

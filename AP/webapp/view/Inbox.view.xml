@@ -54,8 +54,7 @@
 							<fb:FilterItem name="D" label="{i18n>InvoiceDateFrom}">
 								<fb:control>
 									<DatePicker id="idInvoiceFrom" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
-										value="{taskDataFilterModel>/createdAtFrom}" class="sapUiSizeCompact" tooltip="Invoice From Date"
-										change="onDateRangeChange"/>
+										value="{taskDataFilterModel>/createdAtFrom}" class="sapUiSizeCompact" tooltip="Invoice From Date" change="onDateRangeChange"/>
 								</fb:control>
 							</fb:FilterItem>
 							<fb:FilterItem name="E" label="{i18n>InvoiceDateTo}">
@@ -89,8 +88,7 @@
 							</fb:FilterItem>
 							<fb:FilterItem name="J" label="{i18n>InvoiceValueTo}">
 								<fb:control>
-									<Input value="{taskDataFilterModel>/invoiceTotalTo}" liveChange="onChangeInvoiceValue" class="sapUiSizeCompact"
-										tooltip="Invoice Value To"/>
+									<Input value="{taskDataFilterModel>/invoiceTotalTo}" liveChange="onChangeInvoiceValue" class="sapUiSizeCompact" tooltip="Invoice Value To"/>
 								</fb:control>
 							</fb:FilterItem>
 							<fb:FilterItem name="K" label="{i18n>ProcessStatus}">
@@ -118,12 +116,10 @@
 					</Toolbar>
 				</content>
 			</Panel>
-			<OverflowToolbar>
-				<ToolbarSpacer/>
+			<HBox class="alignCls">
 				<SearchField class="sapUiSizeCompact"></SearchField>
 				<Button icon="sap-icon://action-settings" type="Transparent"/>
-				<Button text="{i18n>CREATEINVOICE}" press="onCreateInvoice"></Button>
-			</OverflowToolbar>
+			</HBox>
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
 					<IconTabFilter text="{i18n>OPENTASK}" key="openTask">

@@ -124,10 +124,10 @@
 					"ConfigCockpit"
 				]
 			}, {
-				"name": "TemplateMangement",
-				"pattern": "TemplateMangement",
+				"name": "TemplateManagement",
+				"pattern": "TemplateManagement",
 				"target": [
-					"TemplateMangement"
+					"TemplateManagement"
 				]
 			},
 			{
@@ -166,9 +166,9 @@
 					"viewType": "XML",
 					"viewName": "ConfigCockpit"
 				},
-				"TemplateMangement": {
+				"TemplateManagement": {
 					"viewType": "XML",
-					"viewName": "ConfigCockpit"
+					"viewName": "TemplateManagement"
 				}
 			}
 		}

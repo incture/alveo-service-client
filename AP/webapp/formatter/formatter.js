@@ -107,4 +107,58 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return true;
 	},
+	
+	crDbIndicator: function (value) {
+		var returnValue = "";
+		if (value) {
+			if (value === "H") {
+				returnValue = "Debit";
+			} else {
+				returnValue = "Credit";
+			}
+		}
+		return returnValue;
+	},
+	
+	/** To Remove Leading Zero */
+	removeZero: function (value) {
+		if (value) {
+			return value.replace(/\b0+/g, '');
+		} else {
+			return "";
+		}
+	},
+	
+	/** Currency Symbol */
+	currencySymbolWithValue: function (curVal) {
+		if (curVal) {
+			var currSymbol = {
+				"USD": "$",
+				"EUR": "€",
+				"CRC": "₡",
+				"GBP": "£",
+				"ILS": "₪",
+				"INR": "₹",
+				"JPY": "¥",
+				"KRW": "₩",
+				"NGN": "₦",
+				"PHP": "₱",
+				"PLN": "zł",
+				"PYG": "₲",
+				"THB": "฿",
+				"UAH": "₴",
+				"VND": "₫"
+			};
+			var currncy = currSymbol[curVal] ? currSymbol[curVal] : "";
+			return currncy;
+		}
+	},
+
+	
+	getDate: function (value) {
+		if (value)
+			return new Date(value).toISOString().split("T")[0];
+		return "";
+	},
+	
 };
