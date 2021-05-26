@@ -48,18 +48,38 @@ sap.ui.define([
 		fetchUserDetails: function (mail) {
 			var oUserDetailModel = this.getModel("oUserDetailModel");
 			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var groups = ["IT_Admin", "Accountant", "Buyer", "Process_Lead", "Supplier_Admin", "Supplier_Executive"];
 			var sUrl = "/IDPDEST/service/scim/Users/?filter=emails eq " + '"' + mail + '"';
 			var busy = new sap.m.BusyDialog();
 			var oHeader = {
 				"Content-Type": "application/scim+json"
 			};
-			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
-			oServiceModel.attachRequestCompleted(function (oEvent) {
-				var data = oEvent.getSource().getData();
-				if (data.Resources) {
-					oUserDetailModel.setProperty("/loggedinUserDetail", data.Resources);
+			var data, userGroup = [],
+				vendorId, groupData;
+			oServiceModel.loadData(sUrl, "", false, "GET", false, false, oHeader);
+			// oServiceModel.attachRequestCompleted(function (oEvent) {
+			var data = oServiceModel.getData().Resources[0];
+			if (data) {
+				var group = data.groups,
+					length = data.groups.length;
+				if (data.groups) {
+					for (var i = 0; i < length; i++) {
+						groupData = groups.indexOf(data.groups[i].value);
+						if (data >= 0) {
+							if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
+								.attributes) {
+								vendorId = data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+							}
+							oUserDetailModel.setProperty("/loggedinUserGroup", data.groups[i]);
+							oUserDetailModel.setProperty("/loggedinUserVendorId", vendorId);
+							break;
+						}
+
+					}
 				}
-			});
+				oUserDetailModel.setProperty("/loggedinUserDetail", data);
+			}
+			// });
 		}
 
 	});

@@ -199,19 +199,6 @@
     background-color: white;
 }
 
-/*:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon,*/
-/*:not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon,*/
-/*:not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {*/
-/*    color: #fff;*/
-/*}*/
-
-.sapMPage>.sapMPageHeader+section,
-.sapMPage>.sapMPageSubHeader+section,
-.sapMPage>.sapMPageHeader+.sapUiHiddenPlaceholder+section {
-    top: 2.75rem;
-    height: min-content;
-}
-
 .simpleForm1 {
     padding-right: 8%;
     padding-top: 0rem;

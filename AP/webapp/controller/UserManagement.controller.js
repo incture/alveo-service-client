@@ -19,14 +19,21 @@ sap.ui.define([
 			};
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
+			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
 				if (oEvent.getParameter("name") === "UserManagement") {
-					that.getUserDetails();
-					that.fetchAllGroups();
+					if (userGroup === "IT_Admin") {
+						that.getUserDetails("admin");
+						that.fetchAllGroups();
+					} else if (userGroup === "Supplier_Admin") {
+						that.getUserDetails();
+						that.fetchAllGroups();
+					} else {
+						that.navTo("Dashboard");
+					}
 				}
 			});
-
 		},
 		onAddNewUser: function () {
 			this.oRouter.navTo("CreateUser", {
@@ -52,24 +59,72 @@ sap.ui.define([
 				id: oUserId
 			});
 		},
-		getUserDetails: function () {
+		getUserDetails: function (admin) {
+			var that = this;
 			var oUserDetailModel = this.oUserDetailModel;
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var sUrl = "/IDPDEST/service/scim/Users";
+			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
+			var loggedinUserVendorId = oUserDetailModel.setProperty("/loggedinUserVendorId");
+			var sUrl = "/IDPDEST/service/scim/Users/";
 			var busy = new sap.m.BusyDialog();
 			var oHeader = {
 				"Content-Type": "application/scim+json"
 			};
+			if (admin) {
+				var groups = ["IT_Admin", "Supplier_Admin"];
+			} else {
+				var groups = ["Supplier_Executive"];
+			}
 			busy.open();
 			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				busy.close();
 				var data = oEvent.getSource().getData();
+				var user, userdata = [],
+					vendorId;
 				if (data.Resources) {
-					oUserDetailModel.setProperty("/users", data.Resources);
+					for (var i = 0; i < data.Resources.length; i++) {
+						user = data.Resources[i];
+						if (user.groups) {
+							for (var i = 0; i < user.groups.length; i++) {
+								data = groups.indexOf(user.groups[i].value);
+								if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data[
+										"urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
+									.attributes) {
+									vendorId = user["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+								}
+								if (data >= 0) {
+									if (!admin) {
+										userdata.push(user);
+									} else if (loggedinUserVendorId === vendorId) {
+										userdata.push(user);
+									}
+								}
+							}
+						}
+					}
+					oUserDetailModel.setProperty("/users", userdata);
 				}
 			});
 		},
+		// getUserDetails1: function (id) {
+		// 	var oUserDetailModel = this.oUserDetailModel;
+		// 	var oServiceModel = new sap.ui.model.json.JSONModel();
+		// 	var sUrl = "/IDPDEST/service/scim/Groups/" + id;
+		// 	var busy = new sap.m.BusyDialog();
+		// 	var oHeader = {
+		// 		"Content-Type": "application/scim+json"
+		// 	};
+		// 	busy.open();
+		// 	oServiceModel.loadData(sUrl, "", true, "GET", true, false, oHeader);
+		// 	oServiceModel.attachRequestCompleted(function (oEvent) {
+		// 		busy.close();
+		// 		var data = oEvent.getSource().getData();
+		// 		if (data.Resources) {
+		// 			oUserDetailModel.setProperty("/users", data.Resources);
+		// 		}
+		// 	});
+		// },
 		fetchAllGroups: function () {
 			var oUserDetailModel = this.oUserDetailModel;
 			var oServiceModel = new sap.ui.model.json.JSONModel();

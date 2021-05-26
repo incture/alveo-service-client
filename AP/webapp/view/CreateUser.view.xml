@@ -12,7 +12,8 @@
 						<Label text="{i18n>GROUP}"></Label>
 						<!--<Input value="{oUserDetailModel>/createUser/userGroup}" valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}"></Input>-->
 						<Select forceSelection="false" width="100%" items="{StaticDataModel>/userGroups}" selectedKey="{oUserDetailModel>/createUser/userGroup}"
-							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect">
+							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect"
+							enabled="{oVisibilityModel>/createUser/editable}">
 							<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 						</Select>
 					</VBox>
@@ -42,15 +43,18 @@
 					</VBox>
 					<VBox>
 						<Label text="{i18n>VENDORID}"></Label>
-						<Input value="{oUserDetailModel>/createUser/vendorId}" valueStateText=" " valueState="{oMandatoryModel>/createUser/vendorIdState}"></Input>
+						<Input value="{oUserDetailModel>/createUser/vendorId}" valueStateText=" " valueState="{oMandatoryModel>/createUser/vendorIdState}"
+							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>COMPANYCODE}"></Label>
-						<Input value="{oUserDetailModel>/createUser/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/createUser/companyCodeState}"></Input>
+						<Input value="{oUserDetailModel>/createUser/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/createUser/companyCodeState}"
+							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>PURCHASEORGANISATION}"></Label>
-						<Input value="{oUserDetailModel>/createUser/purchaseOrg}" valueStateText=" " valueState="{oMandatoryModel>/createUser/purchaseOrgState}"></Input>
+						<Input value="{oUserDetailModel>/createUser/purchaseOrg}" valueStateText=" " valueState="{oMandatoryModel>/createUser/purchaseOrgState}"
+							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
 				</l:content>
 			</l:Grid>

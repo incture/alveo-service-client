@@ -24,19 +24,34 @@ sap.ui.define([
 			this.oVisibilityModel = oVisibilityModel;
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
 			this.oDropDownModel = oDropDownModel;
-
+			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
+			var userDetail = oUserDetailModel.getProperty("/loggedinUserDetail");
 			this.fetchCountryList();
+			var obj = {};
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
 				if (oEvent.getParameter("name") === "CreateUser") {
 					that.id = oEvent.getParameter("arguments").id;
 					oVisibilityModel.setProperty("/createUser", {});
 					oMandatoryModel.setProperty("/createUser", {});
 					oUserDetailModel.setProperty("/createUser", {});
-					if (that.id !== "new") {
-						that.fetchUser(that.id);
-						oVisibilityModel.setProperty("/createUser/editable", false);
+					if (userGroup === "IT_Admin" || userGroup === "Supplier_Admin") {
+						if (that.id !== "new") {
+							that.fetchUser(that.id);
+							oVisibilityModel.setProperty("/createUser/editable", false);
+						} else {
+							if (userGroup === "IT_Admin") {
+								oVisibilityModel.setProperty("/createUser/editable", true);
+							} else {
+								oVisibilityModel.setProperty("/createUser/editable", false);
+								obj.vendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+								obj.companyCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
+								obj.purchaseOrg = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[2].value;
+								obj.userGroup = userDetail.groups[0].value;
+								oUserDetailModel.setProperty("/createUser", obj);
+							}
+						}
 					} else {
-						oVisibilityModel.setProperty("/createUser/editable", true);
+						that.navTo("Dashboard");
 					}
 				}
 			});
@@ -170,10 +185,10 @@ sap.ui.define([
 				"displayName": data.firstName + " " + data.lastName,
 				"addresses": [{
 					"type": "home",
-					"country": data.selectedCountry
+					"country": data.country
 				}],
 				"phoneNumbers": [{
-					"value": data.phoneNo,
+					"value": data.phoneNum,
 					"type": "mobile"
 				}],
 				"urn:sap:cloud:scim:schemas:extension:custom:2.0:User": {
@@ -200,19 +215,19 @@ sap.ui.define([
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			if (this.id === "new") {
 				sUrl = "/IDPDEST/service/scim/Users";
-				var mes =  "user is created successfully with User ID";
+				var mes = "user is created successfully with User ID";
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, oHeader);
 			} else {
 				sUrl = "/IDPDEST/service/scim/Users/" + this.id;
-					var mes =  "user is updated successfully with User ID";
-				oPayload.id =  this.id;
+				var mes = "user is updated successfully with User ID";
+				oPayload.id = this.id;
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "PUT", false, false, oHeader);
 			}
 			var message;
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				if (oEvent.getParameter("success")) {
 					message = oEvent.getSource().getData().name.givenName + " " + oEvent.getSource().getData().name.familyName +
-					mes + oEvent.getSource().getData().id;
+						mes + oEvent.getSource().getData().id;
 					sap.m.MessageBox.success(message, {
 						actions: [sap.m.MessageBox.Action.OK],
 						onClose: function (e) {

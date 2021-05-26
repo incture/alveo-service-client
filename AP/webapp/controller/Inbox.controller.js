@@ -19,7 +19,7 @@ sap.ui.define([
 			
 				this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 				this.oRouter.attachRoutePatternMatched(function (oEvent) {
-					if (oEvent.getParameter("name") === "CreateGroup") {
+					if (oEvent.getParameter("name") === "Inbox") {
 						that.getInboxData();
 					}
 				});

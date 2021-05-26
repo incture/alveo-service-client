@@ -88,55 +88,62 @@
 				"clearControlAggregation": false
 			},
 			"routes": [{
-				"name": "UploadInvoice",
-				"pattern": "UploadInvoice",
-				"target": [
-					"UploadInvoice"
-				]
-			}, {
-				"name": "UserManagement",
-				"pattern": "",
-				"target": [
-					"UserManagement"
-				]
-			}, {
-				"name": "Inbox",
-				"pattern": "Inbox",
-				"target": [
-					"Inbox"
-				]
-			}, {
-				"name": "CreateUser",
-				"pattern": "CreateUser/{id}",
-				"target": [
-					"CreateUser"
-				]
-			}, {
-				"name": "CreateGroup",
-				"pattern": "CreateGroup/{id}",
-				"target": [
-					"CreateGroup"
-				]
-			}, {
-				"name": "ConfigCockpit",
-				"pattern": "ConfigCockpit",
-				"target": [
-					"ConfigCockpit"
-				]
-			}, {
-				"name": "TemplateManagement",
-				"pattern": "TemplateManagement",
-				"target": [
-					"TemplateManagement"
-				]
-			},
-			{
-				"name": "NonPOInvoice",
-				"pattern": "NonPOInvoice/:id:/:status:",
-				"target": [
-					"NonPOInvoice"
-				]
-			}],
+					"name": "UploadInvoice",
+					"pattern": "UploadInvoice",
+					"target": [
+						"UploadInvoice"
+					]
+				}, {
+					"name": "UserManagement",
+					"pattern": "",
+					"target": [
+						"UserManagement"
+					]
+				}, {
+					"name": "Inbox",
+					"pattern": "Inbox",
+					"target": [
+						"Inbox"
+					]
+				}, {
+					"name": "CreateUser",
+					"pattern": "CreateUser/{id}",
+					"target": [
+						"CreateUser"
+					]
+				}, {
+					"name": "CreateGroup",
+					"pattern": "CreateGroup/{id}",
+					"target": [
+						"CreateGroup"
+					]
+				}, {
+					"name": "ConfigCockpit",
+					"pattern": "ConfigCockpit",
+					"target": [
+						"ConfigCockpit"
+					]
+				}, {
+					"name": "TemplateManagement",
+					"pattern": "TemplateManagement",
+					"target": [
+						"TemplateManagement"
+					]
+				}, {
+					"name": "Dashboard",
+					"pattern": "Dashboard",
+					"target": [
+						"Dashboard"
+					]
+				}, {
+					"name": "NonPOInvoice",
+					"pattern": "NonPOInvoice/:id:/:status:",
+					"target": [
+						"NonPOInvoice"
+					]
+				}
+
+			],
 			"targets": {
 				"UploadInvoice": {
 					"viewType": "XML",
@@ -154,7 +161,7 @@
 					"viewType": "XML",
 					"viewName": "UserManagement"
 				},
-				"Inbox":{
+				"Inbox": {
 					"viewType": "XML",
 					"viewName": "Inbox"
 				},
@@ -169,6 +176,10 @@
 				"TemplateManagement": {
 					"viewType": "XML",
 					"viewName": "TemplateManagement"
+				},
+				"Dashboard": {
+					"viewType": "XML",
+					"viewName": "Dashboard"
 				}
 			}
 		}
