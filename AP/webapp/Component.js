@@ -65,12 +65,12 @@ sap.ui.define([
 				if (data.groups) {
 					for (var i = 0; i < length; i++) {
 						groupData = groups.indexOf(data.groups[i].value);
-						if (data >= 0) {
+						if (groupData >= 0) {
 							if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
 								.attributes) {
 								vendorId = data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 							}
-							oUserDetailModel.setProperty("/loggedinUserGroup", data.groups[i]);
+							oUserDetailModel.setProperty("/loggedinUserGroup", data.groups[i].value);
 							oUserDetailModel.setProperty("/loggedinUserVendorId", vendorId);
 							break;
 						}

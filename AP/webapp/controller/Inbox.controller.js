@@ -25,12 +25,12 @@ sap.ui.define([
 				});
 			},
 			onCreateInvoice: function (oEvent) {
-					this.oRouter.navo("NonPOInvoice");
+					this.oRouter.navTo("NonPOInvoice");
 			},
 			
 			onReqIdOpenSelect: function(oEvent){
 				var reqId = oEvent.getSource().getText();                         
-				this.oRouter.navo("NonPOInvoice",{
+				this.oRouter.navTo("NonPOInvoice",{
 					id:reqId,
 					status:"OPEN"
 				});
@@ -38,7 +38,7 @@ sap.ui.define([
 			
 			onReqIdClaimSelect: function(oEvent){
 				var reqId = oEvent.getSource().getText();      
-				this.oRouter.navo("NonPOInvoice",{
+				this.oRouter.navTo("NonPOInvoice",{
 					id:reqId,
 					status:"CLAIMED"
 				});

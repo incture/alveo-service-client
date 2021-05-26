@@ -51,7 +51,7 @@ sap.ui.define([
 							}
 						}
 					} else {
-						that.navTo("Dashboard");
+						that.oRouter.navTo("Dashboard");
 					}
 				}
 			});

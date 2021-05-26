@@ -30,7 +30,7 @@ sap.ui.define([
 						that.getUserDetails();
 						that.fetchAllGroups();
 					} else {
-						that.navTo("Dashboard");
+						that.oRouter.navTo("Dashboard");
 					}
 				}
 			});
@@ -65,7 +65,7 @@ sap.ui.define([
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			var loggedinUserVendorId = oUserDetailModel.setProperty("/loggedinUserVendorId");
-			var sUrl = "/IDPDEST/service/scim/Users/";
+			var sUrl = "/IDPDEST/service/scim/Users";
 			var busy = new sap.m.BusyDialog();
 			var oHeader = {
 				"Content-Type": "application/scim+json"
@@ -81,20 +81,20 @@ sap.ui.define([
 				busy.close();
 				var data = oEvent.getSource().getData();
 				var user, userdata = [],
-					vendorId;
+					vendorId,groupData;
 				if (data.Resources) {
 					for (var i = 0; i < data.Resources.length; i++) {
 						user = data.Resources[i];
 						if (user.groups) {
-							for (var i = 0; i < user.groups.length; i++) {
-								data = groups.indexOf(user.groups[i].value);
+							for (var j = 0; j < user.groups.length; j ++) {
+								groupData = groups.indexOf(user.groups[j].value);
 								if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data[
 										"urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
 									.attributes) {
 									vendorId = user["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 								}
-								if (data >= 0) {
-									if (!admin) {
+								if (groupData >= 0) {
+									if (admin) {
 										userdata.push(user);
 									} else if (loggedinUserVendorId === vendorId) {
 										userdata.push(user);
