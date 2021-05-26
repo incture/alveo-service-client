@@ -161,4 +161,10 @@ com.menabev.AP.formatter.formatter = {
 		return "";
 	},
 	
+	getUpdatedBy: function(value){
+		if(!value){
+			return "-";
+		}
+	}
+	
 };

@@ -3,22 +3,22 @@
 		<content>
 			<Table items="{postDataModel>/listNonPoItem}" class="sapUiSizeCompact">
 				<columns>
-					<Column width="3em" hAlign="Center">
-						<Label text="{i18n>DrCr}" design="Bold"/>
+					<Column hAlign="Center">
+						<Label text="{i18n>DebtCred}" design="Bold"/>
 					</Column>
-					<Column width="7em" hAlign="Center">
+					<Column hAlign="Center">
 						<Label text="{i18n>TAXDOC.CURRENCY}" design="Bold"/>
 					</Column>
-					<Column width="7em" hAlign="Center">
+					<Column hAlign="Center">
 						<Label text="{i18n>BASEAMOUNT}" design="Bold"/>
 					</Column>
-					<Column width="7em" hAlign="Center">
+					<Column hAlign="Center">
 						<Label text="{i18n>TAXCODE}" design="Bold"/>
 					</Column>
-					<Column width="5em" hAlign="Center">
+					<Column hAlign="Center">
 						<Label text="{i18n>TAXRATE}" design="Bold"/>
 					</Column>
-					<Column width="5em" hAlign="Center">
+					<Column hAlign="Center">
 						<Label text="{i18n>TAXAMOUNT}" design="Bold"/>
 					</Column>
 				</columns>

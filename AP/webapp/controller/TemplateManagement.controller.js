@@ -18,6 +18,8 @@ sap.ui.define([
 			this.setModel(new JSONModel(), "templateModel");
 			this.getModel("templateModel").setSizeLimit(5000);
 			this.setModel(new JSONModel(), "postDataModel");
+			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+			this.oUserDetailModel = oUserDetailModel;
 
 			var oComponent = this.getOwnerComponent();
 			this.router = oComponent.getRouter();
@@ -80,10 +82,6 @@ sap.ui.define([
 		//function call to load all templates 
 		getAllTemplate: function () {
 			var templateModel = this.getModel("templateModel");
-			/*	var growCount = 10;
-				templateModel.setProperty("/growCount",growCount);*/
-			//	var pageNo = 0;
-			//	var url = "InctureApDest/NonPoTemplate/getAll/50/" + pageNo;
 			this.getView().byId("templateTableId").removeSelections();
 			templateModel.setProperty("/tempBtnEnabled", false);
 			var url = "/menabevdev/NonPoTemplate/getAll";
@@ -437,6 +435,7 @@ sap.ui.define([
 
 		fnOkSaveTemplateCall: function (type) {
 			var postDataModel = this.getModel("postDataModel");
+			var currentDate = new Date().getTime();
 			if (type === "Create") {
 				var jsonData = {
 					nonPoTemplate: {
@@ -444,8 +443,8 @@ sap.ui.define([
 						"basecoderId": null,
 						"vendorId": "INC",
 						"templateName": postDataModel.getData().nonPoTemplate.templateName,
-						"createdBy": "Lakhu", //Test Data
-						"createdAt": null,
+						"createdBy": this.oUserDetailModel.getProperty("/loggedInUserMail"),
+						"createdAt": currentDate,
 						"updatedBy": null,
 						"updatedAt": null
 					},
@@ -481,8 +480,8 @@ sap.ui.define([
 							"basecoderId": null,
 							"vendorId": "INC",
 							"templateName": postDataModel.getData().nonPoTemplate.templateName,
-							"updatedBy": null,
-							"updatedAt": null
+							"updatedBy": this.oUserDetailModel.getProperty("/loggedInUserMail"),
+							"updatedAt": currentDate
 						},
 						nonPoTemplateItems: []
 					};

@@ -30,6 +30,8 @@ sap.ui.define([
 			this.setModel(new JSONModel(), "mRejectModel");
 			this.setModel(new JSONModel(), "taxModel");
 			this.setModel(new JSONModel(), "templateModel");
+			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+			this.oUserDetailModel = oUserDetailModel;
 
 			var oComponent = this.getOwnerComponent();
 			this.router = oComponent.getRouter();
@@ -42,7 +44,6 @@ sap.ui.define([
 			var requestId = oArgs.value;
 			this.busyDialog.open();
 			//handle if route has NonPO request Id 
-			//requestId = "APA-000004"; //Test Data
 
 			//Test Data for Tax Rate
 			var aTax = [{
@@ -61,6 +62,11 @@ sap.ui.define([
 			this.setModel(new JSONModel(), "taxCodeModel");
 			this.getModel("taxCodeModel").setProperty("/aTax", aTax);
 			//End of Tax rate test data
+			
+			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			if(loggedinUserGroup === "Process_Lead"){
+				
+			}
 
 			if (requestId) {
 				this.getNonPOData(requestId);
@@ -1239,7 +1245,7 @@ sap.ui.define([
 		onNonPoSave: function () {
 			// var token = this.getCSRFToken();
 			var oSaveData = this.fnOnSubmitCall();
-			oSaveData.invoiceHeaderDto.taskOwner = "Prashanth.Shekar@incture.com"; //Test data// Need to include logged in user email address
+			oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
 			oSaveData.invoiceHeaderDto.docStatus = "Draft";
 			var postingDate = oSaveData.invoiceHeaderDto.postingDate;
 			if (postingDate) {
@@ -1440,7 +1446,7 @@ sap.ui.define([
 					return;
 				} else {
 					//COST ALLOCATION VALIDATION END
-					jsonData.invoiceHeaderDto.taskOwner = "Prashanth.Shekar@incture.com"; //Test data// Need to include logged in user email address
+					jsonData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
 					jsonData.invoiceHeaderDto.docStatus = "Created";
 					var postingDate = jsonData.invoiceHeaderDto.postingDate;
 					if (postingDate) {

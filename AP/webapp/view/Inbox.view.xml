@@ -117,6 +117,7 @@
 				</content>
 			</Panel>
 			<HBox class="alignCls">
+				<Button text="{i18n>CreateInvoice}" press="onCreateInvoice"/>
 				<SearchField class="sapUiSizeCompact"></SearchField>
 				<Button icon="sap-icon://action-settings" type="Transparent"/>
 			</HBox>
