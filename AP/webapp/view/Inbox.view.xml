@@ -116,11 +116,12 @@
 					</Toolbar>
 				</content>
 			</Panel>
-			<HBox class="alignCls">
-				<Button text="{i18n>CreateInvoice}" press="onCreateInvoice"/>
-				<SearchField class="sapUiSizeCompact"></SearchField>
+			<OverflowToolbar>
+				<ToolbarSpacer></ToolbarSpacer>
+				<Button text="{i18n>CreateInvoice}" press="onCreateInvoice" class="sapUiSizeCompact"/>
+				<SearchField class="sapUiSizeCompact sapUiTinyMarginTop" width="20%"></SearchField>
 				<Button icon="sap-icon://action-settings" type="Transparent"/>
-			</HBox>
+			</OverflowToolbar>
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
 					<IconTabFilter text="{i18n>OPENTASK}" key="openTask">

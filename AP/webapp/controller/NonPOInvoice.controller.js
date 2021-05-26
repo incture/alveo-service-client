@@ -40,8 +40,10 @@ sap.ui.define([
 
 		onRouteMatched: function (oEvent) {
 			//reading the Arguments from url
-			var oArgs = oEvent.getParameter("arguments");
-			var requestId = oArgs.value;
+			var oArgs = oEvent.getParameter("arguments"),
+				requestId = oArgs.id,
+				status = oArgs.status;
+
 			this.busyDialog.open();
 			//handle if route has NonPO request Id 
 
@@ -62,10 +64,10 @@ sap.ui.define([
 			this.setModel(new JSONModel(), "taxCodeModel");
 			this.getModel("taxCodeModel").setProperty("/aTax", aTax);
 			//End of Tax rate test data
-			
+
 			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
-			if(loggedinUserGroup === "Process_Lead"){
-				
+			if (loggedinUserGroup === "Process_Lead") {
+
 			}
 
 			if (requestId) {
@@ -74,10 +76,10 @@ sap.ui.define([
 				this.busyDialog.close();
 				var initializeModelData = {
 					"invoiceHeader": {
-						"attachments":[],
+						"attachments": [],
 						"balance": "",
 						"balanceCheck": true,
-						"comments":[],
+						"comments": [],
 						"clerkId": 0,
 						"createdAtInDB": 0,
 						"extInvNum": "",
@@ -125,12 +127,12 @@ sap.ui.define([
 							vstate: {}
 						});
 						this.getModel("postDataModel").setProperty("/listNonPoItem", oData.costAllocationDto);
-						
+
 						this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
 						var attachments = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
-						if(attachments.length){
-							for(var i=0; i<attachments.length; i++){
-								if(attachments[i].isInvoicePdf){
+						if (attachments.length) {
+							for (var i = 0; i < attachments.length; i++) {
+								if (attachments[i].isInvoicePdf) {
 									this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", true);
 									this.getModel("nonPOInvoiceModel").setProperty("/invoicePdf", attachments[i]);
 								}
@@ -144,10 +146,10 @@ sap.ui.define([
 					this.busyDialog.close();
 					var errorMsg = "";
 					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
+						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error.message.value;
+						errorMsg = result.responseJSON.error;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -339,7 +341,7 @@ sap.ui.define([
 					this.busyDialog.close();
 					var errorMsg = "";
 					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please contact your administrator";
+						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
 						errorMsg = result.responseJSON.error;
@@ -427,10 +429,10 @@ sap.ui.define([
 					this.busyDialog.close();
 					var errorMsg = "";
 					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
+						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error.message.value;
+						errorMsg = result.responseJSON.error;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -550,10 +552,10 @@ sap.ui.define([
 					this.busyDialog.close();
 					var errorMsg = "";
 					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
+						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error.message.value;
+						errorMsg = result.responseJSON.error;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -950,14 +952,14 @@ sap.ui.define([
 							that.getModel("postDataModel").setProperty("/listNonPoItem", data);
 							that.getModel("postDataModel").refresh();
 							errorMsg = "Succefully imported data from excel file";
-							sap.m.MessageToast(errorMsg);
+							sap.m.MessageToast.show(errorMsg);
 						}
 					},
 					error: function (result, xhr, data) {
 						that.busyDialog.close();
 						var errorMsg = "";
 						if (result.status === 504) {
-							errorMsg = "Request timed-out. Please contact your administrator";
+							errorMsg = "Request timed-out. Please refresh your page";
 							that.errorMsg(errorMsg);
 						} else {
 							errorMsg = result.responseJSON.error;
@@ -1264,7 +1266,7 @@ sap.ui.define([
 							sap.m.MessageBox.success(message, {
 								actions: [sap.m.MessageBox.Action.OK],
 								onClose: function (sAction) {
-									that.oRouter.navTo("Workbench"); //Test data//Need to add workbench route
+									that.router.navTo("Inbox");
 								}
 							});
 						} else {
@@ -1353,7 +1355,7 @@ sap.ui.define([
 							sap.m.MessageBox.success(message, {
 								actions: [sap.m.MessageBox.Action.OK],
 								onClose: function (sAction) {
-									that.oRouter.navTo("Workbench"); //Need  to workbench route name
+									that.router.navTo("Inbox");
 								}
 							});
 						} else {
@@ -1466,7 +1468,7 @@ sap.ui.define([
 									sap.m.MessageBox.success(message, {
 										actions: [sap.m.MessageBox.Action.OK],
 										onClose: function (sAction) {
-											that.oRouter.navTo("Workbench");
+											that.router.navTo("Inbox");
 										}
 									});
 								} else {
@@ -1623,7 +1625,7 @@ sap.ui.define([
 		},
 
 		onNavBack: function () {
-			this.router.navTo("Workbench");
+			this.router.navTo("Inbox");
 		},
 
 	});

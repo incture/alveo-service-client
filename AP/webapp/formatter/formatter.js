@@ -107,7 +107,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return true;
 	},
-	
+
 	crDbIndicator: function (value) {
 		var returnValue = "";
 		if (value) {
@@ -119,7 +119,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return returnValue;
 	},
-	
+
 	/** To Remove Leading Zero */
 	removeZero: function (value) {
 		if (value) {
@@ -128,7 +128,7 @@ com.menabev.AP.formatter.formatter = {
 			return "";
 		}
 	},
-	
+
 	/** Currency Symbol */
 	currencySymbolWithValue: function (curVal) {
 		if (curVal) {
@@ -154,17 +154,16 @@ com.menabev.AP.formatter.formatter = {
 		}
 	},
 
-	
 	getDate: function (value) {
 		if (value)
 			return new Date(value).toISOString().split("T")[0];
 		return "";
 	},
-	
-	getUpdatedBy: function(value){
-		if(!value){
+
+	getUpdatedBy: function (value) {
+		if (!value) {
 			return "-";
 		}
 	}
-	
+
 };
