@@ -59,6 +59,10 @@ public class InvoiceItemDo {
 	private String currency;
 	@Column(name = "PRICING_UNIT")
 	private Integer pricingUnit;
+	@Column(name = "ORDER_PRICE_UNIT")
+	private String orderPriceUnit;
+	@Column(name = "GROSS_PRICE")
+	private String grossPrice;
 	@Column(name = "UNIT")
 	private String unit;
 	@Column(name = "DIS_AMT")
@@ -71,6 +75,8 @@ public class InvoiceItemDo {
 	private Integer shippingAmt;
 	@Column(name = "SHIPPING_PER")
 	private String shippingPer;
+	@Column(name = "TAX_CODE")
+	private String taxCode;
 	@Column(name = "TAX_AMT")
 	private Integer taxAmt;
 	@Column(name = "TAX_PER")
@@ -93,22 +99,20 @@ public class InvoiceItemDo {
 	private String unusedField1;
 	@Column(name = "UNUSED_FIELD2")
 	private String unusedField2;
-	
-	
-	
+	@Column(name = "MATCH_SERVICE_NUM")
+	private String matchserviceNumber;
+	@Column(name = "MATCH_PACKAGE_NUMBER")
+	private String matchpackageNumber;
+	@Column(name = "MATCH_TYPE")
+	private String matchType;// manuall or Auto posting
 	@Column(name="CREATED_BY_IN_DB")
  	private String createdByInDb;
- 	
  	@Column(name="CREATED_AT_IN_DB")
 	private Long createdAtInDB;
- 	
  	@Column(name="UPDATED_BY")
 	private String updatedBy;
- 	
  	@Column(name="UPDATED_AT")
 	private Long updatedAt;
- 	
- 	
  	@Column(name = "isSelected")
 	private Boolean isSelected;
  	
@@ -151,9 +155,9 @@ public class InvoiceItemDo {
 
     @Column (name="IS_ACC_ASSIGNED",length=1)
     private String isAccAssigned;
-//	//@Column(name = "UNUSED_FIELD1")
-//	private String price2;
-//	//@Column(name = "UNUSED_FIELD2")
-//	private String invQty2;
 
+    @Column(name = "ARTICLE_NUM")
+    private String articleNum;
+
+    
 }

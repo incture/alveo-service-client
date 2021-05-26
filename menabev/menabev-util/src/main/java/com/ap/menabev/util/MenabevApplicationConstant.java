@@ -27,6 +27,6 @@ public class MenabevApplicationConstant {
 	
 	public static final String MENABEV_ODATA_DESTINATION_NAME = "";
 	public static final String TASK_COMPLETED = "COMPLETED";
-	
+	public static final String INVOICE_SEQUENCE = "APA";
 	
 }

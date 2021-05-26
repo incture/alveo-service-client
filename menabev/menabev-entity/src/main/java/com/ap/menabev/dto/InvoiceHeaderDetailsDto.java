@@ -2,6 +2,7 @@ package com.ap.menabev.dto;
 
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class InvoiceHeaderDetailsDto {
 	private String extInvNum;
 	// added for the tag in xml _InvoiceDate as discussed
 	private String invoiceDate;
-	private String createdAt;
+	private LocalDateTime createdAt;
 	
 	private String dueDate;
 

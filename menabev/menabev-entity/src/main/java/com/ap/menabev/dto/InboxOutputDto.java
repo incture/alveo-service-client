@@ -48,5 +48,7 @@ public class InboxOutputDto {
 	private String claimedUser;
 	
 	private String taskId;
+	
+	private int totalCount;
 
 }

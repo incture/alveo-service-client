@@ -2,6 +2,8 @@ package com.ap.menabev.entity;
 
 
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -26,8 +28,8 @@ import lombok.ToString;
 @Getter
 @Setter
 public class InvoiceHeaderDo {
-	 @Id
-	 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
+	
+	 /*@GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
         "InvoiceHeader")
 	 @GenericGenerator(name = "InvoiceHeader", strategy =
 	 "com.ap.menabev.sequences.InvoiceHeaderSequenceGenerator", parameters = {
@@ -38,7 +40,8 @@ public class InvoiceHeaderDo {
 	 @Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER,
 	 value = "%06d"),
 	 @Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value =
-	 "INVOICE_HEADER_SEQ") })
+	 "INVOICE_HEADER_SEQ") })*/
+	@Id
 	@Column(name = "REQUEST_ID", nullable = false)
 	private String requestId; //0
 
@@ -56,7 +59,7 @@ public class InvoiceHeaderDo {
 	@Column(name = "REF_DOC_NUM")
 	private Long refDocNum;//invoice ref number
 	@Column(name = "EXT_INV_NUM")
-	private String extInvNum;//  Invoice Number for NON po 
+	private String extInvNum;//  Invoice Number for NON po, Invoice Reference Number
 
 	@Column(name = "DUE_DATE")
 	private Long dueDate;//22
@@ -65,7 +68,7 @@ public class InvoiceHeaderDo {
 	@Column(name = "INVOICE_DATE")
 	private Long invoiceDate;//23
 	@Column(name = "CREATED_AT")
-	private String createdAt;//6
+	private LocalDateTime createdAt;//6
 	@Column(name = "VENDOR_ID")
 	private String vendorId;//4
 	@Column(name = "CLERK_ID")
@@ -178,6 +181,34 @@ public class InvoiceHeaderDo {
 	
 	@Column(name="DOC_STATUS") // is Draft or Active 
 	private String docStatus;
+	@Column(name="TRANSACTION_TYPE")
+	private String transactionType;
+	@Column(name="DELIVERY_NOTE")
+	private String deliveryNote;
+	@Column(name = "AMOUNT_BEFORE_TAX")
+	private String amountBeforeTax;
+	@Column(name = "TAX_CODE")
+	private String taxCode;
+	@Column(name = "TAX_RATE")
+	private String taxRate;
+	@Column(name="SURCHARGE")
+	private String surcharge;
+	@Column(name = "DISCOUNT")
+	private String discount;
+	@Column(name = "VAT_REG_NUM")
+	private String vatRegNum;
+	@Column(name = "UNPLANNED_COST")
+	private String unplannedCost;
+	@Column(name = "PLANNED_COST")
+	private String plannedCost;
+	@Column(name = "BASE_LINE")
+	private String baseLine;
+	
+	
+	
+	
+	
+	
 	
 
 	

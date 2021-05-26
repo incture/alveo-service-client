@@ -1,6 +1,7 @@
 package com.ap.menabev.dto;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class InvoiceHeaderDto {
 	
 	private Long dueDate;
 
-	private String createdAt;
+	private LocalDateTime createdAt;
 
 	private String VendorId;
 

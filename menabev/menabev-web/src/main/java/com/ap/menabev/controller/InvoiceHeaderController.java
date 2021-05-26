@@ -27,6 +27,8 @@ import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.service.InvoiceHeaderService;
+import com.ap.menabev.service.SequenceGeneratorService;
+import com.ap.menabev.util.MenabevApplicationConstant;
 import com.ap.menabev.dto.ResponseDto;
 
 @RestController
@@ -37,6 +39,9 @@ public class InvoiceHeaderController {
 	InvoiceHeaderService headerService;
 	@Autowired
 	InvoiceHeaderRepository repo;
+	@Autowired
+	private SequenceGeneratorService seqService;
+
 
 	@PostMapping("/saveOrUpdate")
 	public ResponseDto saveOrUpdate(@RequestBody InvoiceHeaderDto dto) {
@@ -142,7 +147,17 @@ public class InvoiceHeaderController {
 		
 	}
 	
-	
+	@GetMapping(params = { "sequnceCode" })
+	public ResponseDto getCurrentSequnceOfInvoice(@RequestParam(name = "sequnceCode") String sequnceCode){
+	ResponseDto response = new ResponseDto();
+	String sequencId = 	seqService.getSequenceNoByMappingId(
+			MenabevApplicationConstant.INVOICE_SEQUENCE,"INV"
+			);
+	response.setCode("200");
+	response.setMessage(sequencId);
+	response.setStatus("Success");
+		return response;
+		}
 	
 
 

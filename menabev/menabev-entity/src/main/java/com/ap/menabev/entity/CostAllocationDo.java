@@ -25,12 +25,7 @@ import lombok.Setter;
 public @Data class CostAllocationDo {
 
 	@Id
-	/*@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CostDistribution")
-	@GenericGenerator(name = "CostDistribution", strategy = "com.incture.ap.sequences.CostDistributionSequenceGenerator", parameters = {
-			@Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value = "1"),			@Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER, value = "CD-"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER, value = "%06d"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value = "Cost_Distribution_SEQ") })
-*/	@Column(name = "COST_ALLOCATION_ID")
+	@Column(name = "COST_ALLOCATION_ID")
 	private String costAllocationId = UUID.randomUUID().toString();
 	
 	@Column(name = "REQUEST_ID", nullable = false)
@@ -48,8 +43,13 @@ public @Data class CostAllocationDo {
 	@Column(name = "QUANTITY")
 	private String quantity;
 	
+	@Column(name = "QUANTITY_UNIT")
+	private String quantityUnit;
 	@Column(name = "DISTR_PERC")
 	private String distrPerc;
+	
+	@Column(name = "ORDER-ID")
+	private String orderId;
 	
 	@Column(name = "NET_VALUE")
 	private String netValue;
@@ -83,4 +83,18 @@ public @Data class CostAllocationDo {
 	
 	@Column(name = "TAX_C0DE")
 	private String taxCode;
+	
+	@Column(name = "ACCOUNT_NUM")
+	private String accountNum;
+	
+	@Column(name = "LINE_TEXT")
+	private String lineText;
+	
+	@Column(name ="TAX_VALUE")
+	private String taxValue;
+	@Column(name ="TAX_PER")
+	private String taxPer;
+	@Column(name ="TAX_RATE")
+	private String taxRate;
+	
 }

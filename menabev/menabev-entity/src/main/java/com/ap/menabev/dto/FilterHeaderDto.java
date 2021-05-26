@@ -20,12 +20,12 @@ public class FilterHeaderDto {
 	private String createdAtFrom;
 	private String createdAtTo;
 	private Long dueDateFrom;
-	private String dueDateTo;
+	private Long dueDateTo;
 	private String assignedTo;
-	private String invoiceDateFrom;
-	private String invoiceDateTo;
-	private String invoiceValueFrom;
-	private String invoiceValueTo;
+	private Long invoiceDateFrom;
+	private Long invoiceDateTo;
+	private Long invoiceValueFrom;
+	private Long  invoiceValueTo;
 	private String docStatus;
 	private  String validationStatus; /// Exception Status 
 	private String taskOwner;
@@ -39,6 +39,6 @@ public class FilterHeaderDto {
 	private boolean myTask; //true to get my task 
 	private Long indexNum;
 	private Long count;
-	
+	private String invoiceTotal;
 
 }
