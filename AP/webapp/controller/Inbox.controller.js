@@ -16,7 +16,10 @@ sap.ui.define([
 				var taskDataFilterModel = new sap.ui.model.json.JSONModel();
 				this.getView().setModel(taskDataFilterModel, "taskDataFilterModel");
 				this.myTask = false;
-			
+
+				var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+				this.oUserDetailModel = oUserDetailModel;
+
 				this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 				this.oRouter.attachRoutePatternMatched(function (oEvent) {
 					if (oEvent.getParameter("name") === "Inbox") {
@@ -25,22 +28,22 @@ sap.ui.define([
 				});
 			},
 			onCreateInvoice: function (oEvent) {
-					this.oRouter.navTo("NonPOInvoice");
+				this.oRouter.navTo("NonPOInvoice");
 			},
-			
-			onReqIdOpenSelect: function(oEvent){
-				var reqId = oEvent.getSource().getText();                         
-				this.oRouter.navTo("NonPOInvoice",{
-					id:reqId,
-					status:"OPEN"
+
+			onReqIdOpenSelect: function (oEvent) {
+				var reqId = oEvent.getSource().getText();
+				this.oRouter.navTo("NonPOInvoice", {
+					id: reqId,
+					status: "OPEN"
 				});
 			},
-			
-			onReqIdClaimSelect: function(oEvent){
-				var reqId = oEvent.getSource().getText();      
-				this.oRouter.navTo("NonPOInvoice",{
-					id:reqId,
-					status:"CLAIMED"
+
+			onReqIdClaimSelect: function (oEvent) {
+				var reqId = oEvent.getSource().getText();
+				this.oRouter.navTo("NonPOInvoice", {
+					id: reqId,
+					status: "CLAIMED"
 				});
 			},
 
@@ -50,10 +53,12 @@ sap.ui.define([
 				var taskDataFilterModelData = this.getView().getModel("taskDataFilterModel").getData(),
 					url = "/menabevdev/invoiceHeader/inbox",
 					that = this;
-				taskDataFilterModelData.userId = "P000022";
+				taskDataFilterModelData.userId = this.oUserDetailModel.getProperty("/loggedinUserDetail/id");
 				taskDataFilterModelData.indexNum = scroll ? pageNo : 1;
 				taskDataFilterModelData.count = 100;
 				taskDataFilterModelData.myTask = this.myTask;
+				taskDataFilterModelData.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+				taskDataFilterModelData.userEmailId = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				jQuery
 					.ajax({
 						url: url,

@@ -84,8 +84,9 @@
 								</VBox>
 								<VBox >
 									<Label text="{i18n>DueDate}"/>
-									<DatePicker editable="{nonPOInvoiceModel>/userFldValidate}" placeholder="MM/DD/YYYY" id="baseLineDate"
-										value="{nonPOInvoiceModel>/invoiceDetailUIDto/baseLineDate1}" valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"/>
+									<DatePicker placeholder="MM/DD/YYYY" 
+										value="{path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" 
+										valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PaymentTerms}"/>

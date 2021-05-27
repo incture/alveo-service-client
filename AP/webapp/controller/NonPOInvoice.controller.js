@@ -43,9 +43,7 @@ sap.ui.define([
 			var oArgs = oEvent.getParameter("arguments"),
 				requestId = oArgs.id,
 				status = oArgs.status;
-
 			this.busyDialog.open();
-			//handle if route has NonPO request Id 
 
 			//Test Data for Tax Rate
 			var aTax = [{
@@ -69,7 +67,7 @@ sap.ui.define([
 			if (loggedinUserGroup === "Process_Lead") {
 
 			}
-
+			//handle if route has NonPO request Id 
 			if (requestId) {
 				this.getNonPOData(requestId);
 			} else {
@@ -105,6 +103,7 @@ sap.ui.define([
 					"vstate": {}
 				};
 				this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
+				this.getModel("postDataModel").setProperty("/listNonPoItem", []);
 				this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
 			}
 		},
@@ -127,7 +126,6 @@ sap.ui.define([
 							vstate: {}
 						});
 						this.getModel("postDataModel").setProperty("/listNonPoItem", oData.costAllocationDto);
-
 						this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
 						var attachments = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
 						if (attachments.length) {
@@ -149,7 +147,7 @@ sap.ui.define([
 						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error;
+						errorMsg = data;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -230,6 +228,11 @@ sap.ui.define([
 			this.errorHandler(oEvent);
 		},
 
+		onDueDateChange: function (oEvent) {
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/dueDate", oEvent.getSource()._getSelectedDate().getTime());
+		},
+
 		//onclick of Tax Code ValueHelp
 		onValueHelpRequest: function () {
 			var oView = this.getView();
@@ -301,7 +304,51 @@ sap.ui.define([
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("taxCodeModel").getObject();
 			this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto/invoiceHeader/taxRatePercentage", taxDetails.taxRatePercentage);
 			this.getModel("nonPOInvoiceModel").refresh();
+
+			var postDataModel = this.getModel("postDataModel"),
+				nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+				totalAmt = 0,
+				totalTax = 0,
+				taxCode = taxDetails.taxCode,
+				taxRatePercentage = taxDetails.taxRatePercentage;
+			if (postDataModel.getProperty("/listNonPoItem")) {
+				var length = postDataModel.getProperty("/listNonPoItem").length;
+				for (var i = 0; i < length; i++) {
+					//Tax Calculations
+					var netValue = postDataModel.getProperty("/listNonPoItem/" + i + "/netValue");
+					var baseRate = this.nanValCheck(netValue) / (1 + (this.nanValCheck(taxRatePercentage) / 100));
+					var taxValue = (this.nanValCheck(baseRate) * this.nanValCheck(taxRatePercentage)) / 100;
+					totalTax += taxValue;
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxRatePercentage", taxRatePercentage);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", this.nanValCheck(taxValue).toFixed(3));
+					postDataModel.setProperty("/listNonPoItem/" + i + "/baseRate", this.nanValCheck(baseRate).toFixed(3));
+
+					if (postDataModel.getProperty("/listNonPoItem/" + i + "/netValue") && postDataModel.getProperty("/listNonPoItem/" + i +
+							"/crDbIndicator") === "H") {
+						totalAmt += this.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue"));
+
+					} else if (postDataModel.getProperty("/listNonPoItem/" + i + "/netValue") && postDataModel.getProperty("/listNonPoItem/" + i +
+							"/crDbIndicator") === "S") {
+						totalAmt -= this.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue"));
+					}
+				}
+				totalAmt = this.nanValCheck(totalAmt).toFixed(3);
+				totalTax = this.nanValCheck(totalTax).toFixed(3);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount", totalTax);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount", totalAmt);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", totalAmt);
+				var invAmt = this.nanValCheck(nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal"));
+				var diff = this.nanValCheck(invAmt) - this.nanValCheck(totalAmt);
+				diff = this.nanValCheck(diff).toFixed(3);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", diff);
+				nonPOInvoiceModel.refresh();
+				postDataModel.refresh();
+				sap.m.MessageToast.show("Tax Code\r" + taxCode + "\ris applied to all Cost Allocation line items");
+			}
+
 		},
+		
 		//onChange CC item level tax
 		onChangeTax: function (oEvent) {
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("taxCodeModel").getObject();
@@ -344,7 +391,7 @@ sap.ui.define([
 						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error;
+						errorMsg = data;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -432,7 +479,7 @@ sap.ui.define([
 						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error;
+						errorMsg = data;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -555,7 +602,7 @@ sap.ui.define([
 						errorMsg = "Request timed-out. Please refresh your page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error;
+						errorMsg = data;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -569,6 +616,7 @@ sap.ui.define([
 
 		//Frag:PreviewTemplate
 		onOkSelectTemplate: function () {
+			var that = this;
 			var previewListNonPoItem = this.getModel("postDataModel").getProperty("/previewListNonPoItem");
 			// var arr = [];
 			var arr = $.extend(true, [], this.getModel("postDataModel").getProperty("/listNonPoItem"));
@@ -578,10 +626,23 @@ sap.ui.define([
 			this.getModel("postDataModel").setProperty("/listNonPoItem", arr);
 			var postDataModel = this.getModel("postDataModel");
 			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			var totalAmt = 0;
+			var totalAmt = 0,
+				totalTax = 0,
+				taxCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxCode"),
+				taxRatePercentage = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxRatePercentage");
 			if (postDataModel.getProperty("/listNonPoItem")) {
 				var length = postDataModel.getProperty("/listNonPoItem").length;
 				for (var i = 0; i < length; i++) {
+					//Tax Calculations
+					var netValue = postDataModel.getProperty("/listNonPoItem/" + i + "/netValue");
+					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxRatePercentage) / 100));
+					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxRatePercentage)) / 100;
+					totalTax += taxValue;
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxRatePercentage", taxRatePercentage);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(3));
+					postDataModel.setProperty("/listNonPoItem/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(3));
+
 					if (postDataModel.getProperty("/listNonPoItem/" + i + "/netValue") && postDataModel.getProperty("/listNonPoItem/" + i +
 							"/crDbIndicator") === "H") {
 						totalAmt += this.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue"));
@@ -592,6 +653,8 @@ sap.ui.define([
 					}
 				}
 				totalAmt = this.nanValCheck(totalAmt).toFixed(3);
+				totalTax = this.nanValCheck(totalTax).toFixed(3);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount", totalTax);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount", totalAmt);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", totalAmt);
 				var invAmt = this.nanValCheck(nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal"));
@@ -639,11 +702,18 @@ sap.ui.define([
 							postDataModel.setProperty("/listNonPoItem", listNonPoItem);
 							that.selectTemplateFragment.exit();
 							that.closeBusyDialog();
-						},
-						error: function (err) {
+						}.bind(this),
+						error: function (result, xhr, data) {
 							that.closeBusyDialog();
-							sap.m.MessageToast.show(err.statusText);
-						}
+							var errorMsg = "";
+							if (result.status === 504) {
+								errorMsg = "Request timed-out. Please refresh your page";
+								this.errorMsg(errorMsg);
+							} else {
+								errorMsg = data;
+								this.errorMsg(errorMsg);
+							}
+						}.bind(this)
 					});
 					postDataModel.refresh();
 					templateModel.refresh();
@@ -722,18 +792,22 @@ sap.ui.define([
 				for (var i = 0; i < length; i++) {
 					//Tax Calculations
 					var taxRatePercentage = postDataModel.getProperty("/listNonPoItem/" + i + "/taxRatePercentage"),
-						netValue = postDataModel.getProperty("/listNonPoItem/" + i + "/netValue"),
-						taxValue = (that.nanValCheck(netValue) * that.nanValCheck(taxRatePercentage)) / 100;
+						netValue = postDataModel.getProperty("/listNonPoItem/" + i + "/netValue");
+
+					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxRatePercentage) / 100));
+					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxRatePercentage)) / 100;
 					totalTax += taxValue;
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", taxValue);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(3));
+					postDataModel.setProperty("/listNonPoItem/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(3));
+
 					//End of Tax Calulations
 					if (netValue && postDataModel.getProperty("/listNonPoItem/" + i +
 							"/crDbIndicator") === "H") {
-						totalAmt += that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue")) + taxValue;
+						totalAmt += that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue"));
 
 					} else if (netValue && postDataModel.getProperty("/listNonPoItem/" + i +
 							"/crDbIndicator") === "S") {
-						totalAmt -= that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue")) + taxValue;
+						totalAmt -= that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/netValue"));
 					}
 				}
 				totalAmt = that.nanValCheck(totalAmt).toFixed(3);
@@ -962,7 +1036,7 @@ sap.ui.define([
 							errorMsg = "Request timed-out. Please refresh your page";
 							that.errorMsg(errorMsg);
 						} else {
-							errorMsg = result.responseJSON.error;
+							errorMsg = data;
 							that.errorMsg(errorMsg);
 						}
 					}
@@ -1252,6 +1326,7 @@ sap.ui.define([
 			var postingDate = oSaveData.invoiceHeaderDto.postingDate;
 			if (postingDate) {
 				var that = this;
+				this.busyDialog.open();
 				var url = "/menabevdev/invoiceHeader/accountantSave";
 				$.ajax({
 					url: url,
@@ -1260,9 +1335,10 @@ sap.ui.define([
 					contentType: 'application/json',
 					dataType: "json",
 					data: JSON.stringify(oSaveData),
-					success: function (result, xhr, data) {
-						var message = result.message;
-						if (result.status === "Success") {
+					success: function (data, xhr, result) {
+						this.busyDialog.close();
+						var message = data.responseStatus;
+						if (result.status === 200) {
 							sap.m.MessageBox.success(message, {
 								actions: [sap.m.MessageBox.Action.OK],
 								onClose: function (sAction) {
@@ -1274,10 +1350,18 @@ sap.ui.define([
 								actions: [sap.m.MessageBox.Action.OK]
 							});
 						}
-					},
+					}.bind(this),
 					error: function (result, xhr, data) {
-						sap.m.MessageToast.show("Failed");
-					}
+						this.busyDialog.close();
+						var errorMsg = "";
+						if (result.status === 504) {
+							errorMsg = "Request timed-out. Please refresh your page";
+							this.errorMsg(errorMsg);
+						} else {
+							errorMsg = data;
+							this.errorMsg(errorMsg);
+						}
+					}.bind(this)
 				});
 			} else {
 				sap.m.MessageBox.error("Please Enter Posting Date!");
@@ -1338,6 +1422,7 @@ sap.ui.define([
 				var jsonData = objectIsNew.invoiceHeader;
 				var url = "InctureApDest/invoiceHeader/updateLifeCycleStatus";
 				var that = this;
+				this.busyDialog.open();
 				$.ajax({
 					url: url,
 					method: "PUT",
@@ -1348,9 +1433,10 @@ sap.ui.define([
 					contentType: 'application/json',
 					dataType: "json",
 					data: JSON.stringify(jsonData),
-					success: function (result, xhr, data) {
-						var message = result.message;
-						if (result.status === "Success") {
+					success: function (data, xhr, result) {
+						this.busyDialog.close();
+						var message = data.responseStatus;
+						if (result.status === 200) {
 							mRejectModel.setProperty("/selectedKey", "");
 							sap.m.MessageBox.success(message, {
 								actions: [sap.m.MessageBox.Action.OK],
@@ -1363,10 +1449,18 @@ sap.ui.define([
 								actions: [sap.m.MessageBox.Action.OK]
 							});
 						}
-					},
+					}.bind(this),
 					error: function (result, xhr, data) {
-						sap.m.MessageToast.show("Failed");
-					}
+						this.busyDialog.close();
+						var errorMsg = "";
+						if (result.status === 504) {
+							errorMsg = "Request timed-out. Please refresh your page";
+							this.errorMsg(errorMsg);
+						} else {
+							errorMsg = data;
+							this.errorMsg(errorMsg);
+						}
+					}.bind(this)
 				});
 			} else {
 				sap.m.MessageBox.error("Please select Reason Code");
@@ -1454,6 +1548,7 @@ sap.ui.define([
 					if (postingDate) {
 						jsonData = JSON.stringify(jsonData);
 						var that = this;
+						this.busyDialog.open();
 						var url = "/menabevdev/invoiceHeader/accountantSubmit";
 						$.ajax({
 							url: url,
@@ -1462,9 +1557,10 @@ sap.ui.define([
 							contentType: "application/json",
 							dataType: "json",
 							data: jsonData,
-							success: function (result, xhr, data) {
-								var message = result.message;
-								if (result.status === "Success") {
+							success: function (data, xhr, result) {
+								this.busyDialog.close();
+								var message = data.responseStatus;
+								if (result.status === 200) {
 									sap.m.MessageBox.success(message, {
 										actions: [sap.m.MessageBox.Action.OK],
 										onClose: function (sAction) {
@@ -1476,10 +1572,18 @@ sap.ui.define([
 										actions: [sap.m.MessageBox.Action.OK]
 									});
 								}
-							},
+							}.bind(this),
 							error: function (result, xhr, data) {
-								sap.m.MessageToast.show("Failed");
-							}
+								this.busyDialog.close();
+								var errorMsg = "";
+								if (result.status === 504) {
+									errorMsg = "Request timed-out. Please refresh your page";
+									this.errorMsg(errorMsg);
+								} else {
+									errorMsg = data;
+									this.errorMsg(errorMsg);
+								}
+							}.bind(this)
 						});
 					} else {
 						sap.m.MessageBox.error("Please Enter Posting Date!");
@@ -1496,9 +1600,9 @@ sap.ui.define([
 			var objectIsNew = jQuery.extend({}, nonPOInvoiceModelData.invoiceDetailUIDto);
 			var postDataModel = this.getModel("postDataModel");
 			objectIsNew.costAllocation = [];
+			var reqId = objectIsNew.invoiceHeader.requestId ? objectIsNew.invoiceHeader.requestId : null;
 			if (postDataModel.getData().listNonPoItem) {
 				for (var i = 0; i < postDataModel.getData().listNonPoItem.length; i++) {
-					var reqId = objectIsNew.invoiceHeader.requestId ? objectIsNew.invoiceHeader.requestId : null;
 					var itemId = postDataModel.getData().listNonPoItem[i].itemId ? postDataModel.getData().listNonPoItem[i].itemId : null;
 					objectIsNew.costAllocation.push({
 						"allocationPercent": postDataModel.getData().listNonPoItem[i].allocationPercent,
@@ -1556,7 +1660,7 @@ sap.ui.define([
 				"deposit": "",
 				"disAmt": "",
 				"docStatus": "",
-				"dueDate": "",
+				"dueDate": objectIsNew.invoiceHeader.dueDate,
 				"dueDateFrom": "",
 				"dueDateTo": "",
 				"emailFrom": "",
@@ -1571,10 +1675,10 @@ sap.ui.define([
 				"invoiceDateFrom": "",
 				"invoiceDateTo": "",
 				"invoiceItems": [],
-				"invoiceTotal": "",
+				"invoiceTotal": objectIsNew.invoiceHeader.invoiceTotal,
 				"invoiceTotalFrom": "",
 				"invoiceTotalTo": "",
-				"invoiceType": "",
+				"invoiceType": "NON-PO",
 				"lifecycleStatus": "",
 				"lifecycleStatusText": "",
 				"manualpaymentBlock": "",
@@ -1591,11 +1695,12 @@ sap.ui.define([
 				"refDocCat": "",
 				"refDocNum": 0,
 				"rejectionText": "",
-				"requestId": "",
+				"requestId": reqId,
 				"sapInvoiceNumber": 0,
 				"shippingCost": 0,
 				"subTotal": "",
 				"taskOwner": objectIsNew.invoiceHeader.taskOwner,
+				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id"),
 				"taskStatus": "",
 				"taxAmount": objectIsNew.invoiceHeader.taxAmount,
 				"updatedAt": 0,
