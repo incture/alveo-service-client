@@ -98,29 +98,15 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		try {
 			SessionFactory factory = SessionFactoryImpl.newInstance();
 			Map<String, String> parameter = getRepositorySessionConnection();
-
-			List<Repository> repositories = factory.getRepositories(parameter);
-			Date date = new Date();
-			String folderName = new SimpleDateFormat("yyyy-MM-dd").format(date).replace("-", "");
-			System.out.println(folderName);
 			Session session = factory.getRepositories(parameter).get(0).createSession();
 			Folder root = session.getRootFolder();
-			ItemIterable<CmisObject> insideRootFolder = root.getChildren();
 			Folder parent = null;
 			ObjectId parentId = null;
-			// for(CmisObject childFolder : insideRootFolder){
-			// if(childFolder.getName().equalsIgnoreCase("APA-DEV")){
-			// parent = (Folder) session.getObject(childFolder.getId());
-			// System.out.println("Parent:::::::::::::::"+parent);
-			//// parentId = childFolder.getId();
-			// }
-			// }
-			parent = (Folder) session.getObject("HR1vVfGxI3pTs1EpsMV2YjgVe0OujD9fX2se8ENYtj8");
-			String replacedFolderName = requestId.replace("APA-", "");
-			System.out.println(replacedFolderName);
+			String DMS_FOLDER = ApplicationConstants.FOLDER;
+			parent = (Folder) session.getObject(DMS_FOLDER);
 			// TO CHECK THE FOLDER IS AVAILABLE OR NOT
 			ItemIterable<QueryResult> results = session.query(
-					"SELECT COUNT(*) FROM cmis:folder where cmis:name like '%" + replacedFolderName + "'", false);
+					"SELECT COUNT(*) FROM cmis:folder where cmis:name like '%" + requestId + "'", false);
 			System.out.println(results.getTotalNumItems());
 			Object value = null;
 			for (QueryResult hit : results) {
@@ -152,7 +138,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 			if (Integer.parseInt(value.toString()) == 0) {
 				Map<String, Object> properties = new HashMap<String, Object>();
 				properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
-				properties.put(PropertyIds.NAME, "APA-" + folderName + "-" + replacedFolderName); // folder
+				properties.put(PropertyIds.NAME, requestId); // folder
 				// name
 				System.out.println("PARENT::::" + parent);
 				Folder newFolderId = parent.createFolder(properties);
@@ -174,7 +160,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 			} else {
 				String setParentByFolderId = null;
 				ItemIterable<QueryResult> folderIdByQuerry = session.query(
-						"SELECT cmis:objectId FROM cmis:folder where cmis:name like '%" + replacedFolderName + "'",
+						"SELECT cmis:objectId FROM cmis:folder where cmis:name like '%" + requestId + "'",
 						false);
 				System.out.println(folderIdByQuerry.getTotalNumItems());
 				for (QueryResult hit : folderIdByQuerry) {
@@ -285,6 +271,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 				String encoded = Base64.getEncoder().encodeToString(bytes);
 				response.setBase64(encoded);
 				response.setMimeType(contentStream.getMimeType());
+				response.setDocumentName(doc.getName());
 				response.setFileAvailability(true);
 				System.out.println(encoded);
 			} else {
@@ -321,7 +308,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setMessage("Document deleted Succesfully");
 		} catch (Exception e) {
-			response.setCode(ApplicationConstants.FAILURE);
+			response.setCode(ApplicationConstants.CODE_FAILURE);
 			response.setStatus(ApplicationConstants.FAILURE);
 			response.setMessage("Document deletion failed");
 		}
@@ -731,12 +718,18 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		return dto;
 	}
 
+	@Override
+	public String getTest() {
+		// TODO Auto-generated method stub
+		return "Inside DMS";
+	}
+
 //	public static void main(String[] args) throws FileNotFoundException, IOException, SAXException {
 //		DocumentManagementServiceImpl dms = new DocumentManagementServiceImpl();
 //		// dms.getAccessToken();
 //		File file = new File("C:\\Users\\Lakhu D\\Downloads\\exampleXml (1).xlsx");
-//		// dms.uploadDocument(file,"APA-000004");
-//		// dms.downloadDocument("qtpIma2YOLbRxsvFpYeD26ujU2EkWk_qsc7YCAWqd4s");
+//		 dms.uploadDocument(file,"APA-05142021-00000003");
+////		 dms.downloadDocument("jBwOUb1oXWQMnm_D_RNryrVPH9_aheSqT-vrHj5qteM");
 //		// dms.deleteDocument("qtpIma2YOLbRxsvFpYeD26ujU2EkWk_qsc7YCAWqd4s");
 //		// dms.extraxtXml(file);
 ////		dms.uploadXml(file);

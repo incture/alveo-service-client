@@ -11,5 +11,6 @@ public class DmsGetResponseDto {
 
 	private String base64;
 	private String mimeType;
+	private String documentName;
 	private Boolean fileAvailability;
 }

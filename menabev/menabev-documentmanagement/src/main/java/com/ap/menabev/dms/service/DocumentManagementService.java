@@ -19,5 +19,6 @@ public interface DocumentManagementService {
 	DmsGetResponseDto downloadDocument(String fileId);
 	ResponseDto deleteDocument(String fileId);
 	DashBoardDetailsDto extraxtXml(File file) throws ParserConfigurationException, SAXException, IOException;
+	String getTest();
 
 }

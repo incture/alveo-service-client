@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,48 +33,59 @@ import com.ap.menabev.util.ServiceUtil;
 @RestController
 @RequestMapping("/document")
 public class DocumentManagementController {
-	@Autowired(required=true)
+	@Autowired(required = true)
 	DocumentManagementService documentManagementService;
-	
+
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	DmsResponseDto  uploadDocument(@RequestParam("file") MultipartFile multipartFile, @RequestParam("requestId") String requestId) throws IOException
-	{
-		if(!ServiceUtil.isEmpty(multipartFile)){
-			File  file = ServiceUtil.multipartToFile(multipartFile);
-			return documentManagementService.uploadDocument(file,requestId);
+	DmsResponseDto uploadDocument(@RequestParam("file") MultipartFile multipartFile,
+			@RequestParam("requestId") String requestId) throws IOException {
+		try {
+			if (!ServiceUtil.isEmpty(multipartFile)) {
+				File file = ServiceUtil.multipartToFile(multipartFile);
+				System.err.println(file.getName());
+				return documentManagementService.uploadDocument(file, requestId);
+			} else {
+				ResponseDto response = new ResponseDto(ApplicationConstants.FAILURE, ApplicationConstants.CODE_FAILURE,
+						"File Not found");
+				DmsResponseDto dmsResponse = new DmsResponseDto();
+				dmsResponse.setResponse(response);
+				return dmsResponse;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
-		else{
-			ResponseDto response = new ResponseDto(ApplicationConstants.FAILURE,ApplicationConstants.CODE_FAILURE,"File Not found");
-			DmsResponseDto dmsResponse = new DmsResponseDto();
-			dmsResponse.setResponse(response);
-			return dmsResponse;
+
+	}
+
+	@GetMapping(value = "/download/{fileId}")
+	@ResponseBody
+	DmsGetResponseDto download(@PathVariable String fileId) {
+		return documentManagementService.downloadDocument(fileId);
+	}
+
+	@DeleteMapping(value = "/delete/{fileId}")
+	ResponseDto delete(@PathVariable String fileId) {
+		return documentManagementService.deleteDocument(fileId);
+	}
+
+	@GetMapping(value = "/extractXml")
+	DashBoardDetailsDto extraxtXml(@RequestParam("file") MultipartFile multipartFile)
+			throws IOException, ParserConfigurationException, SAXException {
+		if (!ServiceUtil.isEmpty(multipartFile)) {
+			File file = ServiceUtil.multipartToFile(multipartFile);
+			return documentManagementService.extraxtXml(file);
+		} else {
+			return new DashBoardDetailsDto();
 		}
-		
 
 	}
 	
-	@GetMapping(value="/download/{fileId}")
-	@ResponseBody
-	DmsGetResponseDto download(@PathVariable String fileId){
-		return documentManagementService.downloadDocument(fileId);
+	@GetMapping(value = "/dmsGet")
+	String getTest(){
+		return documentManagementService.getTest();
 	}
 	
-	@PostMapping(value="/delete")
-	ResponseDto delete(@RequestBody String fileId){
-		return documentManagementService.deleteDocument(fileId);
-	}
-	
-	@GetMapping(value="/extractXml")
-	DashBoardDetailsDto extraxtXml(@RequestParam("file") MultipartFile multipartFile) throws IOException, ParserConfigurationException, SAXException{
-		if(!ServiceUtil.isEmpty(multipartFile)){
-			File  file = ServiceUtil.multipartToFile(multipartFile);
-			return documentManagementService.extraxtXml(file);
-		}
-		else{
-			 return new DashBoardDetailsDto();
-		}
-		
-	}
 	
 
 }

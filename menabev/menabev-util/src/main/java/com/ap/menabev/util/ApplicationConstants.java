@@ -36,6 +36,13 @@ public interface ApplicationConstants {
 	String USERNAME = "MENABEVD";
 	String PASSWORD = "menBHDev2021";
 	// ----------------------------------------------------------//
+	//QA DataBase Details
+//	String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
+//	String URL = "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
+//	String USERNAME = "MENABEVQA";
+//	String PASSWORD = "Dv4v.6nkTn6weJh6ZSNdL7-NTR8JqwL-AVzr_H-fJI1aj78QpqmGtFggsuSLuOC4e2qCkVurhiW12D9zyv6KRVyPJqPgmWR0tVffmyDZV5Aq7K2Zx_xm-C-esUhSiLC_";
+	//------------------------------------------------------///
+	
 	// Service Status
 	String SUCCESS = "Success";
 	String CODE_SUCCESS = "0";
@@ -68,16 +75,19 @@ public interface ApplicationConstants {
 	// "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
 	// String USERNAME = "MENABEVD";
 	// String PASSWORD = "menBHDev2021";
+	
+	
 	// DocumentManagementSystem
-
-	String DMS_TOKEN_ENDPOINT = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token";
-
-	String DMS_CLIENT_ID = "sb-66065450-19f9-45c7-91ba-de9f72bb48cb!b3189|sdm-di-DocumentManagement-sdm_integration!b873";
-
-	String DMS_CLIENT_SECRET = "DCBoqXT1Hd6gY3vOaIQ7DVie6ns=";
-
-	String DMS_GRANT_TYPE = "client_credentials";
-
-	String DMS_SCOPE = "generate-ads-output";
+    String DMS_TOKEN_ENDPOINT = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token";
+    String DMS_CLIENT_ID = "sb-66065450-19f9-45c7-91ba-de9f72bb48cb!b3189|sdm-di-DocumentManagement-sdm_integration!b873";
+    String DMS_CLIENT_SECRET = "DCBoqXT1Hd6gY3vOaIQ7DVie6ns=";
+    String DMS_GRANT_TYPE = "client_credentials";
+    String DMS_SCOPE = "generate-ads-output";
+//  DEV FOLDER
+	String FOLDER = "HR1vVfGxI3pTs1EpsMV2YjgVe0OujD9fX2se8ENYtj8";
+    
+//    QA FOLDER
+//	String FOLDER = "ud3MtXve86vrngCHttSUW_KwwnMdM2KXiALY5mTLXJ4";
+	//------------------------------------------------------------------------------------//
 
 }
