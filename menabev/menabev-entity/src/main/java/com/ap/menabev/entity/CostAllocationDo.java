@@ -26,7 +26,7 @@ public @Data class CostAllocationDo {
 
 	@Id
 	@Column(name = "COST_ALLOCATION_ID")
-	private String costAllocationId = UUID.randomUUID().toString();
+	private String costAllocationId;
 	
 	@Column(name = "REQUEST_ID", nullable = false)
     private String requestId; // (FK)

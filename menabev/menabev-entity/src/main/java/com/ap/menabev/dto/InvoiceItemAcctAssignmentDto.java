@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.Data;
 
 public @Data class InvoiceItemAcctAssignmentDto {
-	private String invAccAssId=UUID.randomUUID().toString();
+	private String invAccAssId;
 	private String requestId;
 	private String itemId;
 	private String documentNumber;

@@ -9,6 +9,7 @@ public interface WorkflowConstants {
 	String WORKFLOW_DEFINATION_ID_KEY = "workflowDefinitionId";
 	String RECIPIENT_USER_KEY = "recipientUsers";
 	String PROCESSOR_KEY = "processor";
+	String SUBJECT = "subject";
 	String SORT_TASKS_KEY = "$orderby";
 	String CREATED_AT_FROM_KEY = "createdFrom";
 	String CREATED_AT_TO_KEY = "createdUpTo";

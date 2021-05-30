@@ -60,6 +60,12 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo,S
 
 	@Query(value = "select i from InvoiceHeaderDo i where i.requestId=:requestId")
 	InvoiceHeaderDo getInvoiceHeader(@Param("requestId") String requestId);
+	
+	@Query(value = "select i from InvoiceHeaderDo i where i.taskOwnerId=:taskOwnerId and i.docStatus='Draft'")
+	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserId(@Param("taskOwnerId") String taskOwnerId);
+	
+	@Query(value = "select i from InvoiceHeaderDo i where i.taskOwnerId=:taskOwnerId and i.requestId=:requestId and i.docStatus='Draft'")
+	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserIdAndRequestId(@Param("taskOwnerId") String taskOwnerId,@Param("requestId") String requestId);
 
 	@Transactional(TxType.REQUIRES_NEW)
 	@Modifying(clearAutomatically = true)

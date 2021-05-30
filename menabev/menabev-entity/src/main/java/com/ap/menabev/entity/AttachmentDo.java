@@ -45,5 +45,11 @@ public @Data class AttachmentDo {
 	
 	@Column(name="MASTER")
 	private Boolean master;
+	
+	@Column(name = "IS_PO_INVOICE")
+	private Boolean isPoInvoice;
+	
+	@Column(name = "IS_DELETED")
+	private Boolean isDeleted;
 
 }

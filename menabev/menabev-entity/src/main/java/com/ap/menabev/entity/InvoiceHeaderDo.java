@@ -136,50 +136,37 @@ public class InvoiceHeaderDo {
 	@Column(name="ACCOUNTING_DOC")
 	private String accountingDoc;
 	
-
 	@Column(name = "POSTING_DATE")
 	private Long postingDate;
-	
 	@Column(name = "ASSIGNED_TO")
 	private String assignedTo;//25
-	
 	@Column(name="CLEARING_ACCOUNTING_DOCUMENT")
 	private String clearingAccountingDocument;
-	
 	@Column(name="CLEARING_DATE")
 	private Long clearingDate;
-	
 	@Column(name="PAYMENT_STATUS")
 	private String paymentStatus;
-	
 	@Column(name="PAYMENT_BLOCK")
 	private String paymentBlock;
-
 	@Column(name="PAYMENT_BLOCK_DESC")
 	private String paymentBlockDesc;
-	
 	@Column(name="BALANCE_CHECK")
 	private Boolean balanceCheck;
-	
 	@Column(name="MANUAL_PAYMENT_BLOCK")
 	private String manualpaymentBlock;
-	
 	@Column(name = "WORkFLOW_ID")
 	private String workflowId;
-	
 	@Column(name = "VALIDATION_STATUS")
 	private  String validationStatus; /// Exception Status 
-	
 	@Column(name ="TASK_OWNER")
 	private String taskOwner;
-	
+	@Column(name = "TASK_OWNER_ID")
+	private String taskOwnerId; // loggedin userid 
 	@Column(name = "FORWARDED_TASK_OWNER")
 	private String forwaredTaskOwner;
-	
 	@Column(name = "IS_NON-PO_OR_PO")
 	private boolean isNonPoOrPo;
-	
-	@Column(name="DOC_STATUS") // is Draft or Active 
+	@Column(name="DOC_STATUS") // is Draft or Created  or Opened.
 	private String docStatus;
 	@Column(name="TRANSACTION_TYPE")
 	private String transactionType;

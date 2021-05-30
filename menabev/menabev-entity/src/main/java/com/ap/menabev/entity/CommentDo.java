@@ -17,7 +17,7 @@ public @Data class CommentDo {
 	
 	@Id
 	@Column(name="COMMENT_ID")
-	private String commentId = UUID.randomUUID().toString();
+	private String commentId;
 	
 	@Column(name = "REQUEST_ID",nullable=false)
 	private String requestId;

@@ -1,7 +1,5 @@
 package com.ap.menabev.dto;
 
-import java.util.UUID;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,7 +7,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CostAllocationDto {
-	private String costAllocationId= UUID.randomUUID().toString();
+	private String costAllocationId;
 	private String requestId;
 	private Integer itemId;
 	private Integer serialNo;
@@ -27,4 +25,11 @@ public class CostAllocationDto {
 	private String crDbIndicator;
 	private String itemText;
 	private String allocationPercent;
+	private String orderId;
+	private String taxCode;
+	private String accountNum;
+	private String lineText;
+	private String taxValue;
+	private String taxPer;
+	private String taxRate;
 }

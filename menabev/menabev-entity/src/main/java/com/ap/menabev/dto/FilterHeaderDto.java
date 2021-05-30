@@ -40,5 +40,9 @@ public class FilterHeaderDto {
 	private Long indexNum;
 	private Long count;
 	private String invoiceTotal;
+	private  String roleOfUser; 
+	
+	
+		   
 
 }

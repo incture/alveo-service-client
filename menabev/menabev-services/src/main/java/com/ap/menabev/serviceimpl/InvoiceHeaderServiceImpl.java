@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -225,28 +226,33 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			 invoiceItemRepository.saveAll(itemlists);
 			    }
 			    if(invoiceDto.getInvoiceItemAcctAssignmentDto()!=null && !invoiceDto.getInvoiceItemAcctAssignmentDto().isEmpty()){
-			// save invoice Account Assingment 
-			List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
-			listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-			invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
-			    }
-			    if(invoiceDto.getCostAllocationDto()!=null && !invoiceDto.getCostAllocationDto().isEmpty()){
-			// save cost allocation
-			List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
-			listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-			costAllocationRepository.saveAll(listCostAllocation);
-			    }
-			    if(invoiceDto.getInvoiceHeaderDto().getAttachments()!=null && !invoiceDto.getInvoiceHeaderDto().getAttachments().isEmpty()){
-			    	List<AttachmentDo> attachementList = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getAttachments(), AttachmentDo.class);
-			    	attachementList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-			    	attachmentRepository.saveAll(attachementList);
-			    }
-			    if(invoiceDto.getInvoiceHeaderDto().getComments()!=null && !invoiceDto.getInvoiceHeaderDto().getComments().isEmpty()){
-			    	List<CommentDo> commentList = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getComments(), CommentDo.class);
-			    	commentList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
-			    	
-			    	commentRepository.saveAll(commentList);
-			    }
+					// save invoice Account Assingment 
+					List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
+					listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());
+					item.setInvAccAssId(UUID.randomUUID().toString());});
+					
+					invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
+					    }
+					    if(invoiceDto.getCostAllocationDto()!=null && !invoiceDto.getCostAllocationDto().isEmpty()){
+					// save cost allocation
+					List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
+					listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());
+					item.setCostAllocationId(UUID.randomUUID().toString());
+					});
+					costAllocationRepository.saveAll(listCostAllocation);
+					    }
+					    if(invoiceDto.getInvoiceHeaderDto().getAttachments()!=null && !invoiceDto.getInvoiceHeaderDto().getAttachments().isEmpty()){
+					    	List<AttachmentDo> attachementList = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getAttachments(), AttachmentDo.class);
+					    	attachementList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+					    	attachmentRepository.saveAll(attachementList);
+					    }
+					    if(invoiceDto.getInvoiceHeaderDto().getComments()!=null && !invoiceDto.getInvoiceHeaderDto().getComments().isEmpty()){
+					    	List<CommentDo> commentList = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getComments(), CommentDo.class);
+					    	commentList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());
+					    	item.setCommentId(UUID.randomUUID().toString());});
+					    	
+					    	commentRepository.saveAll(commentList);
+					    }
 			    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId() +" saved as draft");
 		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
 		} catch (Exception e){
@@ -267,7 +273,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			determination.setCompCode(invoiceDto.getInvoiceHeaderDto().getCompCode());
 			determination.setProcessLeadCheck("Process Lead");
 			determination.setVednorId(invoiceDto.getInvoiceHeaderDto().getVendorId());
-			//triggerRuleService(determination);
+		            ResponseEntity<?> responseRules =    triggerRuleService(determination);
+		            System.err.println("responseFrom Worklfow "+ responseRules);
 			// Generate Request Id 
 			if(invoiceDto.getInvoiceHeaderDto().getRequestId()!=null && !invoiceDto.getInvoiceHeaderDto().getRequestId().isEmpty()){
 				requestId = invoiceDto.getInvoiceHeaderDto().getRequestId();
@@ -284,6 +291,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			context.setAccountantGroup("APADev@incture.com");
 			context.setAccountantUser("arun.gauda@incture.com");
 			context.setProcessLead("P000022");
+			
 		ResponseEntity<?> response  = triggerWorkflow((WorkflowContextDto)context,"triggerresolutionworkflow.triggerresolutionworkflow");
 		System.err.println("response of workflow Trigger "+response);
 		WorkflowTaskOutputDto  taskOutputDto= (WorkflowTaskOutputDto) response.getBody();
@@ -304,13 +312,17 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		    if(invoiceDto.getInvoiceItemAcctAssignmentDto()!=null && !invoiceDto.getInvoiceItemAcctAssignmentDto().isEmpty()){
 		// save invoice Account Assingment 
 		List<InvoiceItemAcctAssignmentDo>  listAccountAssignement = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceItemAcctAssignmentDto(), InvoiceItemAcctAssignmentDo.class);
-		listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		listAccountAssignement.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());
+		item.setInvAccAssId(UUID.randomUUID().toString());});
+		
 		invoiceItemAcctAssignmentRepository.saveAll(listAccountAssignement);
 		    }
 		    if(invoiceDto.getCostAllocationDto()!=null && !invoiceDto.getCostAllocationDto().isEmpty()){
 		// save cost allocation
 		List<CostAllocationDo>  listCostAllocation = ObjectMapperUtils.mapAll(invoiceDto.getCostAllocationDto(), CostAllocationDo.class);
-		listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		listCostAllocation.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());
+		item.setCostAllocationId(UUID.randomUUID().toString());
+		});
 		costAllocationRepository.saveAll(listCostAllocation);
 		    }
 		    if(invoiceDto.getInvoiceHeaderDto().getAttachments()!=null && !invoiceDto.getInvoiceHeaderDto().getAttachments().isEmpty()){
@@ -320,7 +332,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		    }
 		    if(invoiceDto.getInvoiceHeaderDto().getComments()!=null && !invoiceDto.getInvoiceHeaderDto().getComments().isEmpty()){
 		    	List<CommentDo> commentList = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getComments(), CommentDo.class);
-		    	commentList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
+		    	commentList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());
+		    	item.setCommentId(UUID.randomUUID().toString());});
 		    	
 		    	commentRepository.saveAll(commentList);
 		    }
@@ -344,26 +357,46 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	
 	@Override
 	public ResponseEntity<?>  getInboxTask(FilterHeaderDto filterDto){
-		
-
 		try {
 			if (filterDto.getIndexNum() != null && filterDto.getCount() != null && filterDto.getIndexNum() != 0 && filterDto.getCount() != 0) {
 				if (!HelperClass.checkString(filterDto.getUserId())) {
-						ResponseEntity<?> responseFromSapApi = fetchWorkflowUserTaksList(
-								filterDto.getUserId(),filterDto.isMyTask(), null,null);
+					List<InvoiceHeaderDo>  lists = null;
+						ResponseEntity<?> responseFromSapApi = fetchWorkflowUserTaksList(filterDto);
 						if (responseFromSapApi.getStatusCodeValue() == HttpStatus.OK.value()) {
 							@SuppressWarnings("unchecked")
 							List<WorkflowTaskOutputDto> listOfWorkflowTasks = (List<WorkflowTaskOutputDto>) responseFromSapApi
 									.getBody();
 							logger.error("listOfWorkflowTasks : " + listOfWorkflowTasks);
 							System.err.println("listOfWorkflowTasks :" +listOfWorkflowTasks.size());
-							if (!listOfWorkflowTasks.isEmpty()) {
+							// check condition for accountant role to fetch draft along with his user tasks 
+							if (!listOfWorkflowTasks.isEmpty()  || (listOfWorkflowTasks.isEmpty() && filterDto.getRoleOfUser().equals("Accountant")) ) {
+								if(filterDto.getRoleOfUser().equals("Accountant")&&filterDto.isMyTask()){
+									// than add the requesId with Draft as docStatus 
+									if(filterDto.getRequestId()!=null && !filterDto.getRequestId().isEmpty() ){
+										lists = invoiceHeaderRepository.getInvoiceHeaderDocStatusByUserIdAndRequestId(filterDto.getUserId(),filterDto.getRequestId());
+									}else {
+										lists = invoiceHeaderRepository.getInvoiceHeaderDocStatusByUserId(filterDto.getUserId());
+										System.err.println("list of drafts for accountant = " + lists );
+									}
+									if(lists!=null && !lists.isEmpty()){
+										for(int i=0;i<lists.size();i++){
+											
+											WorkflowTaskOutputDto workflow = new WorkflowTaskOutputDto();
+											workflow.setSubject(lists.get(i).getRequestId());
+											workflow.setProcessor(filterDto.getUserId());
+											listOfWorkflowTasks.add(workflow);
+										}
+									}
+								}
+								
 								long min = (filterDto.getIndexNum()  * filterDto.getCount()) - filterDto.getCount();
 								long max = (filterDto.getIndexNum()  * filterDto.getCount());
+								if(listOfWorkflowTasks!=null && !listOfWorkflowTasks.isEmpty()){
 								if (min < listOfWorkflowTasks.size()) {
 									if (max > listOfWorkflowTasks.size()) {
 										max = listOfWorkflowTasks.size();
 									}
+									System.err.println("list of workflowIDs  for accountant = " + listOfWorkflowTasks );
 									return new ResponseEntity<>(fetchInvoiceDocHeaderDtoListFromRequestNumber(
 											listOfWorkflowTasks.stream().skip(min).limit(max)
 													.collect(Collectors.toList()),filterDto,listOfWorkflowTasks.size()),
@@ -374,8 +407,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 													+ " Select different Index number or Change the count number.",
 											HttpStatus.OK);
 								}
+								}else {
+									return new ResponseEntity<String>("No tasks are available for user : "
+													+ filterDto.getUserId(),HttpStatus.OK);
+								}
 							} else {
-								return new ResponseEntity<String>("No tasks are available with Customer Po for user : "
+								return new ResponseEntity<String>("No tasks are available for user : "
 										+ filterDto.getUserId(), HttpStatus.OK);
 							}
 						} else {
@@ -383,7 +420,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						}
 				} else {
 					return new ResponseEntity<>(
-							"INVALID_INPUT" + "Please provide login in user id and project code",
+							"INVALID_INPUT" + "Please provide login in user id ",
 							HttpStatus.BAD_REQUEST);
 				}
 			} else {
@@ -396,9 +433,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 		
 	}
-	public ResponseEntity<?> fetchWorkflowUserTaksList(String userId,boolean myTask, String isBuyerTask,String isgrnTeamTask){
+	public ResponseEntity<?> fetchWorkflowUserTaksList(FilterHeaderDto filter){
 		try {
-			if (!checkString(userId)) {
+			if (!checkString(filter.getUserId())) {
 				String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
 				
 				HttpClient client = HttpClientBuilder.create().build();
@@ -408,17 +445,19 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				
 				appendParamInUrl(url, WorkflowConstants.WORKFLOW_DEFINATION_ID_KEY,
 						WorkflowConstants.WORKFLOW_DEFINATION_ID_VALUE);
-				if(myTask){
+				if(filter.isMyTask()){
 					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
 							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_RESERVED_VALUE);
-					appendParamInUrl(url, WorkflowConstants.PROCESSOR_KEY, userId);
-					
+					appendParamInUrl(url, WorkflowConstants.PROCESSOR_KEY, filter.getUserId());
 				}else{
 					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
 							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE);
-				appendParamInUrl(url, WorkflowConstants.RECIPIENT_USER_KEY, userId);
+				appendParamInUrl(url, WorkflowConstants.RECIPIENT_USER_KEY, filter.getUserId());
 				appendParamInUrl(url, WorkflowConstants.PROCESSOR_KEY, "");
 				}
+				if(filter.getRequestId()!=null && !filter.getRequestId().isEmpty() ){
+					appendParamInUrl(url, WorkflowConstants.SUBJECT,filter.getRequestId() );
+					}	
 				appendParamInUrl(url, WorkflowConstants.FIND_COUNT_OF_TASKS_KEY,
 						WorkflowConstants.FIND_COUNT_OF_TASKS_VALUE);
 				appendParamInUrl(url, WorkflowConstants.TOP_KEY, WorkflowConstants.TOP_VALUE);
@@ -453,8 +492,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					if (!listOfWorkflowTasks.isEmpty()) {
 						return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
 					} else {
-						return new ResponseEntity<String>("No tasks are available for user : " + userId,
-								HttpStatus.NO_CONTENT);
+						return new ResponseEntity<>(listOfWorkflowTasks ,
+								HttpStatus.OK);
 					}
 				} else {
 					return new ResponseEntity<String>("FETCHING FAILED", HttpStatus.CONFLICT);
@@ -503,20 +542,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
         
        /* List<InvoiceHeaderDo> listOfInvoiceOrders = invoiceHeaderRepository
 				.findByRequestIdIn(requestId);*/
-        // all task method no filters 
-        if(filterDto.getRequestId() != null && !filterDto.getRequestId().isEmpty()){
-        	if( requestIds.contains(filterDto.getRequestId())){
-        		requestIds.clear();
-        		requestIds.add(filterDto.getRequestId());
-        		   responseFromFilter = filterInvoices(requestIds,filterDto);
-        	}else{
-        		// if search for requestId 
-        		responseFromFilter = new ResponseEntity<String>("No Data Found For Searched Criteria",HttpStatus.NO_CONTENT);
-        	}
-        }else{
-        	 // No filter Parameter at all 
+        // List of requestIds fetched for user from user task  
            responseFromFilter = filterInvoices(requestIds,filterDto);
-                 }
           
           if(responseFromFilter.getStatusCodeValue()==200){
         	 listOfInvoiceOrders=  (List<InvoiceHeaderDo>) responseFromFilter.getBody();
@@ -1400,25 +1427,17 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	// ----------   
 	
 public ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination) throws ClientProtocolException, IOException, URISyntaxException{
-		
 		RuleInputProcessLeadDto ruleInput = new RuleInputProcessLeadDto();
-		
 		ruleInput.setCompCode(determination.getCompCode());
 		ruleInput.setProcessLeadCheck(determination.getProcessLeadCheck());
 		ruleInput.setVendorId(determination.getVednorId());
-		
-		
-		String outPut = execute((RuleInputDto) ruleInput ,RuleConstants.menaBevRuleService);
-		
-		
+		ResponseEntity<?> response  = execute((RuleInputDto) ruleInput ,RuleConstants.menaBevRuleService);
 	   // call convert statement and than get the ouput and return it .
-		
-	
-		
-		
-		
-		return null;
-		
+		if(response.getStatusCodeValue() == 201){
+			return response;
+		}else {
+			return response;
+		}
 	}
 
 /*@Override
@@ -1443,8 +1462,9 @@ return null;
 }*/
 	
 	
-	protected String execute(RuleInputDto input, String rulesServiceId) throws ClientProtocolException, IOException, URISyntaxException {
+	protected ResponseEntity<?> execute(RuleInputDto input, String rulesServiceId) throws ClientProtocolException, IOException, URISyntaxException {
 
+		
 		HttpContext httpContext = new BasicHttpContext();
 		httpContext.setAttribute(HttpClientContext.COOKIE_STORE, new BasicCookieStore());
 		HttpPost httpPost = null;
@@ -1470,25 +1490,46 @@ return null;
 		System.err.println("response : " +response);
 
 		// process your response here
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		InputStream inputStream = response.getEntity().getContent();
-		byte[] data = new byte[1024];
-		int length = 0;
-		while ((length = inputStream.read(data)) > 0) {
-			bytes.write(data, 0, length);
+		
+		System.err.println("WorkflowTriggerResponse ="+response);
+		if (response.getStatusLine().getStatusCode() == HttpStatus.CREATED.value()) {
+			String dataFromStream = getDataFromStream(response.getEntity().getContent());
+			System.err.println("dataStream ="+dataFromStream);
+			JSONObject jsonObject = new JSONObject(dataFromStream);
+			System.err.println(" data stram JsonObject "+jsonObject);
+			WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
+					WorkflowTaskOutputDto.class);
+			
+			if (httpPost != null) {
+				httpPost.releaseConnection();
+			}
+			if (response != null) {
+				response.close();
+			}
+			if (httpClient != null) {
+				httpClient.close();
+			}
+			return new ResponseEntity<>(taskDto, HttpStatus.CREATED);
+		} else {
+			
+			if (httpPost != null) {
+				httpPost.releaseConnection();
+			}
+			if (response != null) {
+				response.close();
+			}
+			if (httpClient != null) {
+				httpClient.close();
+			}
+			return new ResponseEntity<>(getDataFromStream(response.getEntity().getContent()),
+					HttpStatus.BAD_REQUEST);
 		}
-		String respBody = new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+
 		// clean-up sessions
-		if (httpPost != null) {
-			httpPost.releaseConnection();
-		}
-		if (response != null) {
-			response.close();
-		}
-		if (httpClient != null) {
-			httpClient.close();
-		}
-		return respBody;
+		
+		
+		
+		
 	}
 	
 	public static String getJwtTokenForAuthenticationForRulesSapApi() throws URISyntaxException, IOException {
