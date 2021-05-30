@@ -5,7 +5,7 @@ sap.ui.define([
 	'sap/ui/model/FilterOperator'
 ], function (BaseController, JSONModel, Filter, FilterOperator) {
 	"use strict";
-	var num, count;
+	var num;
 	return BaseController.extend("com.menabev.AP.controller.TemplateManagement", {
 
 		/**
@@ -28,23 +28,22 @@ sap.ui.define([
 		},
 
 		onRouteMatched: function (oEvent) {
-			// this.getAllTemplate();
-			this.getAllTemplateWithPagination();
+			var templateModel = this.getModel("templateModel");
+			templateModel.setData({});
+			templateModel.setProperty("/tempDeleteBtnEnabled", false);
+			this.getView().byId("btnPrevious").setEnabled(false);
+			this.getAllTemplateWithPagination(null, null, 0);
 		},
 
 		//function call to load all templates with pagination
-		getAllTemplateWithPagination: function () {
-			var templateModel = this.getModel("templateModel");
-			var pageNo = 0;
+		getAllTemplateWithPagination: function (sTempName, sAccNumber, offset) {
 			this.getView().byId("templateTableId").removeSelections();
-			templateModel.setProperty("/tempBtnEnabled", false);
-			this.getView().byId("btnPrevious").setEnabled(false);
 			var payload = {
-				"templateName": null,
-				"accountNo": null,
+				"templateName": sTempName,
+				"accountNo": sAccNumber,
 				"pagination": {
 					"limit": 10,
-					"offset": pageNo
+					"offset": offset
 				}
 			};
 			var url = "/menabevdev/NonPoTemplate/getAll";
@@ -58,52 +57,27 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					this.busyDialog.close();
-					templateModel.setProperty("/aNonPoTemplate", data);
-					this.count = data[0].count;
-					if (num + 10 >= this.count) {
-						this.getView().byId("btnNext").setEnabled(false);
+					if (data.length) {
+						this.getModel("templateModel").setProperty("/aNonPoTemplate", data);
+						var count = data[0].count;
+						if (num + 10 >= count || data.length < 10) {
+							this.getView().byId("btnNext").setEnabled(false);
+						} else {
+							this.getView().byId("btnNext").setEnabled(true);
+						}
 					} else {
-						this.getView().byId("btnNext").setEnabled(true);
+						var errorMsg = "No Templates Found";
+						sap.m.MessageBox.error(errorMsg);
 					}
 				}.bind(this),
 				error: function (result, xhr, data) {
 					this.busyDialog.close();
 					var errorMsg = "";
 					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
+						errorMsg = "Request timed-out. Please refresh page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error.message.value;
-						this.errorMsg(errorMsg);
-					}
-				}.bind(this)
-			});
-		},
-		//function call to load all templates 
-		getAllTemplate: function () {
-			var templateModel = this.getModel("templateModel");
-			this.getView().byId("templateTableId").removeSelections();
-			templateModel.setProperty("/tempBtnEnabled", false);
-			var url = "/menabevdev/NonPoTemplate/getAll";
-			this.busyDialog.open();
-			jQuery.ajax({
-				type: "GET",
-				contentType: "application/json",
-				url: url,
-				dataType: "json",
-				async: true,
-				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
-					templateModel.setProperty("/aNonPoTemplate", data);
-				}.bind(this),
-				error: function (result, xhr, data) {
-					this.busyDialog.close();
-					var errorMsg = "";
-					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
-						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = result.responseJSON.error.message.value;
+						errorMsg = data;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -117,9 +91,9 @@ sap.ui.define([
 			var selectedFilters = oEvent.getSource().getSelectedContextPaths();
 			templateModel.setProperty("/selectedFilters", selectedFilters);
 			if (oSelectedItems.length) {
-				templateModel.setProperty("/tempBtnEnabled", true);
+				templateModel.setProperty("/tempDeleteBtnEnabled", true);
 			} else {
-				templateModel.setProperty("/tempBtnEnabled", false);
+				templateModel.setProperty("/tempDeleteBtnEnabled", false);
 			}
 		},
 
@@ -209,10 +183,10 @@ sap.ui.define([
 					this.busyDialog.close();
 					var errorMsg = "";
 					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
+						errorMsg = "Request timed-out. Please refresh page";
 						this.errorMsg(errorMsg);
 					} else {
-						errorMsg = result.responseJSON.error.message.value;
+						errorMsg = data;
 						this.errorMsg(errorMsg);
 					}
 				}.bind(this)
@@ -284,33 +258,23 @@ sap.ui.define([
 			if (!postDataModelData.nonPoTemplateItems) {
 				postDataModelData.nonPoTemplateItems = [];
 			}
-			var glCode = "",
-				materialDescription = "",
-				crDbIndicator = "H",
-				netValue = "",
-				costCenter = "",
-				internalOrderId = "",
-				profitCenter = "",
-				itemText = "",
-				companyCode = "",
-				templateId = "",
-				allocationPercent = "";
 			postDataModelData.nonPoTemplateItems.unshift({
-				"templateId": templateId,
-				"glAccount": glCode,
-				"costCenter": costCenter,
-				"internalOrderId": internalOrderId,
-				"materialDescription": materialDescription,
-				"crDbIndicator": crDbIndicator,
-				"netValue": netValue,
-				"profitCenter": profitCenter,
-				"itemText": itemText,
-				"companyCode": companyCode,
+				"templateId": "",
+				"glAccount": "",
+				"costCenter": "",
+				"internalOrderId": "",
+				"materialDescription": "",
+				"crDbIndicator": "H",
+				"netValue": "",
+				"profitCenter": "",
+				"itemText": "",
+				"companyCode": "",
 				"assetNo": null,
 				"subNumber": null,
 				"wbsElement": null,
 				"isNonPo": true,
-				"allocationPercent": allocationPercent
+				"accountNo": "",
+				"allocationPercent": ""
 			});
 			postDataModel.refresh();
 		},
@@ -370,7 +334,7 @@ sap.ui.define([
 				}
 				if (!bflag) {
 					postDataModel.setProperty("/nonPoTemplateItems", alistNonPoData);
-					var sMsg = "Please Enter Required Fields G/L Account,Cost Center & Percentage Allocation!";
+					var sMsg = "Please Enter Required Fields Account No., G/L Account,Cost Center & Percentage Allocation!";
 					sap.m.MessageBox.error(sMsg);
 					return;
 				}
@@ -516,10 +480,11 @@ sap.ui.define([
 
 		onClickSearchTemplate: function () {
 			var sTempName = this.getModel("templateModel").getProperty("/inputTempName"),
-				sAccNumber = this.getModel("templateModel").getProperty("/inputAccountNumber"),
-				offset = 0;
-			this.data(sTempName, sAccNumber, offset);
-
+				sAccNumber = this.getModel("templateModel").getProperty("/inputAccountNumber");
+			this.clicks = 0;
+			num = this.clicks * 10;
+			this.getView().byId("btnPrevious").setEnabled(false);
+			this.getAllTemplateWithPagination(sTempName, sAccNumber, this.clicks);
 		},
 
 		onCLickClearInputTemp: function () {
@@ -534,15 +499,12 @@ sap.ui.define([
 				this.clicks += 1;
 			} else {
 				this.clicks += 1;
-			};
+			}
 			num = this.clicks * 10;
-			// if (num === this.count) {
-			// 	this.getView().byId("btnNext").setEnabled(false);
-			// }
 			if (num >= 10) {
 				this.getView().byId("btnPrevious").setEnabled(true);
 			}
-			this.data(null, null, num);
+			this.getAllTemplateWithPagination(null, null, num);
 		},
 
 		onClickPrevious: function () {
@@ -551,64 +513,73 @@ sap.ui.define([
 				num = 0;
 			} else {
 				num = this.clicks * 10;
-			};
-			// if (num < this.count) {
-			// 	this.getView().byId("btnNext").setEnabled(true);
-			// }
+			}
 			if (num === 0) {
 				this.getView().byId("btnPrevious").setEnabled(false);
 			}
-			this.data(null, null, num);
+			this.getAllTemplateWithPagination(null, null, num);
 		},
 
-		data: function (sTempName, sAccNumber, offset) {
-			var that = this;
-			var payload = {
-				"templateName": sTempName,
-				"accountNo": sAccNumber,
-				"pagination": {
-					"limit": 10,
-					"offset": offset
-				}
-			};
-			var url = "/menabevdev/NonPoTemplate/getAll";
-			this.busyDialog.open();
-			jQuery.ajax({
-				type: "POST",
-				contentType: "application/json",
-				url: url,
-				dataType: "json",
-				data: JSON.stringify(payload),
-				async: true,
-				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
-					if (data.length) {
-						this.getModel("templateModel").setProperty("/aNonPoTemplate", data);
-					} else {
-						var errorMsg = "No Templates Found";
-						sap.m.MessageBox.error(errorMsg);
-					}
-					this.count = data[0].count;
-					if (num + 10 >= this.count) {
-						this.getView().byId("btnNext").setEnabled(false);
-					} else {
-						this.getView().byId("btnNext").setEnabled(true);
-					}
-
-				}.bind(this),
-				error: function (result, xhr, data) {
-					this.busyDialog.close();
-					var errorMsg = "";
-					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please try again using different search filters or add more search filters.";
-						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = result.responseJSON.error.message.value;
-						this.errorMsg(errorMsg);
-					}
-				}.bind(this)
-			});
+		/*Start of Excel Upload*/
+		//this function will allow user import cost Allocation data from an excel file
+		//function handleImportFromExcel will import the data to cost allocation table from an excel file uploaded from the local system.
+		handleImportFromExcel: function (oEvent) {
+			var excelFile = oEvent.getParameter("files")[0];
+			if (excelFile) {
+				var oFormData = new FormData();
+				oFormData.set("file", excelFile);
+				var url = "/menabevdev/NonPoTemplate/uploadExcel";
+				this.busyDialog.open();
+				var that = this;
+				jQuery.ajax({
+					url: url,
+					method: "POST",
+					timeout: 0,
+					headers: {
+						"Accept": "application/json"
+					},
+					enctype: "multipart/form-data",
+					contentType: false,
+					processData: false,
+					crossDomain: true,
+					cache: false,
+					data: oFormData,
+					success: function (data, xhr, success) {
+						that.busyDialog.close();
+						var errorMsg = "";
+						if (success.statusText === "Error") {
+							errorMsg = "Request timed-out. Please contact your administrator";
+							that.errorMsg(errorMsg);
+						} else {
+							// var arr = $.extend(true, [], that.getModel("postDataModel").getProperty("/nonPoTemplateItems"));
+							// arr = arr.concat(data);
+							that.getModel("postDataModel").setProperty("/nonPoTemplateItems", data);
+							that.getModel("postDataModel").refresh();
+							errorMsg = "Succefully imported data from excel file";
+							sap.m.MessageToast.show(errorMsg);
+						}
+					}.bind(this),
+					error: function (result, xhr, data) {
+						this.busyDialog.close();
+						var errorMsg = "";
+						if (result.status === 504) {
+							errorMsg = "Request timed-out. Please refresh your page";
+							this.errorMsg(errorMsg);
+						} else {
+							errorMsg = result.responseJSON.error;
+							this.errorMsg(errorMsg);
+						}
+					}.bind(this)
+				});
+			}
 		},
+
+		//onFileSizeExceed is triggerred when Excel file size exceeded more than 10MB 
+		onFileSizeExceed: function (error) {
+			var errorMsg = "File size has exceeded it max limit of 10MB";
+			this.errorMsg(errorMsg);
+		},
+		/*End of Excel Upload*/
 
 	});
 
