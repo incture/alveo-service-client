@@ -1,0 +1,43 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified">
+	<Table id="SupplierQualDoc" fixedLayout="false" class="openRequestTable custBox" inset="false"
+		items="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/attachments}" alternateRowColors="true" growing="true" growingThreshold="20"
+		updateFinished="onUpdateFinishedDocTable">
+		<headerToolbar >
+			<Toolbar visible="{oDropdownModel>/isEditable}">
+				<ToolbarSpacer/>
+				<u:FileUploader id="fileUploader" name="myFileUpload" icon="sap-icon://upload" iconOnly="true" buttonOnly="true" tooltip="Upload"
+						change="handleUploadComplete" class="customButton" enabled="{oDropdownModel>/isEditable}" value="{nonPOInvoiceModel>/uploadedDoc}"/>
+						<Button text="DownLoad" press="onDocumentDelete"/>
+						<Button text="DownLoad" press="onDocumentDownload"/>
+			</Toolbar>
+		</headerToolbar>
+		<columns>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>DOCNAME}" tooltip="{i18n>DOCNAME}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" visible="{= ${device>/landscapePhone}? false :true}">
+				<Label design="Bold" text="{i18n>CREATEDON}" tooltip="{i18n>CREATEDON}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>CREATEDBY}" tooltip="{i18n>CREATEDBY}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" visible="{oDropdownModel>/isEditable}">
+				<Label design="Bold" text="{i18n>Actions}" tooltip="{i18n>Actions}"/>
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem>
+				<cells>
+					<Text text="{nonPOInvoiceModel>fileName}"/>
+					<Text text="{path:'nonPOInvoiceModel>createdAt',formatter:'com.sinarmas.smt.util.formatter.formatDate'}"/>
+					<Text text="{nonPOInvoiceModel>createdBy}"/>
+					<HBox>
+						<Button type="Transparent" icon="sap-icon://download"
+							enabled="{path:'nonPOInvoiceModel>arcDocId',formatter:'com.sinarmas.smt.util.formatter.setDocUploaded'}" press="onDocumentDownload"/>
+						<Button type="Transparent" icon="sap-icon://delete" press="onDeleteItem" class="deleteBtn"/>
+					</HBox>
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+</core:FragmentDefinition>

@@ -140,7 +140,7 @@ sap.ui.define([
 				if (validationState) {
 					// var oFileUploader = sap.ui.getCore().byId("fileUploader");
 					// oFileUploader.setUploadOnChange(true);
-					var oFormData = new FormData();
+					var oFormData = new FormData;
 					var body = JSON.stringify({
 						"PO_Number": pdfModel.getData().pOrder,
 						"Delivery_Note": pdfModel.getData().deliveryNote

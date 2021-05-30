@@ -348,7 +348,7 @@ sap.ui.define([
 			}
 
 		},
-		
+
 		//onChange CC item level tax
 		onChangeTax: function (oEvent) {
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("taxCodeModel").getObject();
@@ -1235,54 +1235,54 @@ sap.ui.define([
 
 		/****Start of Comments Section****/
 		//To post the comment entered by the user
-		onPostComment: function (oEvent) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sValue = oEvent.getParameter("value");
-			var nonPOInvoiceModelData = nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader;
-			var sDate = new Date().getTime();
-			if (!nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto) {
-				nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto = [];
-			}
-			var sId = nonPOInvoiceModel.getProperty("/commentId");
-			var cValue = nonPOInvoiceModel.getProperty("/input");
-			var aCommentSelected = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
-			var aComItem = aCommentSelected.find(function (oRow, index) {
-				return oRow.comment === cValue;
-			});
+		// onPostComment: function (oEvent) {
+		// 	var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
+		// 	var sValue = oEvent.getParameter("value");
+		// 	var nonPOInvoiceModelData = nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader;
+		// 	var sDate = new Date().getTime();
+		// 	if (!nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto) {
+		// 		nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto = [];
+		// 	}
+		// 	var sId = nonPOInvoiceModel.getProperty("/commentId");
+		// 	var cValue = nonPOInvoiceModel.getProperty("/input");
+		// 	var aCommentSelected = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
+		// 	var aComItem = aCommentSelected.find(function (oRow, index) {
+		// 		return oRow.comment === cValue;
+		// 	});
 
-			var aSelected = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
-			var aSelectedItem = aSelected.find(function (oRow, index) {
-				return oRow.commentId === sId;
-			});
-			if (aSelectedItem) {
-				var lDate = new Date();
-				var uDate = lDate.getTime();
-				aSelectedItem.comment = cValue;
-				aSelectedItem.updatedAt = uDate;
-				aSelectedItem.updatedBy = aSelectedItem.createdBy;
+		// 	var aSelected = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
+		// 	var aSelectedItem = aSelected.find(function (oRow, index) {
+		// 		return oRow.commentId === sId;
+		// 	});
+		// 	if (aSelectedItem) {
+		// 		var lDate = new Date();
+		// 		var uDate = lDate.getTime();
+		// 		aSelectedItem.comment = cValue;
+		// 		aSelectedItem.updatedAt = uDate;
+		// 		aSelectedItem.updatedBy = aSelectedItem.createdBy;
 
-			} else if (aComItem) {
-				var cDate = new Date();
-				var nCDate = cDate.getTime();
-				aComItem.comment = cValue;
-				aComItem.updatedAt = nCDate;
-				aComItem.updatedBy = aComItem.createdBy;
-			} else {
-				var oComment = {
-					"requestId": nonPOInvoiceModelData.requestId,
-					"comment": sValue,
-					"createdBy": nonPOInvoiceModelData.emailFrom,
-					"createdAt": sDate,
-					"updatedBy": null,
-					"updatedAt": null,
-					"user": nonPOInvoiceModelData.emailFrom
-				};
-				var aEntries = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
-				aEntries.unshift(oComment);
-			}
-			nonPOInvoiceModel.setProperty("/commentId", "");
-			this.getView().getModel("nonPOInvoiceModel").refresh();
-		},
+		// 	} else if (aComItem) {
+		// 		var cDate = new Date();
+		// 		var nCDate = cDate.getTime();
+		// 		aComItem.comment = cValue;
+		// 		aComItem.updatedAt = nCDate;
+		// 		aComItem.updatedBy = aComItem.createdBy;
+		// 	} else {
+		// 		var oComment = {
+		// 			"requestId": nonPOInvoiceModelData.requestId,
+		// 			"comment": sValue,
+		// 			"createdBy": nonPOInvoiceModelData.emailFrom,
+		// 			"createdAt": sDate,
+		// 			"updatedBy": null,
+		// 			"updatedAt": null,
+		// 			"user": nonPOInvoiceModelData.emailFrom
+		// 		};
+		// 		var aEntries = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
+		// 		aEntries.unshift(oComment);
+		// 	}
+		// 	nonPOInvoiceModel.setProperty("/commentId", "");
+		// 	this.getView().getModel("nonPOInvoiceModel").refresh();
+		// },
 
 		fnEditComment: function (oEvent) {
 			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
@@ -1732,6 +1732,157 @@ sap.ui.define([
 		onNavBack: function () {
 			this.router.navTo("Inbox");
 		},
+
+		onPostComment: function () {
+			var nonPOInvoiceModel = this.nonPOInvoiceModel;
+			var comments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/comments");
+			var obj = {
+				"createdAt": new Date(),
+				"user": "Susmi",
+				"comment": nonPOInvoiceModel.getProperty("/commments"),
+				"createdBy": "susmitha.jm@incture.com"
+			};
+			comments.push(obj);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/comments", comments);
+		},
+		handleUploadComplete: function (oEvent) {
+			var that = this;
+			var upfile = oEvent.getParameters().files[0];
+			var upFileName = upfile.name;
+			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
+			var allowedTypes = ["pdf", "doc", "docx", "jpg", "jpeg", "png", "xlsx", "xls", "csv"];
+			var nonPOInvoiceModel = this.nonPOInvoiceModel;
+			if (!allowedTypes.includes(fileType.toLowerCase())) {
+				MessageBox.error(that.resourceBundle.getText("msgFileType"));
+				return;
+			}
+			if (upfile.size > 2097152) {
+				MessageBox.error(that.resourceBundle.getText("msgFileSize"));
+				return;
+			}
+			if (upFileName.length > 60) {
+				MessageBox.error(that.resourceBundle.getText("msgFileName"));
+				return;
+			}
+			var sUrl = "/menabevdev/document/upload";
+			var oFormData = new FormData;
+			oFormData = oFormData.fd;
+			var requestId = "APA-05142021-00000003";
+			oFormData.set("requestId", requestId);
+			oFormData.set("file", upfile);
+			jQuery.ajax({
+				url: sUrl,
+				method: "POST",
+				timeout: 0,
+				headers: {
+					"Accept": "application/json"
+				},
+				enctype: "multipart/form-data",
+				contentType: false,
+				processData: false,
+				crossDomain: true,
+				cache: false,
+				data: oFormData,
+				success: function (success) {
+					// that.busyDialog.close();
+					var errorMsg = "";
+					if (success.status === "Error") {
+						errorMsg = "Request timed-out. Please contact your administrator";
+						that.errorMsg(errorMsg);
+					} else {
+						MessageBox.success(success.message, {
+							actions: [MessageBox.Action.OK],
+							onClose: function (sAction) {
+								if (sAction === MessageBox.Action.OK) {}
+							}
+						});
+					}
+
+				},
+				error: function (fail) {
+					that.busyDialog.close();
+					var errorMsg = "";
+					if (fail.status === 504) {
+						errorMsg = "Request timed-out. Please contact your administrator";
+						that.errorMsg(errorMsg);
+					} else {
+						errorMsg = fail.responseJSON.message;
+						that.errorMsg(errorMsg);
+					}
+				}
+			});
+
+		},
+
+		onDocumentDownload: function (oEvent) {
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			// var nonPOInvoiceModel = this.nonPOInvoiceModel;
+			// var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
+			// var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
+			// var parts = sPath.split("/");
+			// var index = parts[parts.length - 1];
+			// var documentId = obj.attachmentId;
+			// var busy = new sap.m.BusyDialog();
+			// busy.open();
+			var sUrl = "/menabevdev/document/download/mUMwhDtpMuE2dswkyClsaGUBLVRzJwaNJZNMUCw7sbk";
+			oServiceModel.loadData(sUrl, "", true, "GET", false, false, this.oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				var Base64 = oEvent.getSource().getData().data.base64Value;
+				var fileName = oEvent.getSource().getData().data.fileName;
+				if (fileName && fileName.split(".") && fileName.split(".")[fileName.split(".").length - 1]) {
+					var fileType = fileName.split(".")[fileName.split(".").length - 1].toLowerCase();
+				}
+				if (!jQuery.isEmptyObject(Base64)) {
+					var u8_2 = new Uint8Array(atob(Base64).split("").map(function (c) {
+						return c.charCodeAt(0);
+					}));
+					var a = document.createElement("a");
+					document.body.appendChild(a);
+					a.style = "display: none";
+					var blob = new Blob([u8_2], {
+						type: "application/" + fileType,
+						name: fileName
+					});
+					var url = window.URL.createObjectURL(blob);
+
+					a.href = url;
+					// if (fileType === "pdf") {
+					// 	// a.target = "_blank";
+					// 	window.open(url, fileName, "width=900px, height=600px, scrollbars=yes");
+					// } else {
+					a.download = fileName;
+					a.click();
+					// }
+
+					// window.URL.revokeObjectURL(url);
+					// }
+				}
+				busy.close();
+			});
+			oServiceModel.attachRequestFailed(function (oEvent) {
+				busy.close();
+			});
+		},
+
+		onDocumentDelete: function (oEvent) {
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var nonPOInvoiceModel = this.nonPOInvoiceModel;
+			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
+			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
+			var parts = sPath.split("/");
+			var index = parts[parts.length - 1];
+			var documentId = obj.attachmentId;
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			var sUrl = "/menabevdev/document/delete";
+			var oPayload = {
+				"documentId": documentId
+			};
+			oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, this.oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+
+			});
+		}
 
 	});
 
