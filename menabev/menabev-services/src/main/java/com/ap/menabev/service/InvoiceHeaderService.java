@@ -79,4 +79,6 @@ public interface InvoiceHeaderService {
 
 	ResponseDto delete(String id);
 
+	ResponseEntity<?> getInvoiceDetailChanged(String requestId);
+
 }

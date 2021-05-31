@@ -1,5 +1,7 @@
 package com.ap.menabev.dto;
 
+import javax.persistence.Column;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,13 +9,16 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CostAllocationDto {
-	private String costAllocationId;
-	private String requestId;
-	private Integer itemId;
+private String costAllocationId;
+	
+    private String requestId; // (FK)
+	private Integer itemId; // (FK)
 	private Integer serialNo;
 	private Boolean deleteInd;
 	private String quantity;
+	private String quantityUnit;
 	private String distrPerc;
+	private String orderId;
 	private String netValue;
 	private String glAccount;
 	private String costCenter;
@@ -24,12 +29,11 @@ public class CostAllocationDto {
 	private String wbsElement;
 	private String crDbIndicator;
 	private String itemText;
-	private String allocationPercent;
-	private String orderId;
 	private String taxCode;
 	private String accountNum;
 	private String lineText;
 	private String taxValue;
 	private String taxPer;
 	private String taxRate;
+	
 }

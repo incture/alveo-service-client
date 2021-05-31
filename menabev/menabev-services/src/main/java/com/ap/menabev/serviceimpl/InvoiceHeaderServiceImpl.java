@@ -50,12 +50,14 @@ import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
 import com.ap.menabev.dto.AttachmentDto;
 import com.ap.menabev.dto.CommentDto;
 import com.ap.menabev.dto.CostAllocationDto;
+import com.ap.menabev.dto.CreateInvoiceHeaderChangeDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
 import com.ap.menabev.dto.FilterHeaderDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
 import com.ap.menabev.dto.InboxOutputDto;
+import com.ap.menabev.dto.InvoiceHeaderChangeDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
@@ -725,6 +727,45 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		        invoiceHeadDto.setCostAllocationDto(costAllocationDto);
 		        invoiceHeadDto.setResponseStatus("Success");
 		    return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceHeadDto,HttpStatus.OK);
+		}catch(Exception e){
+			
+			return new ResponseEntity<String>("Failed due to "+e,HttpStatus.INTERNAL_SERVER_ERROR);
+			
+		}
+		        
+	}
+	
+	@Override
+	public ResponseEntity<?> getInvoiceDetailChanged(String requestId){
+		try {
+			CreateInvoiceHeaderChangeDto invoiceHeadDto =new  CreateInvoiceHeaderChangeDto();
+		   // get InvoiceHeader
+		  InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
+		  InvoiceHeaderChangeDto invoiceHeaderDto  =  ObjectMapperUtils.map(invoiceHeaderDo,InvoiceHeaderChangeDto.class);   
+		  // get InvoiceItem
+		   List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
+		   List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
+	      // get AccountAssignment
+		   List<InvoiceItemAcctAssignmentDo>  invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository.getByRequestId(requestId); 
+		     List<InvoiceItemAcctAssignmentDto>    invoiceItemAcctAssignmentdtoList = ObjectMapperUtils.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
+		   // get CostAllocation
+		   List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
+		        List<CostAllocationDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
+		    // get Attachements 
+		        List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
+		        List<AttachmentDto>  AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);    
+		    // get Comments
+		        List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId);
+		        List<CommentDto>    commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);  
+		        
+		        invoiceHeadDto.setInvoiceHeaderDto(invoiceHeaderDto);
+		        invoiceHeadDto.getInvoiceHeaderDto().setInvoiceItems(invoiceItemDtoList);
+		        invoiceHeadDto.getInvoiceHeaderDto().setAttachments(AttachementDto);
+		        invoiceHeadDto.getInvoiceHeaderDto().setComments(commentDto);
+		        invoiceHeadDto.getInvoiceHeaderDto().setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
+		        invoiceHeadDto.getInvoiceHeaderDto().setCostAllocationDto(costAllocationDto);
+		        invoiceHeadDto.setResponseStatus("Success");
+		    return new ResponseEntity<CreateInvoiceHeaderChangeDto>(invoiceHeadDto,HttpStatus.OK);
 		}catch(Exception e){
 			
 			return new ResponseEntity<String>("Failed due to "+e,HttpStatus.INTERNAL_SERVER_ERROR);

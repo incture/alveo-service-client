@@ -57,6 +57,10 @@ public class InvoiceHeaderController {
 	public ResponseEntity<?> getByInvoiceRequestId(@PathVariable String requestId) {
 		return headerService.getInvoiceDetails(requestId);
 	}
+	@GetMapping("/getInvoiceByReqId/{requestId}")
+	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
+	}
 
 
 	@DeleteMapping("/delete/{id}")
