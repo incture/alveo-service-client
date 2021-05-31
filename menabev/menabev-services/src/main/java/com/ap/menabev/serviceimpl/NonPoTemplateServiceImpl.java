@@ -540,7 +540,18 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 					if (cn == 0) {
 						newDto.setGlAccount(cell.toString());
 					} else if (cn == 1) {
-						newDto.setAccountNo((Integer.valueOf(cell.toString())).toString());
+						switch (cell.getCellType())               
+						{  
+						case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
+							newDto.setAccountNo(String.valueOf(cell.getStringCellValue()));
+						break;  
+						case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
+							System.out.println("Here   "+ cell.getNumericCellValue());
+							newDto.setAccountNo(String.valueOf(Integer.valueOf((int) cell.getNumericCellValue())));
+						break;  
+						default:  
+						}
+						
 					} else if (cn == 2) {
 						newDto.setCostCenter((cell.toString()));
 					} else if (cn == 3) {
@@ -551,10 +562,31 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 						newDto.setItemText((cell.toString()));
 					} else if (cn == 6) {
 						newDto.setProfitCenter((cell.toString()));
-					} else if (cn == 5) {
-						newDto.setCompanyCode((cell.toString()));
 					} else if (cn == 7) {
-						newDto.setAllocationPercent((cell.toString()));
+						switch (cell.getCellType())               
+						{  
+						case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
+							newDto.setCompanyCode(String.valueOf(cell.getStringCellValue()));
+						break;  
+						case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
+							System.out.println("Here   "+ cell.getNumericCellValue());
+							newDto.setCompanyCode(String.valueOf(Integer.valueOf((int) cell.getNumericCellValue())));
+						break;  
+						default:  
+						}
+					} else if (cn == 8) {
+						switch (cell.getCellType())               
+						{  
+						case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
+							newDto.setAllocationPercent(String.valueOf(cell.getStringCellValue()));
+						break;  
+						case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
+							System.out.println("Here   "+ cell.getNumericCellValue());
+							newDto.setAllocationPercent(String.valueOf(Integer.valueOf((int) cell.getNumericCellValue())));
+						break;  
+						default:  
+						}
+						
 					}
 
 				}
@@ -584,12 +616,19 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		
 		String  entity  = "<soapenv:Envelopexmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"><soapenv:Header/><soapenv:Body><sfin:JournalEntryBulkCreateRequest><MessageHeader><CreationDateTime>2021-05-25T12:37:00.1234567Z</CreationDateTime></MessageHeader><JournalEntryCreateRequest><MessageHeader><CreationDateTime>2021-05-25T12:37:00.1234567Z</CreationDateTime></MessageHeader><JournalEntry><OriginalReferenceDocumentType>BKPFF</OriginalReferenceDocumentType><OriginalReferenceDocument/><OriginalReferenceDocumentLogicalSystem/><BusinessTransactionType>RFBU</BusinessTransactionType><AccountingDocumentType>KR</AccountingDocumentType><DocumentReferenceID>INV12345</DocumentReferenceID><CreatedByUser>SYUVRAJ</CreatedByUser><CompanyCode>1010</CompanyCode><DocumentDate>2021-05-25</DocumentDate><PostingDate>2021-05-25</PostingDate><Item><GLAccount>0005500046</GLAccount><CompanyCode>1010</CompanyCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">100.00</AmountInTransactionCurrency><Tax><TaxCode>I1</TaxCode></Tax><AccountAssignment><CostCenter>0000521001</CostCenter></AccountAssignment></Item><Item><GLAccount>0006021003</GLAccount><CompanyCode>1010</CompanyCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">100.00</AmountInTransactionCurrency><Tax><TaxCode>I1</TaxCode></Tax><AccountAssignment><CostCenter>0000111001</CostCenter></AccountAssignment></Item><CreditorItem><ReferenceDocumentItem>1</ReferenceDocumentItem><Creditor>0001000030</Creditor><AmountInTransactionCurrencycurrencyCode=\"SAR\">-230.00</AmountInTransactionCurrency></CreditorItem><ProductTaxItem><TaxCode>I1</TaxCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">30.00</AmountInTransactionCurrency><TaxBaseAmountInTransCrcycurrencyCode=\"SAR\">200.00</TaxBaseAmountInTransCrcy><ConditionType>MWVS</ConditionType></ProductTaxItem></JournalEntry></JournalEntryCreateRequest></sfin:JournalEntryBulkCreateRequest></soapenv:Body></soapenv:Envelope>";
 		// call odata method 
+//		stringToDom(entity);
 		ResponseEntity<?> responseFromOdata = consumingOdataService(url, entity, "POST", null);
 		System.err.println("odata output "+ responseFromOdata);
 	 return null;
 
 	}
-	
+//	public static void stringToDom(String xmlSource) 
+//	        throws IOException {
+//	    java.io.FileWriter fw = new java.io.FileWriter("C:/Users/Lakhu D/Desktop/my-file.xml");
+//	    fw.write(xmlSource);
+//	    fw.close();
+//	}
+//	
 	public static String getJwtTokenForAuthenticationForSapApi() throws URISyntaxException, IOException {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
@@ -719,9 +758,9 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				System.err.println("inputEntity "+ input);
 //				 String body ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"http://example.com/v1.0/Records\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><SOAP-ENV:Body>"+soapEnvBody+"</SOAP-ENV:Body></SOAP-ENV:Envelope>";
 				 StringEntity stringEntity = new StringEntity(entity, "UTF-8");
+				 System.out.println(stringEntity);
 				 stringEntity.setChunked(true);
 				 ((HttpPost) httpRequestBase).setEntity(stringEntity);
-				 httpRequestBase.addHeader("Accept", "text/xml");
 
 			}
 //			if (destinationInfo.get("sap-client") != null) {
@@ -897,5 +936,11 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 		return response.getAllHeaders();
 
 	}
+//	public static void main(String[] args) throws IOException, URISyntaxException {
+//		NonPoTemplateServiceImpl obj = new NonPoTemplateServiceImpl();
+//		File file = new File("C:\\Users\\Lakhu D\\Downloads\\exampleXml (1).xlsx");
+//		obj.uploadExcel(file);
+//	}
+	
 
 	}
