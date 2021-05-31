@@ -23,6 +23,7 @@ public class CustomWebServiceMessageCallback implements WebServiceMessageCallbac
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		transformer.transform(headerSource, header.getResult());
 
+		
 	}
 
 }
