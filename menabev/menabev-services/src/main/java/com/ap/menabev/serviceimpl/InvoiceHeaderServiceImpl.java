@@ -1434,20 +1434,23 @@ public ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination det
 		ResponseEntity<?> response  = execute((RuleInputDto) ruleInput ,RuleConstants.menaBevRuleService);
 	   // call convert statement and than get the ouput and return it .
 		if(response.getStatusCodeValue() == 201){
+		String node = (String)	response.getBody();
+		//convertFromJSonNodeRo(node);
+		
 			return response;
 		}else {
 			return response;
 		}
 	}
 
-/*@Override
-public List<RuleOutputDto> convertFromJSonNodeRo(String node){
+
+/*public List<RuleOutputDto> convertFromJSonNodeRo(String node){
 	List<ApproverDataOutputDto> approverList = new ArrayList<>();
 	JSONObject jObj = new JSONObject(node);
 	JSONArray arr = jObj.getJSONArray("Result");
 	JSONArray innerArray = null;
 	if(!arr.isNull(0))
-		innerArray = arr.getJSONObject(0).getJSONArray("ReturnOrderRuleOutput");
+		innerArray = arr.getJSONObject(0).getJSONArray("AcctOrProcessLeadDeterminationResult");
 	
 	if(innerArray!=null) {
 	for (int i = 0; i < innerArray.length(); i++) {
@@ -1459,8 +1462,8 @@ public List<RuleOutputDto> convertFromJSonNodeRo(String node){
 	}
 
 return null;
-}*/
-	
+}
+	*/
 	
 	protected ResponseEntity<?> execute(RuleInputDto input, String rulesServiceId) throws ClientProtocolException, IOException, URISyntaxException {
 
@@ -1491,14 +1494,9 @@ return null;
 
 		// process your response here
 		
-		System.err.println("WorkflowTriggerResponse ="+response);
+		System.err.println("RuleTriggerResponse ="+response);
 		if (response.getStatusLine().getStatusCode() == HttpStatus.CREATED.value()) {
 			String dataFromStream = getDataFromStream(response.getEntity().getContent());
-			System.err.println("dataStream ="+dataFromStream);
-			JSONObject jsonObject = new JSONObject(dataFromStream);
-			System.err.println(" data stram JsonObject "+jsonObject);
-			WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
-					WorkflowTaskOutputDto.class);
 			
 			if (httpPost != null) {
 				httpPost.releaseConnection();
@@ -1509,7 +1507,7 @@ return null;
 			if (httpClient != null) {
 				httpClient.close();
 			}
-			return new ResponseEntity<>(taskDto, HttpStatus.CREATED);
+			return new ResponseEntity<>(dataFromStream, HttpStatus.CREATED);
 		} else {
 			
 			if (httpPost != null) {
@@ -1535,7 +1533,7 @@ return null;
 	public static String getJwtTokenForAuthenticationForRulesSapApi() throws URISyntaxException, IOException {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost(RuleConstants.RULE_BASE_URL);
+		HttpPost httpPost = new HttpPost(RuleConstants.OAUTH_TOKEN_URL);
 		httpPost.addHeader("Content-Type", "application/json");
 		// Encoding username and password
 		String auth = HelperClass.encodeUsernameAndPassword(RuleConstants.RULE_CLIENT_ID,

@@ -191,6 +191,9 @@ public class InvoiceHeaderDo {
 	@Column(name = "BASE_LINE")
 	private String baseLine;
 	
+	@Column(name = "INVOICE_PDF_ID")
+	private String invoicePdfId; // add the document id of the invoice pdf to show in oepn pdf .
+	
 	
 	
 	

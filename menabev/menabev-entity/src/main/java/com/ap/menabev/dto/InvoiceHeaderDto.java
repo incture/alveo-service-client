@@ -101,5 +101,7 @@ public class InvoiceHeaderDto {
 	private String unplannedCost;
 	private String plannedCost;
 	private String baseLine;
+	private String invoicePdfId;
+	
 
 }
