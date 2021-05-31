@@ -17,14 +17,14 @@ public class SoapConfiguration {
 		
 	}
 	
-	@Bean
-	 public Wss4jSecurityInterceptor wsSecurityInterceptor() {
-	   Wss4jSecurityInterceptor wss4jSecurityInterceptor = new Wss4jSecurityInterceptor();
-	   wss4jSecurityInterceptor.setSecurementActions(WSHandlerConstants.USERNAME_TOKEN);
-	   wss4jSecurityInterceptor.setSecurementPasswordType(WSConstants.PW_TEXT);
-	   wss4jSecurityInterceptor.setSecurementUsername("Syuvraj");
-	   wss4jSecurityInterceptor.setSecurementPassword("Incture@12345");
-	   return wss4jSecurityInterceptor;
-	}
+//	@Bean
+//	 public Wss4jSecurityInterceptor wsSecurityInterceptor() {
+//	   Wss4jSecurityInterceptor wss4jSecurityInterceptor = new Wss4jSecurityInterceptor();
+//	   wss4jSecurityInterceptor.setSecurementActions(WSHandlerConstants.USERNAME_TOKEN);
+//	   wss4jSecurityInterceptor.setSecurementPasswordType(WSConstants.PW_TEXT);
+//	   wss4jSecurityInterceptor.setSecurementUsername("Syuvraj");
+//	   wss4jSecurityInterceptor.setSecurementPassword("Incture@12345");
+//	   return wss4jSecurityInterceptor;
+//	}
 
 }
