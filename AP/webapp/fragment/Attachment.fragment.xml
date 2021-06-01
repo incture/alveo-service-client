@@ -6,9 +6,7 @@
 			<Toolbar visible="{oDropdownModel>/isEditable}">
 				<ToolbarSpacer/>
 				<u:FileUploader id="fileUploader" name="myFileUpload" icon="sap-icon://upload" iconOnly="true" buttonOnly="true" tooltip="Upload"
-						change="handleUploadComplete" class="customButton" enabled="{oDropdownModel>/isEditable}" value="{nonPOInvoiceModel>/uploadedDoc}"/>
-						<Button text="DownLoad" press="onDocumentDelete"/>
-						<Button text="DownLoad" press="onDocumentDownload"/>
+					change="handleUploadComplete" class="customButton" enabled="{oDropdownModel>/isEditable}" value="{nonPOInvoiceModel>/uploadedDoc}"/>
 			</Toolbar>
 		</headerToolbar>
 		<columns>
@@ -29,12 +27,11 @@
 			<ColumnListItem>
 				<cells>
 					<Text text="{nonPOInvoiceModel>fileName}"/>
-					<Text text="{path:'nonPOInvoiceModel>createdAt',formatter:'com.sinarmas.smt.util.formatter.formatDate'}"/>
+					<Text text="{path:'nonPOInvoiceModel>createdAt',formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
 					<Text text="{nonPOInvoiceModel>createdBy}"/>
 					<HBox>
-						<Button type="Transparent" icon="sap-icon://download"
-							enabled="{path:'nonPOInvoiceModel>arcDocId',formatter:'com.sinarmas.smt.util.formatter.setDocUploaded'}" press="onDocumentDownload"/>
-						<Button type="Transparent" icon="sap-icon://delete" press="onDeleteItem" class="deleteBtn"/>
+						<Button type="Emphasized" icon="sap-icon://download" press="onDocumentDownload"/>
+						<Button type="Reject" icon="sap-icon://delete" press="onDocumentDelete" class="deleteBtn"/>
 					</HBox>
 				</cells>
 			</ColumnListItem>

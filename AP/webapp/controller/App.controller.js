@@ -26,17 +26,27 @@ sap.ui.define([
 			});
 
 		},
-		onSideNavItemSelection: function(oEvent){
-			var  items = oEvent.getSource().getParent().getItems();
-			for (var i=0;i<items.length;i++){
+		onSideNavItemSelection: function (oEvent) {
+			var items = oEvent.getSource().getParent().getItems();
+			for (var i = 0; i < items.length; i++) {
 				items[i].removeStyleClass("sideNavItemSelected");
 			}
 			oEvent.getSource().addStyleClass("sideNavItemSelected");
 			var key = oEvent.getSource().getKey();
 			this.oRouter.navTo(key);
 		},
-		
-		
+		onUserDetailPressed: function (oEvent) {
+			var that = this;
+			var oButton = oEvent.getSource();
+			if (!that.userDetail) {
+				that.userDetail = sap.ui.xmlfragment("com.menabev.AP.fragment.userDetail", this);
+				that.getView().addDependent(that.userDetail);
+			}
+			that.userDetail.openBy(oButton);
+		},
+		onPressLogout: function (oEvent) {
+			sap.m.URLHelper.redirect("/my/logout", false);
+		},
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered

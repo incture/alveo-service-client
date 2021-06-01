@@ -84,8 +84,8 @@
 								</VBox>
 								<VBox >
 									<Label text="{i18n>DueDate}"/>
-									<DatePicker placeholder="MM/DD/YYYY" 
-										value="{path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" 
+									<DatePicker placeholder="MM/DD/YYYY"
+										value="{path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
 										valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"/>
 								</VBox>
 								<VBox >
@@ -119,7 +119,7 @@
 								</VBox>
 								<VBox>
 									<Label text="{i18n>TaxCode}"/>
-									<Select forceSelection="false" id="taxCodeId" showSecondaryValues="true"
+									<Select forceSelection="false" id="taxCodeId" showSecondaryValues="true" valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/taxCode}"
 										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{taxCodeModel>/aTax}" width="80%"
 										change="onChangeHeaderTax">
 										<items>
@@ -136,9 +136,9 @@
 							<Button text="{i18n>ManageTemplates}" press="onClickManageTemplate"/>
 							<Button text="{i18n>SelectTemplate}" tooltip="Select Template" press="onSelectTemplate" class="sapUiSizeCompact SecondaryBtn"/>
 							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
-							<Button icon="sap-icon://excel-attachment" tooltip="{i18n>DownloadExcel}" press="onDataExportExcel" class="SecondaryBtn"/>
+							<Button icon="sap-icon://excel-attachment" tooltip="{i18n>DownloadExcel}" press="onDataExportExcel" class="SecondaryBtn" visible="false"/>
 							<u:FileUploader id="fileUploaderId" icon="sap-icon://upload" iconOnly="true" maximumFileSize="10" fileType="XLSX" buttonOnly="true"
-								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" class="SecondaryBtn"/>
+								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" class="SecondaryBtn" visible="false"/>
 							<Button icon="sap-icon://action-settings" press="onPressPersonalization" class="SecondaryBtn" enabled="false"/>
 						</Toolbar>
 						<core:Fragment fragmentName="com.menabev.AP.fragment.NonPOCostCenter" type="XML" id="prefix1"/>
@@ -147,20 +147,21 @@
 						<OverflowToolbar class="sapUiTinyMargin">
 							<Label text="{i18n>SubTotal}"></Label>
 							<Input width="9.5rem" enabled="false"
-								value="{path: 'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/grossAmount', type: 'sap.ui.model.type.Float'}">
+								value="{path: 'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/baseTotalAmt', type: 'sap.ui.model.type.Float'}">
 								<layoutData>
 									<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
 								</layoutData>
 							</Input>
 							<ToolbarSpacer/>
 							<Label text="{i18n>Tax}"/>
-							<Input width="4rem" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxAmount}" enabled="false">
+							<Input width="4rem" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/userInputTaxAmount}" type="Number"
+								valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/userInputTaxAmount}" change="onChangeUserInputTaxAmount">
 								<layoutData>
 									<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
 								</layoutData>
 							</Input>
-							<Text text="/{taxModel>/netTaxValue}"></Text>
-							<Button icon="sap-icon://notes" press="openTaxDetails" type="Emphasized" tooltip="Tax Details"/>
+							<Text text="/{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxAmount}"/>
+							<Button icon="sap-icon://notes" press="openTaxDetails" type="Emphasized" tooltip="{i18n>TaxDetails}"/>
 							<ToolbarSpacer/>
 							<Label text="{i18n>Freight}">
 								<layoutData>
@@ -198,49 +199,59 @@
 							</Input>
 						</OverflowToolbar>
 					</VBox>
-					<VBox class="tableBox sapUiTinyMargin">
-						<Toolbar class="boxToolBar" height="3rem">
-							<Title level="H2" text="{i18n>AdditionalDetails}" class="headerTitle sapUiTinyMarginBegin"/>
-						</Toolbar>
-						<VBox id="attachmentTab" class="sapUiTinyMargin">
-							<Toolbar height="3rem">
-								<Text text="{i18n>Attachments}"/>
-								<ToolbarSpacer/>
-								<u:FileUploader id="fileUploader" style="Transparent" maximumFileSize="5" fileType="{nonPOInvoiceModel>/attachFileType}"
-									icon="sap-icon://add" buttonText="{i18n>AddAttachments}" buttonOnly="true" typeMissmatch="handleTypeMisMatch"
-									fileSizeExceed="attachFileSizeExceed" change="onBeforeUploadStarts"/>
-							</Toolbar>
-							<VBox class="shadow">
-								<VBox width="100%" items="{nonPOInvoiceModel>/docManagerDto}">
-									<Toolbar class="atachmentCls sapUiSmallMargin">
-										<FeedListItem sender="{nonPOInvoiceModel>fileName}" iconDensityAware="false" activeIcon="{nonPOInvoiceModel>folderName}"
-											senderPress="fnUploadDoc"></FeedListItem>
-										<ToolbarSpacer></ToolbarSpacer>
-										<Button icon="sap-icon://delete" press="fnDeleteAttachment" width="10%"/>
-									</Toolbar>
-								</VBox>
-							</VBox>
-						</VBox>
-						<VBox id="commnetTab" class="sapUiTinyMargin">
-							<Toolbar height="3rem">
-								<Text text="{i18n>Comments}"/>
-								<ToolbarSpacer/>
-							</Toolbar>
-							<VBox class="shadow">
-								<VBox width="100%">
-									<FeedInput post="onPostComment" showIcon="false" maxLength="199" value="{nonPOInvoiceModel>/input}"/>
-									<List items="{nonPOInvoiceModel>/invoiceDetailUIDto/commentDto}" showSeparators="Inner" growing="true" growingThreshold="4">
-										<FeedListItem sender="{nonPOInvoiceModel>createdBy}" iconDensityAware="false"
-											timestamp="{path:'nonPOInvoiceModel>createdAt', formatter:'com.menabev.AP.formatter.formatter.commentDate'}"
-											text="{nonPOInvoiceModel>comment}">
-											<FeedListItemAction icon="sap-icon://delete" press="fnDeleteComment" text="Delete"></FeedListItemAction>
-											<FeedListItemAction icon="sap-icon://edit" press="fnEditComment" text="Edit"></FeedListItemAction>
-										</FeedListItem>
-									</List>
-								</VBox>
-							</VBox>
-						</VBox>
-					</VBox>
+					<!--<VBox class="tableBox sapUiTinyMargin">-->
+					<!--	<Toolbar class="boxToolBar" height="3rem">-->
+					<!--		<Title level="H2" text="{i18n>AdditionalDetails}" class="headerTitle sapUiTinyMarginBegin"/>-->
+					<!--	</Toolbar>-->
+					<!--	<VBox id="attachmentTab" class="sapUiTinyMargin">-->
+					<!--		<Toolbar height="3rem">-->
+					<!--			<Text text="{i18n>Attachments}"/>-->
+					<!--			<ToolbarSpacer/>-->
+					<!--			<u:FileUploader id="fileUploader" style="Transparent" maximumFileSize="5" fileType="{nonPOInvoiceModel>/attachFileType}"-->
+					<!--				icon="sap-icon://add" buttonText="{i18n>AddAttachments}" buttonOnly="true" typeMissmatch="handleTypeMisMatch"-->
+					<!--				fileSizeExceed="attachFileSizeExceed" change="onBeforeUploadStarts"/>-->
+					<!--		</Toolbar>-->
+					<!--		<VBox class="shadow">-->
+					<!--			<VBox width="100%" items="{nonPOInvoiceModel>/docManagerDto}">-->
+					<!--				<Toolbar class="atachmentCls sapUiSmallMargin">-->
+					<!--					<FeedListItem sender="{nonPOInvoiceModel>fileName}" iconDensityAware="false" activeIcon="{nonPOInvoiceModel>folderName}"-->
+					<!--						senderPress="fnUploadDoc"></FeedListItem>-->
+					<!--					<ToolbarSpacer></ToolbarSpacer>-->
+					<!--					<Button icon="sap-icon://delete" press="fnDeleteAttachment" width="10%"/>-->
+					<!--				</Toolbar>-->
+					<!--			</VBox>-->
+					<!--		</VBox>-->
+					<!--	</VBox>-->
+					<!--	<VBox id="commnetTab" class="sapUiTinyMargin">-->
+					<!--		<Toolbar height="3rem">-->
+					<!--			<Text text="{i18n>Comments}"/>-->
+					<!--			<ToolbarSpacer/>-->
+					<!--		</Toolbar>-->
+					<!--		<VBox class="shadow">-->
+					<!--			<VBox width="100%">-->
+					<!--				<FeedInput post="onPostComment" showIcon="false" maxLength="199" value="{nonPOInvoiceModel>/input}"/>-->
+					<!--				<List items="{nonPOInvoiceModel>/invoiceDetailUIDto/commentDto}" showSeparators="Inner" growing="true" growingThreshold="4">-->
+					<!--					<FeedListItem sender="{nonPOInvoiceModel>createdBy}" iconDensityAware="false"-->
+					<!--						timestamp="{path:'nonPOInvoiceModel>createdAt', formatter:'com.menabev.AP.formatter.formatter.commentDate'}"-->
+					<!--						text="{nonPOInvoiceModel>comment}">-->
+					<!--						<FeedListItemAction icon="sap-icon://delete" press="fnDeleteComment" text="Delete"></FeedListItemAction>-->
+					<!--						<FeedListItemAction icon="sap-icon://edit" press="fnEditComment" text="Edit"></FeedListItemAction>-->
+					<!--					</FeedListItem>-->
+					<!--				</List>-->
+					<!--			</VBox>-->
+					<!--		</VBox>-->
+					<!--	</VBox>-->
+					<!--</VBox>-->
+					<IconTabBar>
+						<items>
+							<IconTabFilter text="{i18n>ATTACHMENTS}" key="attachments">
+								<core:Fragment fragmentName="com.menabev.AP.fragment.Attachment" type="XML"/>
+							</IconTabFilter>
+							<IconTabFilter text="{i18n>COMMENTS}" key="comments">
+								<core:Fragment fragmentName="com.menabev.AP.fragment.Comments" type="XML"/>
+							</IconTabFilter>
+						</items>
+					</IconTabBar>
 					<VBox>
 						<l:Grid id="grid2" vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
 							<l:content></l:content>

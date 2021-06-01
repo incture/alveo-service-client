@@ -11,7 +11,7 @@
 								<OverflowToolbar>
 									<ToolbarSpacer/>
 									<SearchField liveChange="onSearchUserList" width="20%"></SearchField>
-									<Button text="{i18n>ADDNEWUSER}" press="onAddNewUser"></Button>
+									<Button text="{i18n>ADDNEWUSER}" press="onAddNewUser" type="Emphasized"></Button>
 									<Button icon="sap-icon://download"></Button>
 									<Button icon="sap-icon://action-settings"></Button>
 								</OverflowToolbar>

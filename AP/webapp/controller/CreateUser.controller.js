@@ -38,7 +38,9 @@ sap.ui.define([
 						if (that.id !== "new") {
 							that.fetchUser(that.id);
 							oVisibilityModel.setProperty("/createUser/editable", false);
+							oUserDetailModel.setProperty("/createUser/title", "Update User");
 						} else {
+							oUserDetailModel.setProperty("/createUser/title", "Create User");
 							if (userGroup === "IT_Admin") {
 								oVisibilityModel.setProperty("/createUser/editable", true);
 							} else {
@@ -215,11 +217,11 @@ sap.ui.define([
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			if (this.id === "new") {
 				sUrl = "/IDPDEST/service/scim/Users";
-				var mes = "user is created successfully with User ID";
+				var mes = " user is created successfully with User ID ";
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, oHeader);
 			} else {
 				sUrl = "/IDPDEST/service/scim/Users/" + this.id;
-				var mes = "user is updated successfully with User ID";
+				var mes = " user is updated successfully with User ID ";
 				oPayload.id = this.id;
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "PUT", false, false, oHeader);
 			}

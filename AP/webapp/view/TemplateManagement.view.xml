@@ -62,7 +62,7 @@
 				<ToolbarSpacer/>
 				<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Save}" press="onClickCancelTemplate" class="sapUiTinyMarginEnd" visible="false"/>
 				<Button text="{i18n>DELETETEMP}" press="onDeleteofNonpoTemplate" tooltip="{i18n>Delete}" type="Reject"
-					enabled="{templateModel>/tempBtnEnabled}"/>
+					enabled="{templateModel>/tempDeleteBtnEnabled}"/>
 				<Button text="{i18n>CreateTemplate}" type="Emphasized" tooltip="{i18n>Submit}" press="onClickCreateTemplate" class="sapUiTinyMarginEnd"/>
 			</Toolbar>
 		</footer>

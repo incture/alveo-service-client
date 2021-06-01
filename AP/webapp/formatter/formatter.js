@@ -156,7 +156,7 @@ com.menabev.AP.formatter.formatter = {
 
 	getDate: function (value) {
 		if (value)
-			return new Date(value).toISOString().split("T")[0];
+			return new Date(value).getFullYear() + "-" + (new Date(value).getMonth() +1) + "-" + new Date(value).getDate();
 		return "";
 	},
 

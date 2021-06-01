@@ -1,14 +1,17 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified">
 	<Dialog title="{postDataModel>/templateTitle}" class="sapUiSizeCompact" contentWidth="75%" titleAlignment="Center">
 		<content>
 			<VBox class="sapUiSmallMargin">
 				<Table id="idNonPo" class="invTabScroll" items="{postDataModel>/nonPoTemplateItems}" sticky="ColumnHeaders">
 					<headerToolbar>
 						<Toolbar>
-							<Label text="{i18n>TemplateName}" design="Bold"/>
+							<Label text="{i18n>TemplateName}" design="Bold" required="true"/>
 							<Input id="TemplateNameID" value="{postDataModel>/nonPoTemplate/templateName}" placeholder="{i18n>EnterTemplateName}" width="25%"/>
 							<ToolbarSpacer/>
 							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
+							<u:FileUploader id="fileUploaderId" icon="sap-icon://upload" iconOnly="true" maximumFileSize="10" fileType="XLSX" buttonOnly="true"
+								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" 
+								sameFilenameAllowed="true" class="SecondaryBtn"/>
 						</Toolbar>
 					</headerToolbar>
 					<infoToolbar>

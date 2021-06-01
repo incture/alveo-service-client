@@ -4,12 +4,12 @@
 		<content>
 			<OverflowToolbar>
 				<Button icon="sap-icon://nav-back" press="onNavBack"></Button>
-				<Text text="Add New User"></Text>
+				<Text text="{oUserDetailModel>/createUser/title}"></Text>
 			</OverflowToolbar>
 			<l:Grid defaultSpan="XL4 L4 M6 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
 					<VBox>
-						<Label text="{i18n>GROUP}"></Label>
+						<Label text="{i18n>GROUP}" required="true"></Label>
 						<!--<Input value="{oUserDetailModel>/createUser/userGroup}" valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}"></Input>-->
 						<Select forceSelection="false" width="100%" items="{StaticDataModel>/userGroups}" selectedKey="{oUserDetailModel>/createUser/userGroup}"
 							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect"
@@ -18,23 +18,23 @@
 						</Select>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>FIRSTNAME}"></Label>
+						<Label text="{i18n>FIRSTNAME}"  required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/firstName}" valueStateText=" " valueState="{oMandatoryModel>/createUser/firstNameState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>LASTNAME}"></Label>
+						<Label text="{i18n>LASTNAME}"  required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/lastName}" valueStateText=" " valueState="{oMandatoryModel>/createUser/lastNameState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>EMAIL}"></Label>
+						<Label text="{i18n>EMAIL}"  required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/Email}" valueStateText=" " valueState="{oMandatoryModel>/createUser/EmailState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>PHONENO}"></Label>
+						<Label text="{i18n>PHONENO}"  required="false"></Label>
 						<Input value="{oUserDetailModel>/createUser/phoneNum}" valueStateText=" " valueState="{oMandatoryModel>/createUser/phoneNumState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>COUNTRY}"></Label>
+						<Label text="{i18n>COUNTRY}"  required="true"></Label>
 						<!--<Input value="{oUserDetailModel>/createUser/country}" valueStateText=" " valueState="{oMandatoryModel>/createUser/countryState}"></Input>-->
 						<Select forceSelection="false" width="100%" items="{oDropDownModel>/country}" selectedKey="{oUserDetailModel>/createUser/country}"
 							valueStateText=" " valueState="{oMandatoryModel>/createUser/countryState}">
@@ -42,17 +42,17 @@
 						</Select>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>VENDORID}"></Label>
+						<Label text="{i18n>VENDORID}"  required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/vendorId}" valueStateText=" " valueState="{oMandatoryModel>/createUser/vendorIdState}"
 							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>COMPANYCODE}"></Label>
+						<Label text="{i18n>COMPANYCODE}"  required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/createUser/companyCodeState}"
 							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>PURCHASEORGANISATION}"></Label>
+						<Label text="{i18n>PURCHASEORGANISATION}"  required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/purchaseOrg}" valueStateText=" " valueState="{oMandatoryModel>/createUser/purchaseOrgState}"
 							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
@@ -62,7 +62,7 @@
 		<footer>
 			<OverflowToolbar class="footerClass">
 				<ToolbarSpacer/>
-				<Button type="Emphasized" text="{i18n>CANCEL}"></Button>
+				<Button type="Emphasized" text="{i18n>CANCEL}" press="onNavBack"></Button>
 				<Button type="Emphasized" text="{i18n>ADDUSER}" press="onCreateUser" visible="{oVisibilityModel>/createUser/editable}"></Button>
 				<Button type="Emphasized" text="{i18n>UPDATEUSER}" press="onCreateUser"
 					visible="{path:'oVisibilityModel>/createUser/editable', formatter:'com.menabev.AP.formatter.formatter.returnNot'}"></Button>

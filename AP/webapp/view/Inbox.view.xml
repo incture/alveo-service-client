@@ -124,7 +124,7 @@
 			</OverflowToolbar>
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
-					<IconTabFilter text="{i18n>OPENTASK}" key="openTask">
+					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResult/0/totalCount})" key="openTask">
 						<Table items="{oInboxModel>/openResult}" mode="None" class="labelwrapTable">
 							<columns>
 								<Column width="11%" hAlign="Center">
@@ -178,7 +178,7 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>MYTASK}" key="myTask">
+					<IconTabFilter text="{i18n>MYTASK} ({oInboxModel>/openResult/0/totalCount})" key="myTask">
 						<Table items="{oInboxModel>/result}" mode="None">
 							<columns>
 								<Column width="11%" hAlign="Center">

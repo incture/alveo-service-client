@@ -1,0 +1,65 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form">
+	<ResponsivePopover title="USERDETAIL" class="sapUiPopupWithPadding" placement="Bottom" showHeader="True" contentWidth="30rem">
+		<content>
+			<OverflowToolbar>
+				<core:Icon src="sap-icon://person-placeholder" class="clearAllIcon"></core:Icon>
+				<Label text="{i18n>USERDETAIL}" design="Bold" class="notificationText"/>
+				<ToolbarSpacer/>
+				<core:Icon src="sap-icon://decline" tooltip="Close" class="clearAllIcon" color="#E69A17" hoverBackgroundColor="white" hoverColor="#ffcccc"
+					press="handleUserDetailCloseButton"></core:Icon>
+			</OverflowToolbar>
+			<VBox>
+				<l:Grid defaultSpan="XL9 L9 M8 S8" class="userProfileBottomBorder" hSpacing="0.5" vSpacing="0.5">
+					<l:content>
+						<Label text="{i18n>MAILID}" tooltip="{i18n>MAILID/longDescription}" class="sapUiTinyMarginTop surveyTextClass">
+							<layoutData>
+								<l:GridData span="XL3 L3 M4 S4"/>
+							</layoutData>
+						</Label>
+						<Text text="{oUserDetailModel>/loggedInUserMail}" class="sapUiTinyMarginTop boldText"/>
+						<Label text="{i18n>FIRSTNAME}" tooltip="{i18n>FIRSTNAME/longDescription}" class="surveyTextClass">
+							<layoutData>
+								<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>
+							</layoutData>
+						</Label>
+						<Text text="{oUserDetailModel>/loggedinUserDetail/name/firstNmae}" class="boldText"/>
+						<Label text="{i18n>LASTNAME}" tooltip="{i18n>LASTNAME/longDescription}" class="surveyTextClass">
+							<layoutData>
+								<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>
+							</layoutData>
+						</Label>
+						<Text text="{oUserDetailModel>/loggedinUserDetail/name/lastNmae}" class="boldText"/>
+					</l:content>
+				</l:Grid>
+			</VBox>
+			<!--<VBox items="{ path: 'oUserDetailModel>/userData'}"-->
+			<!--	visible="{path:'oUserDetailModel>/userType', formatter:'com.incture.SOCreation.formatter.formatter.formatCustomerVisibility'}">-->
+			<!--	<l:Grid defaultSpan="XL9 L9 M8 S8" hSpacing="0.5" vSpacing="0.5" class="userProfileBottomBorder">-->
+			<!--		<l:content>-->
+			<!--			<Label text="{i18n>CUSTOMER_NAME}" tooltip="{i18n>CUSTOMER_NAME/longDescription}" wrapping="true" class="surveyTextClass">-->
+			<!--				<layoutData>-->
+			<!--					<l:GridData span="XL3 L3 M4 S4"/>-->
+			<!--				</layoutData>-->
+			<!--			</Label>-->
+			<!--			<Text text="{oUserDetailModel>AdName}" class="boldText"/>-->
+			<!--			<Label text="{i18n>CUSTOMER_ID}" tooltip="{i18n>CUSTOMER_ID/longDescription}" wrapping="true" class="surveyTextClass">-->
+			<!--				<layoutData>-->
+			<!--					<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>-->
+			<!--				</layoutData>-->
+			<!--			</Label>-->
+			<!--			<Text text="{oUserDetailModel>Username}" class="boldText"/>-->
+			<!--			<Label text="{i18n>SALESGROUP}" tooltip="{i18n>SALESGROUP/longDescription}" wrapping="true" class="surveyTextClass">-->
+			<!--				<layoutData>-->
+			<!--					<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>-->
+			<!--				</layoutData>-->
+			<!--			</Label>-->
+			<!--			<Text text="{oUserDetailModel>SalesGrp}" class="boldText"/>-->
+			<!--		</l:content>-->
+			<!--	</l:Grid>-->
+			<!--</VBox>-->
+		</content>
+		<endButton>
+			<Button text="{i18n>LOGOUT}" type="Transparent" icon="sap-icon://log" press="onPressLogout"/>
+		</endButton>
+	</ResponsivePopover>
+</core:FragmentDefinition>

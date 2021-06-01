@@ -3,31 +3,31 @@
 		<content>
 			<Table items="{postDataModel>/listNonPoItem}" class="sapUiSizeCompact">
 				<columns>
-					<Column hAlign="Center">
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 						<Label text="{i18n>DebtCred}" design="Bold"/>
 					</Column>
-					<Column hAlign="Center">
-						<Label text="{i18n>TAXDOC.CURRENCY}" design="Bold"/>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Amount}" design="Bold"/>
 					</Column>
-					<Column hAlign="Center">
-						<Label text="{i18n>BASEAMOUNT}" design="Bold"/>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>BaseAmount}" design="Bold"/>
 					</Column>
-					<Column hAlign="Center">
-						<Label text="{i18n>TAXCODE}" design="Bold"/>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>TaxCode}" design="Bold"/>
 					</Column>
-					<Column hAlign="Center">
-						<Label text="{i18n>TAXRATE}" design="Bold"/>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>TaxRate}" design="Bold"/>
 					</Column>
-					<Column hAlign="Center">
-						<Label text="{i18n>TAXAMOUNT}" design="Bold"/>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>TaxAmount}" design="Bold"/>
 					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{path: 'postDataModel>crDbIndicator', formatter:'com.menabev.AP.util.formatter.crDbIndicator' }" textAlign="Center"/>
-							<Text text="" textAlign="Center"/>
+							<Text text="{path: 'postDataModel>crDbIndicator', formatter:'com.menabev.AP.formatter.formatter.crDbIndicator' }" textAlign="Center"/>
 							<Text text="{postDataModel>netValue}" textAlign="Center"/>
+							<Text text="{postDataModel>baseRate}" textAlign="Center"/>
 							<Text text="{postDataModel>taxCode}" textAlign="Center"/>
 							<Text text="{postDataModel>taxRatePercentage}" textAlign="Center"/>
 							<Text text="{postDataModel>taxValue}" textAlign="Center"/>

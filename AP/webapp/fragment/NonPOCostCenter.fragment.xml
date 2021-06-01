@@ -1,40 +1,43 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core"
-	controllerName="com.menabev.AP.controller.NonPOInvoice" id="prefix1">
+	controllerName="com.menabev.AP.controller.NonPOInvoice">
 	<ScrollContainer vertical="true" horizontal="false">
 		<Table id="idNonPo" class="MNBTable" items="{ path: 'postDataModel>/listNonPoItem', templateShareable : true }"
 			sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 			<columns>
-				<Column hAlign="Center" id="glaccountCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" id="descriptionCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>Description}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" id="debtCredCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>DebtCred}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" id="amountCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>Amount}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" id="costcenterCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+					<Label text="{i18n>BaseAmount}" design="Bold"/>
+				</Column>
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" id="taxCodeCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>TaxCode}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" id="orderCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true" visible="false">
 					<Label text="{i18n>Order}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" id="pfCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true" visible="false">
 					<Label text="{i18n>ProfitCentre}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" id="textCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>Text}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" id="comcdCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true" visible="false">
 					<Label text="{i18n>CoCd}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" id="deleteBtnCol" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>Action}" design="Bold"/>
 				</Column>
 			</columns>
@@ -56,6 +59,7 @@
 							<core:Item text="Credit" key="S"/>
 						</Select>
 						<Input type="Number" value="{postDataModel>netValue}" change="amountCal" valueState="{postDataModel>amountError}"/>
+						<Text text="{postDataModel>baseRate}" textAlign="Center"/>
 						<Input value="{postDataModel>costCenter}" tooltip="{postDataModel>costCenter}"
 							suggestionItems="{ path:'costCenterModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
 							suggest="costCenterSuggest" liveChange="handlecostCentreInput" change="onChangeCostCenter" valueState="{postDataModel>costCenterError}">
@@ -69,7 +73,7 @@
 								<core:ListItem key="{taxCodeModel>taxCode}" text="{taxCodeModel>taxCode}" additionalText="{taxCodeModel>taxCodeDescription}"/>
 							</items>
 						</Select>
-						<Input value="{postDataModel>internalOrderId}" tooltip="{postDataModel>internalOrderId}"
+						<Input value="{postDataModel>internalOrderId}" tooltip="{postDataModel>internalOrderId}" visible="false"
 							suggestionItems="{path:'internalOrderModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
 							suggest="internalOrderSuggest">
 							<suggestionItems>
@@ -77,9 +81,9 @@
 									additionalText="{internalOrderModel>IntOrdDesc}"/>
 							</suggestionItems>
 						</Input>
-						<Input value="{postDataModel>profitCentre}" tooltip="{postDataModel>profitCentre}"/>
+						<Input value="{postDataModel>profitCentre}" tooltip="{postDataModel>profitCentre}" visible="false"/>
 						<Input value="{postDataModel>itemText}" tooltip="{postDataModel>text}" valueState="{postDataModel>itemTextError}" change="onChangeText"/>
-						<Input value="{postDataModel>companyCode}" tooltip="{postDataModel>companyCode}"
+						<Input value="{postDataModel>companyCode}" tooltip="{postDataModel>companyCode}" visible="false"
 							suggestionItems="{path:'companyCodeModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
 							suggest="companyCodeSuggest">
 							<suggestionItems>
