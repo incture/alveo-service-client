@@ -7,34 +7,34 @@
 				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 					<Label text="{i18n>Description}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 					<Label text="{i18n>DebtCred}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 					<Label text="{i18n>Amount}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 					<Label text="{i18n>BaseAmount}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 					<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 					<Label text="{i18n>TaxCode}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true" visible="false">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" visible="false">
 					<Label text="{i18n>Order}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true" visible="false">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" visible="false">
 					<Label text="{i18n>ProfitCentre}" design="Bold"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 					<Label text="{i18n>Text}" design="Bold" required="true"/>
 				</Column>
-				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true" visible="false">
+				<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" visible="false">
 					<Label text="{i18n>CoCd}" design="Bold"/>
 				</Column>
 				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
@@ -44,54 +44,60 @@
 			<items>
 				<ColumnListItem>
 					<cells>
-						<Input class="tbCellBorder glaccount" value="{postDataModel>glAccount}" filterSuggests="false"
+						<Input value="{postDataModel>glAccount}" filterSuggests="false"
 							suggestionItems="{path:'glAccountModel>/d/results', templateShareable : true }" tooltip="{postDataModel>glCode}"
 							suggestionItemSelected="glDescription" showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue"
-							valueState="{postDataModel>glError}">
+							valueState="{postDataModel>glError}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{path:'glAccountModel>GLAccounts',formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
 									additionalText="{glAccountModel>GLAccDesc}"/>
 							</suggestionItems>
 						</Input>
-						<Text text="{postDataModel>materialDescription}"/>
-						<Select selectedKey="{postDataModel>crDbIndicator}" change="amountCal" tooltip="{postDataModel>materialDescription}">
+						<Text text="{postDataModel>materialDesc}"/>
+						<Select selectedKey="{postDataModel>crDbIndicator}" change="amountCal"
+							editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<core:Item text="Debit" key="H"/>
 							<core:Item text="Credit" key="S"/>
 						</Select>
-						<Input type="Number" value="{postDataModel>netValue}" change="amountCal" valueState="{postDataModel>amountError}"/>
+						<Input type="Number" value="{postDataModel>netValue}" change="amountCal" valueState="{postDataModel>amountError}"
+							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Text text="{postDataModel>baseRate}" textAlign="Center"/>
 						<Input value="{postDataModel>costCenter}" tooltip="{postDataModel>costCenter}"
 							suggestionItems="{ path:'costCenterModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
-							suggest="costCenterSuggest" liveChange="handlecostCentreInput" change="onChangeCostCenter" valueState="{postDataModel>costCenterError}">
+							suggest="costCenterSuggest" liveChange="handlecostCentreInput" change="onChangeCostCenter" valueState="{postDataModel>costCenterError}"
+							editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{costCenterModel>CostCenters}" additionalText="{costCenterModel>CostCenterDesc}"/>
 							</suggestionItems>
 						</Input>
 						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{postDataModel>taxCode}" items="{taxCodeModel>/aTax}" width="80%"
-							change="onChangeTax">
+							change="onChangeTax" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<items>
 								<core:ListItem key="{taxCodeModel>taxCode}" text="{taxCodeModel>taxCode}" additionalText="{taxCodeModel>taxCodeDescription}"/>
 							</items>
 						</Select>
 						<Input value="{postDataModel>internalOrderId}" tooltip="{postDataModel>internalOrderId}" visible="false"
 							suggestionItems="{path:'internalOrderModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
-							suggest="internalOrderSuggest">
+							suggest="internalOrderSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{path:'internalOrderModel>IntOrdNumber', formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
 									additionalText="{internalOrderModel>IntOrdDesc}"/>
 							</suggestionItems>
 						</Input>
-						<Input value="{postDataModel>profitCentre}" tooltip="{postDataModel>profitCentre}" visible="false"/>
-						<Input value="{postDataModel>itemText}" tooltip="{postDataModel>text}" valueState="{postDataModel>itemTextError}" change="onChangeText"/>
+						<Input value="{postDataModel>profitCentre}" tooltip="{postDataModel>profitCentre}" visible="false"
+							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+						<Input value="{postDataModel>itemText}" tooltip="{postDataModel>text}" valueState="{postDataModel>itemTextError}" change="onChangeText"
+							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Input value="{postDataModel>companyCode}" tooltip="{postDataModel>companyCode}" visible="false"
 							suggestionItems="{path:'companyCodeModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
-							suggest="companyCodeSuggest">
+							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{companyCodeModel>CompCodeDesc}"
 									additionalText="{path : 'companyCodeModel>CompCode' , formatter:'com.menabev.AP.formatter.formatter.removeZero'}"/>
 							</suggestionItems>
 						</Input>
-						<Button type="Reject" icon="sap-icon://delete" tooltip="Delete" press="deleteNonPoItemData"/>
+						<Button type="Reject" icon="sap-icon://delete" tooltip="Delete" press="deleteNonPoItemData"
+							enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 					</cells>
 				</ColumnListItem>
 			</items>

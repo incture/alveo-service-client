@@ -11,7 +11,7 @@
 				<Text
 					text="{path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/currency',formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"/>
 				<Input change="hdrInvAmtCalu" width="120px" type="Number" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/invoiceTotal}"
-					valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceTotal}"/>
+					valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceTotal}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 				<Label text="{i18n>GrossAmt}" design="Bold"/>
 				<Text
 					text="{path :'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/currency', formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"
@@ -48,7 +48,8 @@
 									<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
 									<Input filterSuggests="false" maxLength="10" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}"
 										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/vendorId}" type="Text" showSuggestion="true" suggest="fnVendorIdSuggest"
-										suggestionItemSelected="searchVendorAddr" change="onChangeVendorId" suggestionItems="{searchVendorModel>/d/results}" width="80%">
+										suggestionItemSelected="searchVendorAddr" change="onChangeVendorId" suggestionItems="{searchVendorModel>/d/results}" width="80%"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<suggestionItems>
 											<core:ListItem text="{ path:'searchVendorModel>Vendor', formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
 												additionalText="{searchVendorModel>Name1}"/>
@@ -57,41 +58,42 @@
 								</VBox>
 								<VBox>
 									<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
-									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%"/>
+									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox>
 									<Label required="true" text="{i18n>InvoiceNo}" class="sapUiTinyMarginTop"/>
 									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/extInvNum}" width="80%" change="onChangeInvNumber" maxLength="16"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/extInvNum}"/>
+										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/extInvNum}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox id="idDate">
 									<Label text="{i18n>InvoiceDate}" required="true" class="sapUiTinyMarginTop"/>
-									<DatePicker editable="{nonPOInvoiceModel>/userFldValidate}" id="InvoiceDate" placeholder="MM/DD/YYYY" valueFormat="yyyy-MM-dd"
+									<DatePicker id="InvoiceDate" placeholder="MM/DD/YYYY" valueFormat="yyyy-MM-dd"
 										displayFormat="MM/dd/YYYY" width="80%" change="onChangeInvDate"
 										value="{ path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/invoiceDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceDate}"/>
+										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceDate}"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>BatchId}"/>
-									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/ocrBatchId}" width="80%"/>
+									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PostingDate}" required="true"/>
 									<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
 										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/postingDate}"
 										value="{ path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										change="onPostingDateChange"/>
+										change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>DueDate}"/>
 									<DatePicker placeholder="MM/DD/YYYY"
 										value="{path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"/>
+										valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PaymentTerms}"/>
 									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/paymentTerms}"
-										items="{paymentModel>/d/results}" width="80%">
+										items="{paymentModel>/d/results}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
 											<core:ListItem key="{paymentModel>PaymentTerms}" text="{paymentModel>Vendor}" additionalText="{paymentModel>CompCode}"/>
 										</items>
@@ -100,7 +102,7 @@
 								<VBox >
 									<Label text="{i18n>PaymentMethod}"/>
 									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}"
-										items="{paymentMethodModel>/d/results}" width="80%">
+										items="{paymentMethodModel>/d/results}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
 											<core:ListItem key="{paymentMethodModel>PaymentMeth}" text="{paymentMethodModel>PaymentMethDesc}"
 												additionalText="{paymentMethodModel>VdrPaymentMeth}"/>
@@ -110,7 +112,8 @@
 								<VBox>
 									<Label text="{i18n>PaymentBlock}"/>
 									<Select forceSelection="false" id="paymentBlockComBox" showSecondaryValues="true"
-										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}" items="{paymentBlockModel>/d/results}" width="80%">
+										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}" items="{paymentBlockModel>/d/results}" width="80%"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
 											<core:ListItem key="{paymentBlockModel>VdrPaymentBlock}" text="{paymentBlockModel>PaymentBlockDesc}"
 												additionalText="{paymentBlockModel>PaymentBlock}"/>
@@ -121,7 +124,7 @@
 									<Label text="{i18n>TaxCode}"/>
 									<Select forceSelection="false" id="taxCodeId" showSecondaryValues="true" valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/taxCode}"
 										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{taxCodeModel>/aTax}" width="80%"
-										change="onChangeHeaderTax">
+										change="onChangeHeaderTax" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
 											<core:ListItem key="{taxCodeModel>taxCode}" text="{taxCodeModel>taxCode}" additionalText="{taxCodeModel>taxCodeDescription}"/>
 										</items>
@@ -134,8 +137,10 @@
 						<Toolbar height="3rem">
 							<ToolbarSpacer/>
 							<Button text="{i18n>ManageTemplates}" press="onClickManageTemplate"/>
-							<Button text="{i18n>SelectTemplate}" tooltip="Select Template" press="onSelectTemplate" class="sapUiSizeCompact SecondaryBtn"/>
-							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
+							<Button text="{i18n>SelectTemplate}" tooltip="Select Template" press="onSelectTemplate" class="sapUiSizeCompact SecondaryBtn"
+								enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"
+								enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 							<Button icon="sap-icon://excel-attachment" tooltip="{i18n>DownloadExcel}" press="onDataExportExcel" class="SecondaryBtn" visible="false"/>
 							<u:FileUploader id="fileUploaderId" icon="sap-icon://upload" iconOnly="true" maximumFileSize="10" fileType="XLSX" buttonOnly="true"
 								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" class="SecondaryBtn" visible="false"/>
@@ -147,15 +152,16 @@
 						<OverflowToolbar class="sapUiTinyMargin">
 							<Label text="{i18n>SubTotal}"></Label>
 							<Input width="9.5rem" enabled="false"
-								value="{path: 'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/baseTotalAmt', type: 'sap.ui.model.type.Float'}">
+								value="{path: 'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/totalBaseRate', type: 'sap.ui.model.type.Float'}">
 								<layoutData>
 									<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
 								</layoutData>
 							</Input>
 							<ToolbarSpacer/>
 							<Label text="{i18n>Tax}"/>
-							<Input width="4rem" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/userInputTaxAmount}" type="Number"
-								valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/userInputTaxAmount}" change="onChangeUserInputTaxAmount">
+							<Input width="4rem" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxValue}" type="Number"
+								valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/taxValue}" change="onChangeUserInputTaxAmount"
+								editable="{oVisibilityModel>/NonPOInvoice/editable}">
 								<layoutData>
 									<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
 								</layoutData>

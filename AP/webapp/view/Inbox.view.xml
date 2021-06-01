@@ -118,14 +118,13 @@
 			</Panel>
 			<OverflowToolbar>
 				<ToolbarSpacer></ToolbarSpacer>
-				<Button text="{i18n>CreateInvoice}" press="onCreateInvoice" class="sapUiSizeCompact"/>
-				<SearchField class="sapUiSizeCompact sapUiTinyMarginTop" width="20%"></SearchField>
+				<Button text="{i18n>CreateInvoice}" press="onCreateInvoice" class="sapUiSizeCompact" visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>
 				<Button icon="sap-icon://action-settings" type="Transparent"/>
 			</OverflowToolbar>
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
-					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResult/0/totalCount})" key="openTask">
-						<Table items="{oInboxModel>/openResult}" mode="None" class="labelwrapTable">
+					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResultCount})" key="openTask">
+						<Table items="{oInboxModel>/openResult}" mode="None" class="labelwrapTable" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<columns>
 								<Column width="11%" hAlign="Center">
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
@@ -160,13 +159,13 @@
 							</columns>
 							<items>
 								<ColumnListItem>
-									<Link text="{oInboxModel>requestId}" press="onReqIdOpenSelect"/>
+									<Link text="{oInboxModel>requestId}" press="onReqIdOpenSelect" wrapping="true"/>
 									<Text text="{oInboxModel>vendorId}-{oInboxModel>vendorName}"/>
 									<Text text="{oInboxModel>extInvNum}"/>
-									<Text text="{path:'oInboxModel>invoiceDate', formatter:'com.menabev.AP.util.formatter.formatDate'}"/>
+									<Text text="{path:'oInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
 									<Text text="{oInboxModel>invoiceType}"/>
 									<Text text="{oInboxModel>invoiceTotal}"/>
-									<Text text="{path:'oInboxModel>dueDate', formatter:'com.menabev.AP.util.formatter.formatDate'} "/>
+									<Text text="{path:'oInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
 									<Text text="{oInboxModel>validationStatus}"/>
 									<Text text="{oInboxModel>taskStatus}"/>
 									<core:Icon src="sap-icon://locked" tooltip="claim" press="onClaimRelease">
@@ -178,8 +177,8 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>MYTASK} ({oInboxModel>/openResult/0/totalCount})" key="myTask">
-						<Table items="{oInboxModel>/result}" mode="None">
+					<IconTabFilter text="{i18n>MYTASK} ({oInboxModel>/resultCount})" key="myTask">
+						<Table items="{oInboxModel>/result}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<columns>
 								<Column width="11%" hAlign="Center">
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
@@ -214,13 +213,13 @@
 							</columns>
 							<items>
 								<ColumnListItem>
-									<Link text="{oInboxModel>requestId}" press="onReqIdClaimSelect"/>
+									<Link text="{oInboxModel>requestId}" press="onReqIdClaimSelect" wrapping="true"/>
 									<Text text="{oInboxModel>vendorId}-{oInboxModel>vendorName}"/>
 									<Text text="{oInboxModel>extInvNum}"/>
-									<Text text="{path:'oInboxModel>invoiceDate', formatter:'com.menabev.AP.util.formatter.formatDate'}"/>
+									<Text text="{path:'oInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
 									<Text text="{oInboxModel>invoiceType}"/>
 									<Text text="{oInboxModel>invoiceTotal}"/>
-									<Text text="{path:'oInboxModel>dueDate', formatter:'com.menabev.AP.util.formatter.formatDate'} "/>
+									<Text text="{path:'oInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
 									<Text text="{oInboxModel>validationStatus}"/>
 									<Text text="{oInboxModel>taskStatus}"/>
 									<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease">
@@ -235,20 +234,22 @@
 				</items>
 			</IconTabBar>
 		</content>
-		<!--<footer>-->
-		<!--	<OverflowToolbar class="pageNumberCls" visible="{paginatedModel>/pageVisible}">-->
-		<!--		<content>-->
-		<!--				<HBox>-->
-		<!--					<Button icon="sap-icon://nav-back" class="sapUiSizeCompact navPageCls" press="onScrollLeft" type="Default" enabled="{paginatedModel>/prevButton}"/>-->
-		<!--					<SegmentedButton items="{paginatedModel>/array}" class="sapUiSmallMarginBeginEnd">-->
-		<!--						<items>-->
-		<!--							<SegmentedButtonItem text="{paginatedModel>text}" key="{paginatedModel>text}"/>-->
-		<!--						</items>-->
-		<!--					</SegmentedButton>-->
-		<!--					<Button  enabled="{paginatedModel>/nextbutton}" icon="sap-icon://navigation-right-arrow" class="sapUiSizeCompact navPageCls" type="Default" press="onScrollRight"/>-->
-		<!--				</HBox>-->
-		<!--		</content>-->
-		<!--	</OverflowToolbar>-->
-		<!--</footer>-->
+		<footer>
+			<OverflowToolbar class="pageNumberCls" visible="{paginatedModel>/pageVisible}">
+				<content>
+					<HBox>
+						<Button icon="sap-icon://nav-back" class="sapUiSizeCompact navPageCls" press="onScrollLeft" type="Default"
+							enabled="{paginatedModel>/prevButton}"/>
+						<SegmentedButton items="{paginatedModel>/array}" class="sapUiSmallMarginBeginEnd">
+							<items>
+								<SegmentedButtonItem text="{paginatedModel>text}" key="{paginatedModel>text}" press="onPageClick"/>
+							</items>
+						</SegmentedButton>
+						<Button enabled="{paginatedModel>/nextbutton}" icon="sap-icon://navigation-right-arrow" class="sapUiSizeCompact navPageCls" type="Default"
+							press="onScrollRight"/>
+					</HBox>
+				</content>
+			</OverflowToolbar>
+		</footer>
 	</Page>
 </mvc:View>

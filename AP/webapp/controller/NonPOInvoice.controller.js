@@ -50,24 +50,28 @@ sap.ui.define([
 			var aTax = [{
 				"taxCode": "I0",
 				"taxCodeDescription": "ProductId",
-				"taxRatePercentage": "0"
+				"taxPer": "0"
 			}, {
 				"taxCode": "I1",
 				"taxCodeDescription": "test",
-				"taxRatePercentage": "15"
+				"taxPer": "15"
 			}, {
 				"taxCode": "IE",
 				"taxCodeDescription": "ProductId",
-				"taxRatePercentage": "5"
+				"taxPer": "5"
 			}];
 			this.setModel(new JSONModel(), "taxCodeModel");
 			this.getModel("taxCodeModel").setProperty("/aTax", aTax);
 			//End of Tax rate test data
 
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			oVisibilityModel.setProperty("/NonPOInvoice", {});
+			oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			if (loggedinUserGroup === "Process_Lead") {
-
+				oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
 			}
+
 			this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
 			//handle if route has NonPO request Id 
 			if (requestId) {
@@ -103,7 +107,7 @@ sap.ui.define([
 						"taxCode": "",
 						"vendorId": "",
 						"vendorName": "",
-						"userInputTaxAmount": ""
+						"taxValue": ""
 					},
 					"vstate": {}
 				};
@@ -237,13 +241,13 @@ sap.ui.define([
 			var postDataModel = this.getModel("postDataModel"),
 				nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
 				taxCode = taxDetails.taxCode,
-				taxRatePercentage = taxDetails.taxRatePercentage;
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxRatePercentage", taxRatePercentage);
+				taxPer = taxDetails.taxPer;
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxPer", taxPer);
 			if (postDataModel.getProperty("/listNonPoItem")) {
 				var length = postDataModel.getProperty("/listNonPoItem").length;
 				for (var i = 0; i < length; i++) {
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxRatePercentage", taxRatePercentage);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
 				}
 			}
 			if (taxDetails) {
@@ -260,7 +264,7 @@ sap.ui.define([
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("taxCodeModel").getObject();
 			var postDataModel = this.getModel("postDataModel");
 			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
-			postDataModel.setProperty(sPath + "/taxRatePercentage", taxDetails.taxRatePercentage);
+			postDataModel.setProperty(sPath + "/taxPer", taxDetails.taxPer);
 			this.amountCal(oEvent);
 		},
 		//End of Header Filter function
@@ -526,10 +530,10 @@ sap.ui.define([
 			var postDataModel = this.getModel("postDataModel");
 			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
 				taxCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxCode"),
-				taxRatePercentage = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxRatePercentage");
+				taxPer = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxPer");
 			for (var i = 0; i < arr.length; i++) {
 				postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
-				postDataModel.setProperty("/listNonPoItem/" + i + "/taxRatePercentage", taxRatePercentage);
+				postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
 			}
 			postDataModel.refresh();
 			this.costAllocationTaxCalc();
@@ -552,9 +556,9 @@ sap.ui.define([
 					"glAccount": "",
 					"costCenter": "",
 					"taxCode": this.getModel("nonPOInvoiceModel").getData().invoiceDetailUIDto.invoiceHeader.taxCode,
-					"taxRatePercentage": this.getModel("nonPOInvoiceModel").getData().invoiceDetailUIDto.invoiceHeader.taxRatePercentage,
+					"taxPer": this.getModel("nonPOInvoiceModel").getData().invoiceDetailUIDto.invoiceHeader.taxPer,
 					"internalOrderId": "",
-					"materialDescription": "",
+					"materialDesc": "",
 					"crDbIndicator": "H",
 					"netValue": "",
 					"profitCenter": "",
@@ -614,16 +618,16 @@ sap.ui.define([
 				that = this;
 			var totalAmt = 0,
 				totalTax = 0,
-				baseTotalAmt = 0;
+				totalBaseRate = 0;
 			if (postDataModel.getProperty("/listNonPoItem")) {
 				var length = postDataModel.getProperty("/listNonPoItem").length;
 				for (var i = 0; i < length; i++) {
 					//Tax Calculations
-					var taxRatePercentage = postDataModel.getProperty("/listNonPoItem/" + i + "/taxRatePercentage"),
+					var taxPer = postDataModel.getProperty("/listNonPoItem/" + i + "/taxPer"),
 						netValue = postDataModel.getProperty("/listNonPoItem/" + i + "/netValue");
 
-					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxRatePercentage) / 100));
-					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxRatePercentage)) / 100;
+					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxPer) / 100));
+					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxPer)) / 100;
 					totalTax += taxValue;
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(2));
 					postDataModel.setProperty("/listNonPoItem/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(2));
@@ -631,17 +635,17 @@ sap.ui.define([
 					//End of Tax Calulations
 					if (baseRate && postDataModel.getProperty("/listNonPoItem/" + i +
 							"/crDbIndicator") === "H") {
-						baseTotalAmt += that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/baseRate"));
+						totalBaseRate += that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/baseRate"));
 
 					} else if (baseRate && postDataModel.getProperty("/listNonPoItem/" + i +
 							"/crDbIndicator") === "S") {
-						baseTotalAmt -= that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/baseRate"));
+						totalBaseRate -= that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/baseRate"));
 					}
 				}
-				baseTotalAmt = that.nanValCheck(baseTotalAmt).toFixed(2);
+				totalBaseRate = that.nanValCheck(totalBaseRate).toFixed(2);
 				totalTax = this.nanValCheck(totalTax).toFixed(2);
-				var grossAmount = that.nanValCheck(baseTotalAmt) + that.nanValCheck(totalTax);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/baseTotalAmt", baseTotalAmt);
+				var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(totalTax);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/totalBaseRate", totalBaseRate);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount", grossAmount.toFixed(2));
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount", totalTax);
 				var invAmt = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal");
@@ -775,7 +779,7 @@ sap.ui.define([
 				}, {
 					name: "Description",
 					template: {
-						content: "{materialDescription}"
+						content: "{materialDesc}"
 					}
 				}, {
 					name: "Debt/Cred",
@@ -1220,11 +1224,10 @@ sap.ui.define([
 					oSubmitData.invoiceHeaderDto.docStatus = "Created";
 					var balance = oSubmitData.invoiceHeaderDto.balance;
 					if (this.nanValCheck(balance) !== 0) {
-						sap.m.MessageToast.show("Balance must be 0 to Post to SAP");
-						return;
+						sap.m.MessageToast.show("Balance is not 0");
 					}
 					var totalTax = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount");
-					var userInputTaxAmount = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/userInputTaxAmount");
+					var userInputTaxAmount = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
 					var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
 					if (this.nanValCheck(taxDifference) !== 0) {
 						sap.m.MessageToast.show("Tax MisMatched");
@@ -1300,11 +1303,15 @@ sap.ui.define([
 						"deleteInd": null,
 						"distrPerc": null,
 						"glAccount": postDataModel.getData().listNonPoItem[i].glAccount,
+						"materialDesc": postDataModel.getData().listNonPoItem[i].materialDesc,
 						"internalOrderId": postDataModel.getData().listNonPoItem[i].internalOrderIdId,
 						"itemId": itemId,
 						"itemText": postDataModel.getData().listNonPoItem[i].itemText,
 						"netValue": postDataModel.getData().listNonPoItem[i].netValue,
 						"profitCenter": postDataModel.getData().listNonPoItem[i].profitCenter,
+						"taxValue": postDataModel.getData().listNonPoItem[i].taxValue,
+						"taxPer": postDataModel.getData().listNonPoItem[i].taxPer,
+						"taxRate": postDataModel.getData().listNonPoItem[i].taxValue,
 						"quantity": "0.00",
 						"requestId": reqId,
 						"serialNo": 0,
@@ -1323,6 +1330,7 @@ sap.ui.define([
 				"assignedTo": "",
 				"balance": objectIsNew.invoiceHeader.balance,
 				"balanceCheck": true,
+				"totalBaseRate": objectIsNew.invoiceHeader.totalBaseRate,
 				"channelType": "",
 				"clearingAccountingDocument": "",
 				"clearingDate": "",
@@ -1380,7 +1388,9 @@ sap.ui.define([
 				"taskOwner": objectIsNew.invoiceHeader.taskOwner,
 				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id"),
 				"taskStatus": "",
+				"taxCode": objectIsNew.invoiceHeader.taxCode,
 				"taxAmount": objectIsNew.invoiceHeader.taxAmount,
+				"taxValue": objectIsNew.invoiceHeader.taxValue,
 				"updatedAt": 0,
 				"updatedBy": "",
 				"validationStatus": "",
@@ -1530,7 +1540,7 @@ sap.ui.define([
 			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
 				nonPOInvoiceModelData = nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader,
 				bError = false,
-				mandatoryFeildsForCC = ["invoiceTotal", "taxCode", "userInputTaxAmount"];
+				mandatoryFeildsForCC = ["invoiceTotal", "taxCode", "taxValue"];
 
 			var key;
 			for (key in nonPOInvoiceModelData) {
