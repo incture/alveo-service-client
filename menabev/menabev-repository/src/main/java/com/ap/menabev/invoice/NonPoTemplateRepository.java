@@ -26,7 +26,7 @@ public interface NonPoTemplateRepository extends JpaRepository<NonPoTemplateDo, 
 //	@Query(value = "select * from APAUTOMATION.NON_PO_TEMPLATE order by template_id desc", nativeQuery = true)
 //	public List<NonPoTemplateDo> fetchTemplateId();
 
-	@Query(value = "select \"NON_PO_TEMPLATE_ITEMS_ID\".NEXTVAL from dummy", nativeQuery = true)
+	@Query(value = "select \" NON_PO_TEMPLATE_ITEMS_ID\".NEXTVAL from dummy", nativeQuery = true)
     public String fetchTemplateId();
 	
 //	@Modifying
@@ -60,4 +60,7 @@ public interface NonPoTemplateRepository extends JpaRepository<NonPoTemplateDo, 
 	@Query(value = "select * from NON_PO_TEMPLATE where Template_Name in ?1 order by created_At desc limit ?2 offset ?3", nativeQuery = true)
 	public List<NonPoTemplateDo> fetchAllByTemplateIdWithLimitandOffsetandtemplateName(List<String> getTemplateId,
 			Integer limit, Integer offset);
+
+	@Query("select templateId from NonPoTemplateDo where  templateName= ?1")
+	public String templateIdByName(String templateName);
 }

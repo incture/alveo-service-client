@@ -113,7 +113,7 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 				Double per=ServiceUtil.stringToDouble(item.getAllocationPercent());
 				Double netValue=(amount*per)/100;
 				costAllocationDto.setNetValue(String.format("%.3f", netValue));
-				//costAllocationDto.setAllocationPercent(new Long(item.getAllocationPercent()));
+				costAllocationDto.setDistrPerc((item.getAllocationPercent()));
 				costAllocationList.add(costAllocationDto);
 				
 				

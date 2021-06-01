@@ -230,6 +230,9 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				List<String> getTemplateId = new ArrayList<>();
 				getTemplateId.add(templateName);
 				System.out.println("template Id::::" + getTemplateId);
+				String templateIdByTemplateName = nonPoTemplateRepository.templateIdByName(templateName);
+				List<String> getTemplateIdByName = new ArrayList<>();
+				getTemplateIdByName.add(templateIdByTemplateName);
 				List<NonPoTemplateDo> doList = new ArrayList<>();
 				if (!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)) {
 					doList = nonPoTemplateRepository
@@ -239,7 +242,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 							.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(getTemplateId, 100, 0);
 				}
 				NonPoTemplateHIDto nonPoTemplateHIDto;
-				List<Object[]> is = nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(getTemplateId);
+				List<Object[]> is = nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(getTemplateIdByName);
 				HashMap<String, String> getAccountNo = new HashMap<>();
 				for (Object[] obj : is) {
 					getAccountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
