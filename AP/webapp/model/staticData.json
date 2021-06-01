@@ -1,36 +1,30 @@
 {
 	"mandatoryFields": {
-		"userDetail": ["userGroup","firstName","lastName","Email","country","vendorId","companyCode","purchaseOrg"],
-		"createGroup":["displayName","description","groupName"]
+		"userDetail": ["userGroup", "firstName", "lastName", "Email", "country", "vendorId", "companyCode", "purchaseOrg"],
+		"createGroup": ["displayName", "description", "groupName"]
 	},
-	"leftPane": [{
+	"navItems": [{
+		"label": "AP Workbench",
+		"key": "Inbox",
+		"icon": "sap-icon://document-text"
+	}, {
 		"label": "Upload Invoice",
 		"key": "UploadInvoice",
-		"icon": ""
+		"icon": "sap-icon://document-text"
 	}, {
 		"label": "User management",
 		"key": "UserManagement",
-		"icon": ""
-	}, {
-		"label": "Template Mangement",
-		"key": "TemplateManagement",
-		"icon": ""
+		"icon": "sap-icon://key-user-settings"
 	}, {
 		"label": "Config Cockpit",
 		"key": "ConfigCockpit",
-		"icon": ""
-	},
-	{
-		"label": "AP Workbench",
-		"key": "Inbox",
-		"icon": ""
+		"icon": "sap-icon://action-settings"
 	}],
-	"userGroups":[{
-		"key":"IT_Admin",
-		"value":"IT_Admin"
-	},
-	{
-		"key":"Supplier_Admin",
-		"value":"Supplier_Admin"
+	"userGroups": [{
+		"key": "IT_Admin",
+		"value": "IT_Admin"
+	}, {
+		"key": "Supplier_Admin",
+		"value": "Supplier_Admin"
 	}]
 }

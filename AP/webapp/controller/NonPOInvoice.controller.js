@@ -1239,7 +1239,7 @@ sap.ui.define([
 		},
 
 		//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
-		saveSubmitServiceCall: function (oData, sMethod, sUrl) {
+		saveSubmitServiceCall: function (oData, sMethod, sUrl, save) {
 			var that = this;
 			this.busyDialog.open();
 			$.ajax({
@@ -1252,11 +1252,14 @@ sap.ui.define([
 				success: function (data, xhr, result) {
 					this.busyDialog.close();
 					var message = data.responseStatus;
+					
 					if (result.status === 200) {
 						sap.m.MessageBox.success(message, {
 							actions: [sap.m.MessageBox.Action.OK],
 							onClose: function (sAction) {
+								if(!save){
 								that.router.navTo("Inbox");
+								}
 							}
 						});
 					} else {

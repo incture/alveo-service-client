@@ -44,8 +44,8 @@
 									<cells>
 										<Text text="{oUserDetailModel>id}"/>
 										<Text text="{oUserDetailModel>displayName}"/>
-										<Text text="{oUserDetailModel>oUserDetailModel>emails/0/value}"/>
-										<Text text="{oUserDetailModel>contact}"/>
+										<Text text="{oUserDetailModel>emails/0/value}"/>
+										<Text text="{oUserDetailModel>phoneNumbers/0/value}"/>
 										<Button text="{i18n>RESET}" press="onResetPwd"></Button>
 										<Button text="{i18n>VIEWASSIGNEDGROUPS}" press="onViewGroups"></Button>
 										<HBox>
@@ -64,7 +64,7 @@
 								<OverflowToolbar>
 									<ToolbarSpacer/>
 									<SearchField liveChange="onSearchGroupList" width="20%"></SearchField>
-									<Button text="{i18n>ADDNEWGROUP}" press="onAddNewGroup"></Button>
+									<!--<Button text="{i18n>ADDNEWGROUP}" press="onAddNewGroup"></Button>-->
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
@@ -75,7 +75,7 @@
 									<Label design="Bold" text="{i18n>GROUPDESCRIPTION}" tooltip="{i18n>USERNAME}"/>
 								</Column>
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>GROUPID}" tooltip="{i18n>EMAIL}"/>
+									<Label design="Bold" text="{i18n>GROUPID}" tooltip="{i18n>GROUPID}"/>
 								</Column>
 								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" visible="false">
 									<Label design="Bold" text="{i18n>MANAGEGROUP}" tooltip="{i18n>ACTION}"/>

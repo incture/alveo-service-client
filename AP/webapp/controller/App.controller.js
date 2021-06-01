@@ -13,16 +13,48 @@ sap.ui.define([
 		onInit: function () {
 			var that = this;
 			var StaticDataModel = this.getOwnerComponent().getModel("StaticDataModel");
+			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+			this.oUserDetailModel = oUserDetailModel;
+			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
+			var obj = [];
 			StaticDataModel.loadData("model/staticData.json");
 			StaticDataModel.attachRequestCompleted(function (oEvent) {
-				// that.getView().byId("sideNav").getItems().setSelectedKey("UserManagement");
-				that.getView().byId("sideNav").getItems()[1].addStyleClass("sideNavItemSelected");
+				var navItems = StaticDataModel.getProperty("/navItems");
+				if (userGroup === "IT_Admin") {
+					obj.push(navItems[0]);
+					obj.push(navItems[1]);
+					obj.push(navItems[2]);
+					obj.push(navItems[3]);
+					this.oRouter.navTo("UserManagement");
+				} else if (userGroup === "Accountant") {
+					obj.push(navItems[0]);
+					this.oRouter.navTo("Inbox");
+				} else if (userGroup === "Buyer") {
+					obj.push(navItems[0]);
+					this.oRouter.navTo("Inbox");
+				} else if (userGroup === "Process_Lead") {
+					obj.push(navItems[0]);
+					this.oRouter.navTo("Inbox");
+				} else if (userGroup === "Supplier_Admin") {
+					obj.push(navItems[1]);
+					obj.push(navItems[2]);
+					this.oRouter.navTo("UploadInvoice");
+				} else if (userGroup === "Supplier_Executive") {
+					obj.push(navItems[1]);
+					this.oRouter.navTo("UploadInvoice");
+				}
+
+				StaticDataModel.setProperty("/leftPane", obj);
+				StaticDataModel.refresh();
+				if (userGroup != "IT_Admin") {
+					that.getView().byId("sideNav").getItems()[0].addStyleClass("sideNavItemSelected");
+				} else {
+					that.getView().byId("sideNav").getItems()[2].addStyleClass("sideNavItemSelected");
+				}
 			});
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
-				if (oEvent.getParameter("name") === "App") {
-					this.oRouter.navTo("Inbox");
-				}
+				if (oEvent.getParameter("name") === "App") {}
 			});
 
 		},

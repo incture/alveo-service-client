@@ -81,12 +81,12 @@ sap.ui.define([
 				busy.close();
 				var data = oEvent.getSource().getData();
 				var user, userdata = [],
-					vendorId,groupData;
+					vendorId, groupData;
 				if (data.Resources) {
 					for (var i = 0; i < data.Resources.length; i++) {
 						user = data.Resources[i];
 						if (user.groups) {
-							for (var j = 0; j < user.groups.length; j ++) {
+							for (var j = 0; j < user.groups.length; j++) {
 								groupData = groups.indexOf(user.groups[j].value);
 								if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data[
 										"urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
@@ -250,20 +250,25 @@ sap.ui.define([
 			var value = oEvent.getSource().getValue();
 			var filters = [];
 			var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("id", sap.ui.model.FilterOperator.Contains, value),
-				new sap.ui.model.Filter("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/description", sap.ui.model.FilterOperator.Contains,
-					value)
+				new sap.ui.model.Filter("displayName", sap.ui.model.FilterOperator.Contains, value),
+				new sap.ui.model.Filter("emails/0/value", sap.ui.model.FilterOperator.Contains, value),
+				new sap.ui.model.Filter("phoneNumbers/0/value", sap.ui.model.FilterOperator.Contains, value)
 			]);
 			filters.push(oFilter);
 			var oBinding = this.getView().byId("USERMANAGEMENT").getBinding("items");
 			oBinding.filter(filters);
 		},
+		
 		onSearchGroupList: function (oEvent) {
 			var that = this;
 			var value = oEvent.getSource().getValue();
 			var filters = [];
 			var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("id", sap.ui.model.FilterOperator.Contains, value),
-				new sap.ui.model.Filter("displayName", sap.ui.model.FilterOperator.Contains, value),
-				new sap.ui.model.Filter("emails/0/value", sap.ui.model.FilterOperator.Contains, value)
+				new sap.ui.model.Filter("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/description", sap.ui.model.FilterOperator.Contains,
+					value),
+				new sap.ui.model.Filter("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/groupId", sap.ui.model.FilterOperator.Contains,
+					value)
+
 			]);
 			filters.push(oFilter);
 			var oBinding = this.getView().byId("USERGROUPS").getBinding("items");
