@@ -29,7 +29,7 @@
 							<Text text="{postDataModel>netValue}" textAlign="Center"/>
 							<Text text="{postDataModel>baseRate}" textAlign="Center"/>
 							<Text text="{postDataModel>taxCode}" textAlign="Center"/>
-							<Text text="{postDataModel>taxRatePercentage}" textAlign="Center"/>
+							<Text text="{postDataModel>taxPer}" textAlign="Center"/>
 							<Text text="{postDataModel>taxValue}" textAlign="Center"/>
 						</cells>
 					</ColumnListItem>

@@ -48,6 +48,14 @@ sap.ui.define([
 			},
 
 			getInboxData: function (pageNo, scroll) {
+				var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup"),
+					oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+				oVisibilityModel.setProperty("/Inbox", {});
+				oVisibilityModel.setProperty("/Inbox/btnCreateInvVisible", false);
+				if (loggedinUserGroup === "Accountant") {
+					oVisibilityModel.setProperty("/Inbox/btnCreateInvVisible", true);
+				}
+
 				var oInboxModel = new sap.ui.model.json.JSONModel();
 				this.getView().setModel(oInboxModel, "oInboxModel");
 				var taskDataFilterModelData = this.getView().getModel("taskDataFilterModel").getData(),
@@ -68,13 +76,18 @@ sap.ui.define([
 						type: "POST",
 						success: function (oData) {
 							if (oData && Array.isArray(oData.body)) {
-								if (oData.body[0].claimed == true)
+								var totalCount = oData.body[0].totalCount;
+								oInboxModel.setProperty("/count", totalCount);
+								if (oData.body[0].claimed == true) {
 									oInboxModel.setProperty("/result", oData.body);
-								else
+									oInboxModel.setProperty("/resultCount", totalCount);
+								} else {
 									oInboxModel.setProperty("/openResult", oData.body);
+									oInboxModel.setProperty("/openResultCount", totalCount);
+								}
 							}
-							// if(!scroll)
-							// that.generatePagination();
+							if (!scroll)
+								that.generatePagination();
 						},
 						error: function (oError) {
 							sap.m.MessageToast.show(oError.responseText);

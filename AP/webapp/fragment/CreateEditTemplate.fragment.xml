@@ -8,10 +8,10 @@
 							<Label text="{i18n>TemplateName}" design="Bold" required="true"/>
 							<Input id="TemplateNameID" value="{postDataModel>/nonPoTemplate/templateName}" placeholder="{i18n>EnterTemplateName}" width="25%"/>
 							<ToolbarSpacer/>
-							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
+							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
 							<u:FileUploader id="fileUploaderId" icon="sap-icon://upload" iconOnly="true" maximumFileSize="10" fileType="XLSX" buttonOnly="true"
-								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" 
-								sameFilenameAllowed="true" class="SecondaryBtn"/>
+								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" sameFilenameAllowed="true"
+								class="SecondaryBtn"/>
 						</Toolbar>
 					</headerToolbar>
 					<infoToolbar>
@@ -20,22 +20,22 @@
 						</OverflowToolbar>
 					</infoToolbar>
 					<columns>
-						<Column hAlign="Center" id="accountNoCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 							<Label text="{i18n>AccountNo}" design="Bold" required="true"/>
 						</Column>
-						<Column hAlign="Center" id="glaccountCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
 						</Column>
-						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 							<Label text="{i18n>Description}" design="Bold"/>
 						</Column>
-						<Column hAlign="Center" id="costcenterCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
 						</Column>
-						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 							<Label text="{i18n>percentageAllocation}" design="Bold" required="true" wrapping="true"/>
 						</Column>
-						<Column hAlign="Center" id="amountCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 							<Label text="{i18n>Text}" design="Bold"/>
 						</Column>
 						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true"></Column>

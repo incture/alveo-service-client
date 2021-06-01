@@ -12,16 +12,16 @@
 						</Toolbar>
 					</headerToolbar>
 					<columns>
-						<Column hAlign="Center" id="glaccountCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
 						</Column>
-						<Column hAlign="Center" id="costcenterCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
 						</Column>
 						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>percentageAllocation}" design="Bold" required="true" wrapping="true"/>
 						</Column>
-						<Column hAlign="Center" id="amountCol" minScreenWidth="Small" demandPopin="true">
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 							<Label text="{i18n>Amount}" design="Bold" required="true"/>
 						</Column>
 					</columns>
