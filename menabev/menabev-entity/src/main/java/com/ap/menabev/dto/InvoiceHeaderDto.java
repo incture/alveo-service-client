@@ -102,6 +102,9 @@ public class InvoiceHeaderDto {
 	private String plannedCost;
 	private String baseLine;
 	private String invoicePdfId;
+	private String totalBaseRate;
+	private String taxValue;
+	
 	
 
 }

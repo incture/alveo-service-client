@@ -31,16 +31,16 @@ public interface ApplicationConstants {
 	// ----------------------------------------------------------//
 
 	// DEV DataBase Details
-	/*String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
+	String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
 	String URL = "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
 	String USERNAME = "MENABEVD";
-	String PASSWORD = "menBHDev2021";*/
+	String PASSWORD = "menBHDev2021";
 	// ----------------------------------------------------------//
 	//QA DataBase Details
-	String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
+	/*String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
     String URL = "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
     String USERNAME = "MENABEVQA";
-    String PASSWORD = "Dv4v.6nkTn6weJh6ZSNdL7-NTR8JqwL-AVzr_H-fJI1aj78QpqmGtFggsuSLuOC4e2qCkVurhiW12D9zyv6KRVyPJqPgmWR0tVffmyDZV5Aq7K2Zx_xm-C-esUhSiLC_";
+    String PASSWORD = "Dv4v.6nkTn6weJh6ZSNdL7-NTR8JqwL-AVzr_H-fJI1aj78QpqmGtFggsuSLuOC4e2qCkVurhiW12D9zyv6KRVyPJqPgmWR0tVffmyDZV5Aq7K2Zx_xm-C-esUhSiLC_";*/
     //------------------------------------------------------///
 	
 	// Service Status

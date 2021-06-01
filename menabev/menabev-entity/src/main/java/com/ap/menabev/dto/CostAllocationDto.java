@@ -35,5 +35,6 @@ private String costAllocationId;
 	private String taxValue;
 	private String taxPer;
 	private String taxRate;
+	private String materialDesc;
 	
 }

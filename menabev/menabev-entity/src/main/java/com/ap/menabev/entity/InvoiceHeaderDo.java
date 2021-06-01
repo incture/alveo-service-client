@@ -178,6 +178,10 @@ public class InvoiceHeaderDo {
 	private String taxCode;
 	@Column(name = "TAX_RATE")
 	private String taxRate;
+	@Column(name = "TOTAL_BASE_RATE")
+	private String totalBaseRate;
+	@Column(name = "TAX_VALUE")
+	private String taxValue;
 	@Column(name="SURCHARGE")
 	private String surcharge;
 	@Column(name = "DISCOUNT")
@@ -190,7 +194,6 @@ public class InvoiceHeaderDo {
 	private String plannedCost;
 	@Column(name = "BASE_LINE")
 	private String baseLine;
-	
 	@Column(name = "INVOICE_PDF_ID")
 	private String invoicePdfId; // add the document id of the invoice pdf to show in oepn pdf .
 	

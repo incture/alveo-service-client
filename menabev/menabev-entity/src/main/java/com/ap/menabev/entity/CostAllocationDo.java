@@ -45,6 +45,7 @@ public @Data class CostAllocationDo {
 	
 	@Column(name = "QUANTITY_UNIT")
 	private String quantityUnit;
+	
 	@Column(name = "DISTR_PERC")
 	private String distrPerc;
 	
@@ -96,5 +97,7 @@ public @Data class CostAllocationDo {
 	private String taxPer;
 	@Column(name ="TAX_RATE")
 	private String taxRate;
+	@Column(name ="MATERIAL_DESC")
+	private String materialDesc;
 	
 }

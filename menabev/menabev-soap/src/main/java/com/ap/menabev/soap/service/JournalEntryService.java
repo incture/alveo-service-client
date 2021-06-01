@@ -71,17 +71,19 @@ public class JournalEntryService {
 						"" + "https://sd4.menabev.com:443"
 								+ "/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding",
 						requestMessage);
+		
 			return journalEntryCreateConfirmationMessage;
 	}
 	
-	public String postNonPoItemsToSAP(JournalEntryCreateRequestBulkMessage requestMessage) throws IOException, URISyntaxException {
+	public ResponseEntity<?> postNonPoItemsToSAP() throws IOException, URISyntaxException {
 //		System.err.println("input "+inputDto.toString());
 //		Map<String, Object> destinationInfo = getDestination("https://vhmeasd4ci.hec.menabev.com:44300/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding");
 		
 //		System.err.println("destinationInfo "+destinationInfo);
 		//set Url
-		String url = "https://sd4.menabev.com:443"
-				+ "/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
+		String url = "https://vhmeasd4ci.hec.menabev.com:44300"
+		//String url = "https://sd4.menabev.com:443"
+				+"/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
 		// form payload into a string entity 
 		
 		String  entity  = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"> "
@@ -150,7 +152,7 @@ public class JournalEntryService {
 //		stringToDom(entity);
 		ResponseEntity<?> responseFromOdata = consumingOdataService(url, entity, "POST", null);
 		System.err.println("odata output "+ responseFromOdata);
-	 return null;
+	 return responseFromOdata;
 
 	}
 //	public static File stringToDom(String xmlSource) 
@@ -295,7 +297,7 @@ public class JournalEntryService {
 //			if (destinationInfo.get("sap-client") != null) {
 				httpRequestBase.addHeader("sap-client", "100");
 //			}
-//			httpRequestBase.addHeader("accept", "application/xml");
+		httpRequestBase.addHeader("Content-Type", "text/xml");
 			/*
 			Header[] headers = getAccessToken("https://sd4.menabev.com:443/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding","Syuvraj",
 					"Incture@12345",httpClient,  proxyHost, proxyPort,

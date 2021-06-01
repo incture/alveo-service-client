@@ -614,7 +614,12 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				+ "/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
 		// form payload into a string entity 
 		
-		String  entity  = "<soapenv:Envelopexmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"><soapenv:Header/><soapenv:Body><sfin:JournalEntryBulkCreateRequest><MessageHeader><CreationDateTime>2021-05-25T12:37:00.1234567Z</CreationDateTime></MessageHeader><JournalEntryCreateRequest><MessageHeader><CreationDateTime>2021-05-25T12:37:00.1234567Z</CreationDateTime></MessageHeader><JournalEntry><OriginalReferenceDocumentType>BKPFF</OriginalReferenceDocumentType><OriginalReferenceDocument/><OriginalReferenceDocumentLogicalSystem/><BusinessTransactionType>RFBU</BusinessTransactionType><AccountingDocumentType>KR</AccountingDocumentType><DocumentReferenceID>INV12345</DocumentReferenceID><CreatedByUser>SYUVRAJ</CreatedByUser><CompanyCode>1010</CompanyCode><DocumentDate>2021-05-25</DocumentDate><PostingDate>2021-05-25</PostingDate><Item><GLAccount>0005500046</GLAccount><CompanyCode>1010</CompanyCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">100.00</AmountInTransactionCurrency><Tax><TaxCode>I1</TaxCode></Tax><AccountAssignment><CostCenter>0000521001</CostCenter></AccountAssignment></Item><Item><GLAccount>0006021003</GLAccount><CompanyCode>1010</CompanyCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">100.00</AmountInTransactionCurrency><Tax><TaxCode>I1</TaxCode></Tax><AccountAssignment><CostCenter>0000111001</CostCenter></AccountAssignment></Item><CreditorItem><ReferenceDocumentItem>1</ReferenceDocumentItem><Creditor>0001000030</Creditor><AmountInTransactionCurrencycurrencyCode=\"SAR\">-230.00</AmountInTransactionCurrency></CreditorItem><ProductTaxItem><TaxCode>I1</TaxCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">30.00</AmountInTransactionCurrency><TaxBaseAmountInTransCrcycurrencyCode=\"SAR\">200.00</TaxBaseAmountInTransCrcy><ConditionType>MWVS</ConditionType></ProductTaxItem></JournalEntry></JournalEntryCreateRequest></sfin:JournalEntryBulkCreateRequest></soapenv:Body></soapenv:Envelope>";
+		String  entity  = "POST /StockQuote HTTP/1.1"+
+"Host:"+ "https://sd4.menabev.com:443"+
+"Content-Type:" +"text/xml;"+ "charset=utf-8"+
+"Content-Length: nnnn"
++ ""
++ "<soapenv:Envelopexmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"><soapenv:Header/><soapenv:Body><sfin:JournalEntryBulkCreateRequest><MessageHeader><CreationDateTime>2021-05-25T12:37:00.1234567Z</CreationDateTime></MessageHeader><JournalEntryCreateRequest><MessageHeader><CreationDateTime>2021-05-25T12:37:00.1234567Z</CreationDateTime></MessageHeader><JournalEntry><OriginalReferenceDocumentType>BKPFF</OriginalReferenceDocumentType><OriginalReferenceDocument/><OriginalReferenceDocumentLogicalSystem/><BusinessTransactionType>RFBU</BusinessTransactionType><AccountingDocumentType>KR</AccountingDocumentType><DocumentReferenceID>INV12345</DocumentReferenceID><CreatedByUser>SYUVRAJ</CreatedByUser><CompanyCode>1010</CompanyCode><DocumentDate>2021-05-25</DocumentDate><PostingDate>2021-05-25</PostingDate><Item><GLAccount>0005500046</GLAccount><CompanyCode>1010</CompanyCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">100.00</AmountInTransactionCurrency><Tax><TaxCode>I1</TaxCode></Tax><AccountAssignment><CostCenter>0000521001</CostCenter></AccountAssignment></Item><Item><GLAccount>0006021003</GLAccount><CompanyCode>1010</CompanyCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">100.00</AmountInTransactionCurrency><Tax><TaxCode>I1</TaxCode></Tax><AccountAssignment><CostCenter>0000111001</CostCenter></AccountAssignment></Item><CreditorItem><ReferenceDocumentItem>1</ReferenceDocumentItem><Creditor>0001000030</Creditor><AmountInTransactionCurrencycurrencyCode=\"SAR\">-230.00</AmountInTransactionCurrency></CreditorItem><ProductTaxItem><TaxCode>I1</TaxCode><AmountInTransactionCurrencycurrencyCode=\"SAR\">30.00</AmountInTransactionCurrency><TaxBaseAmountInTransCrcycurrencyCode=\"SAR\">200.00</TaxBaseAmountInTransCrcy><ConditionType>MWVS</ConditionType></ProductTaxItem></JournalEntry></JournalEntryCreateRequest></sfin:JournalEntryBulkCreateRequest></soapenv:Body></soapenv:Envelope>";
 		// call odata method 
 //		stringToDom(entity);
 		ResponseEntity<?> responseFromOdata = consumingOdataService(url, entity, "POST", null);
@@ -751,7 +756,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 					
 					System.err.println("entity "+entity);
 					input = new StringEntity(entity);
-					input.setContentType("application/xml");
+					input.setContentType("text/xml");
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 				}
@@ -765,6 +770,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 			}
 //			if (destinationInfo.get("sap-client") != null) {
 				httpRequestBase.addHeader("sap-client", "100");
+				httpRequestBase.addHeader("Content-Type","text/xml");
 //			}
 //			httpRequestBase.addHeader("accept", "application/xml");
 			/*

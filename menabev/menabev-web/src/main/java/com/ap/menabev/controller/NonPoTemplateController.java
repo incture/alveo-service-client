@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import com.ap.menabev.dto.NonPoTemplateFilterDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
 import com.ap.menabev.service.NonPoTemplateService;
+import com.ap.menabev.soap.service.JournalEntryService;
 import com.ap.menabev.util.ServiceUtil;
 import com.ap.menabev.dto.ResponseDto;
 
@@ -30,6 +32,9 @@ import com.ap.menabev.dto.ResponseDto;
 public class NonPoTemplateController {
     @Autowired
     NonPoTemplateService nonPoTemplateService;
+    
+    @Autowired
+    JournalEntryService   nonJournalEntryService;
     
     @PostMapping("/save")
 	public ResponseDto save(@RequestBody NonPoTemplateHIDto dto) {
@@ -68,8 +73,8 @@ public class NonPoTemplateController {
 	}
 	
 	@PostMapping("/postNonPoItemsToSap")
-	public ResponseDto postNonPoItemsToSAP() throws IOException, URISyntaxException{
-		return nonPoTemplateService.postNonPoItemsToSAP();
+	public ResponseEntity<?> postNonPoItemsToSAP() throws IOException, URISyntaxException{
+		return nonJournalEntryService.postNonPoItemsToSAP();
 	}
 	
 	@PostMapping("/uploadExcel")
