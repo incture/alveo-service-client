@@ -365,7 +365,7 @@ public class JournalEntryService {
 					}
 			
 				} else {
-					String responseFromECC = httpResponse.getEntity().toString();
+					String responseFromECC = httpResponse.getEntity().getContent().toString();
 					
 					System.err.println("responseFromEcc"+responseFromECC);
 					
