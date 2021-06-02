@@ -18,6 +18,10 @@ sap.ui.define([
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			var obj = [];
 			StaticDataModel.loadData("model/staticData.json");
+			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+			this.oRouter.attachRoutePatternMatched(function (oEvent) {
+				if (oEvent.getParameter("name") === "App") {}
+			});
 			StaticDataModel.attachRequestCompleted(function (oEvent) {
 				var navItems = StaticDataModel.getProperty("/navItems");
 				if (userGroup === "IT_Admin") {
@@ -25,23 +29,23 @@ sap.ui.define([
 					obj.push(navItems[1]);
 					obj.push(navItems[2]);
 					obj.push(navItems[3]);
-					this.oRouter.navTo("UserManagement");
+					that.oRouter.navTo("UserManagement");
 				} else if (userGroup === "Accountant") {
 					obj.push(navItems[0]);
-					this.oRouter.navTo("Inbox");
+					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Buyer") {
 					obj.push(navItems[0]);
-					this.oRouter.navTo("Inbox");
+					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Process_Lead") {
 					obj.push(navItems[0]);
-					this.oRouter.navTo("Inbox");
+					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Supplier_Admin") {
 					obj.push(navItems[1]);
 					obj.push(navItems[2]);
-					this.oRouter.navTo("UploadInvoice");
+					that.oRouter.navTo("UploadInvoice");
 				} else if (userGroup === "Supplier_Executive") {
 					obj.push(navItems[1]);
-					this.oRouter.navTo("UploadInvoice");
+					that.oRouter.navTo("UploadInvoice");
 				}
 
 				StaticDataModel.setProperty("/leftPane", obj);
@@ -52,11 +56,6 @@ sap.ui.define([
 					that.getView().byId("sideNav").getItems()[2].addStyleClass("sideNavItemSelected");
 				}
 			});
-			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-			this.oRouter.attachRoutePatternMatched(function (oEvent) {
-				if (oEvent.getParameter("name") === "App") {}
-			});
-
 		},
 		onSideNavItemSelection: function (oEvent) {
 			var items = oEvent.getSource().getParent().getItems();

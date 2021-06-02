@@ -1330,6 +1330,7 @@ sap.ui.define([
 			var invoiceHeaderDto = {
 				"accountNumber": "",
 				"accountingDoc": "",
+				"attachments" :objectIsNew.invoiceHeader.attachments,
 				"assignedTo": "",
 				"balance": objectIsNew.invoiceHeader.balance,
 				"balanceCheck": true,
@@ -1346,6 +1347,7 @@ sap.ui.define([
 				"createdAtTo": "",
 				"createdByInDb": "",
 				"currency": "",
+				"comments":objectIsNew.invoiceHeader.comments,
 				"deposit": "",
 				"disAmt": "",
 				"docStatus": "",
@@ -1402,19 +1404,19 @@ sap.ui.define([
 				"version": 0
 			};
 			obj.invoiceHeaderDto = invoiceHeaderDto;
-			obj.invoiceHeaderDto.attachments = [];
-			if (nonPOInvoiceModel.getData().docManagerDto && nonPOInvoiceModel.getData().docManagerDto.length > 0) {
-				for (var n = 0; n < nonPOInvoiceModel.getData().docManagerDto.length; n++) {
-					obj.invoiceHeaderDto.attachments.push(nonPOInvoiceModel.getData().docManagerDto[n]);
-				}
-			}
-			obj.invoiceHeaderDto.comments = [];
-			if (nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto && nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length >
-				0) {
-				for (var k = 0; k < nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
-					obj.invoiceHeaderDto.comments.push(nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto[k]);
-				}
-			}
+			// obj.invoiceHeaderDto.attachments = [];
+			// if (nonPOInvoiceModel.getData().docManagerDto && nonPOInvoiceModel.getData().docManagerDto.length > 0) {
+			// 	for (var n = 0; n < nonPOInvoiceModel.getData().docManagerDto.length; n++) {
+			// 		obj.invoiceHeaderDto.attachments.push(nonPOInvoiceModel.getData().docManagerDto[n]);
+			// 	}
+			// }
+			// obj.invoiceHeaderDto.comments = [];
+			// if (nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto && nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length >
+			// 	0) {
+			// 	for (var k = 0; k < nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
+			// 		obj.invoiceHeaderDto.comments.push(nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto[k]);
+			// 	}
+			// }
 			obj.invoiceItemAcctAssignmentDto = objectIsNew.invoiceItems;
 			obj.costAllocationDto = objectIsNew.costAllocation;
 			return obj;
