@@ -1265,8 +1265,8 @@ sap.ui.define([
 				return;
 			}
 			var obj = {
-				"createdAt": new Date(),
-				"user": oUserDetailModel.getProperty("/name/givenName"),
+				"createdAt": new Date().getTime(),
+				"user": oUserDetailModel.getProperty("/loggedinUserDetail/name/familyName"),
 				"comment": nonPOInvoiceModel.getProperty("/commments"),
 				"createdBy": oUserDetailModel.getProperty("/loggedInUserMail")
 			};
@@ -1340,7 +1340,7 @@ sap.ui.define([
 					// } else {
 					var obj = {
 						"attachmentId": success.documentId,
-						"createdAt": new Date(),
+						"createdAt": new Date().getTime(),
 						"createdBy": oUserDetailModel.getProperty("/loggedInUserMail"),
 						"fileName": success.documentName,
 						"fileType": "",
