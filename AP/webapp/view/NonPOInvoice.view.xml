@@ -58,7 +58,8 @@
 								</VBox>
 								<VBox>
 									<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
-									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox>
 									<Label required="true" text="{i18n>InvoiceNo}" class="sapUiTinyMarginTop"/>
@@ -67,15 +68,15 @@
 								</VBox>
 								<VBox id="idDate">
 									<Label text="{i18n>InvoiceDate}" required="true" class="sapUiTinyMarginTop"/>
-									<DatePicker id="InvoiceDate" placeholder="MM/DD/YYYY" valueFormat="yyyy-MM-dd"
-										displayFormat="MM/dd/YYYY" width="80%" change="onChangeInvDate"
+									<DatePicker id="InvoiceDate" placeholder="MM/DD/YYYY" valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
+										change="onChangeInvDate"
 										value="{ path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/invoiceDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceDate}"
-										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceDate}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>BatchId}"/>
-									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/ocrBatchId}" width="80%"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PostingDate}" required="true"/>
@@ -205,49 +206,6 @@
 							</Input>
 						</OverflowToolbar>
 					</VBox>
-					<!--<VBox class="tableBox sapUiTinyMargin">-->
-					<!--	<Toolbar class="boxToolBar" height="3rem">-->
-					<!--		<Title level="H2" text="{i18n>AdditionalDetails}" class="headerTitle sapUiTinyMarginBegin"/>-->
-					<!--	</Toolbar>-->
-					<!--	<VBox id="attachmentTab" class="sapUiTinyMargin">-->
-					<!--		<Toolbar height="3rem">-->
-					<!--			<Text text="{i18n>Attachments}"/>-->
-					<!--			<ToolbarSpacer/>-->
-					<!--			<u:FileUploader id="fileUploader" style="Transparent" maximumFileSize="5" fileType="{nonPOInvoiceModel>/attachFileType}"-->
-					<!--				icon="sap-icon://add" buttonText="{i18n>AddAttachments}" buttonOnly="true" typeMissmatch="handleTypeMisMatch"-->
-					<!--				fileSizeExceed="attachFileSizeExceed" change="onBeforeUploadStarts"/>-->
-					<!--		</Toolbar>-->
-					<!--		<VBox class="shadow">-->
-					<!--			<VBox width="100%" items="{nonPOInvoiceModel>/docManagerDto}">-->
-					<!--				<Toolbar class="atachmentCls sapUiSmallMargin">-->
-					<!--					<FeedListItem sender="{nonPOInvoiceModel>fileName}" iconDensityAware="false" activeIcon="{nonPOInvoiceModel>folderName}"-->
-					<!--						senderPress="fnUploadDoc"></FeedListItem>-->
-					<!--					<ToolbarSpacer></ToolbarSpacer>-->
-					<!--					<Button icon="sap-icon://delete" press="fnDeleteAttachment" width="10%"/>-->
-					<!--				</Toolbar>-->
-					<!--			</VBox>-->
-					<!--		</VBox>-->
-					<!--	</VBox>-->
-					<!--	<VBox id="commnetTab" class="sapUiTinyMargin">-->
-					<!--		<Toolbar height="3rem">-->
-					<!--			<Text text="{i18n>Comments}"/>-->
-					<!--			<ToolbarSpacer/>-->
-					<!--		</Toolbar>-->
-					<!--		<VBox class="shadow">-->
-					<!--			<VBox width="100%">-->
-					<!--				<FeedInput post="onPostComment" showIcon="false" maxLength="199" value="{nonPOInvoiceModel>/input}"/>-->
-					<!--				<List items="{nonPOInvoiceModel>/invoiceDetailUIDto/commentDto}" showSeparators="Inner" growing="true" growingThreshold="4">-->
-					<!--					<FeedListItem sender="{nonPOInvoiceModel>createdBy}" iconDensityAware="false"-->
-					<!--						timestamp="{path:'nonPOInvoiceModel>createdAt', formatter:'com.menabev.AP.formatter.formatter.commentDate'}"-->
-					<!--						text="{nonPOInvoiceModel>comment}">-->
-					<!--						<FeedListItemAction icon="sap-icon://delete" press="fnDeleteComment" text="Delete"></FeedListItemAction>-->
-					<!--						<FeedListItemAction icon="sap-icon://edit" press="fnEditComment" text="Edit"></FeedListItemAction>-->
-					<!--					</FeedListItem>-->
-					<!--				</List>-->
-					<!--			</VBox>-->
-					<!--		</VBox>-->
-					<!--	</VBox>-->
-					<!--</VBox>-->
 					<IconTabBar>
 						<items>
 							<IconTabFilter text="{i18n>ATTACHMENTS}" key="attachments">

@@ -5,7 +5,7 @@
 			<VBox>
 				<l:Grid defaultSpan="L3 M6 S12" width="100%">
 					<VBox>
-						<Label text="{i18n>TempalateName}" design="Bold"/>
+						<Label text="{i18n>TemplateName}" design="Bold"/>
 						<Input value="{templateModel>/inputTempName}" width="80%"/>
 					</VBox>
 					<VBox>
@@ -46,25 +46,22 @@
 							<Text text="{templateModel>nonPoTemplate/templateName}" class="selectTemp"/>
 							<Text text="{templateModel>nonPoTemplate/accountNo}" class="selectTemp"/>
 							<Text text="{templateModel>nonPoTemplate/createdBy}" class="selectTemp"/>
-							<Text text="{path:'templateModel>nonPoTemplate/updatedBy',formatter: 'com.menabev.AP.util.formatter.getUpdatedBy'}" class="selectTemp"/>
+							<Text text="{path:'templateModel>nonPoTemplate/updatedBy',formatter: 'com.menabev.AP.formatter.formatter.getUpdatedBy'}" class="selectTemp"/>
 							<Button icon="sap-icon://edit" press="onClickEditTemplate" tooltip="{i18n>Edit}"/>
 						</cells>
 					</ColumnListItem>
 				</items>
 			</Table>
-			<HBox justifyContent="Center">
-				<Button id="btnPrevious" text="{i18n>Previous}" press="onClickPrevious"/>
-				<Button id="btnNext" text="{i18n>Next}" press="onClickNext"/>
-			</HBox>
 		</content>
 		<footer>
-			<Toolbar>
+			<OverflowToolbar class="sapUiMediumMarginTop">
+				<Button id="btnPrevious" text="{i18n>Previous}" press="onClickPrevious"/>
+				<Button id="btnNext" text="{i18n>Next}" press="onClickNext"/>
 				<ToolbarSpacer/>
-				<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Save}" press="onClickCancelTemplate" class="sapUiTinyMarginEnd" visible="false"/>
 				<Button text="{i18n>DELETETEMP}" press="onDeleteofNonpoTemplate" tooltip="{i18n>Delete}" type="Reject"
 					enabled="{templateModel>/tempDeleteBtnEnabled}"/>
 				<Button text="{i18n>CreateTemplate}" type="Emphasized" tooltip="{i18n>Submit}" press="onClickCreateTemplate" class="sapUiTinyMarginEnd"/>
-			</Toolbar>
+			</OverflowToolbar>
 		</footer>
 	</Page>
 </mvc:View>

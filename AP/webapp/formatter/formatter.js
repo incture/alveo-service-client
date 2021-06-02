@@ -156,14 +156,15 @@ com.menabev.AP.formatter.formatter = {
 
 	getDate: function (value) {
 		if (value)
-			return new Date(value).getFullYear() + "-" + (new Date(value).getMonth() +1) + "-" + new Date(value).getDate();
+			return new Date(value).getFullYear() + "-" + (new Date(value).getMonth() + 1) + "-" + new Date(value).getDate();
 		return "";
 	},
 
 	getUpdatedBy: function (value) {
 		if (!value) {
 			return "-";
-		}
+		} else
+			return value;
 	}
 
 };
