@@ -269,7 +269,7 @@ sap.ui.define([
 		},
 		//End of Header Filter function
 
-		//PDF Area details
+		/*PDF Area details */
 		//Start of Open PDF details
 		onPressOpenpdf: function () {
 			//service call to load the pdf document
@@ -343,7 +343,7 @@ sap.ui.define([
 				oContentLayout.setSize("auto");
 			});
 		},
-		//End of Open PDF details
+		/*End of Open PDF details */
 
 		//This function will route to TemplateManagement view
 		onClickManageTemplate: function () {
@@ -826,65 +826,6 @@ sap.ui.define([
 			});
 		},
 
-		/*Start of Excel Upload*/
-		//this function will allow user import cost Allocation data from an excel file
-		//function handleImportFromExcel will import the data to cost allocation table from an excel file uploaded from the local system.
-		handleImportFromExcel: function (oEvent) {
-			var excelFile = oEvent.getParameter("files")[0];
-			if (excelFile) {
-				var oFormData = new FormData();
-				oFormData.set("file", excelFile);
-				var url = "/menabevdev/NonPoTemplate/uploadExcel";
-				this.busyDialog.open();
-				var that = this;
-				jQuery.ajax({
-					url: url,
-					method: "POST",
-					timeout: 0,
-					headers: {
-						"Accept": "application/json"
-					},
-					enctype: "multipart/form-data",
-					contentType: false,
-					processData: false,
-					crossDomain: true,
-					cache: false,
-					data: oFormData,
-					success: function (data, xhr, success) {
-						that.busyDialog.close();
-						var errorMsg = "";
-						if (success.statusText === "Error") {
-							errorMsg = "Request timed-out. Please contact your administrator";
-							that.errorMsg(errorMsg);
-						} else {
-							that.getModel("postDataModel").setProperty("/listNonPoItem", data);
-							that.getModel("postDataModel").refresh();
-							errorMsg = "Succefully imported data from excel file";
-							sap.m.MessageToast.show(errorMsg);
-						}
-					},
-					error: function (result, xhr, data) {
-						that.busyDialog.close();
-						var errorMsg = "";
-						if (result.status === 504) {
-							errorMsg = "Request timed-out. Please refresh your page";
-							that.errorMsg(errorMsg);
-						} else {
-							errorMsg = data;
-							that.errorMsg(errorMsg);
-						}
-					}
-				});
-			}
-		},
-
-		//onFileSizeExceed is triggerred when Excel file size exceeded more than 10MB 
-		onFileSizeExceed: function (error) {
-			var errorMsg = "File size has exceeded it max limit of 10MB";
-			this.errorMsg(errorMsg);
-		},
-		/*End of Excel Upload*/
-
 		//Tax details Fragment
 		//Frag:TaxDetails
 		openTaxDetails: function () {
@@ -899,257 +840,6 @@ sap.ui.define([
 		taxDetailsDialogClose: function () {
 			this.taxDetails.close();
 		},
-
-		/*Start of Attachments tab*/
-		onBeforeUploadStarts: function (oEvent) {
-			var that = this;
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var nonPOInvoiceModelData = this.getView().getModel("nonPOInvoiceModel").getData();
-			var fileName = oEvent.getParameter("newValue"),
-				fileList = oEvent.getSource().oFileUpload.files[0],
-				fileType = fileList.type;
-			String.prototype.replaceAll = function (search, replacement) {
-				var target = this;
-				return target.replace(new RegExp(search, "g"), replacement);
-			};
-
-			fileName = fileName.replaceAll(" ", "_");
-			fileName = fileName.replaceAll("#", "_");
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				var s = event.target.result;
-				var base64 = s.substr(s.lastIndexOf(","));
-				base64 = base64.split(",")[1];
-				var cDate = new Date().getTime();
-				// var sDate = Date.now(cDate);
-				var docDetails = {
-					"requestId": nonPOInvoiceModelData.invoiceDetailUIDto.invoiceHeader.requestId,
-					"fileName": fileName,
-					"fileType": fileType,
-					"fileBase64": base64,
-					"createdBy": that.getView().getModel("oUserModel").getProperty("/email"),
-					"createdAt": cDate,
-					"updatedBy": null,
-					"updatedAt": null,
-					"master": null
-				};
-				if (!nonPOInvoiceModel.getData().docManagerDto) {
-					nonPOInvoiceModel.getData().docManagerDto = [];
-				}
-				nonPOInvoiceModel.getData().docManagerDto.push(docDetails);
-
-				for (var i = that.count; i < nonPOInvoiceModel.getData().docManagerDto.length; i++) {
-					if (nonPOInvoiceModel.getData().docManagerDto[i].createdAt) {
-						var date = new Date(nonPOInvoiceModel.getData().docManagerDto[i].createdAt).toLocaleDateString();
-						nonPOInvoiceModel.setProperty("/docManagerDto/" + i + "/date", date);
-					}
-					if (nonPOInvoiceModel.getData().docManagerDto[i].fileType == "pdf" || nonPOInvoiceModel.getData().docManagerDto[i].fileType ==
-						"application/pdf") {
-						nonPOInvoiceModel.setProperty("/docManagerDto/" + i + "/type",
-							"https://image.shutterstock.com/image-vector/pdf-icon-260nw-215496328.jpg");
-					} else {
-						nonPOInvoiceModel.setProperty("/docManagerDto/" + i + "/type",
-							"https://thumbs.dreamstime.com/z/txt-file-red-arrow-download-button-white-background-71307470.jpg");
-					}
-				}
-				nonPOInvoiceModel.refresh();
-
-			};
-			if (fileList) {
-				reader.readAsDataURL(fileList);
-			}
-
-		},
-
-		onSearchAttachments: function (oEvt) {
-			var aFilters = [];
-			var sQuery = oEvt.getSource().getValue();
-			if (sQuery && sQuery.length > 0) {
-				var afilter = new sap.ui.model.Filter([
-						new sap.ui.model.Filter("fileName", sap.ui.model.FilterOperator.Contains, sQuery)
-					],
-					false);
-				aFilters.push(afilter);
-			}
-			var oBinding = this.getView().byId("attachListItems").getBinding("items");
-			oBinding.filter(aFilters, false);
-		},
-
-		//function onChangeAddAttachment is triggered when the file selected from the browse
-		//this function will add the selected file in the attachment list
-		onChangeAddAttachment: function (oEvent) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var nonPOInvoiceModelData = this.getView().getModel("nonPOInvoiceModel").getData();
-			var fileName = oEvent.getParameter("newValue"),
-				fileList = oEvent.getSource().oFileUpload.files[0],
-				fileType = fileList.type,
-				that = this;
-			String.prototype.replaceAll = function (search, replacement) {
-				var target = this;
-				return target.replace(new RegExp(search, "g"), replacement);
-			};
-
-			fileName = fileName.replaceAll(" ", "_");
-			fileName = fileName.replaceAll("#", "_");
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				var s = event.target.result;
-				var base64 = s.substr(s.lastIndexOf(","));
-				base64 = base64.split(",")[1];
-				var cDate = new Date();
-				var sDate = Date.now(cDate);
-				var docDetails = {
-					"requestId": nonPOInvoiceModelData.invoiceDetailUIDto.invoiceHeader.requestId,
-					"fileName": fileName,
-					"fileType": fileType,
-					"fileBase64": base64,
-					"createdBy": nonPOInvoiceModelData.invoiceDetailUIDto.invoiceHeader.clerkEmail,
-					"createdAt": sDate,
-					"updatedBy": null,
-					"updatedAt": null,
-					"master": null
-				};
-				if (!nonPOInvoiceModel.getData().docManagerDto) {
-					nonPOInvoiceModel.getData().docManagerDto = [];
-				}
-				nonPOInvoiceModel.getData().docManagerDto.push(docDetails);
-				nonPOInvoiceModel.refresh();
-			};
-			if (fileList) {
-				reader.readAsDataURL(fileList);
-			}
-		},
-
-		//This function will list the attachment  
-		fnUploadDoc: function (oEvent) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var attachData = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
-			var apptype = "text/html";
-			var byteCode = attachData.fileBase64;
-			var u8_2 = new Uint8Array(atob(byteCode).split("").map(function (c) {
-				return c.charCodeAt(0);
-			}));
-			var a = document.createElement("a");
-			document.body.appendChild(a);
-			a.style = "display: none";
-			var blob = new Blob([u8_2], {
-				type: apptype
-			});
-			var url = window.URL.createObjectURL(blob);
-			a.href = url;
-			a.download = attachData.fileName;
-			a.click();
-			window.URL.revokeObjectURL(url);
-		},
-
-		//This function will delete the attachment from the attach ment list
-		fnDeleteAttachment: function (oEvent) {
-			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sId = nonPOInvoiceModel.getProperty(sPath).attachmentId;
-			var index = sPath.split("/").pop();
-			nonPOInvoiceModel.getData().docManagerDto.splice(index, 1);
-			nonPOInvoiceModel.refresh();
-			if (sId) {
-				var url = "InctureApDest/attachment/delete/" + sId;
-				jQuery
-					.ajax({
-						url: url,
-						type: "DELETE",
-						headers: {
-							"X-CSRF-Token": this.getCSRFToken()
-						},
-						dataType: "json",
-						success: function (result) {}.bind(this)
-					});
-			}
-
-		},
-		/*****End of Attachment Tab*****/
-
-		/****Start of Comments Section****/
-		//To post the comment entered by the user
-		// onPostComment: function (oEvent) {
-		// 	var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-		// 	var sValue = oEvent.getParameter("value");
-		// 	var nonPOInvoiceModelData = nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader;
-		// 	var sDate = new Date().getTime();
-		// 	if (!nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto) {
-		// 		nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto = [];
-		// 	}
-		// 	var sId = nonPOInvoiceModel.getProperty("/commentId");
-		// 	var cValue = nonPOInvoiceModel.getProperty("/input");
-		// 	var aCommentSelected = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
-		// 	var aComItem = aCommentSelected.find(function (oRow, index) {
-		// 		return oRow.comment === cValue;
-		// 	});
-
-		// 	var aSelected = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
-		// 	var aSelectedItem = aSelected.find(function (oRow, index) {
-		// 		return oRow.commentId === sId;
-		// 	});
-		// 	if (aSelectedItem) {
-		// 		var lDate = new Date();
-		// 		var uDate = lDate.getTime();
-		// 		aSelectedItem.comment = cValue;
-		// 		aSelectedItem.updatedAt = uDate;
-		// 		aSelectedItem.updatedBy = aSelectedItem.createdBy;
-
-		// 	} else if (aComItem) {
-		// 		var cDate = new Date();
-		// 		var nCDate = cDate.getTime();
-		// 		aComItem.comment = cValue;
-		// 		aComItem.updatedAt = nCDate;
-		// 		aComItem.updatedBy = aComItem.createdBy;
-		// 	} else {
-		// 		var oComment = {
-		// 			"requestId": nonPOInvoiceModelData.requestId,
-		// 			"comment": sValue,
-		// 			"createdBy": nonPOInvoiceModelData.emailFrom,
-		// 			"createdAt": sDate,
-		// 			"updatedBy": null,
-		// 			"updatedAt": null,
-		// 			"user": nonPOInvoiceModelData.emailFrom
-		// 		};
-		// 		var aEntries = nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto;
-		// 		aEntries.unshift(oComment);
-		// 	}
-		// 	nonPOInvoiceModel.setProperty("/commentId", "");
-		// 	this.getView().getModel("nonPOInvoiceModel").refresh();
-		// },
-
-		fnEditComment: function (oEvent) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
-			var sId = nonPOInvoiceModel.getProperty(sPath).commentId;
-			var sValue = nonPOInvoiceModel.getProperty(sPath).comment;
-			nonPOInvoiceModel.setProperty("/input", sValue);
-			nonPOInvoiceModel.setProperty("/commentId", sId);
-			nonPOInvoiceModel.refresh();
-		},
-
-		fnDeleteComment: function (oEvent) {
-			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sId = nonPOInvoiceModel.getProperty(sPath).commentId;
-			var index = sPath.split("/").pop();
-			nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.splice(index, 1);
-			nonPOInvoiceModel.refresh();
-			if (sId) {
-				var url = "InctureApDest/comment/delete/" + sId;
-				jQuery
-					.ajax({
-						url: url,
-						type: "DELETE",
-						headers: {
-							"X-CSRF-Token": this.getCSRFToken()
-						},
-						dataType: "json",
-						success: function (result) {}.bind(this)
-					});
-			}
-		},
-		/***End of Comments Section***/
 
 		//Called when the save button is clicked.
 		onNonPoSave: function () {
@@ -1190,21 +880,20 @@ sap.ui.define([
 				var alistNonPoData = $.extend(true, [], postDataModel.getProperty("/listNonPoItem"));
 				var bflag = true;
 				for (var i = 0; i < alistNonPoData.length; i++) {
-					//To handle validations
 					var bValidate = false;
-					if (alistNonPoData[i].glAccount === "" || alistNonPoData[i].glError === "Error") {
+					if (!alistNonPoData[i].glAccount || alistNonPoData[i].glError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].glError = "Error";
 					}
-					if (alistNonPoData[i].netValue === "" || alistNonPoData[i].amountError === "Error") {
+					if (!alistNonPoData[i].netValue || alistNonPoData[i].amountError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].amountError = "Error";
 					}
-					if (alistNonPoData[i].costCenter === "" || alistNonPoData[i].costCenterError === "Error") {
+					if (!alistNonPoData[i].costCenter || alistNonPoData[i].costCenterError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].costCenterError = "Error";
 					}
-					if (alistNonPoData[i].itemText === "" || alistNonPoData[i].itemTextError === "Error") {
+					if (!alistNonPoData[i].itemText || alistNonPoData[i].itemTextError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].itemTextError = "Error";
 					}

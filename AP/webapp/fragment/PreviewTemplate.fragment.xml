@@ -30,7 +30,7 @@
 							<cells>
 								<Text text="{postDataModel>glAccount}"/>
 								<Text text="{postDataModel>costCenter}"/>
-								<Text text="{postDataModel>allocationPercent}"/>
+								<Text text="{postDataModel>distrPerc}"/>
 								<Text text="{postDataModel>netValue}"/>
 							</cells>
 						</ColumnListItem>

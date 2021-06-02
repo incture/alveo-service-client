@@ -1,9 +1,7 @@
 sap.ui.define([
 	"com/menabev/AP/controller/BaseController",
-	"sap/ui/model/json/JSONModel",
-	'sap/ui/model/Filter',
-	'sap/ui/model/FilterOperator'
-], function (BaseController, JSONModel, Filter, FilterOperator) {
+	"sap/ui/model/json/JSONModel"
+], function (BaseController, JSONModel) {
 	"use strict";
 	var num;
 	return BaseController.extend("com.menabev.AP.controller.TemplateManagement", {
@@ -67,7 +65,7 @@ sap.ui.define([
 						}
 					} else {
 						var errorMsg = "No Templates Found";
-						sap.m.MessageBox.error(errorMsg);
+						sap.m.MessageToast.show(errorMsg);
 					}
 				}.bind(this),
 				error: function (result, xhr, data) {
@@ -97,30 +95,14 @@ sap.ui.define([
 			}
 		},
 
-		handleTemplateSearch: function (oEvt) {
-			var aFilters = [];
-			var sQuery = oEvt.getParameter("newValue");
-			if (sQuery && sQuery.length > 0) {
-				var afilter = new sap.ui.model.Filter([
-						new sap.ui.model.Filter("nonPoTemplate/templateName", sap.ui.model.FilterOperator.Contains, sQuery)
-					],
-					false);
-				aFilters.push(afilter);
-			}
-			var oList = this.getView().byId("templateTableId");
-			var oBinding = oList.getBinding("items");
-			oBinding.filter([aFilters]);
-		},
-
 		//function onDeleteTemp is triggered on delete template
 		onDeleteofNonpoTemplate: function (oEvent) {
-			var templateModel = this.getView().getModel("templateModel");
-			var aNonPoTemplate = templateModel.getProperty("/aNonPoTemplate");
-			var selectedFilters = this.getModel("templateModel").getProperty("/selectedFilters");
-			var payload = [];
+			var templateModel = this.getModel("templateModel");
+			var selectedFilters = templateModel.getProperty("/selectedFilters");
+			this.oDeletePayload = [];
 			for (var i = 0; i < selectedFilters.length; i++) {
-				var sTemp = this.getModel("templateModel").getProperty(selectedFilters[i]);
-				payload.push(sTemp.nonPoTemplate.templateId);
+				var sTemp = templateModel.getProperty(selectedFilters[i]);
+				this.oDeletePayload.push(sTemp.nonPoTemplate.templateId);
 			}
 
 			if (!this.oApproveDeleteDialog) {
@@ -134,7 +116,7 @@ sap.ui.define([
 						type: sap.m.ButtonType.Emphasized,
 						text: "Yes",
 						press: function () {
-							this.deleteTemplateServiceCall(payload);
+							this.deleteTemplateServiceCall(this.oDeletePayload);
 							this.oApproveDeleteDialog.close();
 						}.bind(this)
 					}),
@@ -151,7 +133,6 @@ sap.ui.define([
 		},
 
 		deleteTemplateServiceCall: function (payload) {
-			var aNonPoTemplate = this.getModel("templateModel").getProperty("/aNonPoTemplate");
 			var sUrl = "/menabevdev/NonPoTemplate/delete";
 			var that = this;
 			jQuery.ajax({
@@ -228,7 +209,7 @@ sap.ui.define([
 					"basecoderId": null,
 					"vendorId": "INC",
 					"templateName": "",
-					"createdBy": "Lakhu", //Test Data
+					"createdBy": this.oUserDetailModel.getProperty("/loggedInUserMail"),
 					"createdAt": null,
 					"updatedBy": null,
 					"updatedAt": null
@@ -293,8 +274,9 @@ sap.ui.define([
 
 		//Frag:CreateEditTemplate
 		onOkSaveTemplate: function () {
-			var alistNonPoData = $.extend(true, [], this.getModel("postDataModel").getProperty("/nonPoTemplateItems"));
-			var bCostAllocation = false;
+			var alistNonPoData = $.extend(true, [], this.getModel("postDataModel").getProperty("/nonPoTemplateItems")),
+				bCostAllocation = false,
+				sMsg;
 			if (alistNonPoData.length > 0) {
 				bCostAllocation = true;
 			} else {
@@ -309,19 +291,19 @@ sap.ui.define([
 				for (var i = 0; i < alistNonPoData.length; i++) {
 					//To handle validations
 					var bValidate = false;
-					if (alistNonPoData[i].accountNo === "" || alistNonPoData[i].accountNoError === "Error") {
+					if (!alistNonPoData[i].accountNo || alistNonPoData[i].accountNoError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].accountNoError = "Error";
 					}
-					if (alistNonPoData[i].glAccount === "" || alistNonPoData[i].glError === "Error") {
+					if (!alistNonPoData[i].glAccount || alistNonPoData[i].glError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].glError = "Error";
 					}
-					if (alistNonPoData[i].costCenter === "" || alistNonPoData[i].costCenterError === "Error") {
+					if (!alistNonPoData[i].costCenter || alistNonPoData[i].costCenterError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].costCenterError = "Error";
 					}
-					if (alistNonPoData[i].allocationPercent === "" || alistNonPoData[i].allocationPercentError === "Error") {
+					if (!alistNonPoData[i].allocationPercent || alistNonPoData[i].allocationPercentError === "Error") {
 						bValidate = true;
 						alistNonPoData[i].allocationPercentError = "Error";
 					}
@@ -333,14 +315,14 @@ sap.ui.define([
 				}
 				if (!bflag) {
 					postDataModel.setProperty("/nonPoTemplateItems", alistNonPoData);
-					var sMsg = "Please Enter Required Fields Account No., G/L Account,Cost Center & Percentage Allocation!";
+					sMsg = "Please Enter Required Fields Account No., G/L Account,Cost Center & Percentage Allocation!";
 					sap.m.MessageBox.error(sMsg);
 					return;
 				}
 				//COST ALLOCATION VALIDATION END
 				var templateName = postDataModel.getData().nonPoTemplate.templateName;
 				if (!templateName) {
-					var sMsg = "Please Enter template name!";
+					sMsg = "Please Enter template name!";
 					sap.m.MessageBox.error(sMsg);
 					return;
 				}
@@ -374,7 +356,7 @@ sap.ui.define([
 									that.clicks = 0;
 									num = this.clicks * 10;
 									that.getView().byId("btnPrevious").setEnabled(false);
-								} 
+								}
 								sap.m.MessageBox.success(message, {
 									actions: [sap.m.MessageBox.Action.OK],
 									onClose: function (sAction) {
@@ -394,7 +376,7 @@ sap.ui.define([
 					});
 
 				} else {
-					var sMsg = "Percentage Allocation must be equal to 100!";
+					sMsg = "Percentage Allocation must be equal to 100!";
 					sap.m.MessageBox.error(sMsg);
 				}
 
@@ -402,10 +384,11 @@ sap.ui.define([
 		},
 
 		fnOkSaveTemplateCall: function (type) {
-			var postDataModel = this.getModel("postDataModel");
-			var currentDate = new Date().getTime();
+			var postDataModel = this.getModel("postDataModel"),
+				currentDate = new Date().getTime(),
+				jsonData;
 			if (type === "Create") {
-				var jsonData = {
+				jsonData = {
 					nonPoTemplate: {
 						"accClerkId": null,
 						"basecoderId": null,
@@ -440,7 +423,7 @@ sap.ui.define([
 				}
 			} else {
 				if (postDataModel.getData().nonPoTemplateItems) {
-					var jsonData = {
+					jsonData = {
 						nonPoTemplate: {
 							"uuid": postDataModel.getData().nonPoTemplate.uuid,
 							"templateId": postDataModel.getData().nonPoTemplate.templateId,

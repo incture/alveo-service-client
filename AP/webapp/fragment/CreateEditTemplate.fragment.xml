@@ -4,7 +4,7 @@
 			<VBox class="sapUiSmallMargin">
 				<Table id="idNonPo" class="invTabScroll" items="{postDataModel>/nonPoTemplateItems}" sticky="ColumnHeaders">
 					<headerToolbar>
-						<Toolbar>
+						<OverflowToolbar>
 							<Label text="{i18n>TemplateName}" design="Bold" required="true"/>
 							<Input id="TemplateNameID" value="{postDataModel>/nonPoTemplate/templateName}" placeholder="{i18n>EnterTemplateName}" width="25%"/>
 							<ToolbarSpacer/>
@@ -12,7 +12,7 @@
 							<u:FileUploader id="fileUploaderId" icon="sap-icon://upload" iconOnly="true" maximumFileSize="10" fileType="XLSX" buttonOnly="true"
 								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" sameFilenameAllowed="true"
 								class="SecondaryBtn"/>
-						</Toolbar>
+						</OverflowToolbar>
 					</headerToolbar>
 					<infoToolbar>
 						<OverflowToolbar>
@@ -38,7 +38,7 @@
 						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 							<Label text="{i18n>Text}" design="Bold"/>
 						</Column>
-						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true"></Column>
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true"></Column>
 					</columns>
 					<items>
 						<ColumnListItem>
