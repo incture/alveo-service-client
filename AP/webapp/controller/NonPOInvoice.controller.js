@@ -22,8 +22,8 @@ sap.ui.define([
 		 * @memberOf com.menabev.AP.view.NonPOInvoice
 		 */
 		onInit: function () {
-
-			this.busyDialog = new sap.m.BusyDialog();
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			// this.busyDialog = new sap.m.BusyDialog();
 			this.setModel(new JSONModel(), "nonPOInvoiceModel");
 			this.getModel("nonPOInvoiceModel").setSizeLimit(5000);
 			this.setModel(new JSONModel(), "postDataModel");
@@ -34,17 +34,41 @@ sap.ui.define([
 			this.oUserDetailModel = oUserDetailModel;
 
 			var oComponent = this.getOwnerComponent();
-			this.router = oComponent.getRouter();
-			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
-			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-		},
-
-		onRouteMatched: function (oEvent) {
-			//reading the Arguments from url
-			var oArgs = oEvent.getParameter("arguments"),
-				requestId = oArgs.id,
-				status = oArgs.status;
-			this.busyDialog.open();
+			var initializeModelData = {
+				"invoiceHeader": {
+					"attachments": [],
+					"balance": "",
+					"balanceCheck": true,
+					"comments": [],
+					"clerkId": 0,
+					"createdAtInDB": 0,
+					"dueDate": "",
+					"extInvNum": "",
+					"grossAmount": "",
+					"invoiceDate": "",
+					"invoiceTotal": "",
+					"manualpaymentBlock": "",
+					"ocrBatchId": "",
+					"paymentBlock": "",
+					"paymentBlockDesc": "",
+					"paymentStatus": "",
+					"paymentTerms": "",
+					"postingDate": "",
+					"sapInvoiceNumber": 0,
+					"shippingCost": 0,
+					"subTotal": "",
+					"taskOwner": "",
+					"taskStatus": "",
+					"taxAmount": "",
+					"taxCode": "",
+					"vendorId": "",
+					"vendorName": "",
+					"taxValue": ""
+				},
+				"vstate": {}
+			};
+			this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
+			this.getModel("postDataModel").setProperty("/listNonPoItem", []);
 
 			//Test Data for Tax Rate
 			var aTax = [{
@@ -62,9 +86,9 @@ sap.ui.define([
 			}];
 			this.setModel(new JSONModel(), "taxCodeModel");
 			this.getModel("taxCodeModel").setProperty("/aTax", aTax);
+
 			//End of Tax rate test data
 
-			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 			oVisibilityModel.setProperty("/NonPOInvoice", {});
 			oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
@@ -73,46 +97,21 @@ sap.ui.define([
 			}
 
 			this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
+			this.router = oComponent.getRouter();
+			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
+			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+		},
+
+		onRouteMatched: function (oEvent) {
+			//reading the Arguments from url
+			var oArgs = oEvent.getParameter("arguments"),
+				requestId = oArgs.id,
+				status = oArgs.status;
+			// this.busyDialog.open();
+
 			//handle if route has NonPO request Id 
 			if (requestId) {
 				this.getNonPOData(requestId);
-			} else {
-				this.busyDialog.close();
-				var initializeModelData = {
-					"invoiceHeader": {
-						"attachments": [],
-						"balance": "",
-						"balanceCheck": true,
-						"comments": [],
-						"clerkId": 0,
-						"createdAtInDB": 0,
-						"dueDate": "",
-						"extInvNum": "",
-						"grossAmount": "",
-						"invoiceDate": "",
-						"invoiceTotal": "",
-						"manualpaymentBlock": "",
-						"ocrBatchId": "",
-						"paymentBlock": "",
-						"paymentBlockDesc": "",
-						"paymentStatus": "",
-						"paymentTerms": "",
-						"postingDate": "",
-						"sapInvoiceNumber": 0,
-						"shippingCost": 0,
-						"subTotal": "",
-						"taskOwner": "",
-						"taskStatus": "",
-						"taxAmount": "",
-						"taxCode": "",
-						"vendorId": "",
-						"vendorName": "",
-						"taxValue": ""
-					},
-					"vstate": {}
-				};
-				this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
-				this.getModel("postDataModel").setProperty("/listNonPoItem", []);
 			}
 		},
 
@@ -944,13 +943,13 @@ sap.ui.define([
 				success: function (data, xhr, result) {
 					this.busyDialog.close();
 					var message = data.responseStatus;
-					
+
 					if (result.status === 200) {
 						sap.m.MessageBox.success(message, {
 							actions: [sap.m.MessageBox.Action.OK],
 							onClose: function (sAction) {
-								if(!save){
-								that.router.navTo("Inbox");
+								if (!save) {
+									that.router.navTo("Inbox");
 								}
 							}
 						});
@@ -1019,7 +1018,7 @@ sap.ui.define([
 			var invoiceHeaderDto = {
 				"accountNumber": "",
 				"accountingDoc": "",
-				"attachments" :objectIsNew.invoiceHeader.attachments,
+				"attachments": objectIsNew.invoiceHeader.attachments,
 				"assignedTo": "",
 				"balance": objectIsNew.invoiceHeader.balance,
 				"balanceCheck": true,
@@ -1036,7 +1035,7 @@ sap.ui.define([
 				"createdAtTo": "",
 				"createdByInDb": "",
 				"currency": "",
-				"comments":objectIsNew.invoiceHeader.comments,
+				"comments": objectIsNew.invoiceHeader.comments,
 				"deposit": "",
 				"disAmt": "",
 				"docStatus": "",

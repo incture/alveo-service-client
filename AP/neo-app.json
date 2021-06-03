@@ -18,6 +18,15 @@
         "entryPath": "/test-resources"
       },
       "description": "SAPUI5 Test Resources"
+    },
+    {
+      "path": "/sap/opu/odata",
+      "target": {
+        "type": "destination",
+        "name": "SD4_DEST",
+        "entryPath": "/sap/opu/odata"
+      },
+      "description": "ODATA_DEST"
     }
   ],
   "sendWelcomeFileRedirect": true

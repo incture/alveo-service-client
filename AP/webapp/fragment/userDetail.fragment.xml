@@ -2,10 +2,10 @@
 	<ResponsivePopover title="USERDETAIL" class="sapUiPopupWithPadding" placement="Bottom" showHeader="True" contentWidth="30rem">
 		<content>
 			<OverflowToolbar>
-				<core:Icon src="sap-icon://person-placeholder" class="clearAllIcon"></core:Icon>
+				<core:Icon src="sap-icon://person-placeholder"></core:Icon>
 				<Label text="{i18n>USERDETAIL}" design="Bold" class="notificationText"/>
 				<ToolbarSpacer/>
-				<core:Icon src="sap-icon://decline" tooltip="Close" class="clearAllIcon" color="#E69A17" hoverBackgroundColor="white" hoverColor="#ffcccc"
+				<core:Icon src="sap-icon://decline" tooltip="Close" color="#E69A17" hoverBackgroundColor="white" hoverColor="#ffcccc"
 					press="handleUserDetailCloseButton"></core:Icon>
 			</OverflowToolbar>
 			<VBox>
@@ -17,18 +17,25 @@
 							</layoutData>
 						</Label>
 						<Text text="{oUserDetailModel>/loggedInUserMail}" class="sapUiTinyMarginTop boldText"/>
-						<Label text="{i18n>FIRSTNAME}" tooltip="{i18n>FIRSTNAME/longDescription}" class="surveyTextClass">
+						<Label text="{i18n>FIRSTNAME}" tooltip="{i18n>FIRSTNAME}" class="surveyTextClass">
 							<layoutData>
 								<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>
 							</layoutData>
 						</Label>
-						<Text text="{oUserDetailModel>/loggedinUserDetail/name/firstNmae}" class="boldText"/>
-						<Label text="{i18n>LASTNAME}" tooltip="{i18n>LASTNAME/longDescription}" class="surveyTextClass">
+						<Text text="{oUserDetailModel>/loggedinUserDetail/name/givenName}" class="boldText"/>
+						<Label text="{i18n>LASTNAME}" tooltip="{i18n>LASTNAME}" class="surveyTextClass">
 							<layoutData>
 								<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>
 							</layoutData>
 						</Label>
-						<Text text="{oUserDetailModel>/loggedinUserDetail/name/lastNmae}" class="boldText"/>
+						<Text text="{oUserDetailModel>/loggedinUserDetail/name/familyName}" class="boldText"/>
+						<!--<Text text="{oUserDetailModel>/loggedinUserDetail/name/givenName}" class="boldText"/>-->
+						<Label text="{i18n>USERROLE}" tooltip="{i18n>USERROLE}" class="surveyTextClass">
+							<layoutData>
+								<l:GridData span="XL3 L3 M4 S4" linebreak="true"/>
+							</layoutData>
+						</Label>
+						<Text text="{oUserDetailModel>/loggedinUserGroup}" class="boldText"/>
 					</l:content>
 				</l:Grid>
 			</VBox>

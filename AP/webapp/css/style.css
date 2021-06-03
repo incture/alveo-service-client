@@ -103,6 +103,15 @@
     top: 0;
 }
 
+.sideNavItems .sapUiIcon {
+    cursor: default;
+    text-align: center;
+    display: inline-block;
+    vertical-align: baseline;
+    line-height: 1;
+    font-size: 2rem;
+}
+
 
 
 .sideNavItems {

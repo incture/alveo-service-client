@@ -18,9 +18,9 @@ modules:
           name: UserDetail_api
           url: '~{url}'
           forwardAuthToken: true
+      - name: uaa_APWorkbench
       - name: dest_APWorkbench
       - name: conn_APWorkbench
-      - name: uaa_APWorkbench
   - name: APWorkbench_ui_deployer
     type: com.sap.html5.application-content
     path: APWorkbench_ui_deployer
@@ -42,18 +42,17 @@ modules:
         - npm run build
       supported-platforms: []
       build-result: dist
-
   - name: UserDetail
     type: nodejs
     path: UserDetail
     provides:
-     - name: UserDetail_api
-       properties:
+      - name: UserDetail_api
+        properties:
           url: '${default-url}'
     properties:
       UAA_SERVICE_NAME: uaa_APWorkbench
     requires:
-      - name: uaa_APWorkbench   
+      - name: uaa_APWorkbench
 resources:
   - name: APWorkbench_html5_repo_runtime
     parameters:

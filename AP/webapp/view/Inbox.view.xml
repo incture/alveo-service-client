@@ -126,34 +126,34 @@
 					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResultCount})" key="openTask">
 						<Table items="{oInboxModel>/openResult}" mode="None" class="labelwrapTable" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<columns>
-								<Column width="11%" hAlign="Center">
+								<Column  hAlign="Center">
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="22%" hAlign="Center">
+								<Column  hAlign="Center">
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="11%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="11%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>Invoice Date}" design="Bold"/>
 								</Column>
-								<Column width="11%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvoiceType}" design="Bold"/>
 								</Column>
-								<Column width="11%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>Value}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="11%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>DueDate}" design="Bold"/>
 								</Column>
-								<Column width="15%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="15%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="15%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="10%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
 								</Column>
 							</columns>
