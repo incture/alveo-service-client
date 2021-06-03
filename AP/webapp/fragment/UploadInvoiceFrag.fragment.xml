@@ -12,10 +12,21 @@
 									change="handleUploadChange" fileSizeExceed="onFileSizeExceed"/>
 							</Toolbar>
 							<form:SimpleForm editable="true">
-								<Label text="{i18n>porder}" required="true"/>
-								<Input value="{pdfModel>/pOrder}" width="15rem" valueState="{pdfModel>/vstate/pOrder}" type="Number" change="inputErrorHandler"/>
-								<Label text="{i18n>deliveryNote}" required="true"/>
-								<Input value="{pdfModel>/deliveryNote}" width="15rem" valueState="{pdfModel>/vstate/deliveryNote}" change="inputErrorHandler"/>
+								<Label text="{i18n>TransactionType}" required="true"/>
+								<Select forceSelection="false" showSecondaryValues="true" selectedKey="{pdfModel>/transactionType}" width="15rem"
+									change="onChangeTransactionType" valueState="{pdfModel>/vstate/transactionType}">
+									<items>
+										<core:ListItem key="INVOICE" text="Invoice"/>
+										<core:ListItem key="CREDIT" text="Credit"/>
+										<core:ListItem key="DEBIT" text="Debit"/>
+									</items>
+								</Select>
+								<Label text="{i18n>porder}" required="true" visible="{pdfModel>/fldVisble}"/>
+								<Input value="{pdfModel>/pOrder}" width="15rem" valueState="{pdfModel>/vstate/pOrder}" type="Number" change="inputPOValidate"
+									visible="{pdfModel>/fldVisble}" maxLength="10"/>
+								<Label text="{i18n>deliveryNote}" required="true" visible="{pdfModel>/fldVisble}"/>
+								<Input value="{pdfModel>/deliveryNote}" width="15rem" valueState="{pdfModel>/vstate/deliveryNote}" change="inputErrorHandler"
+									visible="{pdfModel>/fldVisble}"/>
 							</form:SimpleForm>
 						</VBox>
 					</l:SplitPane>

@@ -27,6 +27,7 @@ sap.ui.define([
 				"deliveryNote": "",
 				"pOrder_placeholder": "Enter Purchase Order",
 				"deliveryNote_placeholder": "Enter Delivery Note",
+				"fldVisble": false,
 				"vstate": {
 					"pOrder": "None",
 					"deliveryNote": "None",
@@ -111,23 +112,42 @@ sap.ui.define([
 			}
 		},
 		
+		inputPOValidate: function(oEvent){
+			var PONumber = oEvent.getParameter("value");
+			if (!PONumber) {
+				oEvent.getSource().setValueState("Error");
+			} else {
+				oEvent.getSource().setValueState("None");
+				this.POOdataServiceCall(PONumber);
+			}
+		},
+		
 		//Mandatory field check of Upload Invoice Fragment:UploadInvoiceFrag
 		validateMandatoryFields: function () {
 			var oData = this.getView().getModel("pdfModel").getData();
 			var key;
 			var flag = true;
-			for (key in oData) {
-				if (mandatoryFields.includes(key)) {
-					if (!oData[key]) {
-						this.getView().getModel("pdfModel").setProperty("/vstate/" + key, "Error");
-						flag = false;
-					} else {
-						this.getView().getModel("pdfModel").setProperty("/vstate/" + key, "None");
+			var transactionType = this.getView().getModel("pdfModel").getProperty("/transactionType");
+			if (transactionType === "INVOICE") {
+				for (key in oData) {
+					if (mandatoryFields.includes(key)) {
+						if (!oData[key]) {
+							this.getView().getModel("pdfModel").setProperty("/vstate/" + key, "Error");
+							flag = false;
+						} else {
+							this.getView().getModel("pdfModel").setProperty("/vstate/" + key, "None");
+						}
 					}
+				}
+			} else {
+				if (!transactionType) {
+					this.getView().getModel("pdfModel").setProperty("/vstate/transactionType", "Error");
+					flag = false;
+				} else {
+					this.getView().getModel("pdfModel").setProperty("/vstate/transactionType", "None");
 				}
 			}
 			return flag;
-
 		},
 
 		//App: Track Invoice(Upload Invoice) On submit of Upload Invoice Fragment:UploadInvoiceFrag
@@ -140,11 +160,14 @@ sap.ui.define([
 				if (validationState) {
 					// var oFileUploader = sap.ui.getCore().byId("fileUploader");
 					// oFileUploader.setUploadOnChange(true);
-					var oFormData = new FormData;
-					var body = JSON.stringify({
-						"PO_Number": pdfModel.getData().pOrder,
-						"Delivery_Note": pdfModel.getData().deliveryNote
-					});
+					var oFormData = new FormData();
+					var transactionType = pdfModel.getProperty("/transactionType");
+					if (transactionType === "INVOICE") {
+						var body = JSON.stringify({
+							"PO_Number": pdfModel.getData().pOrder,
+							"Delivery_Note": pdfModel.getData().deliveryNote
+						});
+					}
 					oFormData.set("body", body);
 					// jQuery.sap.domById(oFileUploader.getId() + "-fu").setAttribute("type", "file");
 					// oFormData.set("file", jQuery.sap.domById(oFileUploader.getId() + "-fu").files[0]);
@@ -214,6 +237,49 @@ sap.ui.define([
 			);
 		},
 		//End of Upload Invoice Fragment
+		
+		onChangeTransactionType: function (oEvent) {
+			var pdfModel = this.getView().getModel("pdfModel");
+			var selectedKey = oEvent.getSource().getSelectedKey();
+			if (selectedKey) {
+				pdfModel.setProperty("/vstate/transactionType", "None");
+				if (selectedKey === "INVOICE") {
+					pdfModel.setProperty("/fldVisble", true);
+					pdfModel.setProperty("/pOrder", "");
+					pdfModel.setProperty("/vstate/pOrder", "None");
+					pdfModel.setProperty("/deliveryNote", "");
+					pdfModel.setProperty("/vstate/deliveryNote", "None");
+				} else {
+					pdfModel.setProperty("/fldVisble", false);
+				}
+			} else {
+				pdfModel.setProperty("/vstate/transactionType", "Error");
+			}
+		},
+		
+		// OData Service call To Validate PO Number
+		POOdataServiceCall: function (PONumber) {
+			var pdfModel = this.getView().getModel("pdfModel"),
+				oDataModel = this.getView().getModel("ZP2P_API_PODETAILS_SRV");
+			oDataModel.read("/HeaderSet('" + PONumber + "')?$format=json", {
+				async: false,
+				success: function (oData, oResponse) {
+					sap.m.MessageToast.show("PO Validated");
+				}.bind(this),
+				error: function (error) {
+					var errorMsg = "";
+					if (error.statusCode === 504) {
+						errorMsg = "Request timed-out. Please try again!";
+						this.errorMsg(errorMsg);
+					} else {
+						errorMsg = JSON.parse(error.responseText);
+						errorMsg = errorMsg.error.message.value;
+						this.errorMsg(errorMsg);
+					}
+					pdfModel.setProperty("/vstate/pOrder", "Error");
+				}.bind(this)
+			});
+		}
 
 	});
 });

@@ -23,7 +23,7 @@ sap.ui.define([
 		 */
 		onInit: function () {
 			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
-			// this.busyDialog = new sap.m.BusyDialog();
+			this.busyDialog = new sap.m.BusyDialog();
 			this.setModel(new JSONModel(), "nonPOInvoiceModel");
 			this.getModel("nonPOInvoiceModel").setSizeLimit(5000);
 			this.setModel(new JSONModel(), "postDataModel");
@@ -35,38 +35,38 @@ sap.ui.define([
 
 			var oComponent = this.getOwnerComponent();
 			var initializeModelData = {
-				"invoiceHeader": {
-					"attachments": [],
-					"balance": "",
-					"balanceCheck": true,
-					"comments": [],
-					"clerkId": 0,
-					"createdAtInDB": 0,
-					"dueDate": "",
-					"extInvNum": "",
-					"grossAmount": "",
-					"invoiceDate": "",
-					"invoiceTotal": "",
-					"manualpaymentBlock": "",
-					"ocrBatchId": "",
-					"paymentBlock": "",
-					"paymentBlockDesc": "",
-					"paymentStatus": "",
-					"paymentTerms": "",
-					"postingDate": "",
-					"sapInvoiceNumber": 0,
-					"shippingCost": 0,
-					"subTotal": "",
-					"taskOwner": "",
-					"taskStatus": "",
-					"taxAmount": "",
-					"taxCode": "",
-					"vendorId": "",
-					"vendorName": "",
-					"taxValue": ""
-				},
-				"vstate": {}
-			};
+					"invoiceHeader": {
+						"attachments": [],
+						"balance": "",
+						"balanceCheck": true,
+						"comments": [],
+						"clerkId": 0,
+						"createdAtInDB": 0,
+						"dueDate": "",
+						"extInvNum": "",
+						"grossAmount": "",
+						"invoiceDate": "",
+						"invoiceTotal": "",
+						"manualpaymentBlock": "",
+						"ocrBatchId": "",
+						"paymentBlock": "",
+						"paymentBlockDesc": "",
+						"paymentStatus": "",
+						"paymentTerms": "",
+						"postingDate": "",
+						"sapInvoiceNumber": 0,
+						"shippingCost": 0,
+						"subTotal": "",
+						"taskOwner": "",
+						"taskStatus": "",
+						"taxAmount": "",
+						"taxCode": "",
+						"vendorId": "",
+						"vendorName": "",
+						"taxValue": ""
+					},
+					"vstate": {}
+				};
 			this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
 			this.getModel("postDataModel").setProperty("/listNonPoItem", []);
 
@@ -74,15 +74,18 @@ sap.ui.define([
 			var aTax = [{
 				"taxCode": "I0",
 				"taxCodeDescription": "ProductId",
-				"taxPer": "0"
+				"taxPer": "0",
+				"taxConditionType": "MWVS"
 			}, {
 				"taxCode": "I1",
 				"taxCodeDescription": "test",
-				"taxPer": "15"
+				"taxPer": "15",
+				"taxConditionType": "MWVS"
 			}, {
 				"taxCode": "IE",
 				"taxCodeDescription": "ProductId",
-				"taxPer": "5"
+				"taxPer": "5",
+				"taxConditionType": "MWVS"
 			}];
 			this.setModel(new JSONModel(), "taxCodeModel");
 			this.getModel("taxCodeModel").setProperty("/aTax", aTax);
@@ -242,11 +245,13 @@ sap.ui.define([
 				taxCode = taxDetails.taxCode,
 				taxPer = taxDetails.taxPer;
 			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxPer", taxPer);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxConditionType", taxDetails.taxConditionType);
 			if (postDataModel.getProperty("/listNonPoItem")) {
 				var length = postDataModel.getProperty("/listNonPoItem").length;
 				for (var i = 0; i < length; i++) {
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxConditionType", taxDetails.taxConditionType);
 				}
 			}
 			if (taxDetails) {
@@ -264,6 +269,7 @@ sap.ui.define([
 			var postDataModel = this.getModel("postDataModel");
 			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
 			postDataModel.setProperty(sPath + "/taxPer", taxDetails.taxPer);
+			postDataModel.setProperty(sPath + "/taxConditionType", taxDetails.taxConditionType);
 			this.amountCal(oEvent);
 		},
 		//End of Header Filter function
@@ -440,7 +446,7 @@ sap.ui.define([
 			}
 			var costAllocationList = postDataModel.getProperty(sPath + "/costAllocationList");
 			for (var i = 0; i < costAllocationList.length; i++) {
-				var partAmount = (Number(costAllocationList[i].allocationPercent) * Number(totalAmount)) / 100,
+				var partAmount = (Number(costAllocationList[i].distrPerc) * Number(totalAmount)) / 100,
 					partAmtValue = this.nanValCheck(partAmount).toFixed(2);
 				postDataModel.setProperty(sPath + "/costAllocationList/" + [i] + "/netValue", partAmtValue);
 			}
@@ -529,10 +535,12 @@ sap.ui.define([
 			var postDataModel = this.getModel("postDataModel");
 			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
 				taxCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxCode"),
-				taxPer = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxPer");
+				taxPer = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxPer"),
+				taxConditionType = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxConditionType");
 			for (var i = 0; i < arr.length; i++) {
 				postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
 				postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
+				postDataModel.setProperty("/listNonPoItem/" + i + "/taxConditionType", taxConditionType);
 			}
 			postDataModel.refresh();
 			this.costAllocationTaxCalc();
@@ -545,8 +553,9 @@ sap.ui.define([
 		addItem: function (oEvt) {
 			var mandatoryFeildsForCC = this.fnMandatoryFeildsForCC();
 			if (!mandatoryFeildsForCC) {
-				var postDataModel = this.getModel("postDataModel");
-				var postDataModelData = postDataModel.getData();
+				var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+					postDataModel = this.getModel("postDataModel"),
+					postDataModelData = postDataModel.getData();
 				if (!postDataModelData.listNonPoItem) {
 					postDataModelData.listNonPoItem = [];
 				}
@@ -554,8 +563,9 @@ sap.ui.define([
 					"templateId": "",
 					"glAccount": "",
 					"costCenter": "",
-					"taxCode": this.getModel("nonPOInvoiceModel").getData().invoiceDetailUIDto.invoiceHeader.taxCode,
-					"taxPer": this.getModel("nonPOInvoiceModel").getData().invoiceDetailUIDto.invoiceHeader.taxPer,
+					"taxCode": nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader.taxCode,
+					"taxPer": nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader.taxPer,
+					"taxConditionType": nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader.taxConditionType,
 					"internalOrderId": "",
 					"materialDesc": "",
 					"crDbIndicator": "H",
@@ -912,13 +922,15 @@ sap.ui.define([
 					oSubmitData.invoiceHeaderDto.docStatus = "Created";
 					var balance = oSubmitData.invoiceHeaderDto.balance;
 					if (this.nanValCheck(balance) !== 0) {
-						sap.m.MessageToast.show("Balance is not 0");
+						sap.m.MessageBox.Error("Balance is not 0");
+						return;
 					}
 					var totalTax = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount");
 					var userInputTaxAmount = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
 					var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
 					if (this.nanValCheck(taxDifference) !== 0) {
 						sap.m.MessageToast.show("Tax MisMatched");
+						return;
 					}
 
 					var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
@@ -985,25 +997,32 @@ sap.ui.define([
 			if (postDataModel.getData().listNonPoItem) {
 				for (var i = 0; i < postDataModel.getData().listNonPoItem.length; i++) {
 					var itemId = postDataModel.getData().listNonPoItem[i].itemId ? postDataModel.getData().listNonPoItem[i].itemId : null;
+					var costAllocationId = postDataModel.getData().listNonPoItem[i].costAllocationId ? postDataModel.getData().listNonPoItem[i].costAllocationId :
+						null;
 					objectIsNew.costAllocation.push({
-						"allocationPercent": postDataModel.getData().listNonPoItem[i].allocationPercent,
+						"accountNum": postDataModel.getData().listNonPoItem[i].accountNum,
 						"assetNo": null,
-						"costAllocationId": null,
+						"baseRate": postDataModel.getData().listNonPoItem[i].baseRate,
+						"costAllocationId": costAllocationId,
 						"costCenter": postDataModel.getData().listNonPoItem[i].costCenter,
 						"crDbIndicator": postDataModel.getData().listNonPoItem[i].crDbIndicator,
 						"deleteInd": null,
-						"distrPerc": null,
+						"distrPerc": postDataModel.getData().listNonPoItem[i].distrPerc,
 						"glAccount": postDataModel.getData().listNonPoItem[i].glAccount,
-						"materialDesc": postDataModel.getData().listNonPoItem[i].materialDesc,
-						"internalOrderId": postDataModel.getData().listNonPoItem[i].internalOrderIdId,
+						"internalOrderId": postDataModel.getData().listNonPoItem[i].internalOrderId,
 						"itemId": itemId,
 						"itemText": postDataModel.getData().listNonPoItem[i].itemText,
+						"lineText": "",
+						"materialDesc": postDataModel.getData().listNonPoItem[i].materialDesc,
 						"netValue": postDataModel.getData().listNonPoItem[i].netValue,
+						"orderId": "",
 						"profitCenter": postDataModel.getData().listNonPoItem[i].profitCenter,
-						"taxValue": postDataModel.getData().listNonPoItem[i].taxValue,
-						"taxPer": postDataModel.getData().listNonPoItem[i].taxPer,
-						"taxRate": postDataModel.getData().listNonPoItem[i].taxValue,
 						"quantity": "0.00",
+						"quantityUnit": "",
+						"taxCode": postDataModel.getData().listNonPoItem[i].taxCode,
+						"taxPer": postDataModel.getData().listNonPoItem[i].taxPer,
+						"taxValue": postDataModel.getData().listNonPoItem[i].taxValue,
+						"taxConditionType": postDataModel.getData().listNonPoItem[i].taxConditionType,
 						"requestId": reqId,
 						"serialNo": 0,
 						"subNumber": null,
@@ -1018,12 +1037,14 @@ sap.ui.define([
 			var invoiceHeaderDto = {
 				"accountNumber": "",
 				"accountingDoc": "",
-				"attachments": objectIsNew.invoiceHeader.attachments,
+				"amountBeforeTax": "",
 				"assignedTo": "",
 				"balance": objectIsNew.invoiceHeader.balance,
 				"balanceCheck": true,
-				"totalBaseRate": objectIsNew.invoiceHeader.totalBaseRate,
+				"baseLine": "",
 				"channelType": "",
+				"claimed": "",
+				"claimedUser": "",
 				"clearingAccountingDocument": "",
 				"clearingDate": "",
 				"clerkEmail": "",
@@ -1034,10 +1055,12 @@ sap.ui.define([
 				"createdAtInDB": 0,
 				"createdAtTo": "",
 				"createdByInDb": "",
+				"createdOn": 0,
 				"currency": "",
-				"comments": objectIsNew.invoiceHeader.comments,
+				"deliveryNote": "",
 				"deposit": "",
 				"disAmt": "",
+				"discount": "",
 				"docStatus": "",
 				"dueDate": objectIsNew.invoiceHeader.dueDate,
 				"dueDateFrom": "",
@@ -1049,11 +1072,11 @@ sap.ui.define([
 				"forwaredTaskOwner": "",
 				"grossAmount": objectIsNew.invoiceHeader.grossAmount,
 				"headerText": "",
-				"id": "",
 				"invoiceDate": objectIsNew.invoiceHeader.invoiceDate,
 				"invoiceDateFrom": "",
 				"invoiceDateTo": "",
 				"invoiceItems": [],
+				"invoicePdfId": objectIsNew.invoiceHeader.invoicePdfId,
 				"invoiceTotal": objectIsNew.invoiceHeader.invoiceTotal,
 				"invoiceTotalFrom": "",
 				"invoiceTotalTo": "",
@@ -1063,10 +1086,11 @@ sap.ui.define([
 				"manualpaymentBlock": "",
 				"nonPoOrPo": true,
 				"ocrBatchId": objectIsNew.invoiceHeader.ocrBatchId,
-				"paymentBlock": "",
+				"paymentBlock": objectIsNew.invoiceHeader.paymentBlock,
 				"paymentBlockDesc": "",
 				"paymentStatus": "",
-				"paymentTerms": "",
+				"paymentTerms": objectIsNew.invoiceHeader.paymentTerms,
+				"plannedCost": "",
 				"postingDate": objectIsNew.invoiceHeader.postingDate,
 				"postingDateFrom": 0,
 				"postingDateTo": 0,
@@ -1078,33 +1102,39 @@ sap.ui.define([
 				"sapInvoiceNumber": 0,
 				"shippingCost": 0,
 				"subTotal": "",
+				"surcharge": "",
 				"taskOwner": objectIsNew.invoiceHeader.taskOwner,
 				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id"),
-				"taskStatus": "",
-				"taxCode": objectIsNew.invoiceHeader.taxCode,
+				"taskStatus": objectIsNew.invoiceHeader.taskStatus,
 				"taxAmount": objectIsNew.invoiceHeader.taxAmount,
+				"taxCode": objectIsNew.invoiceHeader.taxCode,
+				"taxRate": objectIsNew.invoiceHeader.taxPer,
 				"taxValue": objectIsNew.invoiceHeader.taxValue,
+				"totalBaseRate": objectIsNew.invoiceHeader.totalBaseRate,
+				"transactionType": "",
+				"unplannedCost": "",
 				"updatedAt": 0,
 				"updatedBy": "",
 				"validationStatus": "",
+				"vatRegNum": "",
 				"vendorId": objectIsNew.invoiceHeader.vendorId,
 				"vendorName": objectIsNew.invoiceHeader.vendorName,
 				"version": 0
 			};
 			obj.invoiceHeaderDto = invoiceHeaderDto;
-			// obj.invoiceHeaderDto.attachments = [];
-			// if (nonPOInvoiceModel.getData().docManagerDto && nonPOInvoiceModel.getData().docManagerDto.length > 0) {
-			// 	for (var n = 0; n < nonPOInvoiceModel.getData().docManagerDto.length; n++) {
-			// 		obj.invoiceHeaderDto.attachments.push(nonPOInvoiceModel.getData().docManagerDto[n]);
-			// 	}
-			// }
-			// obj.invoiceHeaderDto.comments = [];
-			// if (nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto && nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length >
-			// 	0) {
-			// 	for (var k = 0; k < nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
-			// 		obj.invoiceHeaderDto.comments.push(nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto[k]);
-			// 	}
-			// }
+			obj.invoiceHeaderDto.attachments = [];
+			if (nonPOInvoiceModel.getData().docManagerDto && nonPOInvoiceModel.getData().docManagerDto.length > 0) {
+				for (var n = 0; n < nonPOInvoiceModel.getData().docManagerDto.length; n++) {
+					obj.invoiceHeaderDto.attachments.push(nonPOInvoiceModel.getData().docManagerDto[n]);
+				}
+			}
+			obj.invoiceHeaderDto.comments = [];
+			if (nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto && nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length >
+				0) {
+				for (var k = 0; k < nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
+					obj.invoiceHeaderDto.comments.push(nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto[k]);
+				}
+			}
 			obj.invoiceItemAcctAssignmentDto = objectIsNew.invoiceItems;
 			obj.costAllocationDto = objectIsNew.costAllocation;
 			return obj;
