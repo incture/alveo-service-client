@@ -65,12 +65,13 @@ sap.ui.define([
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			var loggedinUserVendorId = oUserDetailModel.setProperty("/loggedinUserVendorId");
+			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			var sUrl = "/IDPDEST/service/scim/Users";
 			var busy = new sap.m.BusyDialog();
 			var oHeader = {
 				"Content-Type": "application/scim+json"
 			};
-			if (admin) {
+			if (userGroup === "IT_Admin") {
 				var groups = ["IT_Admin", "Supplier_Admin"];
 			} else {
 				var groups = ["Supplier_Executive"];
@@ -94,7 +95,7 @@ sap.ui.define([
 									vendorId = user["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 								}
 								if (groupData >= 0) {
-									if (admin) {
+									if (userGroup === "IT_Admin") {
 										userdata.push(user);
 									} else if (loggedinUserVendorId === vendorId) {
 										userdata.push(user);
@@ -258,7 +259,7 @@ sap.ui.define([
 			var oBinding = this.getView().byId("USERMANAGEMENT").getBinding("items");
 			oBinding.filter(filters);
 		},
-		
+
 		onSearchGroupList: function (oEvent) {
 			var that = this;
 			var value = oEvent.getSource().getValue();

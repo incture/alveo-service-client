@@ -28,7 +28,9 @@ sap.ui.define([
 				});
 			},
 			onCreateInvoice: function (oEvent) {
-				this.oRouter.navTo("NonPOInvoice");
+				this.oRouter.navTo("NonPOInvoice",{
+					id: "NEW"
+				});
 			},
 
 			onReqIdOpenSelect: function (oEvent) {

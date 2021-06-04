@@ -35,38 +35,38 @@ sap.ui.define([
 
 			var oComponent = this.getOwnerComponent();
 			var initializeModelData = {
-					"invoiceHeader": {
-						"attachments": [],
-						"balance": "",
-						"balanceCheck": true,
-						"comments": [],
-						"clerkId": 0,
-						"createdAtInDB": 0,
-						"dueDate": "",
-						"extInvNum": "",
-						"grossAmount": "",
-						"invoiceDate": "",
-						"invoiceTotal": "",
-						"manualpaymentBlock": "",
-						"ocrBatchId": "",
-						"paymentBlock": "",
-						"paymentBlockDesc": "",
-						"paymentStatus": "",
-						"paymentTerms": "",
-						"postingDate": "",
-						"sapInvoiceNumber": 0,
-						"shippingCost": 0,
-						"subTotal": "",
-						"taskOwner": "",
-						"taskStatus": "",
-						"taxAmount": "",
-						"taxCode": "",
-						"vendorId": "",
-						"vendorName": "",
-						"taxValue": ""
-					},
-					"vstate": {}
-				};
+				"invoiceHeader": {
+					"attachments": [],
+					"balance": "",
+					"balanceCheck": true,
+					"comments": [],
+					"clerkId": 0,
+					"createdAtInDB": 0,
+					"dueDate": "",
+					"extInvNum": "",
+					"grossAmount": "",
+					"invoiceDate": "",
+					"invoiceTotal": "",
+					"manualpaymentBlock": "",
+					"ocrBatchId": "",
+					"paymentBlock": "",
+					"paymentBlockDesc": "",
+					"paymentStatus": "",
+					"paymentTerms": "",
+					"postingDate": "",
+					"sapInvoiceNumber": 0,
+					"shippingCost": 0,
+					"subTotal": "",
+					"taskOwner": "",
+					"taskStatus": "",
+					"taxAmount": "",
+					"taxCode": "",
+					"vendorId": "",
+					"vendorName": "",
+					"taxValue": ""
+				},
+				"vstate": {}
+			};
 			this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
 			this.getModel("postDataModel").setProperty("/listNonPoItem", []);
 
@@ -110,10 +110,47 @@ sap.ui.define([
 			var oArgs = oEvent.getParameter("arguments"),
 				requestId = oArgs.id,
 				status = oArgs.status;
+			if (requestId === "NEW") {
+				var initializeModelData = {
+					"invoiceHeader": {
+						"attachments": [],
+						"balance": "",
+						"balanceCheck": true,
+						"comments": [],
+						"clerkId": 0,
+						"createdAtInDB": 0,
+						"dueDate": "",
+						"extInvNum": "",
+						"grossAmount": "",
+						"invoiceDate": "",
+						"invoiceTotal": "",
+						"manualpaymentBlock": "",
+						"ocrBatchId": "",
+						"paymentBlock": "",
+						"paymentBlockDesc": "",
+						"paymentStatus": "",
+						"paymentTerms": "",
+						"postingDate": "",
+						"sapInvoiceNumber": 0,
+						"shippingCost": 0,
+						"subTotal": "",
+						"taskOwner": "",
+						"taskStatus": "",
+						"taxAmount": "",
+						"taxCode": "",
+						"vendorId": "",
+						"vendorName": "",
+						"taxValue": ""
+					},
+					"vstate": {}
+				};
+				this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
+				this.getModel("postDataModel").setProperty("/listNonPoItem", []);
+			}
 			// this.busyDialog.open();
 
 			//handle if route has NonPO request Id 
-			if (requestId) {
+			else if (requestId) {
 				this.getNonPOData(requestId);
 			}
 		},
@@ -859,7 +896,7 @@ sap.ui.define([
 			if (postingDate) {
 				var sUrl = "/menabevdev/invoiceHeader/accountantSave",
 					sMethod = "POST";
-				this.saveSubmitServiceCall(oSaveData, sMethod, sUrl);
+				this.saveSubmitServiceCall(oSaveData, sMethod, sUrl, "SAVE");
 			} else {
 				sap.m.MessageBox.error("Please Enter Posting Date!");
 			}
@@ -929,7 +966,7 @@ sap.ui.define([
 					var userInputTaxAmount = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
 					var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
 					if (this.nanValCheck(taxDifference) !== 0) {
-						sap.m.MessageToast.show("Tax MisMatched");
+						sap.m.MessageBox.Error("Tax MisMatched");
 						return;
 					}
 
@@ -944,6 +981,7 @@ sap.ui.define([
 		//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
 		saveSubmitServiceCall: function (oData, sMethod, sUrl, save) {
 			var that = this;
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
 			this.busyDialog.open();
 			$.ajax({
 				url: sUrl,
@@ -955,7 +993,8 @@ sap.ui.define([
 				success: function (data, xhr, result) {
 					this.busyDialog.close();
 					var message = data.responseStatus;
-
+					var ReqId = data.invoiceHeaderDto.requestId;
+					nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/requestId", ReqId);
 					if (result.status === 200) {
 						sap.m.MessageBox.success(message, {
 							actions: [sap.m.MessageBox.Action.OK],

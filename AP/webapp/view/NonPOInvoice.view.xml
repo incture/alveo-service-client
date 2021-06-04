@@ -68,10 +68,10 @@
 								</VBox>
 								<VBox id="idDate">
 									<Label text="{i18n>InvoiceDate}" required="true" class="sapUiTinyMarginTop"/>
-									<DatePicker id="InvoiceDate" placeholder="MM/DD/YYYY" valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
-										change="onChangeInvDate"
+									<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
 										value="{ path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/invoiceDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceDate}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/invoiceDate}" change="onChangeInvDate"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>BatchId}"/>
@@ -81,15 +81,15 @@
 								<VBox >
 									<Label text="{i18n>PostingDate}" required="true"/>
 									<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/postingDate}"
 										value="{ path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
+										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/postingDate}"
 										change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>DueDate}"/>
-									<DatePicker placeholder="MM/DD/YYYY"
+									<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
 										value="{path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+										editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onDueDateChange"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PaymentTerms}"/>

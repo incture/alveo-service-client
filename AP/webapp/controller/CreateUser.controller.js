@@ -39,6 +39,7 @@ sap.ui.define([
 							that.fetchUser(that.id);
 							oVisibilityModel.setProperty("/createUser/editable", false);
 							oUserDetailModel.setProperty("/createUser/title", "Update User");
+							
 						} else {
 							oUserDetailModel.setProperty("/createUser/title", "Create User");
 							if (userGroup === "IT_Admin") {
@@ -48,7 +49,7 @@ sap.ui.define([
 								obj.vendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 								obj.companyCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
 								obj.purchaseOrg = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[2].value;
-								obj.userGroup = userDetail.groups[0].value;
+								obj.userGroup = "Supplier_Executive";
 								oUserDetailModel.setProperty("/createUser", obj);
 							}
 						}

@@ -188,6 +188,14 @@ sap.ui.define([
 		},
 
 		fnValidateDate: function (oEvent) {
+			var data = oEvent.getSource().getValue();
+			var dateVal = new Date(data);
+			var day =  dateVal.getDate();
+			if(!day){
+				sap.m.messageToast.show("Please enter valid date");
+				oEvent.getSource().setValue("");
+				return;
+			}
 			var sPath = oEvent.getSource().getBindingInfo("value").binding.sPath.split("/");
 			sPath.pop();
 			sPath = sPath.join("/");

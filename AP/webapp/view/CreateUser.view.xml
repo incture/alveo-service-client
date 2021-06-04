@@ -63,9 +63,7 @@
 			<OverflowToolbar class="footerClass">
 				<ToolbarSpacer/>
 				<Button type="Emphasized" text="{i18n>CANCEL}" press="onNavBack"></Button>
-				<Button type="Emphasized" text="{i18n>ADDUSER}" press="onCreateUser" visible="{oVisibilityModel>/createUser/editable}"></Button>
-				<Button type="Emphasized" text="{i18n>UPDATEUSER}" press="onCreateUser"
-					visible="{path:'oVisibilityModel>/createUser/editable', formatter:'com.menabev.AP.formatter.formatter.returnNot'}"></Button>
+				<Button type="Emphasized" text="{oUserDetailModel>/createUser/title}" press="onCreateUser" ></Button>
 			</OverflowToolbar>
 		</footer>
 	</Page>
