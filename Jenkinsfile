@@ -1,3 +1,4 @@
+
 @Library('piper-lib-os') _
 pipeline {
   agent any
@@ -24,5 +25,10 @@ pipeline {
         fingerprint: true
       }
     }
+     stage ('Starting downstream job ') {
+          steps {
+          build job: 'MenaBev/MenaBev_UI5_deploy'
+            }
+        }
   }
 }
