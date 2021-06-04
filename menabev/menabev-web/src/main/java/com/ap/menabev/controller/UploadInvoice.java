@@ -28,7 +28,7 @@ public class UploadInvoice {
 
 			if (fileToUpload.exists()) {
 				String response = emailServices.sendmailTOCSU(body, fileToUpload);
-				if (response.equalsIgnoreCase("200")) {
+				if ("200".equalsIgnoreCase(response)) {
 					responseDto.setMessage("Uploaded Successfully and sent to the scanning team");
 					responseDto.setCode("200");
 					responseDto.setStatus("Success");
@@ -46,6 +46,7 @@ public class UploadInvoice {
 
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			responseDto.setMessage(e.getLocalizedMessage());
 			responseDto.setCode("500");
 			responseDto.setStatus("Error");

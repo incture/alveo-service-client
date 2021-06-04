@@ -1,33 +1,35 @@
 package com.ap.menabev.controller;
 
-import java.io.File;
-
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.ap.menabev.abbyy.ABBYYIntegration;
-import com.ap.menabev.util.ServiceUtil;
+import com.ap.menabev.dto.ResponseDto;
+import com.ap.menabev.service.AutomationService;
 
 @RestController
 @RequestMapping(value = "/abbyy")
 public class ABBYYController {
 	@Autowired
-	ABBYYIntegration abbyyIntegration;
+	AutomationService automationService;
 
-	@PostMapping
-	public String putFileInSFTPServer(@RequestParam("file") MultipartFile file) {
+	@GetMapping("/inbox")
+	public ResponseDto putFileInSFTPServer() {
 		try {
 
-			File fileToUpload = ServiceUtil.multipartToFile(file);
-			return abbyyIntegration.uploadFileUsingJsch(fileToUpload, "/C/ABBYY/Input/");
+			return automationService.extractInvoiceFromEmail();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO: handle exception
-			return e.getMessage();
+			return new ResponseDto("Error", "500", e.getMessage());
 		}
 	}
+	@GetMapping("/shared")
+	public ResponseDto putFileInSFTPServerFromSharedEmailBox() {
+		return automationService.extractInvoiceFromSharedEmailBox();
+	}
+	
 }

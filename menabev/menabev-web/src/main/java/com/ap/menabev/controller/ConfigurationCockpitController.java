@@ -28,12 +28,6 @@ public class ConfigurationCockpitController
 		
 	}
 	
-	@GetMapping("/hi")
-	public String Hey()
-	{
-		return "hey!!";
-		
-	}
 	
 	
 	@GetMapping
@@ -45,7 +39,16 @@ public class ConfigurationCockpitController
 	public  ConfigurationCockpitDto get(@PathVariable String version) {
 		return configurationcockpitservice.get(version);
 	}
-	
+	@GetMapping("/{version}/{year}")
+	public  ConfigurationCockpitDto get(@PathVariable String version,@PathVariable String year) {
+		return configurationcockpitservice.get(version);
+	}
+	@GetMapping("/hi")
+	public String Hey()
+	{
+		return "hey!!";
+		
+	}
 	
 
 	@GetMapping("/getDistinctVersions")

@@ -15,6 +15,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ap.menabev</groupId>
+			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>menabev-abbyy</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ap.menabev</groupId>
 			<artifactId>menabev-util</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
