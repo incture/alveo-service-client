@@ -165,7 +165,7 @@ public class InvoiceHeaderDo {
 	@Column(name = "FORWARDED_TASK_OWNER")
 	private String forwaredTaskOwner;
 	@Column(name = "IS_NON-PO_OR_PO")
-	private boolean isNonPoOrPo;
+	private boolean isnonPoOrPo;
 	@Column(name="DOC_STATUS") // is Draft or Created  or Opened.
 	private String docStatus;
 	@Column(name="TRANSACTION_TYPE")

@@ -19,7 +19,7 @@ public class InvoiceHeaderChangeDto {
 	private Long invoiceDate;
 	private Long dueDate;
 	private LocalDateTime createdAt;
-	private String VendorId;
+	private String vendorId;
 	private Integer clerkId;
 	private String clerkEmail;
 	private String channelType;
@@ -74,8 +74,8 @@ public class InvoiceHeaderChangeDto {
 	private String validationStatus; /// Exception Status
 	private String taskOwner;
 	private String forwaredTaskOwner;
-	private boolean isNonPoOrPo;
-	private boolean isClaimed;
+	private boolean isnonPoOrPo;
+	private boolean isclaimed;
 	private String claimedUser;
 	private String manualpaymentBlock;
 	private String taskOwnerId; // loggedin userid

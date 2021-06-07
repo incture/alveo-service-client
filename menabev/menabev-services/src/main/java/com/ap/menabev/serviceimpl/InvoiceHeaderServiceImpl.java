@@ -749,10 +749,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	}
 	
 	@Override
-	public ResponseEntity<?> getInvoiceDetailChanged(String requestId){
+	public ResponseEntity<?> getInvoiceDetailChanged(String requestId,String expand){
 		try {
 			CreateInvoiceHeaderChangeDto invoiceHeadDto =new  CreateInvoiceHeaderChangeDto();
-		   // get InvoiceHeader
+			
+			 // get InvoiceHeader
 		  InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
 		  InvoiceHeaderChangeDto invoiceHeaderDto  =  ObjectMapperUtils.map(invoiceHeaderDo,InvoiceHeaderChangeDto.class);   
 		  // get InvoiceItem
@@ -798,49 +799,78 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		  // get InvoiceItem
 		   List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
 		   List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
-		
+		   invoiceItemAndHeader.setInvoiceHeaderDto(invoiceHeaderDto);
 		   
-		return null;
+		   invoiceItemAndHeader.getInvoiceHeaderDto().setInvoiceItems(invoiceItemDtoList);
+		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
 
 
 	@Override
 	public ResponseEntity<?> getCostAllocationDetail(String requestId) {
-		// TODO Auto-generated method stub
-		return null;
+		CreateInvoiceHeaderChangeDto invoiceItemAndHeader = new CreateInvoiceHeaderChangeDto();
+		InvoiceHeaderChangeDto invoice = new InvoiceHeaderChangeDto();
+		  List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
+	        List<CostAllocationDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
+		
+	        invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
+	        invoiceItemAndHeader.getInvoiceHeaderDto().setCostAllocationDto(costAllocationDto);
+		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
 
 
 	@Override
 	public ResponseEntity<?> getInvoiceAcctAssinment(String requestId) {
-		// TODO Auto-generated method stub
-		return null;
+		CreateInvoiceHeaderChangeDto invoiceItemAndHeader = new CreateInvoiceHeaderChangeDto();
+		InvoiceHeaderChangeDto invoice = new InvoiceHeaderChangeDto();
+		  List<InvoiceItemAcctAssignmentDo>  invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository.getByRequestId(requestId); 
+		     List<InvoiceItemAcctAssignmentDto>    invoiceItemAcctAssignmentdtoList = ObjectMapperUtils.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
+		     invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
+		     invoiceItemAndHeader.getInvoiceHeaderDto().setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
+		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
 
 
 	@Override
 	public ResponseEntity<?> getInvoiceAttachment(String requestId) {
-		// TODO Auto-generated method stub
-		return null;
+		CreateInvoiceHeaderChangeDto invoiceItemAndHeader = new CreateInvoiceHeaderChangeDto();
+		InvoiceHeaderChangeDto invoice = new InvoiceHeaderChangeDto(); 
+		// get Attachements 
+        List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
+        List<AttachmentDto>  AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);    
+        invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
+        invoiceItemAndHeader.getInvoiceHeaderDto().setAttachments(AttachementDto);
+        
+		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
 
 
 	@Override
 	public ResponseEntity<?> getInvoiceComments(String requestId) {
-		// TODO Auto-generated method stub
-		return null;
+		CreateInvoiceHeaderChangeDto invoiceItemAndHeader = new CreateInvoiceHeaderChangeDto();	
+		InvoiceHeaderChangeDto invoice = new InvoiceHeaderChangeDto();
+		// get Comments
+        List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId);
+        List<CommentDto>    commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);  
+        
+        invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
+        invoiceItemAndHeader.getInvoiceHeaderDto().setComments(commentDto);
+        
+		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
 
 
 	@Override
 	public ResponseEntity<?> getActivityLog(String requestId) {
-		// TODO Auto-generated method stub
-		return null;
+		CreateInvoiceHeaderChangeDto invoiceItemAndHeader = new CreateInvoiceHeaderChangeDto();	
+		InvoiceHeaderChangeDto invoice = new InvoiceHeaderChangeDto();
+		 invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
+		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 	
 	@Override

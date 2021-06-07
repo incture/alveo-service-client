@@ -20,7 +20,7 @@ public class InvoiceHeaderDto {
 	private Long invoiceDate;
 	private Long dueDate;
 	private LocalDateTime createdAt;
-	private String VendorId;
+	private String vendorId;
 	private Integer clerkId;
 	private String clerkEmail;
 	private String channelType;

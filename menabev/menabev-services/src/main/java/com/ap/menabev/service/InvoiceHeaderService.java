@@ -34,6 +34,7 @@ public interface InvoiceHeaderService {
 
 	InvoiceHeaderDetailsDto getAllInvoiceDetailsOnRequestId(String requestId);
 
+	public ResponseEntity<?> getInvoiceDetailChanged(String requestId,String expand);
 	List<InvoiceHeaderDto> filterByKeys(InvoiceHeaderDto dto);
 
 	MasterResponseDto getDetailsForFilter(InvoiceHeaderDto dto);
@@ -79,7 +80,6 @@ public interface InvoiceHeaderService {
 
 	ResponseDto delete(String id);
 
-	ResponseEntity<?> getInvoiceDetailChanged(String requestId);
 	
 	ResponseEntity<?> getInvoiceItemDetail(String requestId);
 	

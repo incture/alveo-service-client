@@ -7,11 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.sap.db.jdbc.packet.LOB;
+
 import lombok.Data;
 
 
 @Entity
-@Table(name = "ATTACHMENT")
+@Table(name = "ACTIVITY_LOG")
 @Data
 public class ActivityLogDo {
 
@@ -40,5 +42,11 @@ private String statusOfException;
 
 @Column(name = "TASK_STATUS")
 private String taskStatus;
+
+@Column(name = "TASK_USER_ID")
+private String taskUserId;
+
+@Column(name = "TASK_COMMENTS" , columnDefinition = "TEXT")
+private String taskComments;
 
 }

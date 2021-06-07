@@ -59,30 +59,30 @@ public class InvoiceHeaderController {
 	}
 	
 	@GetMapping("/getInvoiceByReqId/{requestId}")
-	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId) {
-		return headerService.getInvoiceDetailChanged(requestId);
+	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId,@PathVariable String expand) {
+		return headerService.getInvoiceDetailChanged(requestId,expand);
 	}
 	@GetMapping("/getInvoiceByReqId/{requestId}/item")
 	public ResponseEntity<?> getByInvoiceRequestIdItem(@PathVariable String requestId) {
-		return headerService.getInvoiceDetailChanged(requestId);
+		return headerService.getInvoiceItemDetail(requestId);
 	}
 	@GetMapping("/getInvoiceByReqId/{requestId}/costAllocation")
 	public ResponseEntity<?> getByInvoiceRequestIdCostAllocation(@PathVariable String requestId) {
-		return headerService.getInvoiceDetailChanged(requestId);
+		return headerService.getCostAllocationDetail(requestId);
 	}
 	@GetMapping("/getInvoiceByReqId/{requestId}/invoiceItemAcctAssignment")
 	public ResponseEntity<?> getByInvoiceRequestIdInvoiceItemAcct(@PathVariable String requestId) {
-		return headerService.getInvoiceDetailChanged(requestId);
+		return headerService.getInvoiceAcctAssinment(requestId);
 	}
 
 	@GetMapping("/getInvoiceByReqId/{requestId}/attachment")
 	public ResponseEntity<?> getByInvoiceRequestIdAttachment(@PathVariable String requestId) {
-		return headerService.getInvoiceDetailChanged(requestId);
+		return headerService.getInvoiceAttachment(requestId);
 	}
 	
 	@GetMapping("/getInvoiceByReqId/{requestId}/comment")
 	public ResponseEntity<?> getByInvoiceRequestIdComment(@PathVariable String requestId) {
-		return headerService.getInvoiceDetailChanged(requestId);
+		return headerService.getInvoiceComments(requestId);
 	}
 
 
