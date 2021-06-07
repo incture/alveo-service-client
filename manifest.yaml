@@ -1,0 +1,82 @@
+ID: APWorkbench
+_schema-version: '2.1'
+parameters:
+  deploy_mode: html5-repo
+version: 0.0.1
+modules:
+  - name: apworkbench-approuter
+    type: approuter.nodejs
+    path: apworkbench-approuter
+    parameters:
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: APWorkbench_html5_repo_runtime
+      - name: UserDetail_api
+        group: destinations
+        properties:
+          name: UserDetail_api
+          url: '~{url}'
+          forwardAuthToken: true
+      - name: uaa_APWorkbench
+      - name: dest_APWorkbench
+      - name: conn_APWorkbench
+  - name: APWorkbench_ui_deployer
+    type: com.sap.html5.application-content
+    path: APWorkbench_ui_deployer
+    requires:
+      - name: APWorkbench_html5_repo_host
+    build-parameters:
+      requires:
+        - name: AP
+          artifacts:
+            - './*'
+          target-path: resources/AP
+  - name: AP
+    type: html5
+    path: AP
+    build-parameters:
+      builder: custom
+      commands:
+        - npm install
+        - npm run build
+      supported-platforms: []
+      build-result: dist
+  - name: UserDetail
+    type: nodejs
+    path: UserDetail
+    provides:
+      - name: UserDetail_api
+        properties:
+          url: '${default-url}'
+    properties:
+      UAA_SERVICE_NAME: uaa_APWorkbench
+    requires:
+      - name: uaa_APWorkbench
+resources:
+  - name: APWorkbench_html5_repo_runtime
+    parameters:
+      service-plan: app-runtime
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: APWorkbench_html5_repo_host
+    parameters:
+      service-plan: app-host
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: uaa_APWorkbench
+    parameters:
+      path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+    type: org.cloudfoundry.managed-service
+  - name: dest_APWorkbench
+    parameters:
+      service-plan: lite
+      service: destination
+    type: org.cloudfoundry.managed-service
+  - name: conn_APWorkbench
+    parameters:
+      service-plan: lite
+      service: connectivity
+    type: org.cloudfoundry.managed-service

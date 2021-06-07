@@ -2,9 +2,14 @@
 	"authenticationMethod": "route",
 	"logout": {
 		"logoutEndpoint": "/my/logout",
-		"logoutPage": "https://middle-east-and-north-africa-beverage-manufacturing-co-3463079c.cfapps.eu20.hana.ondemand.com/commenabevAP/index.html"
+		"logoutPage": "https://middle-east-and-north-africa-beverage-manufacturing-co--m7166b2.cfapps.eu20.hana.ondemand.com/commenabevAP/index.html"
 	},
 	"routes": [{
+		"source": "^/SD4_DEST",
+		"target": "/",
+		"destination": "SD4_DEST",
+		"csrfProtection": false
+	},{
 		"source": "^/IDPDEST",
 		"target": "/",
 		"destination": "IDP-DEST",

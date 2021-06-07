@@ -4,7 +4,7 @@
 		<content>
 			<OverflowToolbar>
 				<Button icon="sap-icon://nav-back" press="onNavBack"></Button>
-				<Text text="{oUserDetailModel>/createUser/title}"></Text>
+				<Text text="{oUserDetailModel>/createUsertitle}"></Text>
 			</OverflowToolbar>
 			<l:Grid defaultSpan="XL4 L4 M6 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
@@ -13,7 +13,7 @@
 						<!--<Input value="{oUserDetailModel>/createUser/userGroup}" valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}"></Input>-->
 						<Select forceSelection="false" width="100%" items="{StaticDataModel>/userGroups}" selectedKey="{oUserDetailModel>/createUser/userGroup}"
 							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect"
-							enabled="{oVisibilityModel>/createUser/editable}">
+							enabled="false">
 							<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 						</Select>
 					</VBox>
@@ -63,7 +63,7 @@
 			<OverflowToolbar class="footerClass">
 				<ToolbarSpacer/>
 				<Button type="Emphasized" text="{i18n>CANCEL}" press="onNavBack"></Button>
-				<Button type="Emphasized" text="{oUserDetailModel>/createUser/title}" press="onCreateUser" ></Button>
+				<Button type="Emphasized" text="{oUserDetailModel>/createUsertitle}" press="onCreateUser" ></Button>
 			</OverflowToolbar>
 		</footer>
 	</Page>

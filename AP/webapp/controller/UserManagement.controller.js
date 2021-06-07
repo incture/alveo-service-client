@@ -72,7 +72,7 @@ sap.ui.define([
 				"Content-Type": "application/scim+json"
 			};
 			if (userGroup === "IT_Admin") {
-				var groups = ["IT_Admin", "Supplier_Admin"];
+				var groups = ["Supplier_Admin"];
 			} else {
 				var groups = ["Supplier_Executive"];
 			}
