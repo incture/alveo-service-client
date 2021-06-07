@@ -2,7 +2,6 @@ package com.ap.menabev.email;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -29,7 +28,6 @@ import javax.mail.search.SearchTerm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
@@ -85,72 +83,7 @@ public class Email {
 
 	}
 
-//	public static void main(String[] args) {
-//		try {
-//
-//			//
-//			// Message[] messages = fetchUnReadMessages("outlook.office365.com",
-//			// ApplicationConstants.ACCPAY_EMAIL_ID,
-//			// ApplicationConstants.ACCPAY_EMAIL_PASSWORD);
-//			// List<Message> unReadmessageList = new ArrayList<Message>();
-//			// Message unreadMeassage = null;
-//			// int msgLength = messages.length;// 100
-//			// System.out.println("Un Read msg Length from IMAP = " +
-//			// msgLength);
-//			// // Added to avoid negative messages.length - i condition ex- for
-//			// // only one unread mail.
-//			// for (int i = 1; i <= 5; i++) {
-//			// if ((messages.length - i) >= 0) {
-//			// unreadMeassage = messages[messages.length - i];
-//			// unReadmessageList.add(unreadMeassage);
-//			// }
-//			// }
-//			//
-//			// for (Message message : unReadmessageList) {
-//			// String contentType = message.getContentType();
-//			// String messageContent = null;
-//			//
-//			// String attachFiles = "";
-//
-//			// String userName = "accpay@menabev.com";
-//			// String password = "MenaBev@123";
-//			// Message[] messages = fetchUnReadMessages("outlook.office365.com",
-//			// userName, password);
-//			// for (Message message : messages) {
-//			// System.out.println(message);
-//			// }
-//
-//		} catch (
-//
-//		Exception e) {
-//			e.printStackTrace();
-//			// TODO: handle exception
-//		}
-//	}
-
-	public static void moveMessage(Message message, String inputFolderName, String outputFolderName) {
-
-		try {
-
-			Properties properties = new Properties();
-			properties.put("mail.store.protocol", "imaps");
-			Session emailSession = Session.getDefaultInstance(properties);
-			Store store = emailSession.getStore();
-			store.connect(ApplicationConstants.OUTLOOK_HOST, ApplicationConstants.ACCPAY_EMAIL_ID,
-					ApplicationConstants.ACCPAY_EMAIL_PASSWORD);
-			Folder emailFolder = store.getFolder(inputFolderName);
-			Folder outputFolder = store.getFolder(outputFolderName);
-			// use READ_ONLY if you don't wish the messages to be marked as read
-			// after retrieving its content
-			emailFolder.open(Folder.READ_WRITE);
-			message.getFolder().copyMessages(new Message[] { message }, outputFolder);
-			message.setFlag(Flag.DELETED, true);
-			message.getFolder().expunge();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 
 	
 
@@ -214,7 +147,7 @@ public class Email {
 		return null;
 	}
 
-	public static List<File> getAttachmentFromEmail(Message message) {
+	public List<File> getAttachmentFromEmail(Message message) {
 		List<File> files = new ArrayList<>();
 		try {
 			Multipart multiPart = (Multipart) message.getContent();
@@ -228,7 +161,8 @@ public class Email {
 					isAttachmentFound = Boolean.TRUE;
 					logger.error("isAttachmentFound   " + isAttachmentFound);
 					String fileName = part.getFileName();
-					if ("pdf".equalsIgnoreCase(fileName.substring(fileName.lastIndexOf(".") + 1))) {
+					if ("pdf".equalsIgnoreCase(fileName.substring(fileName.lastIndexOf(".") + 1))||
+							"json".equalsIgnoreCase(fileName.substring(fileName.lastIndexOf(".") + 1))) {
 						isAttachmentIsPdf = Boolean.TRUE;
 						logger.error("isAttachmentIsPdf   " + isAttachmentIsPdf);
 						File file = new File(fileName);
@@ -245,20 +179,90 @@ public class Email {
 		}
 
 	}
-	
-	public  Message[] fetchUnReadMessagesFromSharedMailBox(String host,Integer port, String user, String password, String folderName, String flagTerm,String sharedMailId) {
+
+//	public static void main(String[] args) throws MessagingException {
+//		Email email = new Email();
+//		System.out.println("For the first method:::"+System.currentTimeMillis());
+//		Message[] messages = email.fetchUnReadMessagesFromSharedMailBox("outlook.office365.com", 993,
+//				ApplicationConstants.SHARED_MAIL_ID_ALLIAS, ApplicationConstants.ACCPAY_EMAIL_PASSWORD,
+//				ApplicationConstants.INBOX_FOLDER, ApplicationConstants.UNSEEN_FLAGTERM,
+//				ApplicationConstants.EMAIL_FROM);
+//		for (Message message : messages) {
+//			System.err.println(message.getFrom()[0]);
+////			email.moveMessage(message, "INBOX", "PROCESSED");
+//		}
+//		System.out.println("For the first method:::"+System.currentTimeMillis());
+//		
+//	}
+
+	public void moveMessage(Message message, String inputFolderName, String outputFolderName) {
+
 		try {
+
 			Properties properties = new Properties();
-			properties.setProperty("mail.imaps.sasl.enable", "true");
-			properties.setProperty("mail.imaps.sasl.authorizationid", ApplicationConstants.CSU_SHARED_MAILBOX_ID);
+			properties.setProperty("mail.imaps.auth.plain.disable", "true");
 			Session session = Session.getInstance(properties);
 			Store store = session.getStore("imaps");
-//			store.connect(host, port, user, password);
-			store.connect("outlook.office365.com", 993, ApplicationConstants.ACCPAY_EMAIL_ID, "MenaBev@123");
-			Folder emailFolder = store.getFolder(folderName.toUpperCase());
+			store.connect(ApplicationConstants.OUTLOOK_HOST, 993,ApplicationConstants.SHARED_MAIL_ID_ALLIAS, ApplicationConstants.ACCPAY_EMAIL_PASSWORD);
+			Folder emailFolder = store.getFolder(inputFolderName);
+		
 			// use READ_ONLY if you don't wish the messages to be marked as read
 			// after retrieving its content
 			emailFolder.open(Folder.READ_ONLY);
+			message.getFolder().copyMessages(new Message[] { message }, store.getFolder(outputFolderName));
+			message.setFlag(Flag.DELETED, true);
+//			message.getFolder().expunge();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Message[] fetchUnReadMessagesFromSharedMailBox(String host, Integer port, String user, String password,
+			String folderName, String flagTerm, String emailFrom) {
+		Message[] filteredMessages = null;
+		try {
+			logger.error("inside fetchUnReadMessagesFromSharedMailBox");
+			Properties properties = new Properties();
+			properties.setProperty("mail.imaps.auth.plain.disable", "true");
+			properties.setProperty("mail.store.protocol", "imaps");
+			Session session = Session.getInstance(properties);
+			Store store = session.getStore("imaps");
+			store.connect(host, port, user, password);
+
+			Folder emailFolder = store.getFolder(folderName.toUpperCase());
+			// use READ_ONLY if you don't wish the messages to be marked as read
+			// after retrieving its content
+			emailFolder.open(Folder.READ_WRITE);
+			SearchTerm emailFromSearchTerm = new SearchTerm() {
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean match(Message msg) {
+					Address[] addresses;
+					try {
+						addresses = msg.getFrom();
+						for (int i = 0; i < addresses.length; i++) {
+							// System.err.println(addresses[i]);
+							if (addresses[i].toString().toLowerCase().contains(emailFrom.toLowerCase())
+									|| addresses[i].toString().equalsIgnoreCase(emailFrom)
+									) {
+								
+								return true;
+							}
+						}
+					} catch (MessagingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return false;
+					}
+					return false;
+				}
+			};
 			Message[] messages = null;
 			if (ApplicationConstants.UNSEEN_FLAGTERM.equalsIgnoreCase(flagTerm)) {
 				Flags seen = new Flags(Flags.Flag.SEEN);
@@ -271,45 +275,32 @@ public class Email {
 			} else {
 				messages = emailFolder.getMessages();
 			}
-			String EMAIL_FROM = "Dipanjan Baidya <dipanjan.baidya@incture.com>";
-			// creates a search criterion
-			SearchTerm searchCondition = new SearchTerm() {
-
-				@Override
-				public boolean match(Message msg) {
-					Address[] addresses;
-					try {
-						addresses = msg.getFrom();
-						for (int i = 0; i < addresses.length; i++) {
-							System.err.println(addresses[i]);
-							if (addresses[i].toString().equalsIgnoreCase(EMAIL_FROM)) {
-								return true;
-							}
-						}
-					} catch (MessagingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						return false;
-					}
-					return false;
-				}
-			};
-			Message[] filteredMessages = null;
+			for (Message message : messages) {
+				logger.error("Email Addresses::: "+message.getFrom()[0]);
+			}
 			// searchConditions
-			if (!(ServiceUtil.isEmpty(messages) && ServiceUtil.isEmpty(searchCondition))) {
-				filteredMessages = emailFolder.search(searchCondition, messages);
+			if (!(ServiceUtil.isEmpty(messages) && ServiceUtil.isEmpty(emailFromSearchTerm))) {
+				filteredMessages = emailFolder.search(emailFromSearchTerm, messages);
 			} else {
 				if (!ServiceUtil.isEmpty(messages)) {
 					filteredMessages = messages;
 				} else {
-					filteredMessages = emailFolder.search(searchCondition);
+					filteredMessages = emailFolder.search(emailFromSearchTerm);
 				}
 			}
+			logger.error("inside fetchUnReadMessagesFromSharedMailBox");
+			
+//			for (Message message : filteredMessages) {
+//				
+//				message.getFolder().copyMessages(new Message[] { message }, store.getFolder("PROCESSED"));
+//				message.setFlag(Flag.SEEN, true);
+////				message.getFolder().expunge();
+//			}
 			return filteredMessages;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return filteredMessages;
 		}
-		return null;
 
 	}
 
@@ -380,5 +371,95 @@ public class Email {
 		}
 		return null;
 	}
+	public List<File> getAttachmentsFromEmail(String host, Integer port, String user, String password,
+			String folderName, String flagTerm, String emailFrom){
+		List<File> attachments = new ArrayList<>();
+		Message[] filteredMessages = null;
+		try {
+			Properties properties = new Properties();
+			properties.setProperty("mail.imaps.auth.plain.disable", "true");
+			Session session = Session.getInstance(properties);
+			Store store = session.getStore("imaps");
+			store.connect(host, port, user, password);
 
+			Folder emailFolder = store.getFolder(folderName.toUpperCase());
+			// use READ_ONLY if you don't wish the messages to be marked as read
+			// after retrieving its content
+			emailFolder.open(Folder.READ_WRITE);
+
+			SearchTerm emailFromSearchTerm = new SearchTerm() {
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean match(Message msg) {
+					Address[] addresses;
+					try {
+						addresses = msg.getFrom();
+						for (int i = 0; i < addresses.length; i++) {
+							// System.err.println(addresses[i]);
+							if (addresses[i].toString().toLowerCase().contains(emailFrom.toLowerCase())
+									|| addresses[i].toString().equalsIgnoreCase(emailFrom)) {
+								return true;
+							}
+						}
+					} catch (MessagingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return false;
+					}
+					return false;
+				}
+			};
+			Message[] messages = null;
+			if (ApplicationConstants.UNSEEN_FLAGTERM.equalsIgnoreCase(flagTerm)) {
+				Flags seen = new Flags(Flags.Flag.SEEN);
+				FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
+				messages = emailFolder.search(unseenFlagTerm);
+			} else if (ApplicationConstants.SEEN_FLAGTERM.equalsIgnoreCase(flagTerm)) {
+				Flags seen = new Flags(Flags.Flag.SEEN);
+				FlagTerm seenFlagTerm = new FlagTerm(seen, true);
+				messages = emailFolder.search(seenFlagTerm);
+			} else {
+				messages = emailFolder.getMessages();
+			}
+			// searchConditions
+			if (!(ServiceUtil.isEmpty(messages) && ServiceUtil.isEmpty(emailFromSearchTerm))) {
+				filteredMessages = emailFolder.search(emailFromSearchTerm, messages);
+			} else {
+				if (!ServiceUtil.isEmpty(messages)) {
+					filteredMessages = messages;
+				} else {
+					filteredMessages = emailFolder.search(emailFromSearchTerm);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Email.getAttachmentsFromEmail():::Error:"+e.getMessage());
+			// TODO: handle exception
+		}finally {
+			
+		}
+		return attachments;
+	}
+	public String getEmail(){
+		try {
+			
+			Properties props = new Properties();
+			props.setProperty("mail.store.protocol", "imaps");
+			props.setProperty("mail.imaps.sasl.enable", "true");
+			props.setProperty("mail.imaps.sasl.authorizationid", "accounts.payble@menabev.com");
+			Session session = Session.getInstance(props);
+			Store store = session.getStore("imaps");
+			store.connect("outlook.office365.com", 993, "accpay@menabev.com", "MenaBev@123");
+			return "ok";
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return "error";
+		}
+	}
 }

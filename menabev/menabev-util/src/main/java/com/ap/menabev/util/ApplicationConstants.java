@@ -7,13 +7,14 @@ public interface ApplicationConstants {
 	String TRANSACTION_TYPE_CREDIT = "Credit";
 	String TRANSACTION_TYPE_DEBIT = "Debit";
 
-	String ACCPAY_EMAIL_ID = "accpay@menabev.com";
-	String ACCPAY_EMAIL_PASSWORD = "MenaBev@123";
-	String CSU_SHARED_MAILBOX_ID = "csu@menabev.com";
-	String CSU_EMAIL = "Accounts.Payable@menabev.com";
-	String UPLOAD_INVOICE_TO_CSU_SUBJECT = "TEST UPLOAD INVOICE";
 	// ----------------------------------------------------------//
 	// SMTP Configuration Details
+	String SHARED_MAIL_ID_ALLIAS = "accpay@menabev.com\\Accounts.Payable";
+	String ACCPAY_EMAIL_ID = "accpay@menabev.com";
+	String ACCPAY_EMAIL_PASSWORD = "MenaBev@123";
+	String CSU_SHARED_MAILBOX_ID = "Accounts.Payable@menabev.com";
+	String CSU_EMAIL = "Accounts.Payable@menabev.com";
+	String UPLOAD_INVOICE_TO_CSU_SUBJECT = "TEST UPLOAD INVOICE";
 	String SMTP_AUTH = "mail.smtp.auth";
 	String SMTP_TTLS = "mail.smtp.starttls.enable";
 	String MAIL_HOST = "mail.smtp.host";
@@ -21,8 +22,8 @@ public interface ApplicationConstants {
 	String TRANSPORT_PROTOCOL = "mail.transport.protocol";
 	String BOUNCER_PORT = "mail.smtp.from";
 	String OUTLOOK_HOST = "outlook.office365.com";
-	// String DIPANJAN_EMAIL_ID = "dipanjan.baidya@incture.com";
-	// String DIPANJAN_EMAIL_PASSWORD="";
+	Integer OUTLOOK_PORT = 993;
+	String EMAIL_FROM = "accpay@menabev.com";
 	String PROCESSED_FOLDER = "PROCESSED";
 	String UNPROCESSED_FOLDER = "UNPROCESSED";
 	String INBOX_FOLDER = "INBOX";
@@ -46,16 +47,16 @@ public interface ApplicationConstants {
 
 	// ABBYY SFTP Configuration Details for MenaBev
 	Integer SESSION_TIME_OUT = 10000;
-	String SOCKS_LOCATION_ID = "dip";
+	String SOCKS_LOCATION_ID = "DEVHEC";
 	String SFTP_CHANNEL = "sftp";
-	String SFTP_USER = "SFTP";
+	String SFTP_USER = "SYuvraj@menabev.com";
 	String SFTP_HOST = "sftp";// Configured in cloud connector
-	String SFTP_PASSWORD = "Incture@123";
+	String SFTP_PASSWORD = "Menabev@159";
 	Integer SFTP_PORT = 8081;// Configured in cloud connector
 	String STRICT_HOST_KEY_CHECKING_KEY = "StrictHostKeyChecking";
 	String STRICT_HOST_KEY_CHECKING_VALUE = "no";
-	String ABBYY_REMOTE_INPUT_FILE_DIRECTORY = "/C/ABBYY/Input/";
-	String ABBYY_REMOTE_OUTPUT_FILE_DIRECTORY = "/C/ABBYY/Output/";
+	String ABBYY_REMOTE_INPUT_FILE_DIRECTORY = "";
+	String ABBYY_REMOTE_OUTPUT_FILE_DIRECTORY = "";
 
 	// ----------------------------------------------------------//
 

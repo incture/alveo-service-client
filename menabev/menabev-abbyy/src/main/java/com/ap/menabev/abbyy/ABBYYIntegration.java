@@ -98,7 +98,8 @@ public class ABBYYIntegration {
 		try {
 			for (File file : files) {
 				String inputFilePath = file.getAbsolutePath();
-				channelSftp.put(inputFilePath, abbyyRemoteInputDirectory + file.getName());
+				channelSftp.cd("\\Input\\");
+				channelSftp.put(inputFilePath,file.getName());
 
 			}
 			message = "File uploaded";
@@ -115,11 +116,12 @@ public class ABBYYIntegration {
 		List<JSONObject> jsonList = new ArrayList<JSONObject>();
 		try {
 			logger.error("Errorrrrrrrrrrrr"+ServiceUtil.isEmpty(channelSftp));
-			channelSftp.cd(ApplicationConstants.ABBYY_REMOTE_OUTPUT_FILE_DIRECTORY);
-			Vector<?> filelist = channelSftp.ls(ApplicationConstants.ABBYY_REMOTE_OUTPUT_FILE_DIRECTORY);
+			Vector<?> filelist = channelSftp.ls(".json");
 			for (int i = 0; i < filelist.size(); i++) {
 				LsEntry entry = (LsEntry) filelist.get(i);
+				logger.error("INSIDE JSON "+entry.getFilename());
 				if (entry.getFilename().contains(".json")) {
+					logger.error("INSIDE JSON ");
 					InputStream is = channelSftp.get(entry.getFilename());
 					ObjectMapper mapper = new ObjectMapper();
 					Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
