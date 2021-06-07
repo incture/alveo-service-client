@@ -62,6 +62,32 @@ public class InvoiceHeaderController {
 	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId) {
 		return headerService.getInvoiceDetailChanged(requestId);
 	}
+	@GetMapping("/getInvoiceByReqId/{requestId}/item")
+	public ResponseEntity<?> getByInvoiceRequestIdItem(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
+	}
+	@GetMapping("/getInvoiceByReqId/{requestId}/costAllocation")
+	public ResponseEntity<?> getByInvoiceRequestIdCostAllocation(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
+	}
+	@GetMapping("/getInvoiceByReqId/{requestId}/invoiceItemAcctAssignment")
+	public ResponseEntity<?> getByInvoiceRequestIdInvoiceItemAcct(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
+	}
+
+	@GetMapping("/getInvoiceByReqId/{requestId}/attachment")
+	public ResponseEntity<?> getByInvoiceRequestIdAttachment(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
+	}
+	
+	@GetMapping("/getInvoiceByReqId/{requestId}/comment")
+	public ResponseEntity<?> getByInvoiceRequestIdComment(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
+	}
+
+
+
+
 
 
 	@DeleteMapping("/delete/{id}")

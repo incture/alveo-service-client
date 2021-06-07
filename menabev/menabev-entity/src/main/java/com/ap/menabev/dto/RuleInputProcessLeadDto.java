@@ -13,8 +13,8 @@ public class RuleInputProcessLeadDto implements RuleInputDto {
 	@Override
 	public String toRuleInputString(String rulesServiceId) {
 		return "{ \"RuleServiceId\" : \"" + rulesServiceId + "\", \"Vocabulary\" : [ {"
-				+ "\"ReturnOrderRuleInputDto\" : { \"vendorId\":" + "\"" + this.getVendorId() + "\""
-				+ ",\"compCode\":" + "\"" + this.getCompCode() + "\"" + ",\"processLeadCheck\":" + "\""
+				+ "\"AcctOrProcessLeadDeterminationNode\" : { \"VendorId\":" + "\"" + this.getVendorId() + "\""
+				+ ",\"CompanyCode\":" + "\"" + this.getCompCode() + "\"" + ",\"ProcessLeadCheck\":" + "\""
 				+ this.getProcessLeadCheck() + "\"" + "} } ] }";
 
 	}

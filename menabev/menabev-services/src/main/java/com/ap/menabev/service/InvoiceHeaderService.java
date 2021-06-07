@@ -80,5 +80,17 @@ public interface InvoiceHeaderService {
 	ResponseDto delete(String id);
 
 	ResponseEntity<?> getInvoiceDetailChanged(String requestId);
+	
+	ResponseEntity<?> getInvoiceItemDetail(String requestId);
+	
+	ResponseEntity<?> getCostAllocationDetail(String requestId);
+	
+	ResponseEntity<?> getInvoiceAcctAssinment(String requestId);
+	
+	ResponseEntity<?> getInvoiceAttachment(String requestId);
+	
+	ResponseEntity<?> getInvoiceComments(String requestId);
+	
+	ResponseEntity<?> getActivityLog(String requestId);
 
 }

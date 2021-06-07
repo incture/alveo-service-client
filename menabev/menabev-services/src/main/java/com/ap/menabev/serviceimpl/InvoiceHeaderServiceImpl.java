@@ -272,12 +272,17 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			// Determine RUle for Process lead 
 			 String requestId = null;
 			AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
-			determination.setCompCode(invoiceDto.getInvoiceHeaderDto().getCompCode());
+			determination.setCompCode("1010");
 			determination.setProcessLeadCheck("Process Lead");
 			determination.setVednorId(invoiceDto.getInvoiceHeaderDto().getVendorId());
 		            ResponseEntity<?> responseRules =    triggerRuleService(determination);
-		            System.err.println("responseFrom Worklfow "+ responseRules);
-			// Generate Request Id 
+		            System.err.println("responseFrom Rules "+ responseRules);
+		            if(responseRules.getStatusCodeValue()==200){
+		            	@SuppressWarnings("unchecked")
+						List<ApproverDataOutputDto> lists =(List<ApproverDataOutputDto>) responseRules.getBody();
+			
+		            	
+		            	// Generate Request Id 
 			if(invoiceDto.getInvoiceHeaderDto().getRequestId()!=null && !invoiceDto.getInvoiceHeaderDto().getRequestId().isEmpty()){
 				requestId = invoiceDto.getInvoiceHeaderDto().getRequestId();
 			}else{
@@ -290,9 +295,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			context.setInvoiceReferenceNumber(invoiceDto.getInvoiceHeaderDto().getExtInvNum());
 			context.setNonPo(true);
 			context.setManualNonPo(true);
-			context.setAccountantGroup("APADev@incture.com");
-			context.setAccountantUser("arun.gauda@incture.com");
-			context.setProcessLead("P000021");
+			context.setAccountantGroup(invoiceDto.getInvoiceHeaderDto().getTaskOwner());
+			context.setAccountantUser(invoiceDto.getInvoiceHeaderDto().getTaskOwnerId());
+			context.setProcessLead(lists.get(0).getUserOrGroup());
 			
 		ResponseEntity<?> response  = triggerWorkflow((WorkflowContextDto)context,"triggerresolutionworkflow.triggerresolutionworkflow");
 		System.err.println("response of workflow Trigger "+response);
@@ -342,10 +347,17 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		    }
 		// Update the Activity Log table 
 		    updateActivityLog();
-		    
-		    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created");
-		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
-		}catch (Exception e){
+		    if(lists.get(0).getUserType().equals("Default")){
+		    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created & task is availble to Default User "+lists.get(0).getUserOrGroup());
+		    }else{
+		    	 invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created & task is availble to User "+lists.get(0).getUserOrGroup());	
+		    }
+		    return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
+		            }else{
+		            	return new ResponseEntity<>(responseRules ,HttpStatus.OK);
+		            }
+		            
+		            }catch (Exception e){
 			
 			return new ResponseEntity<String>("Failed due to "+e.toString(),HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -774,6 +786,63 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 		        
 	}
+	
+	
+	@Override
+	public ResponseEntity<?> getInvoiceItemDetail(String requestId) {
+
+		
+		CreateInvoiceHeaderChangeDto invoiceItemAndHeader = new CreateInvoiceHeaderChangeDto();
+		  InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
+		  InvoiceHeaderChangeDto invoiceHeaderDto  =  ObjectMapperUtils.map(invoiceHeaderDo,InvoiceHeaderChangeDto.class);   
+		  // get InvoiceItem
+		   List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
+		   List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
+		
+		   
+		return null;
+	}
+
+
+
+	@Override
+	public ResponseEntity<?> getCostAllocationDetail(String requestId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ResponseEntity<?> getInvoiceAcctAssinment(String requestId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ResponseEntity<?> getInvoiceAttachment(String requestId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ResponseEntity<?> getInvoiceComments(String requestId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ResponseEntity<?> getActivityLog(String requestId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	@Override
 	public List<InvoiceHeaderDto> getAll() {
 		List<InvoiceHeaderDto> list = new ArrayList<>();
@@ -1469,43 +1538,73 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	// ----------   
 	
 public ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination) throws ClientProtocolException, IOException, URISyntaxException{
-		RuleInputProcessLeadDto ruleInput = new RuleInputProcessLeadDto();
+	 List<ApproverDataOutputDto>  lists = null;	
+	 try{
+	RuleInputProcessLeadDto ruleInput = new RuleInputProcessLeadDto();
 		ruleInput.setCompCode(determination.getCompCode());
 		ruleInput.setProcessLeadCheck(determination.getProcessLeadCheck());
 		ruleInput.setVendorId(determination.getVednorId());
+		System.err.println("ruleInput "+ ruleInput.toRuleInputString(RuleConstants.menaBevRuleService) );
 		ResponseEntity<?> response  = execute((RuleInputDto) ruleInput ,RuleConstants.menaBevRuleService);
-	   // call convert statement and than get the ouput and return it .
+	  System.err.println("1477 responseFromRulesTrigger"+response);
+		// call convert statement and than get the ouput and return it .
 		if(response.getStatusCodeValue() == 201){
 		String node = (String)	response.getBody();
-		//convertFromJSonNodeRo(node);
-		
-			return response;
+		     lists =  convertFromJSonNodeRo(node,"Not-Default");
+		     
+		     if(lists.isEmpty()||lists==null){
+		     RuleInputProcessLeadDto Default = new RuleInputProcessLeadDto();
+		     Default.setCompCode("Default");
+		     Default.setProcessLeadCheck("Default");
+		     Default.setVendorId("Default");
+		     
+		     ResponseEntity<?> responseDefault  = execute((RuleInputDto) Default ,RuleConstants.menaBevRuleService);
+		     if(responseDefault.getStatusCodeValue() == 201){
+		 		String nodeDefault = (String)	responseDefault.getBody();
+		 		     lists =  convertFromJSonNodeRo(nodeDefault,"Default");
+		 		     if(!lists.isEmpty() && lists!=null){
+		 		    return new ResponseEntity<>(lists,HttpStatus.OK);
+		 		     }else {
+		 		    	 return new ResponseEntity<>("Defualt Reccord is missing in Rule file",HttpStatus.CONFLICT);	 
+		 		     }
+		 		     }else{
+		 		    	return new ResponseEntity<>(response,HttpStatus.CONFLICT);	 
+		 		     }
+		     } else{
+		    		return new ResponseEntity<>(lists,HttpStatus.OK); 
+		     }
 		}else {
-			return response;
+			return new ResponseEntity<>(response,HttpStatus.CONFLICT);
 		}
+	 }catch(Exception e){
+		 return new ResponseEntity<>(e.toString(),HttpStatus.INTERNAL_SERVER_ERROR);
+	 }
 	}
 
 
-/*public List<RuleOutputDto> convertFromJSonNodeRo(String node){
+public List<ApproverDataOutputDto> convertFromJSonNodeRo(String node,String checkDefault){
 	List<ApproverDataOutputDto> approverList = new ArrayList<>();
 	JSONObject jObj = new JSONObject(node);
 	JSONArray arr = jObj.getJSONArray("Result");
-	JSONArray innerArray = null;
+	JSONObject innerObject = null;
 	if(!arr.isNull(0))
-		innerArray = arr.getJSONObject(0).getJSONArray("AcctOrProcessLeadDeterminationResult");
-	
-	if(innerArray!=null) {
-	for (int i = 0; i < innerArray.length(); i++) {
-		Map<String,String> userMap = new HashMap<String,String>();
-		 form map to add userDetails
+		innerObject = arr.getJSONObject(0).getJSONObject("AcctOrProcessLeadDeterminationResult");
+	System.err.println("innerObj "+innerObject);
+	if(!innerObject.isEmpty()&&innerObject!=null) {
+	//for (int i = 0; i < innerArray.length(); i++) {
+		ApproverDataOutputDto approverDto = new ApproverDataOutputDto();
+		approverDto.setUserOrGroup(innerObject.get("UserOrGroup").toString());
+		approverDto.setUserType(checkDefault);
+		approverList.add(approverDto);
 
-	}
+	//}
+		System.err.println("list of approveDto "+approverList);
 	return approverList;
 	}
-
-return null;
+	System.err.println("list of approveDto "+approverList);
+return approverList;
 }
-	*/
+	
 	
 	protected ResponseEntity<?> execute(RuleInputDto input, String rulesServiceId) throws ClientProtocolException, IOException, URISyntaxException {
 
@@ -1516,7 +1615,7 @@ return null;
 		CloseableHttpResponse response = null;
 		CloseableHttpClient httpClient = null;
 		httpClient = getHTTPClient();
-		
+		System.err.println("1561 RuleInput "+input);
 		// need to set still the ruleServiceId and than , process the output.
 		
 		String jwToken = getJwtTokenForAuthenticationForRulesSapApi();
@@ -1529,6 +1628,7 @@ return null;
 		String ruleInputString = input.toRuleInputString(rulesServiceId);
 		StringEntity stringEntity = new StringEntity(ruleInputString);
 
+		System.err.println("stringEntity "+ ruleInputString);
 		httpPost.setEntity(stringEntity);
 
 		response = httpClient.execute(httpPost);
@@ -1537,7 +1637,7 @@ return null;
 		// process your response here
 		
 		System.err.println("RuleTriggerResponse ="+response);
-		if (response.getStatusLine().getStatusCode() == HttpStatus.CREATED.value()) {
+		if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 			String dataFromStream = getDataFromStream(response.getEntity().getContent());
 			
 			if (httpPost != null) {
@@ -1717,5 +1817,8 @@ return null;
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+
 	
 }
