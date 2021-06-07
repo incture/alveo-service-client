@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "ATTACHMENT")
+@Table(name = "ATTACHMENT_DOC")
 public @Data class AttachmentDo {
 	
 	@Id

@@ -6,7 +6,7 @@ import lombok.Data;
 
 
 public @Data class CommentDto {
-	private String commentId= UUID.randomUUID().toString();
+	private String commentId;
 	private String requestId;
 	private String comment;
 	private String createdBy;

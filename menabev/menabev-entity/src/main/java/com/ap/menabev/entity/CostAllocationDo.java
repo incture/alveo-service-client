@@ -96,7 +96,9 @@ public @Data class CostAllocationDo {
 	@Column(name ="TAX_PER")
 	private String taxPer;
 	@Column(name ="TAX_RATE")
-	private String taxRate;
+	private String baseRate;
+	
+	
 	@Column(name ="MATERIAL_DESC")
 	private String materialDesc;
 	

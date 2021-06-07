@@ -3,17 +3,10 @@ package com.ap.menabev.dto;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
-import javax.persistence.Column;
+import lombok.Data;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
-@ToString
-@Getter
-@Setter
+@Data
 public class InvoiceHeaderDto {
 
 	private String requestId;

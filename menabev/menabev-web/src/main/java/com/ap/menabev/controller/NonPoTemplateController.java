@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ap.menabev.dto.AllocationDto;
+import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.NonPoTemplateFilterDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
@@ -33,8 +34,8 @@ public class NonPoTemplateController {
     @Autowired
     NonPoTemplateService nonPoTemplateService;
     
-    @Autowired
-    JournalEntryService   nonJournalEntryService;
+   /* @Autowired
+    JournalEntryService   nonJournalEntryService;*/
     
     @PostMapping("/save")
 	public ResponseDto save(@RequestBody NonPoTemplateHIDto dto) {
@@ -72,10 +73,10 @@ public class NonPoTemplateController {
 		return nonPoTemplateService.selectNonPoTemplate();
 	}
 	
-	@PostMapping("/postNonPoItemsToSap")
-	public ResponseEntity<?> postNonPoItemsToSAP() throws IOException, URISyntaxException{
+/*	@PostMapping("/postNonPoItemsToSap")
+	public ResponseEntity<?> postNonPoItemsToSAP(@RequestBody CreateInvoiceHeaderDto create) throws IOException, URISyntaxException{
 		return nonJournalEntryService.postNonPoItemsToSAP();
-	}
+	}*/
 	
 	@PostMapping("/uploadExcel")
 	public List<NonPoTemplateItemsDto> uploadExcel(@RequestParam("file") MultipartFile mfile) throws IOException{

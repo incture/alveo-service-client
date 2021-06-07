@@ -19,6 +19,8 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import lombok.ToString;
+
 
 /**
  * <p>Java class for BusinessDocumentMessageHeader complex type.
@@ -65,6 +67,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "recipientParty",
     "businessScope"
 })
+@ToString
 public class BusinessDocumentMessageHeader {
 
     @XmlElement(name = "ID")

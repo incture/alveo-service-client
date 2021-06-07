@@ -1,16 +1,11 @@
 package com.ap.menabev.dto;
 
 
-import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Lob;
-
 import lombok.Data;
 
 public @Data class AttachmentDto {
 	
-private String attachmentId ;
+    private String attachmentId ;
 	private String requestId;
 	private String fileName;
 	private String fileType;

@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import lombok.ToString;
+
 
 /**
  * <p>Java class for JournalEntryCreateRequestJournalEntry complex type.
@@ -98,6 +100,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "productTaxItem",
     "withholdingTaxItem"
 })
+@ToString
 public class JournalEntryCreateRequestJournalEntry {
 
     @XmlElement(name = "OriginalReferenceDocumentType", required = true)

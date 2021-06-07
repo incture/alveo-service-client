@@ -220,7 +220,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceHeaderDo.setValidationStatus("Draft");
 				invoiceHeaderDo.setDocStatus("Draft");
 			 InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
-			
 			    // save invoice item
 			    if(invoiceDto.getInvoiceHeaderDto().getInvoiceItems()!=null && !invoiceDto.getInvoiceHeaderDto().getInvoiceItems().isEmpty()){
 			List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
@@ -255,6 +254,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					    	
 					    	commentRepository.saveAll(commentList);
 					    }
+					    invoiceDto.getInvoiceHeaderDto().setRequestId(requestId);
 			    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId() +" saved as draft");
 		return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
 		} catch (Exception e){
@@ -329,6 +329,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		    }
 		    if(invoiceDto.getInvoiceHeaderDto().getAttachments()!=null && !invoiceDto.getInvoiceHeaderDto().getAttachments().isEmpty()){
 		    	List<AttachmentDo> attachementList = ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getAttachments(), AttachmentDo.class);
+		    	System.err.println("attachementList "+attachementList);
 		    	attachementList.stream().forEach(item->{item.setRequestId(invoiceSavedDo.getRequestId());});
 		    	attachmentRepository.saveAll(attachementList);
 		    }
