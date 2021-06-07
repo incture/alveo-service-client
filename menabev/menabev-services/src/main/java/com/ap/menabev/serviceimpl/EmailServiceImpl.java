@@ -49,10 +49,16 @@ public class EmailServiceImpl implements EmailServices {
 						.equalsIgnoreCase(json.getString("transactionType"))
 						|| ApplicationConstants.TRANSACTION_TYPE_DEBIT
 								.equalsIgnoreCase(json.getString("transactionType"))) {
-					emailBody = "Hi,\nFind the Attachement for " + json.getString("transactionType").toUpperCase()
-							+ " with PO NUMBER:"+json.getString("PO_Number")+".\nThanks,\nTeam AP";
-					logger.error("Inside Else");
-
+					if(json.has("PO_Number")&&!ServiceUtil.isEmpty(json.getString("PO_Number"))){
+						emailBody = "Hi,\nFind the Attachement for " + json.getString("transactionType").toUpperCase()
+								+ " with PO NUMBER: "+json.getString("PO_Number")+".\nThanks,\nTeam AP";
+						logger.error("Inside if of else");
+					}else{
+						emailBody = "Hi,\nFind the Attachement for " + json.getString("transactionType").toUpperCase()
+								+ ".\nThanks,\nTeam AP";
+						logger.error("Inside Else");
+					}
+					
 					message = email.sendmailTOCSU(ApplicationConstants.CSU_EMAIL,
 							ApplicationConstants.UPLOAD_INVOICE_TO_CSU_SUBJECT, emailBody, file);
 					logger.error("Printing Message:::" + message);
