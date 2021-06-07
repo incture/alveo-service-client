@@ -4,7 +4,7 @@
 		<content>
 			<IconTabBar >
 				<items>
-					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo" class="IconTabBG">
+					<IconTabFilter text="{i18n>USERLIST} ({oUserDetailModel>/userCount})" key="HeaderInfo" class="IconTabBG">
 						<Table items="{oUserDetailModel>/users}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
 							id="USERMANAGEMENT">
 							<headerToolbar>
@@ -57,7 +57,7 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>GROUPLIST}" key="HeaderInfo">
+					<IconTabFilter text="{i18n>GROUPLIST} ({oUserDetailModel>/groupCount})" key="HeaderInfo">
 						<Table items="{oUserDetailModel>/groupList}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
 							id="USERGROUPS">
 							<headerToolbar>

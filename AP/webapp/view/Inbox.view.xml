@@ -52,13 +52,13 @@
 						</fb:FilterItem>
 						<fb:FilterItem name="D" label="{i18n>InvoiceDateFrom}">
 							<fb:control>
-								<DatePicker id="idInvoiceFrom" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
+								<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
 									value="{taskDataFilterModel>/createdAtFrom}"  tooltip="Invoice From Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
 						<fb:FilterItem name="E" label="{i18n>InvoiceDateTo}">
 							<fb:control>
-								<DatePicker id="idInvoiceTo" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
+								<DatePicker  displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
 									value="{taskDataFilterModel>/createdAtTo}"  tooltip="Invoice To Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
@@ -69,13 +69,13 @@
 						</fb:FilterItem>
 						<fb:FilterItem name="G" label="{i18n>DueDateFrom}">
 							<fb:control>
-								<DatePicker id="idDueFrom" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
+								<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
 									value="{taskDataFilterModel>/dueDateFrom}"  tooltip="Due From Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
 						<fb:FilterItem name="H" label="{i18n>DueDateTo}">
 							<fb:control>
-								<DatePicker id="idDueTo" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
+								<DatePicker  displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
 									value="{taskDataFilterModel>/dueDateTo}"  tooltip="Due To Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
@@ -92,7 +92,7 @@
 						</fb:FilterItem>
 						<fb:FilterItem name="K" label="{i18n>ProcessStatus}">
 							<fb:control>
-								<Select  forceSelection="false" id="processStatusDropDown" items="{processModel>/items}"
+								<Select  forceSelection="false" items="{processModel>/items}"
 									selectedKey="{taskDataFilterModel>/validationStatus}">
 									<core:Item key="{processModel>lifeCycleStatus}" text="{processModel>text}"/>
 								</Select>
@@ -114,11 +114,6 @@
 				<!--	<Button text="Clear"  type="Default" press="fnClear"></Button>-->
 				<!--</Toolbar>-->
 			</VBox>
-			<OverflowToolbar>
-				<ToolbarSpacer></ToolbarSpacer>
-				<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"  visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>
-				<Button icon="sap-icon://action-settings" type="Emphasized"/>
-			</OverflowToolbar>
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
 					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResultCount})" key="openTask">

@@ -2,39 +2,38 @@
 	xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<Page title="{i18n>title}" class="sapUiSizeCompact">
 		<content>
-			<l:Grid defaultSpan="XL2 L2 M6 S12" vSpacing="0.5" class="GridBG">
-				<l:content>
-					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>CompanyCode}" design="Bold">
+			<!--<l:Grid defaultSpan="XL2 L2 M6 S12" vSpacing="0.5" class="GridBG">-->
+			<!--	<l:content>-->
+			<!--		<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>CompanyCode}" design="Bold">-->
 						<!--<layoutData>-->
 						<!--	<l:GridData span="L1 M1 S1"/>-->
 						<!--</layoutData>-->
-					</Label>
-					<ComboBox items="{ path: 'mCompanyModel>/results' }" class="" change="onCompanySelect" selectionChange="onSelect"
-						valueState="{baseModel>/companyCodeError}" selectedKey="{oMasterModel>/configurationDto/companyCode}" editable="{baseModel>/Editable}">
-						<core:ListItem key="{mCompanyModel>companyCode}" text="{mCompanyModel>companyCode}"/>
-					</ComboBox>
-					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>TaxCode}" design="Bold">
-						<layoutData>
-							<l:GridData span="L1 M1 S1"/>
-						</layoutData>
-					</Label>
-					<ComboBox items="{ path: 'mTaxModel>/results' }" class="" selectedKey="{oMasterModel>/configurationDto/defaultTaxCode}"
-						editable="{baseModel>/Editable}" valueState="{baseModel>/defaultTaxCodeError}" selectionChange="onSelect">
-						<core:ListItem key="{mTaxModel>taxCode}" text="{mTaxModel>taxCode}"/>
-					</ComboBox>
-					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>OcrSource}" design="Bold">
-						<layoutData>
-							<l:GridData span="L1 M1 S1"/>
-						</layoutData>
-					</Label>
-					<ComboBox class="" selectedKey="{oMasterModel>/configurationDto/ocrSource}" selectionChange="onSelect"
-						valueState="{baseModel>/ocrSourceError}">
-						<core:ListItem key="SAP OCR" text="SAP OCR"/>
-						<core:ListItem key="Abby Flexi Capture" text="Abby Flexi Capture"/>
-						<core:ListItem key="Abby Vantage" text="Abby Vantage"/>
-					</ComboBox>
-				</l:content>
-			</l:Grid>
+			<!--		</Label>-->
+			<!--		<ComboBox items="{ path: 'mCompanyModel>/results' }" change="onCompanySelect" selectionChange="onSelect"-->
+			<!--			valueState="{baseModel>/companyCodeError}" selectedKey="{oMasterModel>/configurationDto/companyCode}" editable="{baseModel>/Editable}">-->
+			<!--			<core:ListItem key="{mCompanyModel>companyCode}" text="{mCompanyModel>companyCode}"/>-->
+			<!--		</ComboBox>-->
+			<!--		<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>TaxCode}" design="Bold">-->
+			<!--			<layoutData>-->
+			<!--				<l:GridData span="L1 M1 S1"/>-->
+			<!--			</layoutData>-->
+			<!--		</Label>-->
+			<!--		<ComboBox items="{ path: 'mTaxModel>/results' }" selectedKey="{oMasterModel>/configurationDto/defaultTaxCode}"-->
+			<!--			editable="{baseModel>/Editable}" valueState="{baseModel>/defaultTaxCodeError}" selectionChange="onSelect">-->
+			<!--			<core:ListItem key="{mTaxModel>taxCode}" text="{mTaxModel>taxCode}"/>-->
+			<!--		</ComboBox>-->
+			<!--		<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>OcrSource}" design="Bold">-->
+			<!--			<layoutData>-->
+			<!--				<l:GridData span="L1 M1 S1"/>-->
+			<!--			</layoutData>-->
+			<!--		</Label>-->
+			<!--		<ComboBox selectedKey="{oMasterModel>/configurationDto/ocrSource}" selectionChange="onSelect" valueState="{baseModel>/ocrSourceError}">-->
+			<!--			<core:ListItem key="SAP OCR" text="SAP OCR"/>-->
+			<!--			<core:ListItem key="Abby Flexi Capture" text="Abby Flexi Capture"/>-->
+			<!--			<core:ListItem key="Abby Vantage" text="Abby Vantage"/>-->
+			<!--		</ComboBox>-->
+			<!--	</l:content>-->
+			<!--</l:Grid>-->
 			<OverflowToolbar>
 				<Label text="{i18n>EMAILREADERCONFIGURATION}"></Label>
 				<ToolbarSpacer/>
@@ -61,8 +60,13 @@
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<Input value="{oMasterModel>/schedulerConfigurationdto/0/frequencyNumber}" type="Number" class=""
-						valueState="{baseModel>/frequencyNumber0Error}" change="onNumberCheck"></Input>
+					<Select forceSelection="false" width="100%" items="{StaticDataModel>/frequency}"
+						selectedKey="{oMasterModel>/schedulerConfigurationdto/0/frequencyNumber}" valueStateText=" " valueState="{baseModel>/frequencyNumber0Error}"
+						enabled="false">
+						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+					</Select>
+					<!--<Input value="{oMasterModel>/schedulerConfigurationdto/0/frequencyNumber}" type="Number"-->
+					<!--	valueState="{baseModel>/frequencyNumber0Error}" change="onNumberCheck"></Input>-->
 					<ComboBox class="sapUiSmallMarginBegin borderlessBox " valueState="{baseModel>/frequencyUnit0Error}"
 						selectedKey="{oMasterModel>/schedulerConfigurationdto/0/frequencyUnit}" editable="{baseModel>/Editable}" selectionChange="onSelect">
 						<core:Item key="min" text="Minutes"/>
@@ -96,192 +100,196 @@
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<Input value="{oMasterModel>/schedulerConfigurationdto/1/frequencyNumber}" type="Number" class="" change="onNumberCheck"
-						valueState="{baseModel>/frequencyNumber1Error}"></Input>
-					<ComboBox class="sapUiSmallMarginBegin borderlessBox " valueState="{baseModel>/frequencyUnit1Error}"
-						selectedKey="{oMasterModel>/schedulerConfigurationdto/1/frequencyUnit}" editable="{baseModel>/Editable}" selectionChange="onSelect">
-						<core:Item key="min" text="Minutes"/>
-						<core:Item key="hrs" text="Hours"/>
-					</ComboBox>
-				</l:content>
-			</l:Grid>
-			<l:Grid defaultSpan="XL6 L6 M12 S12" vSpacing="0.5" class="GridBG">
-				<l:content>
-					<Table mode="MultiSelect" id="apMailboxTable" class="" items="{oMasterModel>/emailTeamDto/0/emailId}">
-						<headerToolbar>
-							<OverflowToolbar>
-								<ToolbarSpacer/>
-								<Button icon="sap-icon://add" type="Emphasized" press="fnAddAPMailBox" enabled="{baseModel>/Editable}"/>
-								<Button icon="sap-icon://delete" type="Emphasized" enabled="{baseModel>/Editable}" press="fnDeleteAPMailBox"/>
-							</OverflowToolbar>
-						</headerToolbar>
-						<columns>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
-								<Text text="{i18n>ACCOUNTSPAYABLEMAILBOXID}"/>
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem>
-								<cells>
-									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" class="" width="100%"
-										valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }" editable="{baseModel>/Editable}"/>
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-					<Table mode="MultiSelect" id="apScanTable" class="" items="{oMasterModel>/emailTeamDto/1/emailId}">
-						<headerToolbar>
-							<OverflowToolbar>
-								<ToolbarSpacer/>
-								<Button icon="sap-icon://add" type="Emphasized" enabled="{baseModel>/Editable}" press="fnAddAPScanTeam"/>
-								<Button icon="sap-icon://delete" type="Emphasized" enabled="{baseModel>/Editable}" press="fnDeleteAPScanTeam"/>
-							</OverflowToolbar>
-						</headerToolbar>
-						<columns>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
-								<Text text="{i18n>ACCOUNTSPAYABLESCANNINGTEAM}"/>
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem>
-								<cells>
-									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" class="" width="100%"
-										editable="{baseModel>/Editable}" valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }"/>
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-					<Table id="idProductsTable" mode="MultiSelect" class="sapUiTinyMarginBottom " items="{oMasterModel>/vendorDetailsDto}">
-						<headerToolbar>
-							<OverflowToolbar>
-								<Title text=""/>
-								<ToolbarSpacer/>
-								<Button icon="sap-icon://add" type="Emphasized" press="fnAddItem" enabled="{baseModel>/Editable}"/>
-								<Button icon="sap-icon://delete" type="Emphasized" press="fnDeleteItem" enabled="{baseModel>/Editable}"/>
-							</OverflowToolbar>
-						</headerToolbar>
-						<columns>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" width="25%">
-								<Text text="{i18n>VENDORID}"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" width="25%">
-								<Text text="{i18n>COMPANYCODE}"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
-								<Text text="{i18n>AUTOPOSTING}"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
-								<Text text="{i18n>PARTIALPOSTING}"/>
-							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
-								<Text text="{i18n>AUTOREJECTION}"/>
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem>
-								<cells>
-									<Input value="{oMasterModel>vendorId}" valueState="{oMasterModel>vendorIdError}">
-										<!--- Uncomment it when odata is available -->
-										<!--<Input value="{oMasterModel>vendorId}" suggest="searchVendorId" startSuggestion="3" maxSuggestionWidth="20rem" showSuggestion="true"-->
-										<!--	filterSuggests="false" maxLength="20" showTableSuggestionValueHelp="false" suggestionRows="{suggestionModel>/d/results}"-->
-										<!--	suggestionItemSelected="onVendorSelected" change="chkSelectedVendor" editable="{baseModel>/Editable}">-->
-										<!--	<suggestionColumns>-->
-										<!--		<Column hAlign="Begin">-->
-										<!--			<Label text="Vendor Id"/>-->
-										<!--		</Column>-->
-										<!--		<Column hAlign="Center">-->
-										<!--			<Label text="Vendor Name1"/>-->
-										<!--		</Column>-->
-										<!--	</suggestionColumns>-->
-										<!--	<suggestionRows>-->
-										<!--		<ColumnListItem>-->
-										<!--			<cells>-->
-										<!--				<Text text="{path:'suggestionModel>Vendor', formatter:'com.inc.ConfigCockpit.util.Formatter.removeZero'}" wrapping="true"/>-->
-										<!--				<Text text="{suggestionModel>Name1}" tooltip="{suggestionModel>Name1}"/>-->
-										<!--			</cells>-->
-										<!--		</ColumnListItem>-->
-										<!--	</suggestionRows>-->
-									</Input>
-									<ComboBox items="{ path: 'mCompanyModel>/results' }" valueState="{oMasterModel>companyCodeError}" class=""
-										selectedKey="{oMasterModel>companyCode}" editable="{baseModel>/Editable}" selectionChange="onSelect">
-										<core:ListItem key="{mCompanyModel>companyCode}" text="{mCompanyModel>companyName} - {mCompanyModel>companyCode}"/>
-									</ComboBox>
-									<Switch state="{oMasterModel>autoPosting}" type="AcceptReject" enabled="{baseModel>/Editable}">
-										<layoutData>
-											<FlexItemData growFactor="1"/>
-										</layoutData>
-									</Switch>
-									<Switch state="{oMasterModel>partialPosting}" type="AcceptReject" enabled="{baseModel>/Editable}">
-										<layoutData>
-											<FlexItemData growFactor="1"/>
-										</layoutData>
-									</Switch>
-									<Switch state="{oMasterModel>autoRejection}" type="AcceptReject" enabled="{baseModel>/Editable}">
-										<layoutData>
-											<FlexItemData growFactor="1"/>
-										</layoutData>
-									</Switch>
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-					<Panel expandable="true" headerText="{i18n>EMAILTEMPLATES}" expanded="false" class="templatePanel">
-						<content>
-							<HBox>
-								<Label text="{i18n>REJECTIONMAILTEMPLATE}" design="Bold"/>
-								<VBox class="MailTemplate">
-									<HBox>
-										<Label text="{i18n>SUBJECT}" class="sapUiSmallMarginEnd"/>
-										<VBox width="100%">
-											<TextArea value="{oMasterModel>/mailTemplateDto/1/subject}" rows="1" width="100%" class="borderlessBox "
-												valueState="{baseModel>/subject1Error}" editable="{baseModel>/Editable}"/>
-										</VBox>
-									</HBox>
-									<HBox>
-										<Label text="{i18n>BODY}" class="sapUiMediumMarginEnd"/>
-										<VBox width="100%">
-											<TextArea value="{oMasterModel>/mailTemplateDto/1/body}" width="100%" rows="5" class="borderlessBox" editable="{baseModel>/Editable}"
-												valueState="{baseModel>/body1Error}"/>
-										</VBox>
-									</HBox>
-								</VBox>
-							</HBox>
-							<HBox>
-								<Label text="{i18n>EXCEPTIONMAILTEMPLATE}" design="Bold"/>
-								<VBox class="MailTemplate">
-									<HBox>
-										<Label text="{i18n>SUBJECT}" class="sapUiSmallMarginEnd"/>
-										<VBox width="100%">
-											<TextArea value="{oMasterModel>/mailTemplateDto/0/subject}" width="100%" rows="1" class="borderlessBox" editable="{baseModel>/Editable}"
-												valueState="{baseModel>/subject0Error}"/>
-										</VBox>
-									</HBox>
-									<HBox>
-										<Label text="{i18n>BODY}" class="sapUiMediumMarginEnd"/>
-										<VBox width="100%">
-											<TextArea value="{oMasterModel>/mailTemplateDto/0/body}" width="100%" rows="5" class="borderlessBox" editable="{baseModel>/Editable}"
-												valueState="{baseModel>/body0Error}"/>
-										</VBox>
-									</HBox>
-								</VBox>
-							</HBox>
-						</content>
-					</Panel>
-					<HBox>
-						<Label text="{i18n>MAXNUMBER}" design="Bold" class="sapUiTinyMarginTop"/>
-						<Input value="{oMasterModel>/configurationDto/maximumNoofUsers}" change="onNumberCheck" valueState="{baseModel>/maximumNoofUsersError}"
-							type="Number" width="5rem"></Input>
-					</HBox>
-				</l:content>
-			</l:Grid>
-		</content>
-		<footer>
-			<OverflowToolbar>
-				<ToolbarSpacer/>
-				<Button text="{i18n>SUBMIT}" type="Emphasized" press="onSubmit" visible="{baseModel>/submitBtn}"/>
-				<!--<Button text="Edit" type="Emphasized" press="onEdit" visible="{baseModel>/editBtn}"/>-->
-				<Button text="{i18n>CANCEL}"/>
-			</OverflowToolbar>
-		</footer>
-	</Page>
+				</Label>
+				<Select forceSelection="false" width="100%" items="{StaticDataModel>/frequency}"
+					selectedKey="{oMasterModel>/schedulerConfigurationdto/1/frequencyNumber}" valueStateText=" " valueState="{baseModel>/frequencyNumber1Error}"
+					enabled="false">
+					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+				</Select>
+				<ComboBox class="sapUiSmallMarginBegin borderlessBox " valueState="{baseModel>/frequencyUnit1Error}"
+					selectedKey="{oMasterModel>/schedulerConfigurationdto/1/frequencyUnit}" editable="{baseModel>/Editable}" selectionChange="onSelect">
+					<core:Item key="min" text="Minutes"/>
+					<core:Item key="hrs" text="Hours"/>
+				</ComboBox>
+			</l:content>
+		</l:Grid>
+		<l:Grid defaultSpan="XL6 L6 M12 S12" vSpacing="0.5" class="GridBG">
+			<l:content>
+				<Table mode="MultiSelect" id="apMailboxTable" items="{oMasterModel>/emailTeamDto/0/emailId}">
+					<headerToolbar>
+						<OverflowToolbar>
+							<ToolbarSpacer/>
+							<Button icon="sap-icon://add" type="Emphasized" press="fnAddAPMailBox" enabled="{baseModel>/Editable}"/>
+							<Button icon="sap-icon://delete" type="Emphasized" enabled="{baseModel>/Editable}" press="fnDeleteAPMailBox"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<columns>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
+							<Text text="{i18n>ACCOUNTSPAYABLEMAILBOXID}"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
+									valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }" editable="{baseModel>/Editable}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+				<Table mode="MultiSelect" id="apScanTable" items="{oMasterModel>/emailTeamDto/1/emailId}">
+					<headerToolbar>
+						<OverflowToolbar>
+							<ToolbarSpacer/>
+							<Button icon="sap-icon://add" type="Emphasized" enabled="{baseModel>/Editable}" press="fnAddAPScanTeam"/>
+							<Button icon="sap-icon://delete" type="Emphasized" enabled="{baseModel>/Editable}" press="fnDeleteAPScanTeam"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<columns>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
+							<Text text="{i18n>ACCOUNTSPAYABLESCANNINGTEAM}"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
+									editable="{baseModel>/Editable}" valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+				<Table id="idProductsTable" mode="MultiSelect" class="sapUiTinyMarginBottom " items="{oMasterModel>/vendorDetailsDto}">
+					<headerToolbar>
+						<OverflowToolbar>
+							<Title text=""/>
+							<ToolbarSpacer/>
+							<Button icon="sap-icon://add" type="Emphasized" press="fnAddItem" enabled="{baseModel>/Editable}"/>
+							<Button icon="sap-icon://delete" type="Emphasized" press="fnDeleteItem" enabled="{baseModel>/Editable}"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<columns>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" width="25%">
+							<Text text="{i18n>VENDORID}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" width="25%">
+							<Text text="{i18n>COMPANYCODE}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+							<Text text="{i18n>AUTOPOSTING}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+							<Text text="{i18n>PARTIALPOSTING}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+							<Text text="{i18n>AUTOREJECTION}"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Input value="{oMasterModel>vendorId}" valueState="{oMasterModel>vendorIdError}">
+									<!--- Uncomment it when odata is available -->
+									<!--<Input value="{oMasterModel>vendorId}" suggest="searchVendorId" startSuggestion="3" maxSuggestionWidth="20rem" showSuggestion="true"-->
+									<!--	filterSuggests="false" maxLength="20" showTableSuggestionValueHelp="false" suggestionRows="{suggestionModel>/d/results}"-->
+									<!--	suggestionItemSelected="onVendorSelected" change="chkSelectedVendor" editable="{baseModel>/Editable}">-->
+									<!--	<suggestionColumns>-->
+									<!--		<Column hAlign="Begin">-->
+									<!--			<Label text="Vendor Id"/>-->
+									<!--		</Column>-->
+									<!--		<Column hAlign="Center">-->
+									<!--			<Label text="Vendor Name1"/>-->
+									<!--		</Column>-->
+									<!--	</suggestionColumns>-->
+									<!--	<suggestionRows>-->
+									<!--		<ColumnListItem>-->
+									<!--			<cells>-->
+									<!--				<Text text="{path:'suggestionModel>Vendor', formatter:'com.inc.ConfigCockpit.util.Formatter.removeZero'}" wrapping="true"/>-->
+									<!--				<Text text="{suggestionModel>Name1}" tooltip="{suggestionModel>Name1}"/>-->
+									<!--			</cells>-->
+									<!--		</ColumnListItem>-->
+									<!--	</suggestionRows>-->
+								</Input>
+								<ComboBox items="{ path: 'mCompanyModel>/results' }" valueState="{oMasterModel>companyCodeError}" selectedKey="{oMasterModel>companyCode}"
+									editable="{baseModel>/Editable}" selectionChange="onSelect">
+									<core:ListItem key="{mCompanyModel>companyCode}" text="{mCompanyModel>companyName} - {mCompanyModel>companyCode}"/>
+								</ComboBox>
+								<Switch state="{oMasterModel>autoPosting}" type="AcceptReject" enabled="{baseModel>/Editable}">
+									<layoutData>
+										<FlexItemData growFactor="1"/>
+									</layoutData>
+								</Switch>
+								<Switch state="{oMasterModel>partialPosting}" type="AcceptReject" enabled="{baseModel>/Editable}">
+									<layoutData>
+										<FlexItemData growFactor="1"/>
+									</layoutData>
+								</Switch>
+								<Switch state="{oMasterModel>autoRejection}" type="AcceptReject" enabled="{baseModel>/Editable}">
+									<layoutData>
+										<FlexItemData growFactor="1"/>
+									</layoutData>
+								</Switch>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+				<Panel expandable="true" headerText="{i18n>EMAILTEMPLATES}" expanded="false" class="templatePanel">
+					<content>
+						<HBox>
+							<Label text="{i18n>REJECTIONMAILTEMPLATE}" design="Bold"/>
+							<VBox class="MailTemplate">
+								<HBox>
+									<Label text="{i18n>SUBJECT}" class="sapUiSmallMarginEnd"/>
+									<VBox width="100%">
+										<TextArea value="{oMasterModel>/mailTemplateDto/1/subject}" rows="1" width="100%" class="borderlessBox "
+											valueState="{baseModel>/subject1Error}" editable="{baseModel>/Editable}"/>
+									</VBox>
+								</HBox>
+								<HBox>
+									<Label text="{i18n>BODY}" class="sapUiMediumMarginEnd"/>
+									<VBox width="100%">
+										<TextArea value="{oMasterModel>/mailTemplateDto/1/body}" width="100%" rows="5" class="borderlessBox" editable="{baseModel>/Editable}"
+											valueState="{baseModel>/body1Error}"/>
+									</VBox>
+								</HBox>
+							</VBox>
+						</HBox>
+						<HBox>
+							<Label text="{i18n>EXCEPTIONMAILTEMPLATE}" design="Bold"/>
+							<VBox class="MailTemplate">
+								<HBox>
+									<Label text="{i18n>SUBJECT}" class="sapUiSmallMarginEnd"/>
+									<VBox width="100%">
+										<TextArea value="{oMasterModel>/mailTemplateDto/0/subject}" width="100%" rows="1" class="borderlessBox" editable="{baseModel>/Editable}"
+											valueState="{baseModel>/subject0Error}"/>
+									</VBox>
+								</HBox>
+								<HBox>
+									<Label text="{i18n>BODY}" class="sapUiMediumMarginEnd"/>
+									<VBox width="100%">
+										<TextArea value="{oMasterModel>/mailTemplateDto/0/body}" width="100%" rows="5" class="borderlessBox" editable="{baseModel>/Editable}"
+											valueState="{baseModel>/body0Error}"/>
+									</VBox>
+								</HBox>
+							</VBox>
+						</HBox>
+					</content>
+				</Panel>
+				<HBox>
+					<Label text="{i18n>MAXNUMBER}" design="Bold" class="sapUiTinyMarginTop"/>
+					<Input value="{oMasterModel>/configurationDto/maximumNoofUsers}" change="onNumberCheck" valueState="{baseModel>/maximumNoofUsersError}"
+						type="Number" width="5rem"></Input>
+				</HBox>
+			</l:content>
+		</l:Grid>
+	</content>
+	<footer>
+		<OverflowToolbar>
+			<ToolbarSpacer/>
+			<Button text="{i18n>SUBMIT}" type="Emphasized" press="onSubmit" visible="{baseModel>/submitBtn}"/>
+			<!--<Button text="Edit" type="Emphasized" press="onEdit" visible="{baseModel>/editBtn}"/>-->
+			<Button text="{i18n>CANCEL}"/>
+		</OverflowToolbar>
+	</footer>
+</Page>
 </mvc:View>

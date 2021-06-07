@@ -35,11 +35,13 @@ sap.ui.define([
 				}
 			});
 		},
+
 		onAddNewUser: function () {
 			this.oRouter.navTo("CreateUser", {
 				id: "new"
 			});
 		},
+
 		onEditUserDetails: function (oEvent) {
 			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
 			var oUserId = oContextObj.id;
@@ -47,11 +49,13 @@ sap.ui.define([
 				id: oUserId
 			});
 		},
+
 		onAddNewGroup: function () {
 			this.oRouter.navTo("CreateGroup", {
 				id: "new"
 			});
 		},
+
 		onEditGroupDetails: function (oEvent) {
 			var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
 			var oUserId = oContextObj.id;
@@ -59,6 +63,7 @@ sap.ui.define([
 				id: oUserId
 			});
 		},
+
 		getUserDetails: function (admin) {
 			var that = this;
 			var oUserDetailModel = this.oUserDetailModel;
@@ -104,28 +109,13 @@ sap.ui.define([
 							}
 						}
 					}
+					var count = userdata.length;
+					oUserDetailModel.setProperty("/userCount", count);
 					oUserDetailModel.setProperty("/users", userdata);
 				}
 			});
 		},
-		// getUserDetails1: function (id) {
-		// 	var oUserDetailModel = this.oUserDetailModel;
-		// 	var oServiceModel = new sap.ui.model.json.JSONModel();
-		// 	var sUrl = "/IDPDEST/service/scim/Groups/" + id;
-		// 	var busy = new sap.m.BusyDialog();
-		// 	var oHeader = {
-		// 		"Content-Type": "application/scim+json"
-		// 	};
-		// 	busy.open();
-		// 	oServiceModel.loadData(sUrl, "", true, "GET", true, false, oHeader);
-		// 	oServiceModel.attachRequestCompleted(function (oEvent) {
-		// 		busy.close();
-		// 		var data = oEvent.getSource().getData();
-		// 		if (data.Resources) {
-		// 			oUserDetailModel.setProperty("/users", data.Resources);
-		// 		}
-		// 	});
-		// },
+
 		fetchAllGroups: function () {
 			var oUserDetailModel = this.oUserDetailModel;
 			var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -137,8 +127,10 @@ sap.ui.define([
 			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				var data = oEvent.getSource().getData();
+				var count = data.Resources.count;
 				if (data.Resources) {
 					oUserDetailModel.setProperty("/groupList", data.Resources);
+					oUserDetailModel.setProperty("/groupCount", count);
 				}
 			});
 		},
@@ -264,7 +256,7 @@ sap.ui.define([
 			var that = this;
 			var value = oEvent.getSource().getValue();
 			var filters = [];
-			var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("id", sap.ui.model.FilterOperator.Contains, value),
+			var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("displayName", sap.ui.model.FilterOperator.Contains, value),
 				new sap.ui.model.Filter("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/description", sap.ui.model.FilterOperator.Contains,
 					value),
 				new sap.ui.model.Filter("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group/groupId", sap.ui.model.FilterOperator.Contains,

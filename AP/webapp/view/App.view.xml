@@ -4,6 +4,9 @@
 		<Page>
 			<customHeader>
 				<OverflowToolbar>
+					<Image src="images/menabevLogo.png" height="1.6rem" class="sapUiMediumMarginTopBottom"/>
+					<Label text="MenaBev" design="Bold"/>
+					<Text text="{StaticDataModel>/selectedApp}"></Text>
 					<ToolbarSpacer/>
 					<Button icon="sap-icon://customer" type="Transparent" class="UserIcon" tooltip="{i18n>PROFILE}" press="onUserDetailPressed"></Button>
 				</OverflowToolbar>

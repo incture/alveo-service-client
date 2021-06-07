@@ -1491,7 +1491,7 @@ sap.ui.define([
 
 		onDocumentDelete: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var nonPOInvoiceModel = this.nonPOInvoiceModel;
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
 			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
 			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
 			var attachments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
@@ -1503,6 +1503,7 @@ sap.ui.define([
 			var sUrl = "/menabevdev/document/delete/" + attachmentId;
 			oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, this.oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
+				busy.close();
 				attachments.splice(index, 1);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/attachments", attachments);
 
