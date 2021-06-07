@@ -50,7 +50,7 @@ public class EmailServiceImpl implements EmailServices {
 						|| ApplicationConstants.TRANSACTION_TYPE_DEBIT
 								.equalsIgnoreCase(json.getString("transactionType"))) {
 					emailBody = "Hi,\nFind the Attachement for " + json.getString("transactionType").toUpperCase()
-							+ ".\nThanks,\nTeam AP";
+							+ " with PO NUMBER:"+json.getString("PO_Number")+".\nThanks,\nTeam AP";
 					logger.error("Inside Else");
 
 					message = email.sendmailTOCSU(ApplicationConstants.CSU_EMAIL,
