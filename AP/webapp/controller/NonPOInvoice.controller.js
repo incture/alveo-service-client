@@ -1088,7 +1088,7 @@ sap.ui.define([
 				"clearingDate": "",
 				"clerkEmail": "",
 				"clerkId": 0,
-				"compCode": "",
+				"compCode": "1010", //hardCoded for testing
 				"createdAt": "",
 				"createdAtFrom": "",
 				"createdAtInDB": 0,

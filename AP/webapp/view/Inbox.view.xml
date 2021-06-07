@@ -5,7 +5,7 @@
 			<VBox class="salesReportHdrBoxClass">
 				<Toolbar class="tabClass">
 					<content>
-						<Label text="Configuration Cockpit" class="matTblLblClass"></Label>
+						<Label text="AP Workbench" class="matTblLblClass"></Label>
 					</content>
 				</Toolbar>
 				<fb:FilterBar  search="getInboxData" clear="fnClear" showClearButton="true" vSpacing="0" hSpacing="1"
@@ -79,15 +79,16 @@
 									value="{taskDataFilterModel>/dueDateTo}"  tooltip="Due To Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
-						<fb:FilterItem name="I" label="{i18n>InvoiceValueFrom}">
+						<fb:FilterItem name="D" label="{i18n>InvoiceDateFrom}">
 							<fb:control>
-								<Input value="{taskDataFilterModel>/invoiceTotalFrom}" tooltip="Invoice Value From" 
-									liveChange="onChangeInvoiceValue"/>
+								<DatePicker id="idInvoiceFrom" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
+									value="{taskDataFilterModel>/createdAtFrom}" class="sapUiSizeCompact" tooltip="Invoice From Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
-						<fb:FilterItem name="J" label="{i18n>InvoiceValueTo}">
+						<fb:FilterItem name="E" label="{i18n>InvoiceDateTo}">
 							<fb:control>
-								<Input value="{taskDataFilterModel>/invoiceTotalTo}" liveChange="onChangeInvoiceValue"  tooltip="Invoice Value To"/>
+								<DatePicker id="idInvoiceTo" displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
+									value="{taskDataFilterModel>/createdAtTo}" class="sapUiSizeCompact" tooltip="Invoice To Date" change="onDateRangeChange"/>
 							</fb:control>
 						</fb:FilterItem>
 						<fb:FilterItem name="K" label="{i18n>ProcessStatus}">
@@ -114,11 +115,11 @@
 				<!--	<Button text="Clear"  type="Default" press="fnClear"></Button>-->
 				<!--</Toolbar>-->
 			</VBox>
-			<OverflowToolbar>
-				<ToolbarSpacer></ToolbarSpacer>
-				<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"  visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>
-				<Button icon="sap-icon://action-settings" type="Emphasized"/>
-			</OverflowToolbar>
+			<!--<OverflowToolbar>-->
+			<!--	<ToolbarSpacer></ToolbarSpacer>-->
+			<!--	<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"  visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>-->
+			<!--	<Button icon="sap-icon://action-settings" type="Emphasized"/>-->
+			<!--</OverflowToolbar>-->
 			<IconTabBar id="idIconTabBarNoIcons" expanded="{device>/isNoPhone}" class="sapUiResponsiveContentPadding" select="onSelectTab">
 				<items>
 					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResultCount})" key="openTask">

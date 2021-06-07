@@ -28,7 +28,7 @@ sap.ui.define([
 				});
 			},
 			onCreateInvoice: function (oEvent) {
-				this.oRouter.navTo("NonPOInvoice",{
+				this.oRouter.navTo("NonPOInvoice", {
 					id: "NEW"
 				});
 			},
@@ -312,6 +312,12 @@ sap.ui.define([
 						return false;
 					}
 				}
+			},
+
+			onChangeInvoiceValue: function (oEvent) {
+				var oValue = oEvent.getSource().getValue();
+				oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
+				oEvent.getSource().setValue(oValue);
 			}
 		});
 	});
