@@ -61,7 +61,7 @@ public interface NonPoTemplateItemsRepository extends JpaRepository<NonPoTemplat
 	@Query(value=selectNonPoTemplateQuery,nativeQuery=true)
 	public List<Object[]> selectNonPoTemplate();
 
-	@Query("select distinct id.templateId from NonPoTemplateItemsDo id where  id.accountNo =?1")
+	@Query("select distinct id.templateId from NonPoTemplateItemsDo id where  UPPER(id.accountNo) like UPPER('%?1%')")
 	public List<String> getTemplateId(String accountNo);
 
 	String selectNonPoTemplateQueryById = "select distinct  t.TEMPLATE_ID, "
@@ -77,7 +77,7 @@ public interface NonPoTemplateItemsRepository extends JpaRepository<NonPoTemplat
 	@Query(value=selectNonPoTemplateQueryById,nativeQuery=true)
 	public List<Object[]> selectNonPoTemplateByTemplateId(List<String> getTemplateId);
 
-	@Query(value="select t.template_id from non_po_template_items t where account_no = ?2 and t.template_id = (select template_id from non_po_template where template_name = ?1)",nativeQuery=true)
+	@Query(value="select t.template_id from non_po_template_items t where UPPER(t.account_no) like UPPER('%?2%') and t.template_id = (select t2.template_id from non_po_template t2 where UPPER(t2.template_name) like UPPER('%?1%'))",nativeQuery=true)
 	public List<String> gettemplateIdByAccountNo(String templateName, String accountNo);
 
 	

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.http.Header;
@@ -85,6 +86,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	@Autowired
 	NonPoTemplateItemsService nonPoTemplateItemsService;
 
+	
 	private static final Logger logger = LoggerFactory.getLogger(NonPoTemplateServiceImpl.class);
 
 	@Override
@@ -182,9 +184,15 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				}
 
 			} else if (ServiceUtil.isEmpty(templateName)) {
-				System.out.println("templateId is null");
-				List<String> getTemplateId = nonPoTemplateItemsRepository.getTemplateId(accountNo);
-				System.out.println("List of template Id:::::" + getTemplateId);
+//				System.out.println("templateId is null");
+//				List<String> getTemplateId = nonPoTemplateItemsRepository.getTemplateId(accountNo);
+//				System.out.println("List of template Id:::::" + getTemplateId);
+				String finalQuery = "select templateId from NonPoTemplateItemsDo where UPPER(accountNo) like UPPER('%"+accountNo+"%')";
+				System.out.println("QUERY:::"+ finalQuery);
+				Query queryForOutput = entityManager.createQuery(finalQuery);
+				List<String> getTemplateId = queryForOutput.getResultList();
+//				List<String> templateIdByTemplateName = nonPoTemplateRepository.templateIdByName(templateName);
+				System.out.println("195 line java tId" + getTemplateId );
 				List<NonPoTemplateDo> doList = new ArrayList<>();
 				if (!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)) {
 					doList = nonPoTemplateRepository.fetchAllByTemplateIdWithLimitandOffset(getTemplateId, limit,
@@ -227,27 +235,34 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 
 			} else if (ServiceUtil.isEmpty(accountNo)) {
 				System.out.println("Account no is null");
-				List<String> getTemplateId = new ArrayList<>();
-				getTemplateId.add(templateName);
-				System.out.println("template Id::::" + getTemplateId);
-				String templateIdByTemplateName = nonPoTemplateRepository.templateIdByName(templateName);
-				List<String> getTemplateIdByName = new ArrayList<>();
-				getTemplateIdByName.add(templateIdByTemplateName);
+//				List<String> getTemplateId = new ArrayList<>();
+//				getTemplateId.add(templateName);
+//				System.out.println("template Id::::" + getTemplateId);
+				String finalQuery = "select templateId from NonPoTemplateDo where UPPER(templateName) like UPPER('%"+templateName+"%')";
+				System.out.println("QUERY:::"+ finalQuery);
+				Query queryForOutput = entityManager.createQuery(finalQuery);
+				List<String> templateIdByTemplateName = queryForOutput.getResultList();
+//				List<String> templateIdByTemplateName = nonPoTemplateRepository.templateIdByName(templateName);
+				System.out.println("234 line java tId" + templateIdByTemplateName );
+//				List<String> getTemplateIdByName = new ArrayList<>();
+//				getTemplateIdByName.add(templateIdByTemplateName);
 				List<NonPoTemplateDo> doList = new ArrayList<>();
 				if (!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)) {
 					doList = nonPoTemplateRepository
-							.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(getTemplateId, limit, offset);
+							.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(templateIdByTemplateName, limit, offset);
 				} else {
 					doList = nonPoTemplateRepository
-							.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(getTemplateId, 100, 0);
+							.fetchAllByTemplateIdWithLimitandOffsetandtemplateName(templateIdByTemplateName, 100, 0);
 				}
 				NonPoTemplateHIDto nonPoTemplateHIDto;
-				List<Object[]> is = nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(getTemplateIdByName);
+				List<Object[]> is = nonPoTemplateItemsRepository.selectNonPoTemplateByTemplateId(templateIdByTemplateName);
 				HashMap<String, String> getAccountNo = new HashMap<>();
 				for (Object[] obj : is) {
 					getAccountNo.put(String.valueOf(obj[0]), String.valueOf(obj[1]));
 				}
 
+				System.out.println("ACCOUNT::::"+ getAccountNo);
+				System.out.println("LIST OF NONPOTEMPLATE:::::::" + doList);
 				for (NonPoTemplateDo nonPoTemplateDo : doList) {
 					NonPoTemplateDto nonPoTemplateDto = new NonPoTemplateDto();
 					nonPoTemplateDto = modelMapper.map(nonPoTemplateDo, NonPoTemplateDto.class);
@@ -275,8 +290,16 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 			} else {
 
 				System.out.println("Both Are Present");
-				List<String> getTemplateId = nonPoTemplateItemsRepository.gettemplateIdByAccountNo(templateName,
-						accountNo);
+//				List<String> getTemplateId = nonPoTemplateItemsRepository.gettemplateIdByAccountNo(templateName,
+//						accountNo);
+				String finalQuery = "select NPT.templateId from NonPoTemplateDo  NPT "
+						+ " where UPPER(NPT.templateName) like UPPER('%"+templateName+"%') "
+						+ "and NPT.templateId in ("
+						+ "select NPTI.templateId from NonPoTemplateItemsDo NPTI where UPPER(NPTI.accountNo) like UPPER('%"+accountNo+"%'))";
+
+				System.out.println("QUERY:::"+ finalQuery);
+				Query queryForOutput = entityManager.createQuery(finalQuery);
+				List<String> getTemplateId = queryForOutput.getResultList();
 				System.out.println("template Id::::" + getTemplateId);
 				List<NonPoTemplateDo> doList = new ArrayList<>();
 				if (!ServiceUtil.isEmpty(limit) && !ServiceUtil.isEmpty(offset)) {

@@ -51,16 +51,16 @@ public interface NonPoTemplateRepository extends JpaRepository<NonPoTemplateDo, 
 	@Query(value = "select * from NON_PO_TEMPLATE order by created_At desc limit ?1 offset ?2", nativeQuery = true)
 	public List<NonPoTemplateDo> fetchAllByLimitOffset(int limit, int offset);
 
-	@Query(value = "select * from NON_PO_TEMPLATE where Template_Id in ?1 order by created_At desc limit ?2 offset ?3", nativeQuery = true)
-	public List<NonPoTemplateDo> fetchAllByTemplateIdWithLimitandOffset(List<String> getTemplateId, int limit,int offset);
+	@Query(value = "select * from NON_PO_TEMPLATE where Template_Id in :Template_Id order by created_At desc limit :limit offset :offset", nativeQuery = true)
+	public List<NonPoTemplateDo> fetchAllByTemplateIdWithLimitandOffset(@Param("Template_Id")List<String> Template_Id, @Param("limit")Integer limit,@Param("offset") Integer offset);
 
 	@Query(value = "select count(*) from NON_PO_TEMPLATE  " ,nativeQuery = true )
 	public Integer getCount();
 
-	@Query(value = "select * from NON_PO_TEMPLATE where Template_Name in ?1 order by created_At desc limit ?2 offset ?3", nativeQuery = true)
-	public List<NonPoTemplateDo> fetchAllByTemplateIdWithLimitandOffsetandtemplateName(List<String> getTemplateId,
-			Integer limit, Integer offset);
+	@Query(value = "select * from NON_PO_TEMPLATE where Template_Id in :Template_Id order by created_At desc limit :limit offset :offset", nativeQuery = true)
+	public List<NonPoTemplateDo> fetchAllByTemplateIdWithLimitandOffsetandtemplateName(@Param("Template_Id") List<String> Template_Id,
+			@Param("limit")Integer limit,@Param("offset") Integer offset);
 
-	@Query("select templateId from NonPoTemplateDo where  templateName= ?1")
-	public String templateIdByName(String templateName);
+	@Query(value = "select template_Id from NON_PO_TEMPLATE where  UPPER(template_Name) like UPPER('%?1%')",nativeQuery = true )
+	public List<String> templateIdByName(String templateName);
 }
