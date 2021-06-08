@@ -311,6 +311,12 @@ sap.ui.define([
 					}
 				}.bind(this)
 			});
+		},
+		
+		uploadFileTypeMismatch: function(oEvent){
+			var fileType = oEvent.getParameter("fileType");
+			var errorMsg = "Please select only PDF file.";
+			this.errorMsg(errorMsg);
 		}
 
 	});

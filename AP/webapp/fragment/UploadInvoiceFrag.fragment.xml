@@ -9,7 +9,7 @@
 							<Toolbar>
 								<ToolbarSpacer/>
 								<u:FileUploader id="fileUploader" value="{pdfModel>/fileName}" buttonOnly="true" uploadComplete="" maximumFileSize="10" fileType="pdf"
-									change="handleUploadChange" fileSizeExceed="onFileSizeExceed"/>
+									change="handleUploadChange" fileSizeExceed="onFileSizeExceed" typeMissmatch="uploadFileTypeMismatch"/>
 							</Toolbar>
 							<form:SimpleForm editable="true">
 								<Label text="{i18n>TransactionType}" required="true"/>
