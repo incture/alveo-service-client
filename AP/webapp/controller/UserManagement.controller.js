@@ -127,7 +127,7 @@ sap.ui.define([
 			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				var data = oEvent.getSource().getData();
-				var count = data.Resources.count;
+				var count = data.Resources.length;
 				if (data.Resources) {
 					oUserDetailModel.setProperty("/groupList", data.Resources);
 					oUserDetailModel.setProperty("/groupCount", count);

@@ -53,11 +53,11 @@ sap.ui.define([
 				StaticDataModel.refresh();
 				if (userGroup != "IT_Admin") {
 					that.getView().byId("sideNav").getItems()[0].addStyleClass("sideNavItemSelected");
-					var text = that.getView().byId("sideNav").getItems()[0].getText();
+					var text = that.getView().byId("sideNav").getItems()[0].getItems()[1].getText();
 					StaticDataModel.setProperty("/selectedApp", text);
 				} else {
 					that.getView().byId("sideNav").getItems()[2].addStyleClass("sideNavItemSelected");
-					var text = that.getView().byId("sideNav").getItems()[0].getText();
+					var text = that.getView().byId("sideNav").getItems()[2].getItems()[1].getText();
 					StaticDataModel.setProperty("/selectedApp", text);
 				}
 			});
@@ -70,7 +70,7 @@ sap.ui.define([
 			}
 			oEvent.getSource().addStyleClass("sideNavItemSelected");
 			var key = oEvent.getSource().getKey();
-			var text = oEvent.getSource().getItems()[0].getText();
+			var text = oEvent.getSource().getItems()[1].getText();
 			StaticDataModel.setProperty("/selectedApp", text);
 			this.oRouter.navTo(key);
 		},
