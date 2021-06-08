@@ -1,5 +1,6 @@
 package com.ap.menabev.dto;
 
+import java.util.Date;
 import java.util.UUID;
 
 import com.sap.db.jdbc.packet.LOB;
@@ -19,6 +20,7 @@ public class ActivityLogDto {
 	private String statusOfException;
 	private String taskStatus;
 	private String taskUserId;
-	private LOB taskComments;
+	private String taskComments;
+	private Date createdAt;
 
 }

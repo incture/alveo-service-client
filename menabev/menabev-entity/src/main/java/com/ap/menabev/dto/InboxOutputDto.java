@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class InboxOutputDto {
 	
+	
 	private String requestId;
 
 	private String vendorName;

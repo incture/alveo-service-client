@@ -144,16 +144,7 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 	
 	public ResponseEntity<?> postNonPoItemsToSAP(JournalEntryCreateRequestBulkMessage requestMessage) throws IOException, URISyntaxException, JAXBException, SOAPException {
 		
-		 ChartOfAccountsItemCode chartVale1 =  new ChartOfAccountsItemCode();
-		    chartVale1.setValue("0005500046");
-		 requestMessage.getJournalEntryCreateRequest().get(0).getJournalEntry().getItem().get(0).setGLAccount(chartVale1);
-		    ChartOfAccountsItemCode chartVale2 =  new ChartOfAccountsItemCode();
-		    chartVale2.setValue("0006021003");
-		 requestMessage.getJournalEntryCreateRequest().get(0).getJournalEntry().getItem().get(1).setGLAccount(chartVale2);
-		
-		String url = "http://sd4.menabev.com:443"
-				+"/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
-		String  entityTest  = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"> "
+		/*String  entityTest  = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"> "
 				+ "<soapenv:Header/> "
 				+ "   <soapenv:Body>    "
 				+ "<sfin:JournalEntryBulkCreateRequest>"
@@ -217,25 +208,42 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 				+ "</JournalEntryCreateRequest>   "
 				+ "    </sfin:JournalEntryBulkCreateRequest>  "
 				+ "  </soapenv:Body> </soapenv:Envelope>";
-		System.err.println("entityTest "+entityTest);
-		 JAXBContext contextObj = JAXBContext.newInstance(JournalEntryCreateRequestBulkMessage.class); 
+		System.err.println("entityTest "+entityTest);*/
+		String entity = formXmlPayload(requestMessage);
+		   
+		String url = "http://sd4.menabev.com:443"
+				+"/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
+		   // String entity  = new String(fs.toByteArray());
+		// call odata method 
+		ResponseEntity<?> responseFromOdata = consumingOdataService(url, entity, "POST", null);
+		System.err.println("odata output "+ responseFromOdata);
+	 return responseFromOdata;
+	}
+
+	
+	
+public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage){
+		
+		try {
+			String entity ="";
+			ChartOfAccountsItemCode chartVale1 =  new ChartOfAccountsItemCode();
+		    chartVale1.setValue("0005500046");
+		    requestMessage.getJournalEntryCreateRequest().get(0).getJournalEntry().getItem().get(0).setGLAccount(chartVale1);
+		    ChartOfAccountsItemCode chartVale2 =  new ChartOfAccountsItemCode();
+		    chartVale2.setValue("0006021003");
+		    requestMessage.getJournalEntryCreateRequest().get(0).getJournalEntry().getItem().get(1).setGLAccount(chartVale2);
+		    JAXBContext contextObj = JAXBContext.newInstance(JournalEntryCreateRequestBulkMessage.class); 
 		    Marshaller marshallerObj = contextObj.createMarshaller(); 
-		    //marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false); 
 		    marshallerObj.setProperty(Marshaller.JAXB_FRAGMENT, true);
 		    StringWriter sw = new StringWriter();
 		    marshallerObj.marshal(requestMessage,sw);  
-		   
 		    String xmlContent = sw.toString();
-		    
-		   // System.err.println("xmlContent "+xmlContent);
 		    int  indexOfHeader = xmlContent.indexOf("<MessageHeader>");
 		    int indexOfEnd =  xmlContent.indexOf("</JournalEntryCreateRequest>");
 		    System.err.println("indexOfHeaderTag "+indexOfHeader);
 		    System.err.println("indexOfEnd "+indexOfEnd);
 		    String croppedContent = xmlContent.substring(indexOfHeader, indexOfEnd);
-		   // System.err.println("croppedContent "+croppedContent);
-		  // croppedContent = croppedContent.replaceAll("\"", "\\\\\"");
-		    String  entity  = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"> "
+		      entity  = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"> "
 					+ "<soapenv:Header/> "
 					+ "   <soapenv:Body>    "
 					+ "   <sfin:JournalEntryBulkCreateRequest>  "
@@ -245,15 +253,13 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 					+ "  </soapenv:Body> </soapenv:Envelope>";
 		   System.err.println("entity "+entity);
 		   
-		   
-		   // String entity  = new String(fs.toByteArray());
-		// call odata method 
-		ResponseEntity<?> responseFromOdata = consumingOdataService(url, entity, "POST", null);
-		System.err.println("odata output "+ responseFromOdata);
-	 return responseFromOdata;
+			return entity;
+		}catch(Exception e){
+			
+			return null;
+		}
+		
 	}
-
-	
 	public static String encodeUsernameAndPassword(String username, String password) {
 		String encodeUsernamePassword = username + ":" + password;
 		String auth = "Basic " + DatatypeConverter.printBase64Binary(encodeUsernamePassword.getBytes());
@@ -316,16 +322,11 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 
 
 		System.err.println("com.incture.utils.HelperClass  + Inside consumingOdataService==================");
-		//		String proxyHost = "connectivityproxy.internal.cf.eu20.hana.ondemand.com";
 		String proxyHost = "10.0.4.5";
 		System.err.println("proxyHost-- " + "10.0.4.5");
 		int proxyPort = 20003;
-		Header[] jsonResponse = null;
-		String objresult = null;
-		
 //		JSONObject jsonObj = new JSONObject(System.getenv("VCAP_SERVICES"));
 		
-//		System.err.println("116 - jsonObj =" + jsonObj);
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
 			    new UsernamePasswordCredentials( "Syuvraj", "Incture@12345")); 
@@ -348,28 +349,15 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 				httpRequestBase = new HttpGet(url);
 			} else if (method.equalsIgnoreCase("POST")) {
 				httpRequestBase = new HttpPost(url);
-				File file = new File("file.xml");
-			    java.io.FileWriter fw = new java.io.FileWriter(file);
-			    fw.write(entity);
-			    fw.close();
-//				InputStream targetStream = new ByteArrayInputStream(entity.getBytes());
-//				((HttpPost) httpRequestBase).setEntity(new InputStreamEntity(targetStream));
-			    //((HttpPost) httpRequestBase).setEntity(new InputStreamEntity(new FileInputStream(file), file.length()));
-			  
 			    StringEntity stringEntity = new StringEntity(entity, "UTF-8");
 			    stringEntity.setChunked(true);
 			    ((HttpPost) httpRequestBase).setEntity(stringEntity);
-			    /* InputStream ins =   ((HttpPost) httpRequestBase).getEntity().getContent();
-			    String result = IOUtils.toString(ins, StandardCharsets.UTF_8);
-			    System.err.println("result ="+result);*/
-			   // httpRequestBase.addHeader("Content-type", "text/xml; charset=UTF-8");
-				file.delete(); 
+				
 			}
 				httpRequestBase.addHeader("sap-client", "100");
-		httpRequestBase.addHeader("Content-Type", "text/xml");
-		httpRequestBase.addHeader("SOAPAction","http://sap.com/xi/SAPSCORE/SFIN/JournalEntryCreateRequestConfirmation_In/JournalEntryCreateRequestConfirmation_InRequest");
-				String encoded = encodeUsernameAndPassword("Syuvraj",
-						"Incture@12345");
+		        httpRequestBase.addHeader("Content-Type", "text/xml");
+		        httpRequestBase.addHeader("SOAPAction","http://sap.com/xi/SAPSCORE/SFIN/JournalEntryCreateRequestConfirmation_In/JournalEntryCreateRequestConfirmation_InRequest");
+				String encoded = encodeUsernameAndPassword("Syuvraj","Incture@12345");
 				httpRequestBase.addHeader("Authorization", encoded);
 				httpRequestBase.setHeader("Proxy-Authorization","Bearer " +jwToken);
 				httpRequestBase.addHeader("SAP-Connectivity-SCC-Location_ID","DEVHEC");

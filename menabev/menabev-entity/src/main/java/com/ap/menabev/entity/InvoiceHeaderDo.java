@@ -82,7 +82,7 @@ public class InvoiceHeaderDo {
 	@Column(name = "INVOICE_TYPE")
 	private String invoiceType;//12
 	@Column(name = "INVOICE_TOTAL")
-	private String invoiceTotal;//2
+	private double invoiceTotal;//2
 	@Column(name = "SUB_TOTAL")
 	private String subTotal;                                           //26
 	@Column(name = "SAP_INVOICE_NUMBER")

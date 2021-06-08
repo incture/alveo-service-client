@@ -17,15 +17,15 @@ public class FilterHeaderDto {
 	private String VendorId;
 	private String channelType;
 	private String invoiceType;
-	private String createdAtFrom;
-	private String createdAtTo;
+	private Long createdAtFrom;
+	private Long createdAtTo;
 	private Long dueDateFrom;
 	private Long dueDateTo;
 	private String assignedTo;
 	private Long invoiceDateFrom;
 	private Long invoiceDateTo;
-	private Long invoiceValueFrom;
-	private Long  invoiceValueTo;
+	private double invoiceValueFrom;
+	private double  invoiceValueTo;
 	private String docStatus;
 	private  String validationStatus; /// Exception Status 
 	private String taskOwner;
@@ -36,7 +36,8 @@ public class FilterHeaderDto {
 	private boolean isGrnTask;
 	private boolean isClaimed;
 	private boolean iscompleted;
-	private boolean myTask; //true to get my task 
+	private String myTask; //true to get my task 
+	
 	private Long indexNum;
 	private Long count;
 	private String invoiceTotal;

@@ -13,7 +13,7 @@ import com.ap.menabev.entity.ConfigurationDo;
 public interface ConfigurationRepository extends JpaRepository<ConfigurationDo, String> {
 	@Query("select cDo from ConfigurationDo cDo where   upper(cDo.version)=upper(:version)")
 	public ConfigurationDo getVersion(@Param("version") String version);
-	@Query(value = "select MENABEVD.CONFIGURATION_VERSION.NEXTVAL from Dummy", nativeQuery = true)
+	@Query(value = "select CONFIGURATION_VERSION.NEXTVAL from Dummy", nativeQuery = true)
 	String getVersionNum();
 	@Query("select cDo.version from ConfigurationDo cDo")
 	public List<String> getVersion();

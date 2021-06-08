@@ -50,6 +50,7 @@ import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
 import com.ap.menabev.dto.AttachmentDto;
 import com.ap.menabev.dto.CommentDto;
 import com.ap.menabev.dto.CostAllocationDto;
+import com.ap.menabev.dto.CountDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderChangeDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DashBoardDetailsDto;
@@ -57,6 +58,7 @@ import com.ap.menabev.dto.FilterHeaderDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InboxDto;
 import com.ap.menabev.dto.InboxOutputDto;
+import com.ap.menabev.dto.InboxResponseOutputDto;
 import com.ap.menabev.dto.InvoiceHeaderChangeDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
@@ -385,7 +387,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							System.err.println("listOfWorkflowTasks :" +listOfWorkflowTasks.size());
 							// check condition for accountant role to fetch draft along with his user tasks 
 							if (!listOfWorkflowTasks.isEmpty()  || (listOfWorkflowTasks.isEmpty() && filterDto.getRoleOfUser().equals("Accountant")) ) {
-								if(filterDto.getRoleOfUser().equals("Accountant")&&filterDto.isMyTask()){
+								if(filterDto.getRoleOfUser().equals("Accountant")&&filterDto.getMyTask().equals("DRAFT")){
 									// than add the requesId with Draft as docStatus 
 									if(filterDto.getRequestId()!=null && !filterDto.getRequestId().isEmpty() ){
 										lists = invoiceHeaderRepository.getInvoiceHeaderDocStatusByUserIdAndRequestId(filterDto.getUserId(),filterDto.getRequestId());
@@ -414,7 +416,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 									System.err.println("list of workflowIDs  for accountant = " + listOfWorkflowTasks );
 									return new ResponseEntity<>(fetchInvoiceDocHeaderDtoListFromRequestNumber(
 											listOfWorkflowTasks.stream().skip(min).limit(max)
-													.collect(Collectors.toList()),filterDto,listOfWorkflowTasks.size()),
+													.collect(Collectors.toList()),filterDto),
 											HttpStatus.OK);
 								} else {
 									return new ResponseEntity<String>(
@@ -423,12 +425,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 											HttpStatus.OK);
 								}
 								}else {
-									return new ResponseEntity<String>("No tasks are available for user : "
-													+ filterDto.getUserId(),HttpStatus.OK);
+									return new ResponseEntity<String>("No tasks are available."
+													,HttpStatus.OK);
 								}
 							} else {
-								return new ResponseEntity<String>("No tasks are available for user : "
-										+ filterDto.getUserId(), HttpStatus.OK);
+								return new ResponseEntity<String>("No tasks are available."
+									, HttpStatus.OK);
 							}
 						} else {
 							return responseFromSapApi;
@@ -451,6 +453,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	public ResponseEntity<?> fetchWorkflowUserTaksList(FilterHeaderDto filter){
 		try {
 			if (!checkString(filter.getUserId())) {
+				List<WorkflowTaskOutputDto> listOfWorkflowTasks = new ArrayList<>();
+				if(!filter.getMyTask().equals("DRAFT")){
 				String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
 				
 				HttpClient client = HttpClientBuilder.create().build();
@@ -460,7 +464,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				
 				appendParamInUrl(url, WorkflowConstants.WORKFLOW_DEFINATION_ID_KEY,
 						WorkflowConstants.WORKFLOW_DEFINATION_ID_VALUE);
-				if(filter.isMyTask()){
+				if(filter.getMyTask().equals("MYTASK")){
 					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
 							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_RESERVED_VALUE);
 					appendParamInUrl(url, WorkflowConstants.PROCESSOR_KEY, filter.getUserId());
@@ -494,7 +498,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 					JSONArray jsonArray = new JSONArray(dataFromStream);
 
-					List<WorkflowTaskOutputDto> listOfWorkflowTasks = new ArrayList<>();
+					
 
 					jsonArray.forEach(jsonObject -> {
 						WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
@@ -515,8 +519,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 				}
 			
+		}else{
+			return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
 		}
-			else {
+			}else {
 				return new ResponseEntity<>("INVALID_INPUT_PLEASE_RETRY" + " with provide USER ID.",
 						HttpStatus.BAD_REQUEST);
 			}
@@ -547,7 +553,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	
 	@SuppressWarnings("unchecked")
 	private ResponseEntity<?> fetchInvoiceDocHeaderDtoListFromRequestNumber(
-			List<WorkflowTaskOutputDto> invoiceRequestIdListPaginated,FilterHeaderDto filterDto,int totalCountTask) {
+			List<WorkflowTaskOutputDto> invoiceRequestIdListPaginated,FilterHeaderDto filterDto) {
 		
 		List<InvoiceHeaderDo> listOfInvoiceOrders = null;
 		ResponseEntity<?> responseFromFilter = null;
@@ -585,11 +591,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		
 		inbox.setTaskStatus(workflowOutPut.getStatus());
 		inbox.setTaskId(workflowOutPut.getId());
-		inbox.setTotalCount(totalCountTask);
-			 inboxOutputList.add(inbox);
+	    inboxOutputList.add(inbox);
 		 }
-		 
-		return  new ResponseEntity<List<InboxOutputDto>>(inboxOutputList,HttpStatus.OK);
+		 InboxResponseOutputDto response = new InboxResponseOutputDto();
+	      
+		 response.setCount(inboxOutputList.size());
+		 response.setListOfTasks(inboxOutputList);
+		return  new ResponseEntity<InboxResponseOutputDto>(response,HttpStatus.OK);
 		
           } else {
         	  return new ResponseEntity<String>("No Data Found For the Filter Query ",HttpStatus.NO_CONTENT); 
@@ -631,12 +639,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 		
 		
-		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateTo()!=null) {
-			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getInvoiceDateFrom() + " AND "+ dto.getInvoiceDateTo());
+		if (dto.getCreatedAtFrom() != null && dto.getCreatedAtFrom()!=null) {
+			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getCreatedAtFrom() + " AND "+ dto.getCreatedAtTo());
 		//correct 
 		}
 		if (dto.getInvoiceDateFrom() != null ) {
-			filterQueryMap.put(" RR.INVOICE_DATE =", "" + dto.getInvoiceDateFrom() + "");
+			filterQueryMap.put(" RR.INVOICE_DATE =", "" + dto.getCreatedAtFrom() + "");
 		//correct 
 		}
 		if (dto.getInvoiceType() != null && !dto.getInvoiceType().isEmpty()) {
@@ -649,15 +657,15 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		// is EMpty 
 		}
 		if (dto.getValidationStatus() != null && !dto.getValidationStatus().isEmpty()) {
-			filterQueryMap.put(" RR.VALIDATION_STATUS =", "'" + dto.getValidationStatus() + "'");
+			filterQueryMap.put(" RR.VALIDATION_STATUS =", "'" + dto.getValidationStatus() + "'");//procss status
 		}
 		if (dto.getExtInvNum() != null && !dto.getExtInvNum().isEmpty()) {
 			filterQueryMap.put(" RR.EXT_INV_NUM =", "'" + dto.getExtInvNum() + "'");
 		}
-		if (dto.getInvoiceValueFrom() != null ) {
+		if (dto.getInvoiceValueFrom()!=0.0) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL =",  "" + dto.getInvoiceValueFrom() + "");
 		}
-		if (dto.getInvoiceValueFrom() != null && dto.getInvoiceValueTo()!=null) {
+		if (dto.getInvoiceValueFrom() !=0.0 && dto.getInvoiceValueTo()!=0.0) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL BETWEEN ", dto.getInvoiceValueFrom() + " AND "+ dto.getInvoiceValueTo());
 		//correct 
 		}
@@ -754,17 +762,17 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			CreateInvoiceHeaderChangeDto invoiceHeadDto =new  CreateInvoiceHeaderChangeDto();
 			
 			 // get InvoiceHeader
-		  InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
+/*		  InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
 		  InvoiceHeaderChangeDto invoiceHeaderDto  =  ObjectMapperUtils.map(invoiceHeaderDo,InvoiceHeaderChangeDto.class);   
 		  // get InvoiceItem
 		   List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
-		   List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
+		   List<//InvoiceItemsDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
 	      // get AccountAssignment
 		   List<InvoiceItemAcctAssignmentDo>  invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository.getByRequestId(requestId); 
 		     List<InvoiceItemAcctAssignmentDto>    invoiceItemAcctAssignmentdtoList = ObjectMapperUtils.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
 		   // get CostAllocation
 		   List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
-		        List<CostAllocationDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
+		        List<CostAllocationsDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
 		    // get Attachements 
 		        List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
 		        List<AttachmentDto>  AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);    
@@ -774,11 +782,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		        
 		        invoiceHeadDto.setInvoiceHeaderDto(invoiceHeaderDto);
 		        invoiceHeadDto.getInvoiceHeaderDto().setInvoiceItems(invoiceItemDtoList);
-		        invoiceHeadDto.getInvoiceHeaderDto().setAttachments(AttachementDto);
+		        invoiceHeadDto.getInvoiceHeaderDto().setAttachment(AttachementDto);
 		        invoiceHeadDto.getInvoiceHeaderDto().setComments(commentDto);
 		        invoiceHeadDto.getInvoiceHeaderDto().setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
 		        invoiceHeadDto.getInvoiceHeaderDto().setCostAllocationDto(costAllocationDto);
-		        invoiceHeadDto.setResponseStatus("Success");
+		        invoiceHeadDto.setResponseStatus("Success");*/
 		    return new ResponseEntity<CreateInvoiceHeaderChangeDto>(invoiceHeadDto,HttpStatus.OK);
 		}catch(Exception e){
 			
@@ -801,7 +809,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		   List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
 		   invoiceItemAndHeader.setInvoiceHeaderDto(invoiceHeaderDto);
 		   
-		   invoiceItemAndHeader.getInvoiceHeaderDto().setInvoiceItems(invoiceItemDtoList);
+		 //  invoiceItemAndHeader.getInvoiceHeaderDto().setInvoiceItemss(invoiceItemDtoList);
 		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
@@ -815,7 +823,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	        List<CostAllocationDto>  costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo, CostAllocationDto.class);                            
 		
 	        invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
-	        invoiceItemAndHeader.getInvoiceHeaderDto().setCostAllocationDto(costAllocationDto);
+	       // invoiceItemAndHeader.getInvoiceHeaderDto().setCostAllocationDto(costAllocationDto);
 		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
@@ -828,7 +836,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		  List<InvoiceItemAcctAssignmentDo>  invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository.getByRequestId(requestId); 
 		     List<InvoiceItemAcctAssignmentDto>    invoiceItemAcctAssignmentdtoList = ObjectMapperUtils.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
 		     invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
-		     invoiceItemAndHeader.getInvoiceHeaderDto().setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
+		   //  invoiceItemAndHeader.getInvoiceHeaderDto().setInvoiceItemAcctAssignmentDto(invoiceItemAcctAssignmentdtoList);
 		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
 
@@ -842,7 +850,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
         List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
         List<AttachmentDto>  AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);    
         invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
-        invoiceItemAndHeader.getInvoiceHeaderDto().setAttachments(AttachementDto);
+       // invoiceItemAndHeader.getInvoiceHeaderDto().setAttachments(AttachementDto);
         
 		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
@@ -858,7 +866,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
         List<CommentDto>    commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);  
         
         invoiceItemAndHeader.setInvoiceHeaderDto(invoice);
-        invoiceItemAndHeader.getInvoiceHeaderDto().setComments(commentDto);
+       // invoiceItemAndHeader.getInvoiceHeaderDto().setComments(commentDto);
         
 		return new  ResponseEntity<>(invoiceItemAndHeader,HttpStatus.OK);
 	}
@@ -1044,7 +1052,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		if (!ServiceUtil.isEmpty(dto.getFiscalYear()))
 			entity.setFiscalYear(dto.getFiscalYear());
 		if (!ServiceUtil.isEmpty(dto.getInvoiceTotal()))
-			entity.setInvoiceTotal(dto.getInvoiceTotal());
+			entity.setInvoiceTotal(new Double(dto.getInvoiceTotal()));
 		if (!ServiceUtil.isEmpty(dto.getInvoiceType()))
 			entity.setInvoiceType(dto.getInvoiceType());
 		if (!ServiceUtil.isEmpty(dto.getLifecycleStatus()))
@@ -1389,7 +1397,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		
 		invoiceHeader.setManualpaymentBlock(dto.getManualpaymentBlock());
 
-		invoiceHeader.setInvoiceTotal(dto.getInvoiceTotal());
+		invoiceHeader.setInvoiceTotal(new Double(dto.getInvoiceTotal()));
 
 		invoiceHeader.setInvoiceType(dto.getInvoiceType());
 
