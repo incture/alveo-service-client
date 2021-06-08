@@ -80,8 +80,8 @@
 			</fb:FilterBar>
 			<IconTabBar expanded="true" headerMode="Inline" select="onSelectTab">
 				<items>
-					<IconTabFilter text="{i18n>OPENTASK} ({oInboxModel>/openResultCount})" key="openTask">
-						<Table items="{oInboxModel>/openResult}" mode="None" class="labelwrapTable" sticky="ColumnHeaders">
+					<IconTabFilter text="{i18n>OPENTASK}" key="openTask" count="{oInboxModel>/openTaskCount}">
+						<Table items="{oInboxModel>/openTask}" mode="None" class="labelwrapTable" sticky="ColumnHeaders">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
@@ -141,8 +141,69 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>MYTASK} ({oInboxModel>/resultCount})" key="myTask">
-						<Table items="{oInboxModel>/result}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+					<IconTabFilter text="{i18n>MYTASK}" key="myTask" count="{oInboxModel>/myTaskCount}">
+						<Table items="{oInboxModel>/myTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+							<headerToolbar>
+								<OverflowToolbar>
+									<ToolbarSpacer></ToolbarSpacer>
+									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice" visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>
+									<Button icon="sap-icon://action-settings" type="Emphasized"/>
+								</OverflowToolbar>
+							</headerToolbar>
+							<columns>
+								<Column hAlign="Center">
+									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column hAlign="Center">
+									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+									<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+									<Label text="{i18n>Invoice Date}" design="Bold"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+									<Label text="{i18n>InvoiceType}" design="Bold"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>Value}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>DueDate}" design="Bold"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<Link text="{oInboxModel>requestId}" press="onReqIdClaimSelect" wrapping="true"/>
+									<Text text="{oInboxModel>vendorId}-{oInboxModel>vendorName}"/>
+									<Text text="{oInboxModel>extInvNum}"/>
+									<Text text="{path:'oInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
+									<Text text="{oInboxModel>invoiceType}"/>
+									<Text text="{oInboxModel>invoiceTotal}"/>
+									<Text text="{path:'oInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
+									<Text text="{oInboxModel>validationStatus}"/>
+									<Text text="{oInboxModel>taskStatus}"/>
+									<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease">
+										<core:layoutData>
+											<FlexItemData growFactor="1"/>
+										</core:layoutData>
+									</core:Icon>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</IconTabFilter>
+					<IconTabFilter text="{i18n>DRAFT}" key="draft" count="{oInboxModel>/draftCount}">
+						<Table items="{oInboxModel>/draftTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
@@ -205,21 +266,21 @@
 				</items>
 			</IconTabBar>
 		</content>
-		<footer>
-			<OverflowToolbar class="pageNumberCls" visible="{paginatedModel>/pageVisible}">
-				<content>
-					<HBox>
-						<Button icon="sap-icon://nav-back" class=" navPageCls" press="onScrollLeft" type="Default" enabled="{paginatedModel>/prevButton}"/>
-						<SegmentedButton items="{paginatedModel>/array}" class="sapUiSmallMarginBeginEnd">
-							<items>
-								<SegmentedButtonItem text="{paginatedModel>text}" key="{paginatedModel>text}" press="onPageClick"/>
-							</items>
-						</SegmentedButton>
-						<Button enabled="{paginatedModel>/nextbutton}" icon="sap-icon://navigation-right-arrow" class=" navPageCls" type="Default"
-							press="onScrollRight"/>
-					</HBox>
-				</content>
-			</OverflowToolbar>
-		</footer>
+		<!--<footer>-->
+		<!--	<OverflowToolbar class="pageNumberCls" visible="{paginatedModel>/pageVisible}">-->
+		<!--		<content>-->
+		<!--			<HBox>-->
+		<!--				<Button icon="sap-icon://nav-back" class=" navPageCls" press="onScrollLeft" type="Default" enabled="{paginatedModel>/prevButton}"/>-->
+		<!--				<SegmentedButton items="{paginatedModel>/array}" class="sapUiSmallMarginBeginEnd">-->
+		<!--					<items>-->
+		<!--						<SegmentedButtonItem text="{paginatedModel>text}" key="{paginatedModel>text}" press="onPageClick"/>-->
+		<!--					</items>-->
+		<!--				</SegmentedButton>-->
+		<!--				<Button enabled="{paginatedModel>/nextbutton}" icon="sap-icon://navigation-right-arrow" class=" navPageCls" type="Default"-->
+		<!--					press="onScrollRight"/>-->
+		<!--			</HBox>-->
+		<!--		</content>-->
+		<!--	</OverflowToolbar>-->
+		<!--</footer>-->
 	</Page>
 </mvc:View>

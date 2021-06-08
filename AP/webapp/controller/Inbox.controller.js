@@ -23,7 +23,9 @@ sap.ui.define([
 				this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 				this.oRouter.attachRoutePatternMatched(function (oEvent) {
 					if (oEvent.getParameter("name") === "Inbox") {
-						that.getInboxData();
+						that.getInboxData("", "", "OPEN ", "openTask", "openTaskCount");
+						that.getInboxData("", "", "MYTASK", "myTask", "myTaskCount");
+						that.getInboxData("", "", "DRAFT", "draftTask", "draftCount");
 					}
 				});
 			},
@@ -49,7 +51,7 @@ sap.ui.define([
 				});
 			},
 
-			getInboxData: function (pageNo, scroll) {
+			getInboxData: function (pageNo, scroll, taskStatus, object, count) {
 				var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup"),
 					oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 				oVisibilityModel.setProperty("/Inbox", {});
@@ -66,35 +68,35 @@ sap.ui.define([
 				taskDataFilterModelData.userId = this.oUserDetailModel.getProperty("/loggedinUserDetail/id");
 				taskDataFilterModelData.indexNum = scroll ? pageNo : 1;
 				taskDataFilterModelData.count = 100;
-				taskDataFilterModelData.myTask = this.myTask;
+				taskDataFilterModelData.myTask = taskStatus;
 				taskDataFilterModelData.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 				taskDataFilterModelData.userEmailId = this.oUserDetailModel.getProperty("/loggedInUserMail");
-				jQuery
-					.ajax({
-						url: url,
-						dataType: "json",
-						data: JSON.stringify(taskDataFilterModelData),
-						contentType: "application/json",
-						type: "POST",
-						success: function (oData) {
-							if (oData && Array.isArray(oData.body)) {
-								var totalCount = oData.body[0].totalCount;
-								oInboxModel.setProperty("/count", totalCount);
-								if (oData.body[0].claimed == true) {
-									oInboxModel.setProperty("/result", oData.body);
-									oInboxModel.setProperty("/resultCount", totalCount);
-								} else {
-									oInboxModel.setProperty("/openResult", oData.body);
-									oInboxModel.setProperty("/openResultCount", totalCount);
-								}
-							}
-							if (!scroll)
-								that.generatePagination();
-						},
-						error: function (oError) {
-							sap.m.MessageToast.show(oError.responseText);
+				jQuery.ajax({
+					url: url,
+					dataType: "json",
+					data: JSON.stringify(taskDataFilterModelData),
+					contentType: "application/json",
+					type: "POST",
+					success: function (oData) {
+						if (oData && Array.isArray(oData.body.listOfTasks)) {
+							oInboxModel.setProperty("/" + count, oData.body.count);
+							oInboxModel.setProperty("/" + object, oData.body.listOfTasks);
+							// oInboxModel.setProperty("/resultCount", totalCount);
+							// if (oData.body[0].claimed == true) {
+							// oInboxModel.setProperty("/result", oData.body);
+							// oInboxModel.setProperty("/resultCount", totalCount);
+							// } else {
+							// 	oInboxModel.setProperty("/openResult", oData.body);
+							// 	oInboxModel.setProperty("/openResultCount", totalCount);
+							// }
 						}
-					});
+						if (!scroll)
+							that.generatePagination();
+					},
+					error: function (oError) {
+						sap.m.MessageToast.show(oError.responseText);
+					}
+				});
 			},
 			generatePagination: function () {
 				var oInboxModel = this.getView().getModel("oInboxModel"),
@@ -231,10 +233,16 @@ sap.ui.define([
 					this.getInboxData();
 			},
 			onSelectTab: function (oEvent) {
-				this.myTask = true;
-				if (oEvent.getSource().getSelectedKey() == "openTask")
-					this.myTask = false;
-				this.getInboxData();
+				var key = oEvent.getSource().getSelectedKey();
+				if (key == "openTask") {
+					this.getInboxData("", "", "OPEN ", "openTask", "openTaskCount");
+				} else if (key == "myTask") {
+					this.getInboxData("", "", "MYTASK", "myTask", "myTaskCount");
+				} else if (key == "draft") {
+					this.getInboxData("", "", "DRAFT", "draftTask", "draftCount");
+				}
+				// this.myTask = false;
+
 			},
 			fnClear: function () {
 				var taskDataFilterModel = this.getView().getModel("taskDataFilterModel");

@@ -959,14 +959,14 @@ sap.ui.define([
 					oSubmitData.invoiceHeaderDto.docStatus = "Created";
 					var balance = oSubmitData.invoiceHeaderDto.balance;
 					if (this.nanValCheck(balance) !== 0) {
-						sap.m.MessageBox.Error("Balance is not 0");
+						sap.m.MessageBox.error("Balance is not 0");
 						return;
 					}
 					var totalTax = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount");
 					var userInputTaxAmount = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
 					var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
 					if (this.nanValCheck(taxDifference) !== 0) {
-						sap.m.MessageBox.Error("Tax MisMatched");
+						sap.m.MessageBox.error("Tax MisMatched");
 						return;
 					}
 
