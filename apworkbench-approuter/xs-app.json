@@ -22,6 +22,7 @@
 	}, {
 		"source": "^/(.*)$",
 		"target": "$1",
-		"destination": "UserDetail_api"
+		"destination": "UserDetail_api",
+		 "cacheControl": "no-cache"
 	}]
 }

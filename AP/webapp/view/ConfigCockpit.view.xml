@@ -1,40 +1,7 @@
 <mvc:View controllerName="com.menabev.AP.controller.ConfigCockpit" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m"
 	xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
-	<Page title="{i18n>title}" class="sapUiSizeCompact">
+	<Page showHeader="false" class="sapUiSizeCompact">
 		<content>
-			<l:Grid defaultSpan="XL2 L2 M6 S12" vSpacing="0.5" class="GridBG">
-				<l:content>
-					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>CompanyCode}" design="Bold">
-						<!--<layoutData>-->
-						<!--	<l:GridData span="L1 M1 S1"/>-->
-						<!--</layoutData>-->
-					</Label>
-					<ComboBox items="{ path: 'mCompanyModel>/results' }" class="" change="onCompanySelect" selectionChange="onSelect"
-						valueState="{baseModel>/companyCodeError}" selectedKey="{oMasterModel>/configurationDto/companyCode}" editable="{baseModel>/Editable}">
-						<core:ListItem key="{mCompanyModel>companyCode}" text="{mCompanyModel>companyCode}"/>
-					</ComboBox>
-					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>TaxCode}" design="Bold">
-						<layoutData>
-							<l:GridData span="L1 M1 S1"/>
-						</layoutData>
-					</Label>
-					<ComboBox items="{ path: 'mTaxModel>/results' }" class="" selectedKey="{oMasterModel>/configurationDto/defaultTaxCode}"
-						editable="{baseModel>/Editable}" valueState="{baseModel>/defaultTaxCodeError}" selectionChange="onSelect">
-						<core:ListItem key="{mTaxModel>taxCode}" text="{mTaxModel>taxCode}"/>
-					</ComboBox>
-					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>OcrSource}" design="Bold">
-						<layoutData>
-							<l:GridData span="L1 M1 S1"/>
-						</layoutData>
-					</Label>
-					<ComboBox class="" selectedKey="{oMasterModel>/configurationDto/ocrSource}" selectionChange="onSelect"
-						valueState="{baseModel>/ocrSourceError}">
-						<core:ListItem key="SAP OCR" text="SAP OCR"/>
-						<core:ListItem key="Abby Flexi Capture" text="Abby Flexi Capture"/>
-						<core:ListItem key="Abby Vantage" text="Abby Vantage"/>
-					</ComboBox>
-				</l:content>
-			</l:Grid>
 			<OverflowToolbar>
 				<Label text="{i18n>EMAILREADERCONFIGURATION}"></Label>
 				<ToolbarSpacer/>
@@ -61,8 +28,10 @@
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<Input value="{oMasterModel>/schedulerConfigurationdto/0/frequencyNumber}" type="Number" class=""
-						valueState="{baseModel>/frequencyNumber0Error}" change="onNumberCheck"></Input>
+					<Select forceSelection="false" width="100%" items="{StaticDataModel>/frequency}"
+						selectedKey="{oMasterModel>/schedulerConfigurationdto/0/frequencyNumber}" valueStateText=" " valueState="{baseModel>/frequencyNumber0Error}">
+						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+					</Select>
 					<ComboBox class="sapUiSmallMarginBegin borderlessBox " valueState="{baseModel>/frequencyUnit0Error}"
 						selectedKey="{oMasterModel>/schedulerConfigurationdto/0/frequencyUnit}" editable="{baseModel>/Editable}" selectionChange="onSelect">
 						<core:Item key="min" text="Minutes"/>
@@ -96,8 +65,10 @@
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<Input value="{oMasterModel>/schedulerConfigurationdto/1/frequencyNumber}" type="Number" class="" change="onNumberCheck"
-						valueState="{baseModel>/frequencyNumber1Error}"></Input>
+					<Select forceSelection="false" width="100%" items="{StaticDataModel>/frequency}"
+						selectedKey="{oMasterModel>/schedulerConfigurationdto/1/frequencyNumber}" valueStateText=" " valueState="{baseModel>/frequencyNumber1Error}">
+						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+					</Select>
 					<ComboBox class="sapUiSmallMarginBegin borderlessBox " valueState="{baseModel>/frequencyUnit1Error}"
 						selectedKey="{oMasterModel>/schedulerConfigurationdto/1/frequencyUnit}" editable="{baseModel>/Editable}" selectionChange="onSelect">
 						<core:Item key="min" text="Minutes"/>
@@ -107,7 +78,7 @@
 			</l:Grid>
 			<l:Grid defaultSpan="XL6 L6 M12 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
-					<Table mode="MultiSelect" id="apMailboxTable" class="" items="{oMasterModel>/emailTeamDto/0/emailId}">
+					<Table mode="MultiSelect" id="apMailboxTable" items="{oMasterModel>/accountsPayableMailbox}">
 						<headerToolbar>
 							<OverflowToolbar>
 								<ToolbarSpacer/>
@@ -123,13 +94,13 @@
 						<items>
 							<ColumnListItem>
 								<cells>
-									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" class="" width="100%"
+									<Input value="{oMasterModel>emailId}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
 										valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }" editable="{baseModel>/Editable}"/>
 								</cells>
 							</ColumnListItem>
 						</items>
 					</Table>
-					<Table mode="MultiSelect" id="apScanTable" class="" items="{oMasterModel>/emailTeamDto/1/emailId}">
+					<Table mode="MultiSelect" id="apScanTable" items="{oMasterModel>/emailTeamDto/1/emailId}">
 						<headerToolbar>
 							<OverflowToolbar>
 								<ToolbarSpacer/>
@@ -145,7 +116,7 @@
 						<items>
 							<ColumnListItem>
 								<cells>
-									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" class="" width="100%"
+									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
 										editable="{baseModel>/Editable}" valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }"/>
 								</cells>
 							</ColumnListItem>
@@ -202,8 +173,8 @@
 										<!--		</ColumnListItem>-->
 										<!--	</suggestionRows>-->
 									</Input>
-									<ComboBox items="{ path: 'mCompanyModel>/results' }" valueState="{oMasterModel>companyCodeError}" class=""
-										selectedKey="{oMasterModel>companyCode}" editable="{baseModel>/Editable}" selectionChange="onSelect">
+									<ComboBox items="{ path: 'mCompanyModel>/results' }" valueState="{oMasterModel>companyCodeError}" selectedKey="{oMasterModel>companyCode}"
+										editable="{baseModel>/Editable}" selectionChange="onSelect">
 										<core:ListItem key="{mCompanyModel>companyCode}" text="{mCompanyModel>companyName} - {mCompanyModel>companyCode}"/>
 									</ComboBox>
 									<Switch state="{oMasterModel>autoPosting}" type="AcceptReject" enabled="{baseModel>/Editable}">
@@ -280,7 +251,7 @@
 				<ToolbarSpacer/>
 				<Button text="{i18n>SUBMIT}" type="Emphasized" press="onSubmit" visible="{baseModel>/submitBtn}"/>
 				<!--<Button text="Edit" type="Emphasized" press="onEdit" visible="{baseModel>/editBtn}"/>-->
-				<Button text="{i18n>CANCEL}"/>
+				<Button text="{i18n>CANCEL}" press="onCancelChanges"/>
 			</OverflowToolbar>
 		</footer>
 	</Page>

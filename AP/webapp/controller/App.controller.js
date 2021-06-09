@@ -13,6 +13,7 @@ sap.ui.define([
 		onInit: function () {
 			var that = this;
 			var StaticDataModel = this.getOwnerComponent().getModel("StaticDataModel");
+			this.StaticDataModel = StaticDataModel;
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
@@ -52,18 +53,25 @@ sap.ui.define([
 				StaticDataModel.refresh();
 				if (userGroup != "IT_Admin") {
 					that.getView().byId("sideNav").getItems()[0].addStyleClass("sideNavItemSelected");
+					var text = that.getView().byId("sideNav").getItems()[0].getItems()[1].getText();
+					StaticDataModel.setProperty("/selectedApp", text);
 				} else {
 					that.getView().byId("sideNav").getItems()[2].addStyleClass("sideNavItemSelected");
+					var text = that.getView().byId("sideNav").getItems()[2].getItems()[1].getText();
+					StaticDataModel.setProperty("/selectedApp", text);
 				}
 			});
 		},
 		onSideNavItemSelection: function (oEvent) {
+			var StaticDataModel = this.StaticDataModel;
 			var items = oEvent.getSource().getParent().getItems();
 			for (var i = 0; i < items.length; i++) {
 				items[i].removeStyleClass("sideNavItemSelected");
 			}
 			oEvent.getSource().addStyleClass("sideNavItemSelected");
 			var key = oEvent.getSource().getKey();
+			var text = oEvent.getSource().getItems()[1].getText();
+			StaticDataModel.setProperty("/selectedApp", text);
 			this.oRouter.navTo(key);
 		},
 		onUserDetailPressed: function (oEvent) {

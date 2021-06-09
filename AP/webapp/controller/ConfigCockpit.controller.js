@@ -9,59 +9,8 @@ sap.ui.define([
 
 	return Controller.extend("com.menabev.AP.controller.ConfigCockpit", {
 		onInit: function () {
-			// var MasterData = {
-			// 	schedulerConfigurationdto: [{
-			// 		"isActive": false
-			// 	}, {
-			// 		"isActive": false
-			// 	}],
-			// 	configurationDto: {
-			// 		"createdBy": null,
-			// 		"createdAt": null,
-			// 		"updatedBy": null,
-			// 		"updatedAt": null,
-			// 		"ocrSource": "",
-			// 		"defaultTaxCode": "",
-			// 		"companyCode": "",
-			// 		"configurationId": "f0ca0680-8e30-4c02-bcc1-decbd4dae004",
-			// 		"maximumNoofUsers": "",
-			// 		"version": "CURRENT"
-			// 	},
-			// 	vendorDetailsDto: [{
-			// 		"vendorId": "",
-			// 		"companyCode": "",
-			// 		"autoPosting": false,
-			// 		"partialPosting": false,
-			// 		"autoRejection": false
-			// 	}],
-			// 	mailTemplateDto: [{
-			// 		"subject": "",
-			// 		"actionType": "Exception Mail Template",
-			// 		"body": "",
-			// 		"mailTemplateId": "fcf20584-e7e2-4c65-9091-bfc65d840265",
-			// 		"configurationId": "f0ca0680-8e30-4c02-bcc1-decbd4dae004"
-			// 	}, {
-			// 		"subject": "",
-			// 		"actionType": "Rejection Mail Template",
-			// 		"body": "",
-			// 		"mailTemplateId": "9761e59d-8a3a-460b-a873-82a3921b00e7",
-			// 		"configurationId": "f0ca0680-8e30-4c02-bcc1-decbd4dae004"
-			// 	}],
-			// 	emailTeamDto: [{
-			// 		"emailId": [""],
-			// 		"actionType": "Accounts Payablle Mailbox Id",
-			// 		"isActive": true,
-			// 		"emailTeamApid": "0bccc8cf-d65b-4fa8-9b5c-36099503a678",
-			// 		"configurationId": "f0ca0680-8e30-4c02-bcc1-decbd4dae004"
-			// 	}, {
-			// 		"emailId": [""],
-			// 		"actionType": "Accounts Payable Scanning Team",
-			// 		"isActive": true,
-			// 		"emailTeamApid": "8411d7c7-6a14-4331-89cd-0b066ac2ad66",
-			// 		"configurationId": "f0ca0680-8e30-4c02-bcc1-decbd4dae004"
-			// 	}]
-			// };
-			// var oMasterModel = new JSONModel(MasterData);
+			var that = this;
+			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			var oMasterModel = new JSONModel();
 			this.getView().setModel(oMasterModel, "oMasterModel");
 			var baseData = {
@@ -77,7 +26,13 @@ sap.ui.define([
 			this.getView().setModel(oPODetailModel, "oPODetailModel");
 			this.handleLoadCompany();
 			oMasterModel.refresh();
-			this._fnGetMasterData();
+			this.oRouter.attachRoutePatternMatched(function (oEvent) {
+				if (oEvent.getParameter("name") === "ConfigCockpit") {
+					oMasterModel.setData({});
+					that._fnGetMasterData();
+				}
+			});
+
 		},
 		_fnGetMasterData: function () {
 			var masterModel = this.getView().getModel("oMasterModel");
@@ -89,9 +44,127 @@ sap.ui.define([
 					// sap.m.MessageToast.show("Destination Failed");
 				},
 				success: function (data, textStatus, jqXHR) {
+					if (!data.schedulerConfigurationdto) {
+						// var data = {
+						// 	"vendorDetailsDto": [{
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "a96ccdba-1a96-437e-aaaa-09c7f69f2219",
+						// 		"companyCode": "1011",
+						// 		"autoPosting": false,
+						// 		"partialPosting": true,
+						// 		"autoRejection": true,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "64223ad4-6b83-4f27-b808-3d74a3d34ad9",
+						// 		"companyCode": "1234",
+						// 		"autoPosting": false,
+						// 		"partialPosting": true,
+						// 		"autoRejection": true,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "abfaba72-51fd-489e-aadf-34b1ea922af0",
+						// 		"companyCode": "1001",
+						// 		"autoPosting": true,
+						// 		"partialPosting": false,
+						// 		"autoRejection": false,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "4637ce3e-86a0-4c71-a231-e1a110aa8f54",
+						// 		"companyCode": "1011",
+						// 		"autoPosting": true,
+						// 		"partialPosting": false,
+						// 		"autoRejection": false,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}],
+						// 	"configurationDto": {
+						// 		"createdBy": "Dipanjan Test",
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"ocrSource": "Abby Flexi Capture",
+						// 		"defaultTaxCode": "1234",
+						// 		"companyCode": "1234",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"maximumNoofUsers": 0,
+						// 		"version": "CURRENT"
+						// 	},
+						// 	"emailTeamDto": [{
+						// 		"emailId": ["niharika.thakur@incture.com", "niharika.thakur@incture.com"],
+						// 		"actionType": "Accounts Payablle Mailbox Id",
+						// 		"isActive": true,
+						// 		"emailTeamApid": "6d78d1a6-4b2d-46a5-961f-040eb6ca6eb4",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}, {
+						// 		"emailId": ["sowndharya.k@incture.com", "sowndharya.k@incture.com", "niharika.thakur@incture.com"],
+						// 		"actionType": "Accounts Payable Scanning Team",
+						// 		"isActive": true,
+						// 		"emailTeamApid": "5b2c7481-67c2-477c-890a-f3f57cf8d11b",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}],
+						// 	"mailTemplateDto": [{
+						// 		"subject": "Exception Subject New 1",
+						// 		"actionType": "Exception Mail Template",
+						// 		"body": "exception mail body",
+						// 		"mailTemplateId": "49661bce-9695-485d-8998-9882eaa1fcd0",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}, {
+						// 		"subject": "Rejection Subject New Dipanjan test",
+						// 		"actionType": "Rejection Mail Template",
+						// 		"body": "rejection mail body",
+						// 		"mailTemplateId": "2e085549-97b5-4bbb-93f0-82f289c280a8",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}],
+						// 	"schedulerConfigurationdto": [{
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"scId": "e3632a11-e6f2-472b-8ca5-65fdcfb92e2c",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"startDate": "05/29/2021",
+						// 		"endDate": "05/31/2021",
+						// 		"frequencyNumber": 0,
+						// 		"frequencyUnit": "min",
+						// 		"isActive": true,
+						// 		"actionType": "GRN Scheduler Configuration"
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"scId": "644ce7e1-89c8-433a-b915-2fc7e8862a34",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"startDate": "05/28/2021",
+						// 		"endDate": "05/31/2021",
+						// 		"frequencyNumber": 0,
+						// 		"frequencyUnit": "min",
+						// 		"isActive": true,
+						// 		"actionType": "Email Scheduler Configuration"
+						// 	}]
+						// };
+					}
 					masterModel.setData(data);
+					masterModel.referesh();
 				}
-
 			});
 		},
 		onSelect: function (oEvent) {
@@ -190,11 +263,13 @@ sap.ui.define([
 		fnValidateDate: function (oEvent) {
 			var data = oEvent.getSource().getValue();
 			var dateVal = new Date(data);
-			var day =  dateVal.getDate();
-			if(!day){
-				sap.m.messageToast.show("Please enter valid date");
+			var day = dateVal.getDate();
+			if (!day) {
+				MessageToast.show("Please enter valid date");
 				oEvent.getSource().setValue("");
 				return;
+			} else {
+				oEvent.getSource().setDateValue(dateVal);
 			}
 			var sPath = oEvent.getSource().getBindingInfo("value").binding.sPath.split("/");
 			sPath.pop();
@@ -228,14 +303,18 @@ sap.ui.define([
 		},
 		fnDeleteItem: function () {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			var aList = this.byId("idProductsTable").getSelectedContextPaths();
+			var aList = this.byId("idProductsTable").getSelectedContexts();
 			this.byId("idProductsTable").removeSelections();
+			var vendor = oMasterModel.getProperty("/vendorDetailsDto");
+			var index;
 			if (aList.length === 0) {
 				MessageToast.show("Please select items to delete");
 			} else {
 				for (var i = aList.length - 1; i >= 0; i--) {
-					oMasterModel.getData().vendorDetailsDto.splice(aList[i].split("/").pop(), 1);
+					index = aList[i].getPath().split("/").pop();
+					vendor.splice(index, 1);
 				}
+				oMasterModel.setProperty("/vendorDetailsDto", vendor);
 				oMasterModel.refresh();
 			}
 		},
@@ -271,40 +350,59 @@ sap.ui.define([
 		/* ************************ Mail Id Configuration :START *********************************************** */
 		fnAddAPMailBox: function () {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			oMasterModel.getData().emailTeamDto[0].emailId.push("");
+			var Obj = {
+				"configurationId": "",
+				"emailId": "",
+				"emailTeamApid": ""
+			};
+			oMasterModel.getData().accountsPayableMailbox(Obj);
 			oMasterModel.refresh();
 		},
 
 		fnAddAPScanTeam: function () {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			oMasterModel.getData().emailTeamDto[1].emailId.push("");
+			var Obj = {
+				"configurationId": "",
+				"emailId": "",
+				"emailTeamApid": ""
+			};
+			oMasterModel.getData().accountsPayableScanningTeam(Obj);
 			oMasterModel.refresh();
 		},
 
 		fnDeleteAPMailBox: function (oEvent) {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			var aList = this.byId("apMailboxTable").getSelectedContextPaths();
+			var aList = this.byId("apMailboxTable").getSelectedContexts();
+			var email = oMasterModel.getData().accountsPayableMailbox;
 			this.byId("apMailboxTable").removeSelections();
+			var index;
 			if (aList.length === 0) {
 				MessageToast.show("Please select items to delete");
 			} else {
+
 				for (var i = aList.length - 1; i >= 0; i--) {
-					oMasterModel.getData().emailTeamDto[0].emailId.splice(aList[i].split("/").pop(), 1);
+					index = aList[i].getPath().split("/").pop();
+					email.splice(index, 1);
 				}
+				oMasterModel.setProperty("/accountsPayableMailbox", email);
 				oMasterModel.refresh();
 			}
 		},
 
 		fnDeleteAPScanTeam: function (oEvent) {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			var aList = this.byId("apScanTable").getSelectedContextPaths();
+			var aList = this.byId("apScanTable").getSelectedContexts();
+			var email = oMasterModel.getData().accountsPayableScanningTeam;
 			this.byId("apScanTable").removeSelections();
+			var index;
 			if (aList.length === 0) {
 				MessageToast.show("Please select items to delete");
 			} else {
 				for (var i = aList.length - 1; i >= 0; i--) {
-					oMasterModel.getData().emailTeamDto[1].emailId.splice(aList[i].split("/").pop(), 1);
+					index = aList[i].getPath().split("/").pop();
+					email.splice(index, 1);
 				}
+				oMasterModel.setProperty("/accountsPayableScanningTeam", email);
 				oMasterModel.refresh();
 			}
 		},
@@ -397,7 +495,7 @@ sap.ui.define([
 						// sap.m.MessageToast.show("Destination Failed");
 					},
 					success: function (data, textStatus, jqXHR) {
-						MessageBox.success("Configuration saved successfully");
+						MessageBox.success(data.message);
 					}
 
 				});
@@ -405,6 +503,19 @@ sap.ui.define([
 				MessageBox.success("Please enter all the mandatory fields highlighted");
 			}
 		},
+
+		onCancelChanges: function () {
+			var that = this;
+			var message = "Are you sure You want to cancel changes?";
+			sap.m.MessageBox.warning(message, {
+				actions: [sap.m.MessageBox.Action.OK],
+				onClose: function (e) {
+					if (e === "OK") {
+						that._fnGetMasterData();
+					}
+				}
+			});
+		}
 
 	});
 });

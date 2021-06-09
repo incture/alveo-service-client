@@ -77,6 +77,11 @@
     color: #fff;
     font-size: larger;
 }
+
+.sapUiSizeCompact .sapMBtn {
+    height: 2.000rem;
+    padding: 0.1875rem 0.2rem;
+}
 /*FD*/
 
 .salesReportHdrBoxClass {
@@ -193,7 +198,10 @@
     border-radius: 8px;
 }
 
-
+.sapMITB {
+    position: relative;
+    width: 100%;
+}
 
 .navContainerPage {
     background-color: white;

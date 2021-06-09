@@ -2,9 +2,9 @@
 	xmlns:html="http://www.w3.org/1999/xhtml">
 	<Page showHeader="false" class="sapUiSizeCompact PageHeader">
 		<content>
-			<IconTabBar >
+			<IconTabBar headerMode="Inline" class="sapUiResponsivePadding--header sapUiResponsivePadding--content">
 				<items>
-					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo" class="IconTabBG">
+					<IconTabFilter text="{i18n>USERLIST}" key="HeaderInfo" class="IconTabBG" count="{oUserDetailModel>/userCount}">
 						<Table items="{oUserDetailModel>/users}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
 							id="USERMANAGEMENT">
 							<headerToolbar>
@@ -57,7 +57,7 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>GROUPLIST}" key="HeaderInfo">
+					<IconTabFilter text="{i18n>GROUPLIST}" key="HeaderInfo" count="{oUserDetailModel>/groupCount}">
 						<Table items="{oUserDetailModel>/groupList}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20"
 							id="USERGROUPS">
 							<headerToolbar>
