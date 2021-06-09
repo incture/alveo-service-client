@@ -12,7 +12,7 @@
 				<VBox class="gridContainer">
 					<VBox id="sideNav" class="sideNav" items="{StaticDataModel>/leftPane}">
 						<vc:VBoxCC class="sideNavItems" key="{StaticDataModel>key}" press="onSideNavItemSelection">
-							<!--<core:Icon src="sap-icon://activity-items"></core:Icon>-->
+							<core:Icon src="{StaticDataModel>icon}"></core:Icon>
 							<Label text="{StaticDataModel>label}" wrapping="true"></Label>
 						</vc:VBoxCC>
 					</VBox>

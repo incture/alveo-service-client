@@ -11,7 +11,7 @@
 							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" icon="sap-icon://add" class="SecondaryBtn" press="addItem"/>
 							<u:FileUploader id="fileUploaderId" icon="sap-icon://upload" iconOnly="true" maximumFileSize="10" fileType="XLSX" buttonOnly="true"
 								tooltip="{i18n>ImportFromExcel}" change="handleImportFromExcel" fileSizeExceed="onFileSizeExceed" sameFilenameAllowed="true"
-								class="SecondaryBtn"/>
+								class="SecondaryBtn" typeMissmatch="uploadExcelTypeMismatch"/>
 						</OverflowToolbar>
 					</headerToolbar>
 					<infoToolbar>
@@ -49,7 +49,7 @@
 									suggestionItemSelected="glDescription" showSuggestion="true" suggest="glAccountSuggest" change="errorHandler"
 									valueState="{postDataModel>glError}">
 									<suggestionItems>
-										<core:ListItem text="{path:'glAccountModel>GLAccounts',formatter:'com.menabev.AP.util.formatter.removeZero'}"
+										<core:ListItem text="{path:'glAccountModel>GLAccounts',formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
 											additionalText="{glAccountModel>GLAccDesc}"/>
 									</suggestionItems>
 								</Input>

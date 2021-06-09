@@ -79,6 +79,10 @@ sap.ui.define([
 			sap.m.URLHelper.redirect("/my/logout", false);
 		},
 
+		handleUserDetailCloseButton: function (oEvent) {
+			this.userDetail.close(oEvent);
+		},
+
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
 		 * (NOT before the first rendering! onInit() is used for that one!).

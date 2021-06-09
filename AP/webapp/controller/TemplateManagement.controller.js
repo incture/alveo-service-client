@@ -352,14 +352,16 @@ sap.ui.define([
 						success: function (result, xhr, data) {
 							var message = result.message;
 							if (result.status === "Success") {
-								if (this.cFalg === "Create") {
-									that.clicks = 0;
-									num = this.clicks * 10;
-									that.getView().byId("btnPrevious").setEnabled(false);
-								}
 								sap.m.MessageBox.success(message, {
 									actions: [sap.m.MessageBox.Action.OK],
 									onClose: function (sAction) {
+										if (that.cFalg === "Create") {
+											that.clicks = 0;
+											num = that.clicks * 10;
+											that.getView().byId("btnPrevious").setEnabled(false);
+										} else {
+											num = that.clicks * 10;
+										}
 										that.getAllTemplateWithPagination(null, null, num);
 										that.CreateEditTemplate.close();
 									}
@@ -566,6 +568,11 @@ sap.ui.define([
 			var errorMsg = "File size has exceeded it max limit of 10MB";
 			this.errorMsg(errorMsg);
 		},
+		
+		uploadExcelTypeMismatch: function(oEvent){
+			var errorMsg = "File type Mismatch";
+			this.errorMsg(errorMsg);
+		}
 		/*End of Excel Upload*/
 
 	});

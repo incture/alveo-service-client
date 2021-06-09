@@ -1,7 +1,7 @@
-<mvc:View controllerName="com.menabev.AP.controller.ConfigCockpit" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout"
-	xmlns:core="sap.ui.core">
-	<Page title="{i18n>title}">
-			<content>
+<mvc:View controllerName="com.menabev.AP.controller.ConfigCockpit" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m"
+	xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<Page title="{i18n>title}" class="sapUiSizeCompact">
+		<content>
 			<l:Grid defaultSpan="XL2 L2 M6 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
 					<Label width="100%" textAlign="Right" class="sapUiTinyMarginTop" text="{i18n>CompanyCode}" design="Bold">
@@ -47,14 +47,14 @@
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<DatePicker class="borderlessBox" displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy"
-						value="{oMasterModel>/schedulerConfigurationdto/0/startDate}" change="fnValidateDate" valueState="{baseModel>/startDate0Error}"></DatePicker>
+					<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" value="{oMasterModel>/schedulerConfigurationdto/0/startDate}"
+						change="fnValidateDate" valueState="{baseModel>/startDate0Error}"></DatePicker>
 					<Label width="100%" textAlign="Right" text="{i18n>TO}" design="Bold" labelFor="grnDuration" class="sapUiTinyMarginTop">
 						<layoutData>
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<DatePicker class="borderlessBox " displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" valueState="{baseModel>/endDate0Error}"
+					<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" valueState="{baseModel>/endDate0Error}"
 						value="{oMasterModel>/schedulerConfigurationdto/0/endDate}" change="fnValidateDate"></DatePicker>
 					<Label width="100%" textAlign="Right" text="{i18n>FREQUENCY}" design="Bold" labelFor="emailFrequency" class="sapUiTinyMarginTop">
 						<layoutData>
@@ -82,15 +82,15 @@
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<DatePicker class="borderlessBox" displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy"
-						value="{oMasterModel>/schedulerConfigurationdto/1/startDate}" change="fnValidateDate" valueState="{baseModel>/startDate1Error}"></DatePicker>
+					<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" value="{oMasterModel>/schedulerConfigurationdto/1/startDate}"
+						change="fnValidateDate" valueState="{baseModel>/startDate1Error}"></DatePicker>
 					<Label width="100%" textAlign="Right" text="{i18n>TO}" design="Bold" labelFor="grnDuration" class="sapUiTinyMarginTop">
 						<layoutData>
 							<l:GridData span="L1 M1 S1"/>
 						</layoutData>
 					</Label>
-					<DatePicker class="borderlessBox " displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy"
-						value="{oMasterModel>/schedulerConfigurationdto/1/endDate}" change="fnValidateDate" valueState="{baseModel>/endDate1Error}"></DatePicker>
+					<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" value="{oMasterModel>/schedulerConfigurationdto/1/endDate}"
+						change="fnValidateDate" valueState="{baseModel>/endDate1Error}"></DatePicker>
 					<Label width="100%" textAlign="Right" text="{i18n>FREQUENCY}" design="Bold" labelFor="emailFrequency" class="sapUiTinyMarginTop">
 						<layoutData>
 							<l:GridData span="L1 M1 S1"/>
@@ -161,10 +161,10 @@
 							</OverflowToolbar>
 						</headerToolbar>
 						<columns>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" width="25%">
 								<Text text="{i18n>VENDORID}"/>
 							</Column>
-							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center" width="25%">
 								<Text text="{i18n>COMPANYCODE}"/>
 							</Column>
 							<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">

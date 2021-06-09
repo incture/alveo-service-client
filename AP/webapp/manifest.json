@@ -10,8 +10,31 @@
 		"title": "{{appTitle}}",
 		"description": "{{appDescription}}",
 		"sourceTemplate": {
-			"id": "html5moduletemplates.basicSAPUI5ApplicationProjectModule",
-			"version": "1.40.12"
+			"id": "servicecatalog.connectivityComponentForManifest",
+			"version": "0.0.0"
+		},
+		"dataSources": {
+			"ZP2P_API_SADETAILS_SRV": {
+				"uri": "/SD4_DEST/sap/opu/odata/sap/ZP2P_API_SADETAILS_SRV/",
+				"type": "OData",
+				"settings": {
+					"localUri": "localService/metadata.xml"
+				}
+			},
+			"ZP2P_API_PODETAILS_SRV": {
+				"uri": "/SD4_DEST/sap/opu/odata/sap/ZP2P_API_PODETAILS_SRV/",
+				"type": "OData",
+				"settings": {
+					"localUri": "localService/ZP2P_API_PODETAILS_SRV/metadata.xml"
+				}
+			},
+			"API_BUSINESS_PARTNER": {
+				"uri": "/SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/",
+				"type": "OData",
+				"settings": {
+					"localUri": "localService/API_BUSINESS_PARTNER/metadata.xml"
+				}
+			}
 		}
 	},
 	"sap.ui": {
@@ -70,12 +93,44 @@
 			},
 			"oDropDownModel": {
 				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oDataModel": {
+				"type": "sap.ui.model.odata.ODataModel",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Request"
+				},
+				"dataSource": "ZP2P_API_SADETAILS_SRV",
+				"preload": true
+			},
+			"ZP2P_API_PODETAILS_SRV": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Request"
+				},
+				"dataSource": "ZP2P_API_PODETAILS_SRV",
+				"preload": true
+			},
+			"API_BUSINESS_PARTNER": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Request"
+				},
+				"dataSource": "API_BUSINESS_PARTNER",
+				"preload": true
 			}
 		},
 		"resources": {
-			"css": [{
-				"uri": "css/style.css"
-			}]
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
 		},
 		"routing": {
 			"config": {
@@ -87,62 +142,70 @@
 				"controlId": "AppId",
 				"clearControlAggregation": false
 			},
-			"routes": [{
+			"routes": [
+				{
 					"name": "UploadInvoice",
 					"pattern": "UploadInvoice",
 					"target": [
 						"UploadInvoice"
 					]
-				}, {
+				},
+				{
 					"name": "UserManagement",
 					"pattern": "",
 					"target": [
 						"UserManagement"
 					]
-				}, {
+				},
+				{
 					"name": "Inbox",
 					"pattern": "Inbox",
 					"target": [
 						"Inbox"
 					]
-				}, {
+				},
+				{
 					"name": "CreateUser",
 					"pattern": "CreateUser/{id}",
 					"target": [
 						"CreateUser"
 					]
-				}, {
+				},
+				{
 					"name": "CreateGroup",
 					"pattern": "CreateGroup/{id}",
 					"target": [
 						"CreateGroup"
 					]
-				}, {
+				},
+				{
 					"name": "ConfigCockpit",
 					"pattern": "ConfigCockpit",
 					"target": [
 						"ConfigCockpit"
 					]
-				}, {
+				},
+				{
 					"name": "TemplateManagement",
 					"pattern": "TemplateManagement",
 					"target": [
 						"TemplateManagement"
 					]
-				}, {
+				},
+				{
 					"name": "Dashboard",
 					"pattern": "Dashboard",
 					"target": [
 						"Dashboard"
 					]
-				}, {
+				},
+				{
 					"name": "NonPOInvoice",
 					"pattern": "NonPOInvoice/:id:/:status:",
 					"target": [
 						"NonPOInvoice"
 					]
 				}
-
 			],
 			"targets": {
 				"UploadInvoice": {

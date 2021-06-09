@@ -28,7 +28,9 @@ sap.ui.define([
 				});
 			},
 			onCreateInvoice: function (oEvent) {
-				this.oRouter.navTo("NonPOInvoice");
+				this.oRouter.navTo("NonPOInvoice", {
+					id: "NEW"
+				});
 			},
 
 			onReqIdOpenSelect: function (oEvent) {
@@ -61,6 +63,19 @@ sap.ui.define([
 				var taskDataFilterModelData = this.getView().getModel("taskDataFilterModel").getData(),
 					url = "/menabevdev/invoiceHeader/inbox",
 					that = this;
+				var taskDataFilterModelData = jQuery.extend(true, {}, this.getView().getModel("taskDataFilterModel").getData());
+				if (taskDataFilterModelData.createdAtFrom) {
+					taskDataFilterModelData.createdAtFrom = new Date(taskDataFilterModelData.createdAtFrom).getTime();
+				}
+				if (taskDataFilterModelData.createdAtTo) {
+					taskDataFilterModelData.createdAtTo = new Date(taskDataFilterModelData.createdAtTo).getTime();
+				}
+				if (taskDataFilterModelData.dueDateFrom) {
+					taskDataFilterModelData.dueDateFrom = new Date(taskDataFilterModelData.dueDateFrom).getTime();
+				}
+				if (taskDataFilterModelData.dueDateTo) {
+					taskDataFilterModelData.dueDateTo = new Date(taskDataFilterModelData.dueDateTo).getTime();
+				}
 				taskDataFilterModelData.userId = this.oUserDetailModel.getProperty("/loggedinUserDetail/id");
 				taskDataFilterModelData.indexNum = scroll ? pageNo : 1;
 				taskDataFilterModelData.count = 100;
@@ -258,7 +273,7 @@ sap.ui.define([
 				var obj = {
 					"claim": true,
 					"taskID": oEvent.getSource().getBindingContext("oInboxModel").getObject().taskId,
-					"userId": "P000022"
+					"userId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id")
 				};
 				if (oEvent.getSource().getTooltip() == "release")
 					obj.claim = false;
@@ -310,6 +325,12 @@ sap.ui.define([
 						return false;
 					}
 				}
+			},
+
+			onChangeInvoiceValue: function (oEvent) {
+				var oValue = oEvent.getSource().getValue();
+				oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
+				oEvent.getSource().setValue(oValue);
 			}
 		});
 	});

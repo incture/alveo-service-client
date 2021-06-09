@@ -26,5 +26,8 @@
 	}, {
 		"key": "Supplier_Admin",
 		"value": "Supplier_Admin"
+	}, {
+		"key": "Supplier_Executive",
+		"value": "Supplier_Executive"
 	}]
 }
