@@ -479,6 +479,10 @@ sap.ui.define([
 		onCLickClearInputTemp: function () {
 			this.getModel("templateModel").setProperty("/inputTempName", null);
 			this.getModel("templateModel").setProperty("/inputAccountNumber", null);
+			this.clicks = 0;
+			num = this.clicks * 10;
+			this.getView().byId("btnPrevious").setEnabled(false);
+			this.getAllTemplateWithPagination(null, null, this.clicks);
 		},
 
 		//Pagination of Template 
@@ -568,12 +572,12 @@ sap.ui.define([
 			var errorMsg = "File size has exceeded it max limit of 10MB";
 			this.errorMsg(errorMsg);
 		},
-		
-		uploadExcelTypeMismatch: function(oEvent){
-			var errorMsg = "File type Mismatch";
-			this.errorMsg(errorMsg);
-		}
-		/*End of Excel Upload*/
+
+		uploadExcelTypeMismatch: function (oEvent) {
+				var errorMsg = "File type Mismatch";
+				this.errorMsg(errorMsg);
+			}
+			/*End of Excel Upload*/
 
 	});
 

@@ -25,19 +25,19 @@
 				selectionChange="onSelectionChangeTemplate" growing="true" growingThreshold="10" noDataText="{i18n>NoTemplatesFound}">
 				<columns>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Label text="{i18n>TemplateName}" class="selectTemp"/>
+						<Label text="{i18n>TemplateName}" class="selectTemp" design="Bold"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Label text="{i18n>AccountNumber}" class="selectTemp"/>
+						<Label text="{i18n>AccountNumber}" class="selectTemp" design="Bold"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Label text="{i18n>CreatedBy}" class="selectTemp"/>
+						<Label text="{i18n>CreatedBy}" class="selectTemp" design="Bold"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Label text="{i18n>UpdatedBy}" class="selectTemp"/>
+						<Label text="{i18n>UpdatedBy}" class="selectTemp" design="Bold"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Label text="{i18n>Edit}" class="selectTemp"/>
+						<Label text="{i18n>Edit}" class="selectTemp" design="Bold"/>
 					</Column>
 				</columns>
 				<items>

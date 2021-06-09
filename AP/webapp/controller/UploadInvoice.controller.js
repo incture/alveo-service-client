@@ -247,6 +247,8 @@ sap.ui.define([
 							}
 						}
 					});
+				} else {
+					that.errorMsg("Please enter all mandatory fields");
 				}
 			} else {
 				that.errorMsg("Upload an Invoice to process");
@@ -282,6 +284,7 @@ sap.ui.define([
 				} else {
 					pdfModel.setProperty("/fldVisble", false);
 					pdfModel.setProperty("/crDbPOVisble", true);
+					pdfModel.setProperty("/crDbPO", "");
 				}
 			} else {
 				pdfModel.setProperty("/vstate/transactionType", "Error");
@@ -301,19 +304,14 @@ sap.ui.define([
 				}.bind(this),
 				error: function (error) {
 					var errorMsg = "";
-					if (error.statusCode === 504) {
-						errorMsg = "Request timed-out. Please try again!";
-						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = JSON.parse(error.responseText);
-						errorMsg = errorMsg.error.message.value;
-						this.errorMsg(errorMsg);
-					}
+					errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
-		
-		uploadFileTypeMismatch: function(oEvent){
+
+		uploadFileTypeMismatch: function (oEvent) {
 			var fileType = oEvent.getParameter("fileType");
 			var errorMsg = "Please select only PDF file.";
 			this.errorMsg(errorMsg);

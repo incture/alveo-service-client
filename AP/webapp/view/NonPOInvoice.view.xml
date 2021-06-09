@@ -46,13 +46,29 @@
 							<l:content>
 								<VBox>
 									<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
-									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}" width="80%"
-										editable="{oVisibilityModel>/NonPOInvoice/editable}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="onValueHelpRequested"/>
+									<!--<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}" width="80%"-->
+									<!--	editable="{oVisibilityModel>/NonPOInvoice/editable}"/>-->
+									<Input filterSuggests="false" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}" width="80%"
+										showSuggestion="true" suggest="VendorIdSuggest" tooltip="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}"
+										suggestionItemSelected="vendorIdSelected" suggestionItems="{searchVendorModel>/d/results}"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}">
+										<suggestionItems>
+											<core:ListItem text="{searchVendorModel>Supplier}" additionalText="{searchVendorModel>SupplierName}"/>
+										</suggestionItems>
+									</Input>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
-									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%"
-										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<!--<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%"-->
+									<!--	editable="{oVisibilityModel>/NonPOInvoice/editable}"/>-->
+									<Input filterSuggests="false" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}" width="80%" type="Text"
+										showSuggestion="true" suggest="VendorNameSuggest" tooltip="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorName}"
+										suggestionItemSelected="vendorNameSelected" suggestionItems="{searchVendorModel>/d/results}"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}">
+										<suggestionItems>
+											<core:ListItem text="{searchVendorModel>SupplierName}" additionalText="{searchVendorModel>Supplier}"/>
+										</suggestionItems>
+									</Input>
 								</VBox>
 								<VBox>
 									<Label required="true" text="{i18n>InvoiceNo}" class="sapUiTinyMarginTop"/>
@@ -75,8 +91,8 @@
 									<Label text="{i18n>PostingDate}" required="true"/>
 									<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
 										value="{ path:'nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/postingDate}"
-										change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/postingDate}" change="onPostingDateChange"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>DueDate}"/>

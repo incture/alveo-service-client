@@ -197,18 +197,16 @@ sap.ui.define([
 
 		//function hdrInvAmtCalu is triggered on change of Invoice Amount in the header field
 		hdrInvAmtCalu: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			var inValue = oEvent.getParameter("value");
-			if (inValue === "") {
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+				invoiceAmt = oEvent.getParameter("value");
+			if (!invoiceAmt) {
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/invoiceTotal", "Error");
 			} else {
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/invoiceTotal", "None");
-				var invAmt = (parseFloat(inValue)).toFixed(2);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal", invAmt);
-				var aDetails = nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader;
-				var fBalance = (parseFloat(aDetails.invoiceTotal - aDetails.grossAmount)).toFixed(2);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", fBalance);
+				invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal", invoiceAmt);
 			}
+			this.calculateBalance();
 		},
 
 		//function getGLaccountValue is triggered on change of GL Account in the Cost Center table
@@ -674,7 +672,7 @@ sap.ui.define([
 
 					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxPer) / 100));
 					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxPer)) / 100;
-					totalTax += taxValue;
+					totalTax += Number(taxValue.toFixed(2));
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(2));
 					postDataModel.setProperty("/listNonPoItem/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(2));
 
@@ -690,14 +688,10 @@ sap.ui.define([
 				}
 				totalBaseRate = that.nanValCheck(totalBaseRate).toFixed(2);
 				totalTax = this.nanValCheck(totalTax).toFixed(2);
-				var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(totalTax);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/totalBaseRate", totalBaseRate);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount", grossAmount.toFixed(2));
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount", totalTax);
-				var invAmt = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal");
-				var diff = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
-				diff = that.nanValCheck(diff).toFixed(2);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", diff);
+				this.calculateGrossAmount();
+				this.calculateBalance();
 				nonPOInvoiceModel.refresh();
 				postDataModel.refresh();
 			}
@@ -1116,7 +1110,7 @@ sap.ui.define([
 				"invoiceDateTo": "",
 				"invoiceItems": [],
 				"invoicePdfId": objectIsNew.invoiceHeader.invoicePdfId,
-				"invoiceTotal": objectIsNew.invoiceHeader.invoiceTotal,
+				"invoiceTotal": Number(objectIsNew.invoiceHeader.invoiceTotal),
 				"invoiceTotalFrom": "",
 				"invoiceTotalTo": "",
 				"invoiceType": "NON-PO",
@@ -1491,7 +1485,7 @@ sap.ui.define([
 
 		onDocumentDelete: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			var nonPOInvoiceModel = this.nonPOInvoiceModel;
 			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
 			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
 			var attachments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
@@ -1503,7 +1497,6 @@ sap.ui.define([
 			var sUrl = "/menabevdev/document/delete/" + attachmentId;
 			oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, this.oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
-				busy.close();
 				attachments.splice(index, 1);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/attachments", attachments);
 
@@ -1511,7 +1504,17 @@ sap.ui.define([
 		},
 
 		onChangeUserInputTaxAmount: function (oEvent) {
-			this.errorHandler(oEvent);
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+				userInputTaxAmount = oEvent.getParameter("value");
+			if (!userInputTaxAmount) {
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/taxValue", "Error");
+			} else {
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/taxValue", "None");
+				userInputTaxAmount = (parseFloat(userInputTaxAmount)).toFixed(2);
+				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxValue", userInputTaxAmount);
+			}
+			this.calculateGrossAmount();
+			this.calculateBalance();
 		},
 		
 		//Vendor search valuehelp request
@@ -1598,7 +1601,79 @@ sap.ui.define([
 
 		onCloseVendorValueHelp: function () {
 			this.vendorValueHelp.close();
-		}
+		},
+		
+		calculateBalance: function () {
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+				that = this,
+				invAmt = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal"),
+				grossAmount = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount");
+			var balance = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
+			balance = that.nanValCheck(balance).toFixed(2);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", balance);
+			nonPOInvoiceModel.refresh();
+		},
+		
+		
+		calculateGrossAmount: function () {
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+				that = this,
+				totalBaseRate = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/totalBaseRate"),
+				userInputTaxAmount = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
+			var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
+			grossAmount = that.nanValCheck(grossAmount).toFixed(2);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount", grossAmount);
+			nonPOInvoiceModel.refresh();
+		},
+		
+		VendorNameSuggest: function (oEvent) {
+			var searchVendorModel = new sap.ui.model.json.JSONModel();
+			this.getView().setModel(searchVendorModel, "searchVendorModel");
+			var value = oEvent.getParameter("suggestValue");
+			value = value.toUpperCase();
+			if (value && value.length > 2) {
+				var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=substringof('" + value +
+					"',SupplierName) eq true";
+				searchVendorModel.loadData(url, null, true);
+				searchVendorModel.attachRequestCompleted(null, function (oEvt) {
+					searchVendorModel.refresh();
+				});
+			}
+		},
+
+		vendorNameSelected: function (oEvt) {
+			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
+			var sVendorId = oEvt.getParameter("selectedItem").getProperty("additionalText"),
+				sVendorName = oEvt.getParameter("selectedItem").getProperty("text");
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", sVendorName);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", sVendorId);
+			nonPOInvoiceModel.refresh();
+		},
+
+		VendorIdSuggest: function (oEvent) {
+			var searchVendorModel = new sap.ui.model.json.JSONModel();
+			this.getView().setModel(searchVendorModel, "searchVendorModel");
+			var value = oEvent.getParameter("suggestValue");
+			// value = value.toUpperCase();
+			if (value && value.length > 2) {
+				// var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=Supplier eq '"+ value +"'";
+				var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=substringof('" + value +
+					"',Supplier) eq true";
+				searchVendorModel.loadData(url, null, true);
+				searchVendorModel.attachRequestCompleted(null, function (oEvt) {
+					searchVendorModel.refresh();
+				});
+			}
+		},
+
+		vendorIdSelected: function (oEvt) {
+			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
+			var sVendorId = oEvt.getParameter("selectedItem").getProperty("text"),
+				sVendorName = oEvt.getParameter("selectedItem").getProperty("additionalText");
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", sVendorName);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", sVendorId);
+			nonPOInvoiceModel.refresh();
+		},
 
 	});
 
