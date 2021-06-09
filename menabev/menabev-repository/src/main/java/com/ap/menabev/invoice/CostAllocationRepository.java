@@ -30,7 +30,9 @@ public interface CostAllocationRepository extends JpaRepository<CostAllocationDo
 	@Query(value = "select cd from CostAllocationDo cd where cd.requestId=:requestId")
     public List<CostAllocationDo> getAllOnRequestId(@Param("requestId") String requestId);
 	
-	@Modifying
+	
+	@Transactional
+	@Modifying(clearAutomatically=true)
 	@Query("Delete from CostAllocationDo cd where cd.requestId=:requestId")
 	public Integer deleteCostAllocationDo(@Param("requestId") String requestId);
 	

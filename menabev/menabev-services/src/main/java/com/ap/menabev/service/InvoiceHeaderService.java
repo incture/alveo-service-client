@@ -19,6 +19,7 @@ import com.ap.menabev.dto.MasterResponseDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
+import com.ap.menabev.serviceimpl.FilterMultipleHeaderSearchDto;
 
 
 
@@ -34,7 +35,6 @@ public interface InvoiceHeaderService {
 
 	InvoiceHeaderDetailsDto getAllInvoiceDetailsOnRequestId(String requestId);
 
-	public ResponseEntity<?> getInvoiceDetailChanged(String requestId,String expand);
 	List<InvoiceHeaderDto> filterByKeys(InvoiceHeaderDto dto);
 
 	MasterResponseDto getDetailsForFilter(InvoiceHeaderDto dto);
@@ -92,5 +92,10 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> getInvoiceComments(String requestId);
 	
 	ResponseEntity<?> getActivityLog(String requestId);
+    ResponseEntity<?> getInvoiceDetailChanged(String requestId);
+
+	ResponseEntity<?> deleteDraft(String requestId);
+
+	ResponseEntity<?> getInboxTaskWithMultipleSearch(FilterMultipleHeaderSearchDto filterDto);
 
 }

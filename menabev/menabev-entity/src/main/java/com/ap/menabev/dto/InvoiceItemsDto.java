@@ -32,8 +32,8 @@ public class InvoiceItemsDto {
     private String  netWorth;
     private String  avlQtyUoM;
     private String poUnitPriceUoM;
-    private boolean isTwoWayMatched;
-    private boolean  isThreewayMatched;
+    private boolean istwoWayMatched;
+    private boolean  isthreewayMatched;
     private String  matchDocNum;
     private String  matchDocItem;
     private String  matchParam;
@@ -46,7 +46,7 @@ public class InvoiceItemsDto {
     private String  AccountAssignmentCat;
     private boolean isDeleted;
     private List<ItemMessageDto> itemMessages;
-    private List<ItemInvoiceAcctAssign>  invoiceItemAccAssgn;
+    private List<InvoiceItemAcctAssignmentDto>  invoiceItemAccAssgn;
      
 
 }

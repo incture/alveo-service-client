@@ -11,60 +11,53 @@ import lombok.Data;
 public @Data class InvoiceItemAcctAssignmentDo {
 	@Id
 	@Column(name="INV_ACC_ASS_ID")
-	private String invAccAssId;
-	
+	private String accountAssgnGuid;
 	@Column(name="REQUEST_ID", nullable = false)
 	private String requestId;
-	
 	@Column(name = "ITEM_ID", nullable = false)
 	private String itemId;
-	
 	@Column(name = "DOCUMENT_NUMBER",nullable=false)
 	private String documentNumber;
-	
 	@Column(name = "DOCUMENT_ITEM",nullable=false)
 	private String documentItem;
-	
 	@Column(name="SERIAL_NO",nullable=false)
 	private String serialNo;
-	
 	@Column(name="IS_DELETED",nullable=false)
-	private Boolean isDeleted;
-	
+	private boolean isDeleted;
+	@Column(name = "IS_UNPLANNED")
+	private boolean  isUnplanned;
 	@Column(name="CREATED_ON")
 	private Long createdOn;
-	
 	@Column(name="IS_CHANGED")
 	private Boolean isChanged;
-	
 	@Column(name = "QUANTITY")
-	private String quantity;
-	
-	@Column(name="DIS_PER")
-	private double disPer;
-	
-	
+	private String qty;
+	@Column(name = "QUANTITY_UNIT")
+	private String qtyUnit;
+	@Column(name="DIST_PERC")
+	private double distPerc;
 	@Column(name = "NET_VALUE")
 	private String netValue;
-	
 	@Column(name = "GL_ACCOUNT")
 	private String glAccount;
-	
 	@Column(name = "BUSINESS_AREA")
 	private String businessArea;
-	
 	@Column(name = "COST_CENTER")
 	private String costCenter;
-	
+	@Column(name = "DEBIT_OR_CREDIT")
+	 private String  debitOrCredit;
+	@Column(name="TEXT")
+	private String text;
+	@Column(name="TAX_VALUE")
+	private String  taxValue;
+	@Column(name = "TAX-PERC")
+     private String taxPercentage;
 	@Column(name="SD_DOC")
 	private String sdDoc;
-	
 	@Column(name="ITEM_NUMBER")
 	private String itemNumber;
-	
 	@Column(name="SCHED_LINE")
 	private String schedLine;
-	
 	@Column(name="ASSET_NO")
 	private String assetNo;
 	@Column(name="SUB_NUMBER")
@@ -109,16 +102,12 @@ public @Data class InvoiceItemAcctAssignmentDo {
 	private String nondItax;
 	@Column(name="ACT_TYPE")
 	private String acttype;
-
 	@Column(name="CO_BUS_PROC")
 	private String coBusproc;
-
 	@Column(name="RES_DOC")
 	private String resDoc;
-
 	@Column(name="RES_ITEM")
 	private String resItem;
-
 	@Column(name="ACTIVITY")
 	private String activity;
 	@Column(name="GRANTNBR")

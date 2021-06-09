@@ -218,7 +218,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		// TODO Auto-generated method stub
 
 		InvoiceItemDo itDo = new InvoiceItemDo();
-		itDo.setAmountDifference(dto.getAmountDifference());
+		/*itDo.setAmountDifference(dto.getAmountDifference());
 		itDo.setCreatedAtInDB(dto.getCreatedAtInDB());
 		itDo.setCreatedByInDb(dto.getCreatedByInDb());
 		itDo.setCurrency(dto.getCurrency());
@@ -265,7 +265,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		itDo.setUnusedField2(dto.getUnusedField2());
 		itDo.setUpcCode(dto.getUpcCode());
 		itDo.setUpdatedAt(dto.getUpdatedAt());
-		itDo.setUpdatedBy(dto.getUpdatedBy());
+		itDo.setUpdatedBy(dto.getUpdatedBy());*/
 
 		invoiceItemRepository.save(itDo);
 		// Account Assignment Start
@@ -280,7 +280,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 
 					for (InvoiceItemAcctAssignmentDto iDto : dto.getInvItemAcctDtoList()) {
 
-						iDto.setInvAccAssId(UUID.randomUUID().toString());
+						iDto.setAccountAssgnGuid(UUID.randomUUID().toString());
 					}
 					invoiceItemAcctAssignmentServiceImpl.saveInvoiceItemAcctAssignment(dto.getInvItemAcctDtoList());
 				}
@@ -307,7 +307,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		for (InvoiceItemDashBoardDto dto : itDtoList) {
 			InvoiceItemDo itDo = new InvoiceItemDo();
 			itDo.setAmountDifference(dto.getAmountDifference());
-			itDo.setCreatedAtInDB(dto.getCreatedAtInDB());
+			/*itDo.setCreatedAtInDB(dto.getCreatedAtInDB());
 			itDo.setCreatedByInDb(dto.getCreatedByInDb());
 			itDo.setCurrency(dto.getCurrency());
 			itDo.setCustomerItemId(Integer.valueOf(dto.getCustomerItemID() == null ? "0" : dto.getCustomerItemID()));
@@ -353,7 +353,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 			itDo.setUnusedField2(dto.getUnusedField2());
 			itDo.setUpcCode(dto.getUpcCode());
 			itDo.setUpdatedAt(dto.getUpdatedAt());
-			itDo.setUpdatedBy(dto.getUpdatedBy());
+			itDo.setUpdatedBy(dto.getUpdatedBy());*/
 
 			invoiceItemRepository.save(itDo);
 			// Account Assignment Start
@@ -369,7 +369,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 
 						for (InvoiceItemAcctAssignmentDto iDto : dto.getInvItemAcctDtoList()) {
 
-							iDto.setInvAccAssId(UUID.randomUUID().toString());
+							iDto.setAccountAssgnGuid(UUID.randomUUID().toString());
 						}
 						invoiceItemAcctAssignmentServiceImpl.saveInvoiceItemAcctAssignment(dto.getInvItemAcctDtoList());
 					}

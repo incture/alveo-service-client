@@ -41,9 +41,9 @@ public class InvoiceItemAcctAssignmentServiceImpl implements InvoiceItemAcctAssi
 
 		try {
 
-			for (InvoiceItemAcctAssignmentDto dto : dtoList) {
+			/*for (InvoiceItemAcctAssignmentDto dto : dtoList) {
 				InvoiceItemAcctAssignmentDo aDo = entityManager.find(InvoiceItemAcctAssignmentDo.class,
-						dto.getInvAccAssId());
+						dto.getAccountAssgnGuid());
 				if (ServiceUtil.isEmpty(aDo)) {
 					logger.error("In empty id block");
 					System.err.println("IN empty Id block");
@@ -67,7 +67,7 @@ public class InvoiceItemAcctAssignmentServiceImpl implements InvoiceItemAcctAssi
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setMessage("Account Assigned successfully for " + dtoList.get(0).getRequestId());
-
+*/
 		} catch (Exception e) {
 			response.setCode(ApplicationConstants.CODE_FAILURE);
 			response.setStatus(ApplicationConstants.FAILURE);

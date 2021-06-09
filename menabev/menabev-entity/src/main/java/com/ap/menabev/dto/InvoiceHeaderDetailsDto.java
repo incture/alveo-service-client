@@ -47,7 +47,7 @@ public class InvoiceHeaderDetailsDto {
 
 	private String invoiceType;
 
-	private String invoiceTotal;
+	private double invoiceTotal;
 
 	private Long sapInvoiceNumber;
 

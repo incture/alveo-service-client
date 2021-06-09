@@ -26,7 +26,7 @@ public class InvoiceHeaderDto {
 	private String channelType;
 	private String refDocCat;
 	private String invoiceType;
-	private String invoiceTotal;
+	private double invoiceTotal;
 	private Long sapInvoiceNumber;
 	private String fiscalYear;
 	private String currency;

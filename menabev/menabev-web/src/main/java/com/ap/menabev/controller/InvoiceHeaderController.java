@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ap.menabev.dto.ClaimAndReleaseDto;
@@ -23,13 +24,14 @@ import com.ap.menabev.dto.InboxDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.MasterResponseDto;
+import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.service.InvoiceHeaderService;
 import com.ap.menabev.service.SequenceGeneratorService;
+import com.ap.menabev.serviceimpl.FilterMultipleHeaderSearchDto;
 import com.ap.menabev.util.MenabevApplicationConstant;
-import com.ap.menabev.dto.ResponseDto;
 
 @RestController
 @RequestMapping("/invoiceHeader")
@@ -59,8 +61,9 @@ public class InvoiceHeaderController {
 	}
 	
 	@GetMapping("/getInvoiceByReqId/{requestId}")
-	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId,@PathVariable String expand) {
-		return headerService.getInvoiceDetailChanged(requestId,expand);
+	@ResponseBody
+	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId) {
+		return headerService.getInvoiceDetailChanged(requestId);
 	}
 	@GetMapping("/getInvoiceByReqId/{requestId}/item")
 	public ResponseEntity<?> getByInvoiceRequestIdItem(@PathVariable String requestId) {
@@ -86,13 +89,9 @@ public class InvoiceHeaderController {
 	}
 
 
-
-
-
-
-	@DeleteMapping("/delete/{id}")
-	public ResponseDto delete(@PathVariable Integer id) {
-		return headerService.delete(id);
+	@DeleteMapping("/delete/{requestId}")
+	public ResponseEntity<?> delete(@PathVariable String requestId) {
+		return headerService.deleteDraft(requestId);
 	}
 
 	@GetMapping(params = { "pageNo", "limit" })
@@ -116,6 +115,12 @@ public class InvoiceHeaderController {
 	@PostMapping("/inbox")
 	public ResponseEntity<?> getinboxTaskByPageNo(@RequestBody FilterHeaderDto dto) {
 		return headerService.getInboxTask(dto);
+	}
+	
+	
+	@PostMapping("/inboxMultiple")
+	public ResponseEntity<?> getinboxTaskByPageNo(@RequestBody FilterMultipleHeaderSearchDto dto) {
+		return headerService.getInboxTaskWithMultipleSearch(dto);
 	}
 	
 	@PostMapping("/claimOrRelease")

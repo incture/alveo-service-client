@@ -61,6 +61,11 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo,S
 	@Query(value = "select i from InvoiceHeaderDo i where i.requestId=:requestId")
 	InvoiceHeaderDo getInvoiceHeader(@Param("requestId") String requestId);
 	
+	@Query(value = "Delete from InvoiceHeaderDo i where i.requestId=:requestId")
+	int deleteInvoiceHeader(@Param("requestId") String requestId);
+	
+	
+	
 	@Query(value = "select i from InvoiceHeaderDo i where i.taskOwnerId=:taskOwnerId and i.docStatus='Draft'")
 	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserId(@Param("taskOwnerId") String taskOwnerId);
 	
@@ -164,6 +169,7 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo,S
 
 	@Query(value = "select rDo from InvoiceHeaderDo rDo where rDo.id =:id")
 	InvoiceHeaderDo getAllById(@Param("id")String id);
+	
 
 	
 }

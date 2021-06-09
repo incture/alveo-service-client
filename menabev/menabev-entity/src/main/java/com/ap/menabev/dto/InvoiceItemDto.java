@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 public class InvoiceItemDto {
 
-	private String Id = UUID.randomUUID().toString();
+	private String Id;
 	private String requestId;
 	private String itemId;
 	private String itemCode;

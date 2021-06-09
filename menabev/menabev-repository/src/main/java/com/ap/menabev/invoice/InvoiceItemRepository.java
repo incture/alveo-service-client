@@ -43,6 +43,12 @@ public interface InvoiceItemRepository extends JpaRepository<InvoiceItemDo, Stri
 	InvoiceItemDo getInvoiceItem(@Param("inQty") String inQty, @Param("refDocNum") Long refDocNum,
 			@Param("reqId") String reqId);
 
+	
+	
+	@Transactional
+	@Modifying(clearAutomatically=true)
+	@Query(value="Delete from InvoiceItemDo iDo where iDo.requestId=:requestId")
+	 int  deleteTotalItems(@Param("requestId") String requestId);
 	@Transactional(TxType.REQUIRES_NEW)
 	@Modifying(clearAutomatically = true)
 	@Query(value = "UPDATE InvoiceItemDo i SET i.isThreewayMatched=false WHERE i.matchDocItem=:matchDocItem  AND  i.matchDocNum=:matchDocNum AND i.requestId=:reqId")
