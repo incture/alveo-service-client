@@ -117,6 +117,9 @@ public interface InvoiceItemRepository extends JpaRepository<InvoiceItemDo, Stri
 	@Query(value = "select count(id.itemLifeCycleStatus) from InvoiceItemDo id where id.requestId=:requestId  and id.isDeleted=false and id.itemLifeCycleStatus='12'")
 	int getPartialComplete(@Param("requestId") String requestId);
 
+	@Query("select distinct th.refDocNum from InvoiceItemDo th where th.requestId = ?1")
+	List<String> PurchaseOrderByRequestId(String requestId);
+
 //	@Transactional(TxType.REQUIRES_NEW)
 //	@Modifying(clearAutomatically = true)
 //	@Query(value = "UPDATE InvoiceItemDo i SET i.isThreewayMatched=false, i.isSelected=false, i.isTwowayMatched=false, i.matchDocItem=null,"

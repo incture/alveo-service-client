@@ -1,10 +1,11 @@
 package com.ap.menabev.service;
 
 
-import com.ap.menabev.dto.InvoiceHeaderObjectInputDto;
-import com.ap.menabev.dto.InvoiceHeaderObjectOutputDto;
+import com.ap.menabev.dto.InvoiceHeaderObjectDto;
 
 public interface DuplicateCheckService {
 
-	InvoiceHeaderObjectOutputDto duplicateCheck(InvoiceHeaderObjectInputDto dto);
+	InvoiceHeaderObjectDto duplicateCheck(InvoiceHeaderObjectDto dto);
+
+	InvoiceHeaderObjectDto vendorCheck(InvoiceHeaderObjectDto dto);
 }

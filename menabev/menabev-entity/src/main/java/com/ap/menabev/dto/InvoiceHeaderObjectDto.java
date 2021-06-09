@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class InvoiceHeaderObjectOutputDto {
+public class InvoiceHeaderObjectDto {
 
 	private String requestId;
 
