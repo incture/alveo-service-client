@@ -12,5 +12,10 @@ import com.ap.menabev.entity.EmailTeamAPDo;
 public interface EmailTeamApRepository extends JpaRepository<EmailTeamAPDo, String> {
 	@Query("select eDo from EmailTeamAPDo eDo where eDo.configurationId=:configurationId and Upper(eDo.actionType)=Upper(:actionType)")
 	public List<EmailTeamAPDo> getEmailTeamAP(@Param("configurationId") String configurationId , @Param("actionType") String actionType);
+	
+	
+	
+	@Query("select eDo from EmailTeamAPDo eDo where eDo.configurationId=:configurationId and Upper(eDo.actionType) in(:actionType1,:actionType2)")
+	public List<EmailTeamAPDo> getEmailTeamAP(@Param("configurationId") String configurationId , @Param("actionType1") String actionType1, @Param("actionType2") String actionType2);
 
 }

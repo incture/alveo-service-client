@@ -15,9 +15,10 @@ public class ConfigurationCockpitDto
 	
 	private ConfigurationDto configurationDto;
 	
-	private List<EmailTeamAPDto> emailTeamDto;
+//	private List<EmailTeamAPDto> emailTeamDto;
 	
-	
+	private List<APMailBoxDto> accountsPayableMailbox;
+	private List<APScanningTeamDto> accountsPayableScanningTeam;
 	private List<MailTemplateDto> mailTemplateDto;
 	
 	private List<SchedulerConfigurationDto> schedulerConfigurationdto;

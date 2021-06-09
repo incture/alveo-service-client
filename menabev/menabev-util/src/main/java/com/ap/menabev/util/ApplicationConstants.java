@@ -2,7 +2,8 @@ package com.ap.menabev.util;
 
 public interface ApplicationConstants {
 	
-	
+	String APMAILBOX = "APMAILBOX";
+	String APSCANNINGTEAM = "APSCANNINGTEAM";
 	String TRANSACTION_TYPE_INVOICE = "Invoice";
 	String TRANSACTION_TYPE_CREDIT = "Credit";
 	String TRANSACTION_TYPE_DEBIT = "Debit";

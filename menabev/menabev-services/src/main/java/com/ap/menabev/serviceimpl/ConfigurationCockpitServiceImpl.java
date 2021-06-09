@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ap.menabev.dto.APMailBoxDto;
+import com.ap.menabev.dto.APScanningTeamDto;
 import com.ap.menabev.dto.ConfigurationCockpitDto;
 import com.ap.menabev.dto.ConfigurationDto;
 import com.ap.menabev.dto.EmailTeamAPDto;
@@ -83,42 +85,66 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 
 			List<MailTemplateDto> mailTemplateDtoList = dto.getMailTemplateDto();
 
-			List<MailTemplateDo> mailTemplateDoList = new ArrayList<>();
+			// List<MailTemplateDo> mailTemplateDoList = new ArrayList<>();
 
 			for (MailTemplateDto mailTemplateDto : mailTemplateDtoList) {
 				mailTemplateDto.setMailTemplateId(UUID.randomUUID().toString());
 				mailTemplateDto.setConfigurationId(configId);
 				mailtemplateRepository.save(mapper.map(mailTemplateDto, MailTemplateDo.class));
 			}
-
-			List<EmailTeamAPDto> emailTeamApDtoList = dto.getEmailTeamDto();
-
-			// my
-			for (EmailTeamAPDto emailTeamAPDto : emailTeamApDtoList) {
-				EmailTeamAPDto emaildto = emailTeamAPDto;
-				// dto.getEmailTeamDto();
-
-				List<String> emailIds = emaildto.getEmailId();
-				List<EmailTeamAPDo> emailDoList = new ArrayList<>();
-
-				for (String emailId : emailIds) {
+			// -----------------------------------------------------------------------------------/////////
+			// List<EmailTeamAPDto> emailTeamApDtoList = dto.getEmailTeamDto();
+			// for (EmailTeamAPDto emailTeamAPDto : emailTeamApDtoList) {
+			// EmailTeamAPDto emaildto = emailTeamAPDto;
+			// // dto.getEmailTeamDto();
+			// List<String> emailIds = emaildto.getEmailId();
+			// List<EmailTeamAPDo> emailDoList = new ArrayList<>();
+			// for (String emailId : emailIds) {
+			// EmailTeamAPDo emailteamDo = new EmailTeamAPDo();
+			// emailteamDo.setActionType(emaildto.getActionType());
+			// emailteamDo.setConfigurationId(configId);
+			// emailteamDo.setEmailId(emailId);
+			// // emailteamDo.setEmailTeamApid("3");
+			// emailteamDo.setEmailTeamApid(UUID.randomUUID().toString());
+			// emailteamDo.setIsActive(emaildto.getIsActive());
+			// emailteamRepository.save(emailteamDo);
+			// }
+			//
+			// }
+			List<EmailTeamAPDo> entityList = new ArrayList<>();
+			List<APMailBoxDto> apMailBoxList = dto.getAccountsPayableMailbox();
+			if (!ServiceUtil.isEmpty(apMailBoxList)) {
+				for (APMailBoxDto apMailBoxDto : apMailBoxList) {
 					EmailTeamAPDo emailteamDo = new EmailTeamAPDo();
-
-					emailteamDo.setActionType(emaildto.getActionType());
+					emailteamDo.setActionType("APMailBox");
 					emailteamDo.setConfigurationId(configId);
-					emailteamDo.setEmailId(emailId);
-					// emailteamDo.setEmailTeamApid("3");
+					emailteamDo.setEmailId(apMailBoxDto.getEmailId());
 					emailteamDo.setEmailTeamApid(UUID.randomUUID().toString());
-					emailteamDo.setIsActive(emaildto.getIsActive());
+					emailteamDo.setIsActive(apMailBoxDto.getIsActive());
+					entityList.add(emailteamDo);
 
-					emailteamRepository.save(emailteamDo);
 				}
-
 			}
+			List<APScanningTeamDto> apScanningTeamList = dto.getAccountsPayableScanningTeam();
+			if (!ServiceUtil.isEmpty(apScanningTeamList)) {
+				for (APScanningTeamDto apScanningTeam : apScanningTeamList) {
+					EmailTeamAPDo emailteamDo = new EmailTeamAPDo();
+					emailteamDo.setActionType("APScanningTeam");
+					emailteamDo.setConfigurationId(configId);
+					emailteamDo.setEmailId(apScanningTeam.getEmailId());
+					emailteamDo.setEmailTeamApid(UUID.randomUUID().toString());
+					emailteamDo.setIsActive(apScanningTeam.getIsActive());
+					entityList.add(emailteamDo);
+				}
+			}
+			if (!ServiceUtil.isEmpty(entityList))
+				emailteamRepository.saveAll(entityList);
 
+			// -----------------------------------------------------------------------------------/////////
 			List<SchedulerConfigurationDto> schedulerConfigurationDtoList = dto.getSchedulerConfigurationdto();
 
-			List<SchedulerConfigurationDo> schedulerConfigurationDoList = new ArrayList<>();
+			// List<SchedulerConfigurationDo> schedulerConfigurationDoList = new
+			// ArrayList<>();
 
 			for (SchedulerConfigurationDto schedulerConfigurationDto : schedulerConfigurationDtoList) {
 				// schedulerConfigurationDto.setId("4");;
@@ -226,44 +252,66 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 			}
 			configCockpitDto.setMailTemplateDto(mDtoList);
 
+			List<APMailBoxDto> accountsPayableMailbox = new ArrayList<>();
+			List<APScanningTeamDto> accountsPayableScanningTeam = new ArrayList<>();
+
 			List<EmailTeamAPDto> emailDtoList = new ArrayList<EmailTeamAPDto>();
-			List<EmailTeamAPDo> mailDoList = emailteamRepository.getEmailTeamAP(configId,
-					"Accounts Payablle Mailbox Id");
-			List<EmailTeamAPDo> scanDoList = emailteamRepository.getEmailTeamAP(configId,
-					"Accounts Payable Scanning Team");
-
-			EmailTeamAPDto mailDto = mapper.map(mailDoList.get(0), EmailTeamAPDto.class);
-			EmailTeamAPDto scanDto = mapper.map(scanDoList.get(0), EmailTeamAPDto.class);
-
-			logger.error("MailDto start " + mailDto);
-			logger.error("scanDto start " + scanDto);
-
-			List<String> emailIds = new ArrayList<String>();
-			for (EmailTeamAPDo mailDo : mailDoList) {
-				emailIds.add(mailDo.getEmailId());
+			List<EmailTeamAPDo> emailTeamDoList = emailteamRepository.getEmailTeamAP(configId,
+					ApplicationConstants.APMAILBOX, ApplicationConstants.APSCANNINGTEAM);
+			logger.error("emailTeamDoList:"+emailTeamDoList.size());
+			for (EmailTeamAPDo emailTeamAPDo : emailTeamDoList) {
+				logger.error("emailTeamAPDo:"+emailTeamAPDo.toString());
+				if (ApplicationConstants.APMAILBOX.equalsIgnoreCase(emailTeamAPDo.getActionType())) {
+					APMailBoxDto dto = new APMailBoxDto();
+					dto.setConfigurationId(emailTeamAPDo.getConfigurationId());
+					dto.setEmailId(emailTeamAPDo.getEmailId());
+					dto.setEmailTeamApid(emailTeamAPDo.getEmailTeamApid());
+					accountsPayableMailbox.add(dto);
+				} else if(ApplicationConstants.APSCANNINGTEAM.equalsIgnoreCase(emailTeamAPDo.getActionType())){
+					APScanningTeamDto dto = new APScanningTeamDto();
+					dto.setConfigurationId(emailTeamAPDo.getConfigurationId());
+					dto.setEmailId(emailTeamAPDo.getEmailId());
+					dto.setEmailTeamApid(emailTeamAPDo.getEmailTeamApid());
+					accountsPayableScanningTeam.add(dto);
+				}
 			}
 
-			logger.error("Mail emailId " + emailIds);
-
-			mailDto.setEmailId(emailIds);
-
-			emailDtoList.add(mailDto);
-			logger.error("emailDtoList " + emailDtoList);
-			mailDto = null;
-			emailIds = new ArrayList<String>();
-
-			for (EmailTeamAPDo scanDo : scanDoList) {
-				emailIds.add(scanDo.getEmailId());
-			}
-
-			logger.error("Mail emailId " + emailIds);
-
-			scanDto.setEmailId(emailIds);
-
-			emailDtoList.add(scanDto);
-
-			logger.error("emailDtoList " + emailDtoList);
-			configCockpitDto.setEmailTeamDto(emailDtoList);
+			configCockpitDto.setAccountsPayableMailbox(accountsPayableMailbox);
+			configCockpitDto.setAccountsPayableScanningTeam(accountsPayableScanningTeam);
+			// EmailTeamAPDto mailDto = mapper.map(mailDoList.get(0),
+			// EmailTeamAPDto.class);
+			// EmailTeamAPDto scanDto = mapper.map(scanDoList.get(0),
+			// EmailTeamAPDto.class);
+			//
+			// logger.error("MailDto start " + mailDto);
+			// logger.error("scanDto start " + scanDto);
+			//
+			// List<String> emailIds = new ArrayList<String>();
+			// for (EmailTeamAPDo mailDo : mailDoList) {
+			// emailIds.add(mailDo.getEmailId());
+			// }
+			//
+			// logger.error("Mail emailId " + emailIds);
+			//
+			// mailDto.setEmailId(emailIds);
+			//
+			// emailDtoList.add(mailDto);
+			// logger.error("emailDtoList " + emailDtoList);
+			// mailDto = null;
+			// emailIds = new ArrayList<String>();
+			//
+			// for (EmailTeamAPDo scanDo : scanDoList) {
+			// emailIds.add(scanDo.getEmailId());
+			// }
+			//
+			// logger.error("Mail emailId " + emailIds);
+			//
+			// scanDto.setEmailId(emailIds);
+			//
+			// emailDtoList.add(scanDto);
+			//
+			// logger.error("emailDtoList " + emailDtoList);
+			// configCockpitDto.setEmailTeamDto(emailDtoList);
 
 		} catch (Exception e) {
 			System.err.println("Exception :" + e.getMessage());
