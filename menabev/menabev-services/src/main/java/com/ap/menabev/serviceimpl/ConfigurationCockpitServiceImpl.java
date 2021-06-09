@@ -165,7 +165,7 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
-			response.setMessage(ApplicationConstants.CREATED_SUCCESS);
+			response.setMessage(ApplicationConstants.UPDATE_SUCCESS);
 			return response;
 		} catch (Exception e) {
 			System.out.println("error :" + e);

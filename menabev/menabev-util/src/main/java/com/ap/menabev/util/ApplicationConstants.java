@@ -82,7 +82,7 @@ public interface ApplicationConstants {
 	String CODE_FAILURE = "1";
 	String CREATED_SUCCESS = "created successfully";
 	String CREATE_FAILURE = "creation failed";
-	String UPDATE_SUCCESS = "updated successfully";
+	String UPDATE_SUCCESS = "Updated successfully";
 	String UPDATE_FAILURE = "updation failed";
 	String FETCHED_SUCCESS = "fetched successfully";
 	String FETCHED_FAILURE = "fetching failed";
