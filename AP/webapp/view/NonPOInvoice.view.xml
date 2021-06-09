@@ -46,15 +46,8 @@
 							<l:content>
 								<VBox>
 									<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
-									<Input filterSuggests="false" maxLength="10" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}"
-										valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/vendorId}" type="Text" showSuggestion="true" suggest="fnVendorIdSuggest"
-										suggestionItemSelected="searchVendorAddr" change="onChangeVendorId" suggestionItems="{searchVendorModel>/d/results}" width="80%"
-										editable="{oVisibilityModel>/NonPOInvoice/editable}">
-										<suggestionItems>
-											<core:ListItem text="{ path:'searchVendorModel>Vendor', formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
-												additionalText="{searchVendorModel>Name1}"/>
-										</suggestionItems>
-									</Input>
+									<Input value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}" width="80%"
+										editable="{oVisibilityModel>/NonPOInvoice/editable}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="onValueHelpRequested"/>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>

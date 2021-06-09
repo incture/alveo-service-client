@@ -45,122 +45,122 @@ sap.ui.define([
 				},
 				success: function (data, textStatus, jqXHR) {
 					if (!data.schedulerConfigurationdto) {
-						var data = {
-							"vendorDetailsDto": [{
-								"createdBy": null,
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"vendorId": "a96ccdba-1a96-437e-aaaa-09c7f69f2219",
-								"companyCode": "1011",
-								"autoPosting": false,
-								"partialPosting": true,
-								"autoRejection": true,
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"vendor_id_payload": null
-							}, {
-								"createdBy": null,
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"vendorId": "64223ad4-6b83-4f27-b808-3d74a3d34ad9",
-								"companyCode": "1234",
-								"autoPosting": false,
-								"partialPosting": true,
-								"autoRejection": true,
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"vendor_id_payload": null
-							}, {
-								"createdBy": null,
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"vendorId": "abfaba72-51fd-489e-aadf-34b1ea922af0",
-								"companyCode": "1001",
-								"autoPosting": true,
-								"partialPosting": false,
-								"autoRejection": false,
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"vendor_id_payload": null
-							}, {
-								"createdBy": null,
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"vendorId": "4637ce3e-86a0-4c71-a231-e1a110aa8f54",
-								"companyCode": "1011",
-								"autoPosting": true,
-								"partialPosting": false,
-								"autoRejection": false,
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"vendor_id_payload": null
-							}],
-							"configurationDto": {
-								"createdBy": "Dipanjan Test",
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"ocrSource": "Abby Flexi Capture",
-								"defaultTaxCode": "1234",
-								"companyCode": "1234",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"maximumNoofUsers": 0,
-								"version": "CURRENT"
-							},
-							"emailTeamDto": [{
-								"emailId": ["niharika.thakur@incture.com", "niharika.thakur@incture.com"],
-								"actionType": "Accounts Payablle Mailbox Id",
-								"isActive": true,
-								"emailTeamApid": "6d78d1a6-4b2d-46a5-961f-040eb6ca6eb4",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
-							}, {
-								"emailId": ["sowndharya.k@incture.com", "sowndharya.k@incture.com", "niharika.thakur@incture.com"],
-								"actionType": "Accounts Payable Scanning Team",
-								"isActive": true,
-								"emailTeamApid": "5b2c7481-67c2-477c-890a-f3f57cf8d11b",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
-							}],
-							"mailTemplateDto": [{
-								"subject": "Exception Subject New 1",
-								"actionType": "Exception Mail Template",
-								"body": "exception mail body",
-								"mailTemplateId": "49661bce-9695-485d-8998-9882eaa1fcd0",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
-							}, {
-								"subject": "Rejection Subject New Dipanjan test",
-								"actionType": "Rejection Mail Template",
-								"body": "rejection mail body",
-								"mailTemplateId": "2e085549-97b5-4bbb-93f0-82f289c280a8",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
-							}],
-							"schedulerConfigurationdto": [{
-								"createdBy": null,
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"scId": "e3632a11-e6f2-472b-8ca5-65fdcfb92e2c",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"startDate": "05/29/2021",
-								"endDate": "05/31/2021",
-								"frequencyNumber": 0,
-								"frequencyUnit": "min",
-								"isActive": true,
-								"actionType": "GRN Scheduler Configuration"
-							}, {
-								"createdBy": null,
-								"createdAt": null,
-								"updatedBy": null,
-								"updatedAt": null,
-								"scId": "644ce7e1-89c8-433a-b915-2fc7e8862a34",
-								"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
-								"startDate": "05/28/2021",
-								"endDate": "05/31/2021",
-								"frequencyNumber": 0,
-								"frequencyUnit": "min",
-								"isActive": true,
-								"actionType": "Email Scheduler Configuration"
-							}]
-						};
+						// var data = {
+						// 	"vendorDetailsDto": [{
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "a96ccdba-1a96-437e-aaaa-09c7f69f2219",
+						// 		"companyCode": "1011",
+						// 		"autoPosting": false,
+						// 		"partialPosting": true,
+						// 		"autoRejection": true,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "64223ad4-6b83-4f27-b808-3d74a3d34ad9",
+						// 		"companyCode": "1234",
+						// 		"autoPosting": false,
+						// 		"partialPosting": true,
+						// 		"autoRejection": true,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "abfaba72-51fd-489e-aadf-34b1ea922af0",
+						// 		"companyCode": "1001",
+						// 		"autoPosting": true,
+						// 		"partialPosting": false,
+						// 		"autoRejection": false,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"vendorId": "4637ce3e-86a0-4c71-a231-e1a110aa8f54",
+						// 		"companyCode": "1011",
+						// 		"autoPosting": true,
+						// 		"partialPosting": false,
+						// 		"autoRejection": false,
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"vendor_id_payload": null
+						// 	}],
+						// 	"configurationDto": {
+						// 		"createdBy": "Dipanjan Test",
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"ocrSource": "Abby Flexi Capture",
+						// 		"defaultTaxCode": "1234",
+						// 		"companyCode": "1234",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"maximumNoofUsers": 0,
+						// 		"version": "CURRENT"
+						// 	},
+						// 	"emailTeamDto": [{
+						// 		"emailId": ["niharika.thakur@incture.com", "niharika.thakur@incture.com"],
+						// 		"actionType": "Accounts Payablle Mailbox Id",
+						// 		"isActive": true,
+						// 		"emailTeamApid": "6d78d1a6-4b2d-46a5-961f-040eb6ca6eb4",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}, {
+						// 		"emailId": ["sowndharya.k@incture.com", "sowndharya.k@incture.com", "niharika.thakur@incture.com"],
+						// 		"actionType": "Accounts Payable Scanning Team",
+						// 		"isActive": true,
+						// 		"emailTeamApid": "5b2c7481-67c2-477c-890a-f3f57cf8d11b",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}],
+						// 	"mailTemplateDto": [{
+						// 		"subject": "Exception Subject New 1",
+						// 		"actionType": "Exception Mail Template",
+						// 		"body": "exception mail body",
+						// 		"mailTemplateId": "49661bce-9695-485d-8998-9882eaa1fcd0",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}, {
+						// 		"subject": "Rejection Subject New Dipanjan test",
+						// 		"actionType": "Rejection Mail Template",
+						// 		"body": "rejection mail body",
+						// 		"mailTemplateId": "2e085549-97b5-4bbb-93f0-82f289c280a8",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef"
+						// 	}],
+						// 	"schedulerConfigurationdto": [{
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"scId": "e3632a11-e6f2-472b-8ca5-65fdcfb92e2c",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"startDate": "05/29/2021",
+						// 		"endDate": "05/31/2021",
+						// 		"frequencyNumber": 0,
+						// 		"frequencyUnit": "min",
+						// 		"isActive": true,
+						// 		"actionType": "GRN Scheduler Configuration"
+						// 	}, {
+						// 		"createdBy": null,
+						// 		"createdAt": null,
+						// 		"updatedBy": null,
+						// 		"updatedAt": null,
+						// 		"scId": "644ce7e1-89c8-433a-b915-2fc7e8862a34",
+						// 		"configurationId": "d36fb9ba-e55a-4965-9cb3-c759b2cbbeef",
+						// 		"startDate": "05/28/2021",
+						// 		"endDate": "05/31/2021",
+						// 		"frequencyNumber": 0,
+						// 		"frequencyUnit": "min",
+						// 		"isActive": true,
+						// 		"actionType": "Email Scheduler Configuration"
+						// 	}]
+						// };
 					}
 					masterModel.setData(data);
 					masterModel.referesh();
@@ -350,20 +350,30 @@ sap.ui.define([
 		/* ************************ Mail Id Configuration :START *********************************************** */
 		fnAddAPMailBox: function () {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			oMasterModel.getData().emailTeamDto[0].emailId.push("");
+			var Obj = {
+				"configurationId": "",
+				"emailId": "",
+				"emailTeamApid": ""
+			};
+			oMasterModel.getData().accountsPayableMailbox(Obj);
 			oMasterModel.refresh();
 		},
 
 		fnAddAPScanTeam: function () {
 			var oMasterModel = this.getView().getModel("oMasterModel");
-			oMasterModel.getData().emailTeamDto[1].emailId.push("");
+			var Obj = {
+				"configurationId": "",
+				"emailId": "",
+				"emailTeamApid": ""
+			};
+			oMasterModel.getData().accountsPayableScanningTeam(Obj);
 			oMasterModel.refresh();
 		},
 
 		fnDeleteAPMailBox: function (oEvent) {
 			var oMasterModel = this.getView().getModel("oMasterModel");
 			var aList = this.byId("apMailboxTable").getSelectedContexts();
-			var email = oMasterModel.getData().emailTeamDto[0].emailId;
+			var email = oMasterModel.getData().accountsPayableMailbox;
 			this.byId("apMailboxTable").removeSelections();
 			var index;
 			if (aList.length === 0) {
@@ -374,7 +384,7 @@ sap.ui.define([
 					index = aList[i].getPath().split("/").pop();
 					email.splice(index, 1);
 				}
-				oMasterModel.setProperty("/emailTeamDto/0/emailId/", email);
+				oMasterModel.setProperty("/accountsPayableMailbox", email);
 				oMasterModel.refresh();
 			}
 		},
@@ -382,7 +392,7 @@ sap.ui.define([
 		fnDeleteAPScanTeam: function (oEvent) {
 			var oMasterModel = this.getView().getModel("oMasterModel");
 			var aList = this.byId("apScanTable").getSelectedContexts();
-			var email = oMasterModel.getData().emailTeamDto[1].emailId;
+			var email = oMasterModel.getData().accountsPayableScanningTeam;
 			this.byId("apScanTable").removeSelections();
 			var index;
 			if (aList.length === 0) {
@@ -392,7 +402,7 @@ sap.ui.define([
 					index = aList[i].getPath().split("/").pop();
 					email.splice(index, 1);
 				}
-				oMasterModel.setProperty("/emailTeamDto/1/emailId/", email);
+				oMasterModel.setProperty("/accountsPayableScanningTeam", email);
 				oMasterModel.refresh();
 			}
 		},

@@ -2,7 +2,7 @@
 	xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<Page showHeader="false" class="sapUiSizeCompact">
 		<content>
-			<fb:FilterBar search="getInboxData" clear="fnClear" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
+			<fb:FilterBar id="filterBarId" search="SearchInboxData" clear="fnClear" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
 				visible="{baseModel>/SearchVisiblity}">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>Vendor Id}">
@@ -47,18 +47,6 @@
 						<fb:control>
 							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy" value="{taskDataFilterModel>/dueDateTo}"
 								tooltip="Due To Date" change="onDateRangeChange"/>
-						</fb:control>
-					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="I" label="{i18n>InvoiceDateFrom}">
-						<fb:control>
-							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy" value="{taskDataFilterModel>/createdAtFrom}"
-								class="sapUiSizeCompact" tooltip="Invoice From Date" change="onDateRangeChange"/>
-						</fb:control>
-					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="J" label="{i18n>InvoiceDateTo}">
-						<fb:control>
-							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy" value="{taskDataFilterModel>/createdAtTo}"
-								class="sapUiSizeCompact" tooltip="Invoice To Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="K" label="{i18n>ProcessStatus}">
@@ -202,7 +190,7 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>DRAFT}" key="draft" count="{oInboxModel>/draftCount}">
+					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oInboxModel>/draftCount}">
 						<Table items="{oInboxModel>/draftTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<headerToolbar>
 								<OverflowToolbar>
@@ -254,11 +242,7 @@
 									<Text text="{path:'oInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
 									<Text text="{oInboxModel>validationStatus}"/>
 									<Text text="{oInboxModel>taskStatus}"/>
-									<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease">
-										<core:layoutData>
-											<FlexItemData growFactor="1"/>
-										</core:layoutData>
-									</core:Icon>
+									<Button icon="sap-icon://delete" press="onDeleteDraft"></Button>
 								</ColumnListItem>
 							</items>
 						</Table>
@@ -266,21 +250,21 @@
 				</items>
 			</IconTabBar>
 		</content>
-		<!--<footer>-->
-		<!--	<OverflowToolbar class="pageNumberCls" visible="{paginatedModel>/pageVisible}">-->
-		<!--		<content>-->
-		<!--			<HBox>-->
-		<!--				<Button icon="sap-icon://nav-back" class=" navPageCls" press="onScrollLeft" type="Default" enabled="{paginatedModel>/prevButton}"/>-->
-		<!--				<SegmentedButton items="{paginatedModel>/array}" class="sapUiSmallMarginBeginEnd">-->
-		<!--					<items>-->
-		<!--						<SegmentedButtonItem text="{paginatedModel>text}" key="{paginatedModel>text}" press="onPageClick"/>-->
-		<!--					</items>-->
-		<!--				</SegmentedButton>-->
-		<!--				<Button enabled="{paginatedModel>/nextbutton}" icon="sap-icon://navigation-right-arrow" class=" navPageCls" type="Default"-->
-		<!--					press="onScrollRight"/>-->
-		<!--			</HBox>-->
-		<!--		</content>-->
-		<!--	</OverflowToolbar>-->
-		<!--</footer>-->
+		<footer>
+			<OverflowToolbar class="pageNumberCls" visible="{paginatedModel>/pageVisible}">
+				<content>
+					<HBox>
+						<Button icon="sap-icon://nav-back" class=" navPageCls" press="onScrollLeft" type="Default" enabled="{paginatedModel>/prevButton}"/>
+						<SegmentedButton items="{paginatedModel>/array}" class="sapUiSmallMarginBeginEnd">
+							<items>
+								<SegmentedButtonItem text="{paginatedModel>text}" key="{paginatedModel>text}" press="onPageClick"/>
+							</items>
+						</SegmentedButton>
+						<Button enabled="{paginatedModel>/nextbutton}" icon="sap-icon://navigation-right-arrow" class=" navPageCls" type="Default"
+							press="onScrollRight"/>
+					</HBox>
+				</content>
+			</OverflowToolbar>
+		</footer>
 	</Page>
 </mvc:View>

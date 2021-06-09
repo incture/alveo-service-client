@@ -1513,6 +1513,92 @@ sap.ui.define([
 		onChangeUserInputTaxAmount: function (oEvent) {
 			this.errorHandler(oEvent);
 		},
+		
+		//Vendor search valuehelp request
+		onValueHelpRequested: function () {
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			if (!this.vendorValueHelp) {
+				this.vendorValueHelp = sap.ui.xmlfragment("com.menabev.AP.fragment.VendorValueHelp", this);
+				this.getView().addDependent(this.vendorValueHelp);
+			}
+			var vendorSearchModel = new JSONModel();
+			this.getView().setModel(vendorSearchModel, "vendorSearchModel");
+			vendorSearchModel.setProperty("/vendorId", nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"));
+			vendorSearchModel.setProperty("/vendorName", nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorName"));
+			vendorSearchModel.setProperty("/VATRegistration", "");
+			this.fnVendorIdServiceCall();
+			this.vendorValueHelp.open();
+		},
+
+		onSearchVendor: function (oEvent) {
+			this.fnVendorIdServiceCall();
+		},
+
+		onClearSearchVendor: function () {
+			var vendorSearchModel = this.getView().getModel("vendorSearchModel");
+			vendorSearchModel.setProperty("/vendorId", "");
+			vendorSearchModel.setProperty("/vendorName", "");
+			vendorSearchModel.setProperty("/VATRegistration", "");
+		},
+
+		fnVendorIdServiceCall: function () {
+			var vendorSearchModel = this.getView().getModel("vendorSearchModel"),
+				vendorId = vendorSearchModel.getProperty("/vendorId"),
+				vendorName = vendorSearchModel.getProperty("/vendorName"),
+				VATRegistration = vendorSearchModel.getProperty("/VATRegistration");
+			var oFilter = [];
+			if (vendorId) {
+				oFilter.push(new sap.ui.model.Filter("Supplier", sap.ui.model.FilterOperator.EQ, vendorId));
+			}
+			if (vendorName) {
+				vendorName = vendorName.toUpperCase();
+				oFilter.push(new sap.ui.model.Filter("SupplierName", sap.ui.model.FilterOperator.Contains, vendorName));
+			}
+			if (VATRegistration) {
+				oFilter.push(new sap.ui.model.Filter("VATRegistration", sap.ui.model.FilterOperator.EQ, VATRegistration));
+			}
+			var oDataModel = this.getOwnerComponent().getModel("API_BUSINESS_PARTNER");
+			this.busyDialog.open();
+			oDataModel.read("/A_Supplier", {
+				filters: oFilter,
+				async: false,
+				success: function (oData, oResponse) {
+					this.busyDialog.close();
+					if (oData.results.length) {
+						vendorSearchModel.setProperty("/vendorResult", oData.results);
+						// sap.m.MessageToast.show("vendor search successfull");
+					} else {
+						sap.m.MessageToast.show("No Vendors found for the filters");
+					}
+				}.bind(this),
+				error: function (error) {
+					this.busyDialog.close();
+					var errorMsg = "";
+					if (error.statusCode === 504) {
+						errorMsg = "Request timed-out. Please try again!";
+						this.errorMsg(errorMsg);
+					} else {
+						errorMsg = JSON.parse(error.responseText);
+						errorMsg = errorMsg.error.message.value;
+						this.errorMsg(errorMsg);
+					}
+				}.bind(this)
+			});
+		},
+
+		onSelectVendorSearch: function (oEvent) {
+			var sPath = oEvent.getSource().getSelectedContextPaths()[0],
+				vendorSearchModel = this.getView().getModel("vendorSearchModel"),
+				selectedObject = vendorSearchModel.getProperty(sPath);
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", selectedObject.Supplier);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", selectedObject.SupplierName);
+			this.vendorValueHelp.close();
+		},
+
+		onCloseVendorValueHelp: function () {
+			this.vendorValueHelp.close();
+		}
 
 	});
 

@@ -568,6 +568,11 @@ sap.ui.define([
 			var errorMsg = "File size has exceeded it max limit of 10MB";
 			this.errorMsg(errorMsg);
 		},
+		
+		uploadExcelTypeMismatch: function(oEvent){
+			var errorMsg = "File type Mismatch";
+			this.errorMsg(errorMsg);
+		}
 		/*End of Excel Upload*/
 
 	});

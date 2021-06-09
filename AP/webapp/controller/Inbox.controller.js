@@ -19,7 +19,7 @@ sap.ui.define([
 
 				var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 				this.oUserDetailModel = oUserDetailModel;
-
+				this.setFilterBar();
 				this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 				this.oRouter.attachRoutePatternMatched(function (oEvent) {
 					if (oEvent.getParameter("name") === "Inbox") {
@@ -29,6 +29,18 @@ sap.ui.define([
 					}
 				});
 			},
+			setFilterBar: function () {
+				var filterBar = this.getView().byId("filterBarId");
+				filterBar._oFiltersButton.setVisible(false);
+				filterBar._oHideShowButton
+					.setType("Default").addStyleClass("sapUiSizeCompact");
+				filterBar._oClearButtonOnFB.setType("Default").addStyleClass(
+					"sapUiSizeCompact");
+				filterBar._oSearchButton.setText("Search").addStyleClass("sapUiSizeCompact").setWidth("5rem");
+				filterBar._oClearButtonOnFB
+					.setVisible(true);
+			},
+
 			onCreateInvoice: function (oEvent) {
 				this.oRouter.navTo("NonPOInvoice", {
 					id: "NEW"
@@ -65,6 +77,19 @@ sap.ui.define([
 				var taskDataFilterModelData = this.getView().getModel("taskDataFilterModel").getData(),
 					url = "/menabevdev/invoiceHeader/inbox",
 					that = this;
+				var taskDataFilterModelData = jQuery.extend(true, {}, this.getView().getModel("taskDataFilterModel").getData());
+				if (taskDataFilterModelData.createdAtFrom) {
+					taskDataFilterModelData.createdAtFrom = new Date(taskDataFilterModelData.createdAtFrom).getTime();
+				}
+				if (taskDataFilterModelData.createdAtTo) {
+					taskDataFilterModelData.createdAtTo = new Date(taskDataFilterModelData.createdAtTo).getTime();
+				}
+				if (taskDataFilterModelData.dueDateFrom) {
+					taskDataFilterModelData.dueDateFrom = new Date(taskDataFilterModelData.dueDateFrom).getTime();
+				}
+				if (taskDataFilterModelData.dueDateTo) {
+					taskDataFilterModelData.dueDateTo = new Date(taskDataFilterModelData.dueDateTo).getTime();
+				}
 				taskDataFilterModelData.userId = this.oUserDetailModel.getProperty("/loggedinUserDetail/id");
 				taskDataFilterModelData.indexNum = scroll ? pageNo : 1;
 				taskDataFilterModelData.count = 100;
@@ -241,8 +266,12 @@ sap.ui.define([
 				} else if (key == "draft") {
 					this.getInboxData("", "", "DRAFT", "draftTask", "draftCount");
 				}
-				// this.myTask = false;
+			},
 
+			SearchInboxData: function (oEvent) {
+				this.getInboxData("", "", "OPEN ", "openTask", "openTaskCount");
+				this.getInboxData("", "", "MYTASK", "myTask", "myTaskCount");
+				this.getInboxData("", "", "DRAFT", "draftTask", "draftCount");
 			},
 			fnClear: function () {
 				var taskDataFilterModel = this.getView().getModel("taskDataFilterModel");
@@ -268,7 +297,7 @@ sap.ui.define([
 				var obj = {
 					"claim": true,
 					"taskID": oEvent.getSource().getBindingContext("oInboxModel").getObject().taskId,
-					"userId": "P000022"
+					"userId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id")
 				};
 				if (oEvent.getSource().getTooltip() == "release")
 					obj.claim = false;
@@ -287,7 +316,8 @@ sap.ui.define([
 									that.myTask = false;
 								else
 									that.myTask = true;
-								that.getInboxData();
+								that.getInboxData("", "", "OPEN ", "openTask", "openTaskCount");
+								that.getInboxData("", "", "MYTASK", "myTask", "myTaskCount");
 							} else {
 								sap.m.MessageToast.show(oError.responseText);
 							}
@@ -326,6 +356,39 @@ sap.ui.define([
 				var oValue = oEvent.getSource().getValue();
 				oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
 				oEvent.getSource().setValue(oValue);
+			},
+
+			onDeleteDraft: function (oEvent) {
+				var that = this;
+				var taskDataFilterModel = this.getView().getModel("taskDataFilterModel");
+				var oContextObj = oEvent.getSource().getBindingContext("taskDataFilterModel").getObject();
+				var reqId = oContextObj.requestId;
+				sap.m.MessageBox.confirm("Are you sure you want to delete - " + reqId, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+					onClose: function (oAction) {
+						if (oAction === "YES") {
+							that.triggerDeleteDraft(reqId);
+						}
+					}
+				});
+			},
+
+			triggerDeleteDraft: function (reqId) {
+				var that = this;
+				var oServiceModel = new sap.ui.model.json.JSONModel();
+				var sUrl = "/menabevdev/delete/" + reqId;
+				var busy = new sap.m.BusyDialog();
+				busy.open();
+				var oHeader = {
+					"Content-Type": "application/scim+json"
+				};
+				oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, oHeader);
+				oServiceModel.attachRequestCompleted(function (oEvent) {
+					busy.close();
+					that.getInboxData("", "", "DRAFT", "draftTask", "draftCount");
+					sap.m.MessageToast.show(oEvent.getSource().getData().message);
+				});
 			}
 		});
 	});

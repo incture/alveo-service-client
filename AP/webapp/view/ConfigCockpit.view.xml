@@ -78,7 +78,7 @@
 			</l:Grid>
 			<l:Grid defaultSpan="XL6 L6 M12 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
-					<Table mode="MultiSelect" id="apMailboxTable" items="{oMasterModel>/emailTeamDto/0/emailId}">
+					<Table mode="MultiSelect" id="apMailboxTable" items="{oMasterModel>/accountsPayableMailbox}">
 						<headerToolbar>
 							<OverflowToolbar>
 								<ToolbarSpacer/>
@@ -94,7 +94,7 @@
 						<items>
 							<ColumnListItem>
 								<cells>
-									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
+									<Input value="{oMasterModel>emailId}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
 										valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }" editable="{baseModel>/Editable}"/>
 								</cells>
 							</ColumnListItem>

@@ -1,0 +1,56 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout">
+	<Dialog title="{i18n>VendorSearch}" contentWidth="70%" class="sapUiSizeCompact">
+		<content>
+			<l:Grid defaultSpan="L3 M6 S12">
+				<l:content>
+					<VBox>
+						<Label text="{i18n>VendorId}" class="sapUiTinyMarginTop"/>
+						<Input value="{vendorSearchModel>/vendorId}"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
+						<Input value="{vendorSearchModel>/vendorName}"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>VATRegistration}" class="sapUiTinyMarginTop"/>
+						<Input value="{vendorSearchModel>/VATRegistration}"/>
+					</VBox>
+					<VBox>
+						<Label class="sapUiTinyMarginTop"/>
+						<HBox>
+							<Button text="{i18n>Clear}" type="Reject" press="onClearSearchVendor" class="sapUiTinyMarginEnd"/>
+							<Button text="{i18n>Search}" press="onSearchVendor"/>
+						</HBox>
+					</VBox>
+				</l:content>
+			</l:Grid>
+			<Table items="{vendorSearchModel>/vendorResult}" class="sapUiSizeCompact" growing="true" growingThreshold="100"
+				sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" alternateRowColors="true" mode="SingleSelectMaster" itemPress="onSelectVendorSearch">
+				<columns>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Vendor}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>VendorName}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>VATRegistration}" design="Bold"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Active">
+						<cells>
+							<Text text="{vendorSearchModel>Supplier}" textAlign="Center"/>
+							<Text text="{vendorSearchModel>SupplierName}" textAlign="Center" wrapping="true"/>
+							<Text text="{vendorSearchModel>VATRegistration}" textAlign="Center"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<endButton>
+			<Button text="{i18n>Cancel}" press="onCloseVendorValueHelp"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
