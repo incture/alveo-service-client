@@ -105,12 +105,22 @@ sap.ui.define([
 		},
 
 		//Upload Invoice Fragment:UploadInvoiceFrag
-		inputErrorHandler: function (oEvent) {
+		onChangeDeliveryNote: function (oEvent) {
 			var input = oEvent.getParameter("value");
+			input = input.trim();
 			if (!input) {
 				oEvent.getSource().setValueState("Error");
 			} else {
 				oEvent.getSource().setValueState("None");
+			}
+		},
+		
+		//function will trim if the user input is alphabets and special characters on live change
+		inputLiveChange: function(oEvent){
+			var oValue = oEvent.getSource().getValue();
+			if (isNaN(oValue)) {
+				oValue = oValue.replace(/[^\d]/g, '');
+				oEvent.getSource().setValue(oValue);
 			}
 		},
 
@@ -142,6 +152,7 @@ sap.ui.define([
 			if (transactionType === "INVOICE") {
 				for (key in oData) {
 					if (mandatoryFields.includes(key)) {
+						oData[key] = oData[key].trim();
 						if (!oData[key]) {
 							this.getView().getModel("pdfModel").setProperty("/vstate/" + key, "Error");
 							flag = false;

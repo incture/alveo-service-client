@@ -23,7 +23,7 @@ com.menabev.AP.formatter.formatter = {
 		var yyyy = date.getFullYear();
 		yyyy = yyyy.toString();
 
-		var date1 = dd + "/" + mm + "/" + yyyy;
+		var date1 = mm + "/" + dd + "/" + yyyy;
 		return date1;
 	},
 
