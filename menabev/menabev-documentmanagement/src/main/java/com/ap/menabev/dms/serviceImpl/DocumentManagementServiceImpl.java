@@ -103,6 +103,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 			Folder parent = null;
 			ObjectId parentId = null;
 			String DMS_FOLDER = ApplicationConstants.FOLDER;
+			System.out.println("DMS FOLDER::::::"+ DMS_FOLDER);
 			parent = (Folder) session.getObject(DMS_FOLDER);
 			// TO CHECK THE FOLDER IS AVAILABLE OR NOT
 			ItemIterable<QueryResult> results = session.query(
@@ -152,7 +153,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 				Document newDoc = newFolderId.createDocument(properties2, contentStream, VersioningState.MAJOR);
 				response.setCode(ApplicationConstants.CODE_SUCCESS);
 				response.setStatus(ApplicationConstants.SUCCESS);
-				response.setMessage("Document Updated Succesfully");
+				response.setMessage("Document Uploaded Successfully");
 				dmsResponse.setDocumentId(newDoc.getId());
 				System.out.println(dmsResponse);
 				dmsResponse.setResponse(response);
@@ -238,7 +239,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
-			response.setMessage("Document Updated Succesfully");
+			response.setMessage("Document Uploaded Successfully");
 			dmsResponse.setResponse(response);
 
 		} catch (Exception e) {
@@ -728,7 +729,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 //		DocumentManagementServiceImpl dms = new DocumentManagementServiceImpl();
 //		// dms.getAccessToken();
 //		File file = new File("C:\\Users\\Lakhu D\\Downloads\\exampleXml (1).xlsx");
-//		 dms.uploadDocument(file,"APA-05142021-00000003");
+//		 dms.uploadDocument(file,"APA-05142021-00000004");
 ////		 dms.downloadDocument("jBwOUb1oXWQMnm_D_RNryrVPH9_aheSqT-vrHj5qteM");
 //		// dms.deleteDocument("qtpIma2YOLbRxsvFpYeD26ujU2EkWk_qsc7YCAWqd4s");
 //		// dms.extraxtXml(file);
