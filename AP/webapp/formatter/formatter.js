@@ -165,6 +165,37 @@ com.menabev.AP.formatter.formatter = {
 			return "-";
 		} else
 			return value;
-	}
+	},
 
+	// Pagination
+
+	setLeftPaginationVisible: function (currentPage, totalPage) {
+		if (totalPage < 6) {
+			return false;
+		} else if (currentPage != 1) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	setRightPaginationVisible: function (currentPage, totalPage) {
+		if (totalPage < 6) {
+			return false;
+		} else if (currentPage != totalPage) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	// Inbox
+
+	createInvoiceVisible: function (loggedinUser) {
+		if (loggedinUser === "Accountant") {
+			return true;
+		} else {
+			return false;
+		}
+	}
 };

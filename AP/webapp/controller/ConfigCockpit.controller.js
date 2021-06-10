@@ -443,16 +443,34 @@ sap.ui.define([
 					bError = true;
 				}
 			}
-			var data2 = sData.schedulerConfigurationdto;
-			for (var j = 0; j < data2.length; j++) {
-				if (data2[j].isActive) {
-					for (var _i = 0, _Object$keys = Object.keys(data2[j]); _i < _Object$keys.length; _i++) {
-						var i2 = _Object$keys[_i];
-						if (!data2[j][i2] && (i2 == "startDate" || i2 == "endDate" || i2 == "frequencyNumber" || i2 == "frequencyUnit")) {
-							this.getView().getModel("baseModel").setProperty("/" + i2 + j + "Error", "Error");
-							bError = true;
-						}
-					}
+			// var data2 = sData.schedulerConfigurationdto;
+			// for (var j = 0; j < data2.length; j++) {
+			// 	if (data2[j].isActive) {
+			// 		for (var _i = 0, _Object$keys = Object.keys(data2[j]); _i < _Object$keys.length; _i++) {
+			// 			var i2 = _Object$keys[_i];
+			// 			if (!data2[j][i2] && (i2 == "startDate" || i2 == "endDate" || i2 == "frequencyNumber" || i2 == "frequencyUnit")) {
+			// 				this.getView().getModel("baseModel").setProperty("/" + i2 + j + "Error", "Error");
+			// 				bError = true;
+			// 			}
+			// 		}
+			// 	}
+			// }
+
+			var accountsPayableMailbox = sData.accountsPayableMailbox,
+				email;
+			for (var k = 0; k < accountsPayableMailbox.length; k++) {
+				email = accountsPayableMailbox[k].emailId;
+				if (!email) {
+					bError = true;
+				}
+			}
+
+			var accountsPayableScanningTeam = sData.accountsPayableScanningTeam,
+				email1;
+			for (var s = 0; s < accountsPayableMailbox.length; s++) {
+				email = accountsPayableScanningTeam[s].emailId;
+				if (!email1) {
+					bError = true;
 				}
 			}
 			var data3 = sData.mailTemplateDto;

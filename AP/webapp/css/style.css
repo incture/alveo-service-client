@@ -488,3 +488,36 @@
     color: #fff;
     text-shadow: 0 0 0.125rem transparent;
 }
+
+
+
+/*Pagination class*/
+.pagingLabel.sapMLabel {
+    padding-top: .15rem;
+    font-size: .775rem
+}
+
+.pageNumberDivClass {
+    height: 3rem;
+    background: #fff;
+    border-top: 1px solid #dff1ff;
+    padding-top: 2rem !important
+}
+
+.pagingText.sapMText {
+    font-size: .775rem
+}
+
+.pageLinkClass {
+    top: -1rem
+}
+
+.navigateButtonClass {
+    padding-top: .7rem !important
+}
+
+.paginationNumbers {
+    width: 1.5rem;
+    padding-top: 1rem;
+    padding-left: 1rem
+}

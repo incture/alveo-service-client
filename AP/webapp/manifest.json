@@ -94,6 +94,12 @@
 			"oDropDownModel": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
+			"oTaskInboxModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oPaginationModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
 			"oDataModel": {
 				"type": "sap.ui.model.odata.ODataModel",
 				"settings": {

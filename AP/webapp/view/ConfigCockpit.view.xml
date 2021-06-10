@@ -100,7 +100,7 @@
 							</ColumnListItem>
 						</items>
 					</Table>
-					<Table mode="MultiSelect" id="apScanTable" items="{oMasterModel>/emailTeamDto/1/emailId}">
+					<Table mode="MultiSelect" id="apScanTable" items="{oMasterModel>/accountsPayableScanningTeam}">
 						<headerToolbar>
 							<OverflowToolbar>
 								<ToolbarSpacer/>
@@ -116,7 +116,7 @@
 						<items>
 							<ColumnListItem>
 								<cells>
-									<Input value="{oMasterModel>}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
+									<Input value="{oMasterModel>emailId}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
 										editable="{baseModel>/Editable}" valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }"/>
 								</cells>
 							</ColumnListItem>

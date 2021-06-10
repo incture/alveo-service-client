@@ -60,5 +60,12 @@
 	}, {
 		"key": "10",
 		"value": "10"
+	}],
+	"invoiceType": [{
+		"key": "Credit",
+		"value": "Credit"
+	}, {
+		"key": "Supplier_Admin",
+		"value": "Supplier_Admin"
 	}]
 }
