@@ -50,7 +50,7 @@
 									<!--	editable="{oVisibilityModel>/NonPOInvoice/editable}"/>-->
 									<Input filterSuggests="false" value="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}" width="80%"
 										showSuggestion="true" suggest="VendorIdSuggest" tooltip="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/vendorId}"
-										suggestionItemSelected="vendorIdSelected" suggestionItems="{searchVendorModel>/d/results}"
+										suggestionItemSelected="vendorIdSelected" suggestionItems="{searchVendorModel>/d/results}" maxLength="10"
 										editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<suggestionItems>
 											<core:ListItem text="{searchVendorModel>Supplier}" additionalText="{searchVendorModel>SupplierName}"/>
@@ -236,9 +236,16 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer/>
-				<Button text="{i18n>Save}" type="Default" tooltip="{i18n>Save}" press="onNonPoSave" class="sapUiTinyMarginEnd"/>
-				<Button text="{i18n>Submit}" type="Emphasized" tooltip="{i18n>Submit}" press="onNonPoSubmit" class="btnEmphasized sapUiTinyMarginEnd"/>
-				<Button text="{i18n>Reject}" type="Reject" tooltip="{i18n>Reject}" press="onNonPoReject" class="sapUiTinyMarginEnd" enabled="false"/>
+				<Button text="{i18n>Approve}" type="Default" tooltip="{i18n>Approve}" press="onNonPoApprove" class="sapUiTinyMarginEnd"
+					visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}" enabled="false"/>
+				<Button text="{i18n>ReSend}" type="Default" tooltip="{i18n>ReSend}" press="onNonPoReSend" class="sapUiTinyMarginEnd"
+					visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}" enabled="false"/>
+				<Button text="{i18n>Save}" type="Default" tooltip="{i18n>Save}" press="onNonPoSave" class="sapUiTinyMarginEnd"
+					visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
+				<Button text="{i18n>Submit}" type="Emphasized" tooltip="{i18n>Submit}" press="onNonPoSubmit" class="btnEmphasized sapUiTinyMarginEnd"
+					visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
+				<Button text="{i18n>Reject}" type="Reject" tooltip="{i18n>Reject}" press="onNonPoReject" class="sapUiTinyMarginEnd" enabled="false"
+					visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}"/>
 			</Toolbar>
 		</footer>
 	</Page>

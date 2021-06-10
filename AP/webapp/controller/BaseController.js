@@ -196,6 +196,82 @@ sap.ui.define([
 				}
 			);
 		},
+		
+		//Open PDF Area details
+		//Start of Open PDF details
+		fnOpenPDF: function (documentId) {
+			//service call to load the pdf document
+			// var documentId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
+			this.busyDialog.open();
+			var sUrl = "/menabevdev/document/download/" + documentId;
+			jQuery.ajax({
+				type: "GET",
+				contentType: "application/json",
+				url: sUrl,
+				dataType: "json",
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					this.busyDialog.close();
+					this.pdfData = data;
+					if (data.fileAvailability) {
+						this.byId("grid").setDefaultSpan("L6 M6 S12");
+						this.byId("grid2").setDefaultSpan("L6 M6 S12");
+						this.addPDFArea();
+					} else {
+						sap.m.MessageToast.show("No PDF is available");
+					}
+				}.bind(this),
+				error: function (result, xhr, data) {
+					this.busyDialog.close();
+					var errorMsg = "";
+					if (result.status === 504) {
+						errorMsg = "Request timed-out. Please refresh your page";
+						this.errorMsg(errorMsg);
+					} else {
+						errorMsg = data;
+						this.errorMsg(errorMsg);
+					}
+				}.bind(this)
+			});
+		},
+
+		addPDFArea: function () {
+			var that = this;
+			var pdfData = this.pdfData;
+			that.pdf = sap.ui.xmlfragment(that.getView().getId(), "com.menabev.AP.fragment.PDF", that);
+			var oPdfFrame = that.pdf.getItems()[1];
+			oPdfFrame.setContent('<embed width="100%" height="859rem" name="plugin" src="data:application/pdf;base64, ' + pdfData.base64 +
+				'" ' + 'type=' + "" + "application/pdf" + " " + 'internalinstanceid="21">');
+			var oSplitter = that.byId("idMainSplitter");
+			var oLastContentArea = oSplitter.getContentAreas().pop();
+			if (oSplitter.getContentAreas().length > 1)
+				oSplitter.removeContentArea(oLastContentArea);
+			if (oSplitter.getContentAreas().length === 1)
+				oSplitter.insertContentArea(that.pdf, 1);
+		},
+
+		//frag:PDF
+		//this function will close the PDF Area.
+		closePDFArea: function () {
+			var oSplitter = this.byId("idMainSplitter");
+			var oLastContentArea = oSplitter.getContentAreas().pop();
+			if (oSplitter.getContentAreas().length > 1) {
+				oSplitter.removeContentArea(oLastContentArea);
+			}
+			this.resizeSplitterLayout();
+			this.byId("grid").setDefaultSpan("L3 M4 S12");
+			this.byId("grid2").setDefaultSpan("L3 M6 S12");
+		},
+
+		resizeSplitterLayout: function () {
+			var oContentLayout;
+			var oSplitter = this.byId("idMainSplitter");
+			oSplitter.getContentAreas().forEach(function (oElement) {
+				oContentLayout = oElement.getLayoutData();
+				oContentLayout.setSize("auto");
+			});
+		},
+		//End of Open PDF details
 
 	});
 
