@@ -94,7 +94,7 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> getActivityLog(String requestId);
     ResponseEntity<?> getInvoiceDetailChanged(String requestId);
 
-	ResponseEntity<?> deleteDraft(String requestId);
+	ResponseEntity<?> deleteDraft(List<String> requestId);
 
 	ResponseEntity<?> getInboxTaskWithMultipleSearch(FilterMultipleHeaderSearchDto filterDto);
 

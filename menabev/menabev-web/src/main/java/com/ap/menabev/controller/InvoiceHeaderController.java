@@ -89,8 +89,8 @@ public class InvoiceHeaderController {
 	}
 
 
-	@DeleteMapping("/delete/{requestId}")
-	public ResponseEntity<?> delete(@PathVariable String requestId) {
+	@DeleteMapping("/delete")
+	public ResponseEntity<?> delete(@RequestBody List<String> requestId) {
 		return headerService.deleteDraft(requestId);
 	}
 

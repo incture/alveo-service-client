@@ -85,8 +85,8 @@ public class SequenceGenerator implements SequenceGeneratorServices{
 			int seqVal = getCounterVariable(seqCode).getAndIncrement();
 
 			// Preparing the pattern.
-			seq = seqCode + todaysDate.format(DateTimeFormatter.ofPattern(DateUtils.SEQ_DATE_FORMAT))
-					+mappingId+"-"+String.format("%04d", seqVal);
+			seq = seqCode+"-" + todaysDate.format(DateTimeFormatter.ofPattern(DateUtils.SEQ_DATE_FORMAT))
+			+"-"+String.format("%08d", seqVal);
 		}
 
 		return seq;
@@ -168,12 +168,7 @@ public class SequenceGenerator implements SequenceGeneratorServices{
 			break;
 		}
 	}
-		
 
-	
-
-	
-	
 	public String getNextByMappingId(String seqCode, String mappingId) {
 		LocalDate todaysDate = LocalDate.now(ZONE_ID);
 		String seq;
@@ -193,8 +188,8 @@ public class SequenceGenerator implements SequenceGeneratorServices{
  			int seqVal = service.getCounterVariableByMappingId(seqCode,mappingId).getAndIncrement();
 
 			// Preparing the pattern.
-			seq = seqCode + todaysDate.format(DateTimeFormatter.ofPattern(DateUtils.SEQ_DATE_FORMAT))
-					+mappingId+"-"+String.format("%04d", seqVal);
+			seq = seqCode+"-" + todaysDate.format(DateTimeFormatter.ofPattern(DateUtils.SEQ_DATE_FORMAT))
+			+"-"+String.format("%08d", seqVal);
 		}
 
 		return seq;

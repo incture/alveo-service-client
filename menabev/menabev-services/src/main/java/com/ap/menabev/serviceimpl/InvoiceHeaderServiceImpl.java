@@ -203,13 +203,15 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	
 	@Override
-	public ResponseEntity<?>  deleteDraft(String requestId){
+	public ResponseEntity<?>  deleteDraft(List<String> requestId){
 		
 		try{
-		invoiceHeaderRepository.deleteById(requestId);
-		invoiceItemRepository.deleteTotalItems(requestId);
-		costAllocationRepository.deleteCostAllocationDo(requestId);
-		invoiceItemAcctAssignmentRepository.deleteByRequestIdItemId(requestId);
+			requestId.stream().forEach(item -> {
+		invoiceHeaderRepository.deleteById(item);
+		invoiceItemRepository.deleteTotalItems(item);
+		costAllocationRepository.deleteCostAllocationDo(item);
+		invoiceItemAcctAssignmentRepository.deleteByRequestIdItemId(item);
+			});
 		
 		ResponseDto reponse = new ResponseDto();
 		reponse.setCode("200");
@@ -245,8 +247,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		    // save header
 			 InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),InvoiceHeaderDo.class);
 			    invoiceHeaderDo.setRequestId(requestId);
+			    if(!invoiceDto.getInvoiceHeaderDto().getValidationStatus().isEmpty() && invoiceDto.getInvoiceHeaderDto().getValidationStatus()!=null){
 				invoiceHeaderDo.setValidationStatus("Draft");
-				invoiceHeaderDo.setDocStatus("Draft");
+			    }
+			    if(!invoiceDto.getInvoiceHeaderDto().getDocStatus().isEmpty() && invoiceDto.getInvoiceHeaderDto().getDocStatus()!=null)
+				{invoiceHeaderDo.setDocStatus("Draft");}
 			 InvoiceHeaderDo invoiceSavedDo  = invoiceHeaderRepository.save(invoiceHeaderDo);
 			    // save invoice item
 			    if(invoiceDto.getInvoiceHeaderDto().getInvoiceItems()!=null && !invoiceDto.getInvoiceHeaderDto().getInvoiceItems().isEmpty()){
@@ -337,7 +342,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		invoiceHeaderDo.setDocStatus("Created");
 		invoiceHeaderDo.setWorkflowId(taskOutputDto.getId());
 		invoiceHeaderDo.setCreatedAt(LocalDateTime.parse(taskOutputDto.getStartedAt().subSequence(0,taskOutputDto.getStartedAt().length()-5)));
-	    InvoiceHeaderDo 	invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+	   invoiceHeaderDo.setAssignedTo(lists.get(0).getUserOrGroup());
+		InvoiceHeaderDo 	invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
 		    // save invoice item 
 	    if(invoiceDto.getInvoiceHeaderDto().getInvoiceItems()!=null &&!invoiceDto.getInvoiceHeaderDto().getInvoiceItems().isEmpty()){
 			List<InvoiceItemDo> itemlists =  ObjectMapperUtils.mapAll(invoiceDto.getInvoiceHeaderDto().getInvoiceItems(), InvoiceItemDo.class);
@@ -377,9 +383,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		// Update the Activity Log table 
 		    updateActivityLog();
 		    if(lists.get(0).getUserType().equals("Default")){
-		    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created & task is availble to Default User "+lists.get(0).getUserOrGroup());
+		    invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created & task is available to Default User "+lists.get(0).getUserOrGroup());
 		    }else{
-		    	 invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created & task is availble to User "+lists.get(0).getUserOrGroup());	
+		    	 invoiceDto.setResponseStatus("Invoice "+invoiceSavedDo.getRequestId()+" has been created & task is available to User "+lists.get(0).getUserOrGroup());	
 		    }
 		    return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto,HttpStatus.OK);
 		            }else{
@@ -811,6 +817,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
           if(responseFromFilter.getStatusCodeValue()==200){
         	 listOfInvoiceOrders=  (List<InvoiceHeaderDo>) responseFromFilter.getBody();
 		System.err.println("lisOFInvoice by requestIds "+listOfInvoiceOrders);
+		
 		// check for claim 
 		Map<String,WorkflowTaskOutputDto> map = checkForClaim(invoiceRequestIdListPaginated);
 		// filter of the invoice. create a method at night for filter of invoice
@@ -873,20 +880,20 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		if (dto.getVendorId() != null && !dto.getVendorId().isEmpty()) {
 			filterQueryMap.put(" RR.VENDOR_ID =", "'" + dto.getVendorId()+ "'");
 		} 
-		if (dto.getDueDateFrom() != null && dto.getDueDateTo()!=null) {
+		if (dto.getDueDateFrom() != null && dto.getDueDateTo()!=null&& dto.getDueDateFrom()!=0&&dto.getDueDateTo()!=00) {
 			filterQueryMap.put(" RR.DUE_DATE BETWEEN ",  + dto.getDueDateFrom() + " AND "+ dto.getDueDateTo());
 		 // is empty 
 		}
-		if (dto.getDueDateFrom() != null ) {
+		if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
 			filterQueryMap.put(" RR.DUE_DATE =", dto.getDueDateFrom() + "");
 		//correct 
 		}
 		
-		if (dto.getCreatedAtFrom() != null && dto.getCreatedAtFrom()!=null) {
+		if (dto.getCreatedAtFrom() != null && dto.getCreatedAtFrom()!=null && dto.getCreatedAtFrom() != 0 && dto.getCreatedAtFrom()!= 0) {
 			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getCreatedAtFrom() + " AND "+ dto.getCreatedAtTo());
 		//correct 
 		}
-		if (dto.getInvoiceDateFrom() != null ) {
+		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != 0  ) {
 			filterQueryMap.put(" RR.INVOICE_DATE =",  dto.getCreatedAtFrom()+"");
 		//correct 
 		}
@@ -917,7 +924,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		if (dto.getInvoiceValueFrom()!=0.0) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL =",  "" + dto.getInvoiceValueFrom() + "");
 		}
-		if (dto.getInvoiceValueFrom() !=0.0 && dto.getInvoiceValueTo()!=0.0) {
+		if (dto.getInvoiceValueFrom() !=0 && dto.getInvoiceValueTo()!=0.0) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL BETWEEN ", dto.getInvoiceValueFrom() + " AND "+ dto.getInvoiceValueTo());
 		//correct 
 		}
@@ -983,8 +990,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					rqstId.append("'" + dto.getVendorName().get(i) + "'");
 				}
 			}
-			
-			
 			filterQueryMap.put(" RR.VENDOR_NAME IN", "(" + rqstId + ")");
 		}
 		if (dto.getVendorId() != null && !dto.getVendorId().isEmpty()) {
@@ -996,33 +1001,37 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					rqstId.append("'" + dto.getVendorId().get(i) + "'");
 				}
 			}
-			
-			
 			filterQueryMap.put(" RR.VENDOR_ID IN",  "(" + rqstId + ")");
 		} 
-		if (dto.getDueDateFrom() != null && dto.getDueDateTo()!=null) {
+		if (dto.getDueDateFrom() != null && dto.getDueDateTo()!=null && dto.getDueDateFrom()!=0 && dto.getDueDateTo()!=0) {
 			filterQueryMap.put(" RR.DUE_DATE BETWEEN ",  + dto.getDueDateFrom() + " AND "+ dto.getDueDateTo());
 		 // is empty 
 		}
-		if (dto.getDueDateFrom() != null ) {
+		if (dto.getDueDateFrom() != null && dto.getDueDateFrom()!=0) {
 			filterQueryMap.put(" RR.DUE_DATE =", dto.getDueDateFrom() + "");
 		//correct 
 		}
-		
-		if (dto.getCreatedAtFrom() != null && dto.getCreatedAtFrom()!=null) {
+		if (dto.getCreatedAtFrom() != null && dto.getCreatedAtFrom()!=null && dto.getCreatedAtFrom() !=0 && dto.getCreatedAtTo() != 0) {
 			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getCreatedAtFrom() + " AND "+ dto.getCreatedAtTo());
 		//correct 
 		}
-		if (dto.getInvoiceDateFrom() != null ) {
+		if (dto.getCreatedAtFrom() != null ) {
 			filterQueryMap.put(" RR.INVOICE_DATE =",  dto.getCreatedAtFrom()+"");
 		//correct 
 		}
 		if (dto.getInvoiceType() != null && !dto.getInvoiceType().isEmpty()) {
 			
-			filterQueryMap.put(" RR.INVOICE_TYPE =", "'" + dto.getInvoiceType() + "'");
+			StringBuffer rqstId = new StringBuffer();
+			for (int i = 0; i < dto.getInvoiceType().size(); i++) {
+				if (i < dto.getInvoiceType().size() - 1) {
+					rqstId.append("'" + dto.getInvoiceType().get(i) + "'" + ",");
+				} else {
+					rqstId.append("'" + dto.getInvoiceType().get(i) + "'");
+				}
+			}
+			filterQueryMap.put(" RR.INVOICE_TYPE IN", "'" +rqstId+ "'");
 		//checked 
 		}
-		
 		if (dto.getAssignedTo() != null && !dto.getAssignedTo().isEmpty()) {
 			
 			StringBuffer rqstId = new StringBuffer();
@@ -1033,14 +1042,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					rqstId.append("'" + dto.getAssignedTo().get(i) + "'");
 				}
 			}
-			
-			
-			
 			filterQueryMap.put(" RR.ASSIGNED_TO IN", "(" + rqstId + ")");
 		// is EMpty 
 		}
 		if (dto.getValidationStatus() != null && !dto.getValidationStatus().isEmpty()) {
-			
 			StringBuffer status = new StringBuffer();
 			for (int i = 0; i < dto.getValidationStatus().size(); i++) {
 				if (i < dto.getValidationStatus().size() - 1) {
@@ -1061,11 +1066,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.INVOICE_TOTAL BETWEEN ", dto.getInvoiceValueFrom() + " AND "+ dto.getInvoiceValueTo());
 		//correct 
 		}
-		
-		
-		
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
-
 		AtomicInteger count = new AtomicInteger(0);
 		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
 
