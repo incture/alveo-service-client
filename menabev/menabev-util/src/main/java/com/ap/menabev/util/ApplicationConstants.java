@@ -121,5 +121,51 @@ public interface ApplicationConstants {
 	// QA FOLDER
 	// String FOLDER = "ud3MtXve86vrngCHttSUW_KwwnMdM2KXiALY5mTLXJ4";
 	// ------------------------------------------------------------------------------------//
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//Destination Service Key details for DEV
+		public static final String DESTINATION_CLIENT_ID = "sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2";
+		public static final String DESTINATION_CLIENT_SECRET = "f845b3d5-4cc9-443e-8d29-fb6bf26d5dbc$kZHRRKM05NdJ6i-B6QqdOyM7UuN-qvyiVkMpY0dBqnY=";
+		public static final String DESTINATION_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
+		public static final String DESTINATION_BASE_URL = "https://destination-configuration.cfapps.eu20.hana.ondemand.com/destination-configuration/v1/destinations/";
+		
+		
+		//Destination Service Key details for QA
+		
+		
+		
+		
+		//Destination Service Key details for PROD
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }

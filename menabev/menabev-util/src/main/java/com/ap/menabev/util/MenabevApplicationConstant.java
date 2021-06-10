@@ -3,6 +3,9 @@ package com.ap.menabev.util;
 public class MenabevApplicationConstant {
 
 	public static final String IDP_SERVICES_DESTINATION_NAME = "";
+	
+	
+	
 
 	// Destination Service Key
 	public static final String DESTINATION_CLIENT_ID = "sb-cloned8d5fe79e99e4a9ab916e72948ddf02a!b19391|destination-xsappname!b404";
@@ -22,8 +25,8 @@ public class MenabevApplicationConstant {
 	public static final String WORKFLOW_REST_BASE_URL = "https://api.workflow-sap.cfapps.eu20.hana.ondemand.com/workflow-service/rest";
 	
 	// connectivity service key 
-	public static final String CONECTIVITY_CLIENT_ID = "sb-clone90edf2c53da04e99a2d67a015e6be8e4!b19391|connectivity!b17";
-	public static final String CONECTIVITY_CLIENT_SECRET = "40afe54d-9895-4748-af49-d81bcfed3f66$xCzyLr3BY-zcKBXilEgj3zpeYEEZWXOr8fU44LdrKeM=";
+	public static final String CONECTIVITY_CLIENT_ID = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
+	public static final String CONECTIVITY_CLIENT_SECRET = "cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=";
 	public static final String CONECTIVITY_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 	public static final String CONECTIVITY_BASE_URL = "https://destination-configuration.cfapps.eu20.hana.ondemand.com";
     
@@ -32,5 +35,21 @@ public class MenabevApplicationConstant {
 	public static final String MENABEV_ODATA_DESTINATION_NAME = "";
 	public static final String TASK_COMPLETED = "COMPLETED";
 	public static final String INVOICE_SEQUENCE = "APA";
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
