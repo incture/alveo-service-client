@@ -1079,7 +1079,7 @@ sap.ui.define([
 				"subTotal": "",
 				"surcharge": "",
 				"taskOwner": objectIsNew.invoiceHeader.taskOwner,
-				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id"),
+				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedInUserMail"),
 				"taskStatus": objectIsNew.invoiceHeader.taskStatus,
 				"taxAmount": objectIsNew.invoiceHeader.taxAmount,
 				"taxCode": objectIsNew.invoiceHeader.taxCode,
@@ -1427,7 +1427,7 @@ sap.ui.define([
 
 		onDocumentDelete: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var nonPOInvoiceModel = this.nonPOInvoiceModel;
+			var nonPOInvoiceModel =  this.getModel("nonPOInvoiceModel");
 			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
 			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
 			var attachments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
@@ -1439,6 +1439,8 @@ sap.ui.define([
 			var sUrl = "/menabevdev/document/delete/" + attachmentId;
 			oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, this.oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
+					busy.close();
+					sap.m.MessageToast.show(oEvent.getSource().getData().message);
 				attachments.splice(index, 1);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/attachments", attachments);
 

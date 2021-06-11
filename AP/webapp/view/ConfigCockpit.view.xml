@@ -95,7 +95,7 @@
 							<ColumnListItem>
 								<cells>
 									<Input value="{oMasterModel>emailId}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
-										valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }" editable="{baseModel>/Editable}"/>
+										valueState="{= ${oMasterModel>emailId}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }" editable="{baseModel>/Editable}"/>
 								</cells>
 							</ColumnListItem>
 						</items>
@@ -117,7 +117,7 @@
 							<ColumnListItem>
 								<cells>
 									<Input value="{oMasterModel>emailId}" type="Email" placeholder="Enter Email..." change="fnValidateEmail" width="100%"
-										editable="{baseModel>/Editable}" valueState="{= ${oMasterModel>}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }"/>
+										editable="{baseModel>/Editable}" valueState="{= ${oMasterModel>emailId}==='' &amp;&amp; ${baseModel>/submitFlag} ? 'Error' : 'None' }"/>
 								</cells>
 							</ColumnListItem>
 						</items>
@@ -195,6 +195,9 @@
 								</cells>
 							</ColumnListItem>
 						</items>
+						<layoutData>
+							<l:GridData linebreak="true"/>
+						</layoutData>
 					</Table>
 					<Panel expandable="true" headerText="{i18n>EMAILTEMPLATES}" expanded="false" class="templatePanel">
 						<content>
@@ -242,6 +245,9 @@
 						<Label text="{i18n>MAXNUMBER}" design="Bold" class="sapUiTinyMarginTop"/>
 						<Input value="{oMasterModel>/configurationDto/maximumNoofUsers}" change="onNumberCheck" valueState="{baseModel>/maximumNoofUsersError}"
 							type="Number" width="5rem"></Input>
+						<layoutData>
+							<l:GridData linebreak="true"/>
+						</layoutData>
 					</HBox>
 				</l:content>
 			</l:Grid>

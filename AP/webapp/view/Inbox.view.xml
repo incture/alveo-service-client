@@ -52,7 +52,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="K" label="{i18n>ProcessStatus}">
 						<fb:control>
-							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/validationStatus}"  items="{oDropdownModel>/validationStatus}">
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/validationStatus}" items="{oDropdownModel>/validationStatus}">
 								<core:Item key="{processModel>statusCode}" text="{processModel>shortText}"/>
 							</MultiComboBox>
 						</fb:control>
@@ -136,7 +136,8 @@
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
-									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice" visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>
+									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"
+										visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>
 									<Button icon="sap-icon://action-settings" type="Emphasized"/>
 								</OverflowToolbar>
 							</headerToolbar>
@@ -192,12 +193,13 @@
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}">
+					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}" 	visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}">
 						<Table items="{oTaskInboxModel>/draftTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<headerToolbar>
-								<OverflowToolbar>
+									<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
-									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice" visible="{oVisibilityModel>/Inbox/btnCreateInvVisible}"/>
+									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"
+										visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>
 									<Button icon="sap-icon://action-settings" type="Emphasized"/>
 								</OverflowToolbar>
 							</headerToolbar>

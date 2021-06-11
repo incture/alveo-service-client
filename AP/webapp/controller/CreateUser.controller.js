@@ -259,7 +259,7 @@ sap.ui.define([
 		},
 
 		validateEmail: function (value) {
-			var oRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+			var oRegex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
 			var sText = value;
 			if (oRegex.test(sText)) {
 				return "S";

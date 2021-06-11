@@ -163,7 +163,7 @@ sap.ui.define([
 						// };
 					}
 					masterModel.setData(data);
-					masterModel.referesh();
+					masterModel.refresh();
 				}
 			});
 		},
@@ -355,7 +355,7 @@ sap.ui.define([
 				"emailId": "",
 				"emailTeamApid": ""
 			};
-			oMasterModel.getData().accountsPayableMailbox(Obj);
+			oMasterModel.getData().accountsPayableMailbox.push(Obj);
 			oMasterModel.refresh();
 		},
 
@@ -366,7 +366,7 @@ sap.ui.define([
 				"emailId": "",
 				"emailTeamApid": ""
 			};
-			oMasterModel.getData().accountsPayableScanningTeam(Obj);
+			oMasterModel.getData().accountsPayableScanningTeam.push(Obj);
 			oMasterModel.refresh();
 		},
 
@@ -467,7 +467,7 @@ sap.ui.define([
 
 			var accountsPayableScanningTeam = sData.accountsPayableScanningTeam,
 				email1;
-			for (var s = 0; s < accountsPayableMailbox.length; s++) {
+			for (var s = 0; s < accountsPayableScanningTeam.length; s++) {
 				email = accountsPayableScanningTeam[s].emailId;
 				if (!email1) {
 					bError = true;
@@ -518,7 +518,7 @@ sap.ui.define([
 
 				});
 			} else {
-				MessageBox.success("Please enter all the mandatory fields highlighted");
+				MessageBox.warning("Please enter all the mandatory fields highlighted");
 			}
 		},
 

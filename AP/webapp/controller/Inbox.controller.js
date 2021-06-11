@@ -87,14 +87,14 @@ sap.ui.define([
 					oPaginationModel.setProperty("/" + objectName + "/totalTaskCount", 0);
 				} else {
 					oPaginationModel.setProperty("/" + objectName + "/totalTaskCount", count);
-					var pages = parseInt(count / 6);
+					var pages = parseInt(count / 2);
 					if (pages < 1) {
 						oPaginationModel.setProperty("/" + objectName + "/paginationVisible", false);
 						return;
 					} else {
 						oPaginationModel.setProperty("/" + objectName + "/paginationVisible", true);
 					}
-					var remainder = count % 6;
+					var remainder = count % 2;
 					if (remainder) {
 						pages = pages + 1;
 					}
@@ -249,7 +249,7 @@ sap.ui.define([
 				}
 				oPayload.userId = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				oPayload.indexNum = pageNo;
-				oPayload.count = 10;
+				oPayload.count = 2;
 				oPayload.myTask = taskStatus;
 				oPayload.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 				var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -260,12 +260,14 @@ sap.ui.define([
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					var data = oEvent.getSource().getData();
 					var arr = [];
-					if (data.body.count) {
+					if (data.body && data.body.count) {
 						oTaskInboxModel.setProperty("/" + count, data.body.count);
 						oTaskInboxModel.setProperty("/" + object, data.body.listOfTasks);
 						that.pagination(data.body.count, paginationObject, pageNo);
 					} else {
-
+						oTaskInboxModel.setProperty("/" + count, 0);
+						oTaskInboxModel.setProperty("/" + object, {});
+						that.pagination(data.body.count, paginationObject, pageNo);
 					}
 				});
 
@@ -339,8 +341,8 @@ sap.ui.define([
 				var that = this;
 				var obj = {
 					"claim": true,
-					"taskID": oEvent.getSource().getBindingContext("oInboxModel").getObject().taskId,
-					"userId": this.oUserDetailModel.getProperty("/loggedinUserDetail/id")
+					"taskID": oEvent.getSource().getBindingContext("oTaskInboxModel").getObject().taskId,
+					"userId": this.oUserDetailModel.getProperty("/loggedInUserMail")
 				};
 				if (oEvent.getSource().getTooltip() == "release")
 					obj.claim = false;
@@ -359,8 +361,8 @@ sap.ui.define([
 									that.myTask = false;
 								else
 									that.myTask = true;
-								this.getInboxData("", "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
-								this.getInboxData("", "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
+								that.getInboxData(1, "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
+								that.getInboxData(1, "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
 							} else {
 								sap.m.MessageToast.show(oError.responseText);
 							}
