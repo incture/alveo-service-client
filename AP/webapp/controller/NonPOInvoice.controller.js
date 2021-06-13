@@ -347,7 +347,6 @@ sap.ui.define([
 				}
 				templateModel.setProperty("/searchValue", "");
 				this.getAllTemplate(); //Call service to fetch the templates
-				this.selectTemplateFragment.open();
 			} else {
 				sap.m.MessageToast.show("Fill Invoice Amount, Tax Code and Tax Value to proceed with Cost Allocation");
 			}
@@ -369,6 +368,7 @@ sap.ui.define([
 				success: function (data, textStatus, jqXHR) {
 					this.busyDialog.close();
 					templateModel.setProperty("/aNonPoTemplate", data);
+					this.selectTemplateFragment.open();
 				}.bind(this),
 				error: function (result, xhr, data) {
 					this.busyDialog.close();
@@ -1624,6 +1624,14 @@ sap.ui.define([
 			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", sVendorId);
 			nonPOInvoiceModel.refresh();
 		},
+		
+		//To open vendor balance
+		onClickVendorBalances: function () {
+			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel"),
+				vendorId = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"),
+				companyCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/companyCode");
+			this.loadVendorBalanceFrag(vendorId, companyCode);
+		}
 
 	});
 

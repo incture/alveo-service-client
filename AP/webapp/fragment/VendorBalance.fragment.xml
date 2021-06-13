@@ -1,0 +1,39 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:html="http://www.w3.org/1999/xhtml">
+	<Dialog draggable="true" title="{i18n>VendorBalances}" contentWidth="70%">
+		<content>
+			<Table items="{vendorBalanceModel>/ToVendorBalance/results}" class="sapUiSizeCompact">
+				<columns>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Currency}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>DebtCred}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>CurrencyBalance}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>LocalCurrency}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>LocalCurrencyBalance}" design="Bold"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{vendorBalanceModel>Currency}" textAlign="Center"/>
+							<Text text="{path: 'vendorBalanceModel>DrCrInd', formatter:'com.menabev.AP.formatter.formatter.crDbIndicator' }" textAlign="Center"/>
+							<Text text="{vendorBalanceModel>BalTC}" textAlign="Center"/>
+							<Text text="{vendorBalanceModel>LocalCurrency}" textAlign="Center"/>
+							<Text text="{vendorBalanceModel>BalLC}" textAlign="Center"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<endButton>
+			<Button text="{i18n>OK}" press="vendorBalancesClose"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
