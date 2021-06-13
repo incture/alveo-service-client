@@ -13,22 +13,30 @@
 					</headerToolbar>
 					<columns>
 						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
-							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
+							<Label text="{i18n>AccountNumber}" design="Bold"/>
 						</Column>
 						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
-							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
+							<Label text="{i18n>GLAccount}" design="Bold"/>
 						</Column>
 						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
-							<Label text="{i18n>percentageAllocation}" design="Bold" required="true" wrapping="true"/>
+							<Label text="{i18n>Description}" design="Bold"/>
 						</Column>
 						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
-							<Label text="{i18n>Amount}" design="Bold" required="true"/>
+							<Label text="{i18n>CostCentre}" design="Bold"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>percentageAllocation}" design="Bold" wrapping="true"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+							<Label text="{i18n>Amount}" design="Bold"/>
 						</Column>
 					</columns>
 					<items>
 						<ColumnListItem>
 							<cells>
+								<Text text="{postDataModel>accountNum}"/>
 								<Text text="{postDataModel>glAccount}"/>
+								<Text text="{postDataModel>materialDesc}"/>
 								<Text text="{postDataModel>costCenter}"/>
 								<Text text="{postDataModel>distrPerc}"/>
 								<Text text="{postDataModel>netValue}"/>

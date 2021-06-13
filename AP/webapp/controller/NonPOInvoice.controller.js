@@ -345,6 +345,7 @@ sap.ui.define([
 					this.selectTemplateFragment = sap.ui.xmlfragment(oFragmentId, oFragmentName, this);
 					this.getView().addDependent(this.selectTemplateFragment);
 				}
+				templateModel.setProperty("/searchValue", "");
 				this.getAllTemplate(); //Call service to fetch the templates
 				this.selectTemplateFragment.open();
 			} else {
@@ -404,8 +405,14 @@ sap.ui.define([
 
 		//Frag:SelectTemplate
 		handleTemplateSearch: function (oEvt) {
-			var sValue = oEvt.getParameter("value");
-			var oFilter = new Filter("templateName", FilterOperator.Contains, sValue);
+			var sValue = oEvt.getParameter("query");
+			var oFilter = new sap.ui.model.Filter({
+				filters: [
+					new Filter("templateName", FilterOperator.Contains, sValue),
+					new Filter("accountNumber", FilterOperator.Contains, sValue)
+				],
+				and: false
+			});
 			var oBinding = sap.ui.getCore().byId("saveTemplate--templateSelectId").getBinding("items");
 			oBinding.filter([oFilter]);
 		},

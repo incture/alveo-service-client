@@ -7,7 +7,7 @@
 					sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 					<headerToolbar>
 						<Toolbar>
-							<SearchField width="100%" search="handleTemplateSearch"/>
+							<SearchField width="100%" value="{templateModel>/searchValue}" search="handleTemplateSearch"/>
 						</Toolbar>
 					</headerToolbar>
 					<columns>

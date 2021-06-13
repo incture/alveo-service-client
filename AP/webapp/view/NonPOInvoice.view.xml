@@ -146,7 +146,7 @@
 					<VBox class="tableBox sapUiTinyMargin">
 						<Toolbar height="3rem">
 							<ToolbarSpacer/>
-							<Button text="{i18n>ManageTemplates}" press="onClickManageTemplate"/>
+							<Button text="{i18n>ManageTemplates}" press="onClickManageTemplate" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 							<Button text="{i18n>SelectTemplate}" tooltip="Select Template" press="onSelectTemplate" class="sapUiSizeCompact SecondaryBtn"
 								enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 							<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" id="addId" icon="sap-icon://add" class="SecondaryBtn" press="addItem"
