@@ -22,9 +22,9 @@ public class FilterMultipleHeaderSearchDto {
 	private double  invoiceValueTo;
 	private String docStatus; /// Exception Status 
 	private String userId;
-	private String myTask; //true to get my task 
+	private String tab; //true to get my task 
 	private Long indexNum;
-	private Long count;
+	private Long pageCount;
 	private String invoiceTotal;
 	private  String roleOfUser; 
 	private List<String> invoiceType;

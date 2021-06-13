@@ -59,16 +59,16 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 //	@Autowired(required=true)
 //	PurchaseDocumentItemService purchaseDocumentItemService;
 
-	@Autowired
-	InvoiceHeaderServiceImpl invoiceHeaderServiceImpl;
+	/*@Autowired
+	InvoiceHeaderServiceImpl invoiceHeaderServiceImpl;*/
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Autowired
 	InvoiceItemAcctAssignmentRepository invoiceItemAcctAssignmentRepository;
-	@Autowired
-	InvoiceItemAcctAssignmentServiceImpl invoiceItemAcctAssignmentServiceImpl;
+	/*@Autowired
+	InvoiceItemAcctAssignmentServiceImpl invoiceItemAcctAssignmentServiceImpl;*/
 
 	@Override
 	public ResponseDto save(InvoiceItemDto dto) {
@@ -213,173 +213,10 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		}
 	}
 
-	@Override
-	public void update(InvoiceItemDashBoardDto dto) {
-		// TODO Auto-generated method stub
+	
 
-		InvoiceItemDo itDo = new InvoiceItemDo();
-		/*itDo.setAmountDifference(dto.getAmountDifference());
-		itDo.setCreatedAtInDB(dto.getCreatedAtInDB());
-		itDo.setCreatedByInDb(dto.getCreatedByInDb());
-		itDo.setCurrency(dto.getCurrency());
-		itDo.setCustomerItemId(Integer.valueOf(dto.getCustomerItemID() == null ? "0" : dto.getCustomerItemID()));
-		itDo.setDisAmt(dto.getDisAmt());
-		itDo.setDisPer(dto.getDisPer());
-		itDo.setExtItemId(dto.getExtItemId());
-		itDo.setId(dto.getId());
-		itDo.setInvQty(dto.getInvQty());
-		itDo.setIsAccAssigned(dto.getIsAccAssigned());
-		itDo.setIsDeleted(dto.getIsDeleted());
-		itDo.setIsSelected(dto.getIsSelected());
-		itDo.setIsThreewayMatched(dto.getIsThreewayMatched());
-		itDo.setIsTwowayMatched(dto.getIsTwowayMatched());
-		itDo.setItemCode(dto.getItemCode());
-		itDo.setItemComment(dto.getItemComment());
-		itDo.setItemId(dto.getItemId());
-		itDo.setItemLifeCycleStatus(dto.getItemLifeCycleStatus());
-		itDo.setItemText(dto.getItemText());
-		itDo.setMatchDocItem(dto.getMatchDocItem());
-		itDo.setMatchDocNum(dto.getMatchDocNum());
-		itDo.setMatchedBy(dto.getMatchedBy());
-		itDo.setMatchParam(dto.getMatchParam());
-		itDo.setNetWorth(dto.getNetWorth());
-		itDo.setPoAvlQtyOU(dto.getPoAvlQtyOU());
-		itDo.setPoMaterialNum(dto.getPoMaterialNum());
-		itDo.setPoNetPrice(dto.getPoNetPrice());
-		itDo.setPoTaxCode(dto.getPoTaxCode());
-		itDo.setPoUPC(dto.getPoUPC());
-		itDo.setPoVendMat(dto.getPoVendMat());
-		itDo.setPrice(dto.getPrice());
-		itDo.setPricingUnit(dto.getPricingUnit());
-		itDo.setQtyUom(dto.getQtyUom());
-		itDo.setPoQty(dto.getPoQty());
-		itDo.setPoUom(dto.getPoUom());
-		itDo.setRefDocCat(dto.getRefDocCat());
-		itDo.setRefDocNum(Long.valueOf(dto.getRefDocNum() == null ? "0" : dto.getRefDocNum()));
-		itDo.setRequestId(dto.getRequestId());
-		itDo.setShippingAmt(dto.getShippingAmt());
-		itDo.setShippingPer(dto.getShippingPer());
-		itDo.setUnit(dto.getUnit());
-		itDo.setUnitPriceOPU(dto.getUnitPriceOPU());
-		itDo.setUnusedField1(dto.getUnusedField1());
-		itDo.setUnusedField2(dto.getUnusedField2());
-		itDo.setUpcCode(dto.getUpcCode());
-		itDo.setUpdatedAt(dto.getUpdatedAt());
-		itDo.setUpdatedBy(dto.getUpdatedBy());*/
+	
 
-		invoiceItemRepository.save(itDo);
-		// Account Assignment Start
-		if (!ServiceUtil.isEmpty(itDo.getIsAccAssigned())
-				&& (itDo.getIsAccAssigned().equalsIgnoreCase("K") || itDo.getIsAccAssigned().equalsIgnoreCase("L"))) {
-			ModelMapper m = new ModelMapper();
-			int deleteCount = invoiceItemAcctAssignmentRepository.deleteByRequestIdItemId(itDo.getRequestId(),
-					itDo.getItemId());
-			if (deleteCount >= 0) {
-
-				if (!ServiceUtil.isEmpty(dto.getInvItemAcctDtoList())) {
-
-					for (InvoiceItemAcctAssignmentDto iDto : dto.getInvItemAcctDtoList()) {
-
-						iDto.setAccountAssgnGuid(UUID.randomUUID().toString());
-					}
-					invoiceItemAcctAssignmentServiceImpl.saveInvoiceItemAcctAssignment(dto.getInvItemAcctDtoList());
-				}
-			}
-		}
-		// Account Assignment End
-
-	}
-
-	@Override
-	public DashBoardDetailsDto manualMatch(ManualMatchingDto manualMatchingDto) {
-		return null;
-	}
-
-	@Override
-	public DashBoardDetailsDto unMatch(DashBoardDetailsDto dashBoardDetailsDto) {
-		return null;
-	}
-
-	@Override
-	public int updateInvoiceItems(List<InvoiceItemDashBoardDto> itDtoList) {
-		// TODO Auto-generated method stub
-		int count = 0;
-		for (InvoiceItemDashBoardDto dto : itDtoList) {
-			InvoiceItemDo itDo = new InvoiceItemDo();
-			itDo.setAmountDifference(dto.getAmountDifference());
-			/*itDo.setCreatedAtInDB(dto.getCreatedAtInDB());
-			itDo.setCreatedByInDb(dto.getCreatedByInDb());
-			itDo.setCurrency(dto.getCurrency());
-			itDo.setCustomerItemId(Integer.valueOf(dto.getCustomerItemID() == null ? "0" : dto.getCustomerItemID()));
-			itDo.setDisAmt(dto.getDisAmt());
-			itDo.setDisPer(dto.getDisPer());
-			itDo.setExtItemId(dto.getExtItemId());
-			itDo.setId(dto.getId());
-			itDo.setInvQty(dto.getInvQty());
-			itDo.setIsAccAssigned(dto.getIsAccAssigned());
-			itDo.setIsDeleted(dto.getIsDeleted());
-			itDo.setIsSelected(dto.getIsSelected());
-			itDo.setIsThreewayMatched(dto.getIsThreewayMatched());
-			itDo.setIsTwowayMatched(dto.getIsTwowayMatched());
-			itDo.setItemCode(dto.getItemCode());
-			itDo.setItemComment(dto.getItemComment());
-			itDo.setItemId(dto.getItemId());
-			itDo.setItemLifeCycleStatus(dto.getItemLifeCycleStatus());
-			itDo.setItemText(dto.getItemText());
-			itDo.setMatchDocItem(dto.getMatchDocItem());
-			itDo.setMatchDocNum(dto.getMatchDocNum());
-			itDo.setMatchedBy(dto.getMatchedBy());
-			itDo.setMatchParam(dto.getMatchParam());
-			itDo.setNetWorth(dto.getNetWorth());
-			itDo.setPoAvlQtyOU(dto.getPoAvlQtyOU());
-			itDo.setPoMaterialNum(dto.getPoMaterialNum());
-			itDo.setPoNetPrice(dto.getPoNetPrice());
-			itDo.setPoTaxCode(dto.getPoTaxCode());
-			itDo.setPoQty(dto.getPoQty());
-			itDo.setPoUom(dto.getPoUom());
-			itDo.setPoUPC(dto.getPoUPC());
-			itDo.setPoVendMat(dto.getPoVendMat());
-			itDo.setPrice(dto.getPrice());
-			itDo.setPricingUnit(dto.getPricingUnit());
-			itDo.setQtyUom(dto.getQtyUom());
-			itDo.setRefDocCat(dto.getRefDocCat());
-			itDo.setRefDocNum(Long.valueOf(dto.getRefDocNum() == null ? "0" : dto.getRefDocNum()));
-			itDo.setRequestId(dto.getRequestId());
-			itDo.setShippingAmt(dto.getShippingAmt());
-			itDo.setShippingPer(dto.getShippingPer());
-			itDo.setUnit(dto.getUnit());
-			itDo.setUnitPriceOPU(dto.getUnitPriceOPU());
-			itDo.setUnusedField1(dto.getUnusedField1());
-			itDo.setUnusedField2(dto.getUnusedField2());
-			itDo.setUpcCode(dto.getUpcCode());
-			itDo.setUpdatedAt(dto.getUpdatedAt());
-			itDo.setUpdatedBy(dto.getUpdatedBy());*/
-
-			invoiceItemRepository.save(itDo);
-			// Account Assignment Start
-
-			if (!ServiceUtil.isEmpty(itDo.getIsAccAssigned()) && (itDo.getIsAccAssigned().equalsIgnoreCase("K")
-					|| itDo.getIsAccAssigned().equalsIgnoreCase("L"))) {
-				ModelMapper m = new ModelMapper();
-				int deleteCount = invoiceItemAcctAssignmentRepository.deleteByRequestIdItemId(itDo.getRequestId(),
-						itDo.getItemId());
-				if (deleteCount >= 0) {
-
-					if (!ServiceUtil.isEmpty(dto.getInvItemAcctDtoList())) {
-
-						for (InvoiceItemAcctAssignmentDto iDto : dto.getInvItemAcctDtoList()) {
-
-							iDto.setAccountAssgnGuid(UUID.randomUUID().toString());
-						}
-						invoiceItemAcctAssignmentServiceImpl.saveInvoiceItemAcctAssignment(dto.getInvItemAcctDtoList());
-					}
-				}
-			}
-			// Account Assignment End
-			count++;
-		}
-		return count;
-	}
 
 	/*
 	 * GRN Calculations Updating lifecycle status at Item level Item level : NO
@@ -580,6 +417,30 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		    }
 		    return input; 
 		}
+
+	@Override
+	public void update(InvoiceItemDashBoardDto dto) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public DashBoardDetailsDto manualMatch(ManualMatchingDto manualMatchingDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DashBoardDetailsDto unMatch(DashBoardDetailsDto dashBoardDetailsDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int updateInvoiceItems(List<InvoiceItemDashBoardDto> itDtoList) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	    
 //	    public static void main(String[] args) {

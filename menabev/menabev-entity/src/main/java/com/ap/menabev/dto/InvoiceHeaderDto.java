@@ -35,7 +35,6 @@ public class InvoiceHeaderDto {
 	private Double shippingCost;
 	private String lifecycleStatus;
 	private String lifecycleStatusText;
-	private String taskStatus;
 	private Integer version;
 	private String emailFrom;
 	private String invoiceTotalFrom;
@@ -97,7 +96,4 @@ public class InvoiceHeaderDto {
 	private String invoicePdfId;
 	private String totalBaseRate;
 	private String taxValue;
-	
-	
-
 }
