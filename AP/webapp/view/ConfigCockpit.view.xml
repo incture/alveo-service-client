@@ -7,7 +7,7 @@
 				<ToolbarSpacer/>
 				<Switch state="{oMasterModel>/schedulerConfigurationdto/0/isActive}" class="sapUiTinyMarginBottom " enabled="{baseModel>/Editable}"></Switch>
 			</OverflowToolbar>
-			<l:Grid defaultSpan="XL2 L2 M6 S12" vSpacing="0.5" class="GridBG">
+			<l:Grid defaultSpan="XL2 L2 M2 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
 					<Label width="100%" textAlign="Right" text="{i18n>FROM}" design="Bold" labelFor="emailDuration" class="sapUiTinyMarginTop">
 						<layoutData>
@@ -44,7 +44,7 @@
 				<ToolbarSpacer/>
 				<Switch state="{oMasterModel>/schedulerConfigurationdto/1/isActive}" class="sapUiTinyMarginBottom " enabled="{baseModel>/Editable}"></Switch>
 			</OverflowToolbar>
-			<l:Grid defaultSpan="XL2 L2 M6 S12" vSpacing="0.5" class="GridBG">
+			<l:Grid defaultSpan="XL2 L2 M2 S12" vSpacing="0.5" class="GridBG">
 				<l:content>
 					<Label width="100%" textAlign="Right" text="{i18n>FROM}" design="Bold" labelFor="grnDuration" class="sapUiTinyMarginTop">
 						<layoutData>

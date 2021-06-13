@@ -468,7 +468,7 @@ sap.ui.define([
 			var accountsPayableScanningTeam = sData.accountsPayableScanningTeam,
 				email1;
 			for (var s = 0; s < accountsPayableScanningTeam.length; s++) {
-				email = accountsPayableScanningTeam[s].emailId;
+				email1 = accountsPayableScanningTeam[s].emailId;
 				if (!email1) {
 					bError = true;
 				}
