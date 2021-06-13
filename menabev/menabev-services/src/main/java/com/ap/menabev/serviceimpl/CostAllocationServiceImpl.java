@@ -115,7 +115,9 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 				costAllocationDto.setNetValue(String.format("%.2f", netValue));
 				costAllocationDto.setDistrPerc((item.getAllocationPercent()));
 				costAllocationDto.setAccountNum(item.getAccountNo());
+				costAllocationDto.setMaterialDesc(item.getMaterialDescription());
 				costAllocationList.add(costAllocationDto);
+				
 				
 				
 			}
