@@ -46,7 +46,7 @@ private String taskStatus;
 @Column(name = "TASK_USER_ID")
 private String taskUserId;
 
-@Column(name = "TASK_COMMENTS" , columnDefinition = "TEXT")
+@Column(name = "TASK_COMMENTS")
 private String taskComments;
 
 }
