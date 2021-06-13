@@ -414,7 +414,8 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		map.put("ico", "image/vnd.microsoft.icon");
 		map.put("ics", "text/calendar");
 		map.put("jar", "application/java-archive");
-		map.put("jpg/.jpeg", "image/jpeg");
+		map.put("jpg", "image/jpeg");
+		map.put("jpeg", "image/jpeg");
 		map.put("js", "text/javascript");
 		map.put("json", "application/json");
 		map.put("mid/.midi", "audio/midi, audio/x-midi");
@@ -723,6 +724,12 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 	public String getTest() {
 		// TODO Auto-generated method stub
 		return "Inside DMS";
+	}
+
+	@Override
+	public String getToken() {
+		// TODO Auto-generated method stub
+		return getAccessToken();
 	}
 
 //	public static void main(String[] args) throws FileNotFoundException, IOException, SAXException {

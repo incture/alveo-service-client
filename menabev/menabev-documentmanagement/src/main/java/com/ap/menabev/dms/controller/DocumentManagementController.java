@@ -86,6 +86,9 @@ public class DocumentManagementController {
 		return documentManagementService.getTest();
 	}
 	
-	
+	@GetMapping(value= "/getToken")
+	String getToken(){
+		return documentManagementService.getToken();
+	}
 
 }
