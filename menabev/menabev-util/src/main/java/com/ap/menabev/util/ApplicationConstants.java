@@ -116,6 +116,8 @@ public interface ApplicationConstants {
 	String DMS_SCOPE = "generate-ads-output";
 	// DEV FOLDER
 	String FOLDER = "HR1vVfGxI3pTs1EpsMV2YjgVe0OujD9fX2se8ENYtj8";
+	String LIFE_CYCLE_STATUS_OPEN = "Open";
+	String CHANEL_TYPE_EMAIL = "Email";
 	
 
 	// QA FOLDER

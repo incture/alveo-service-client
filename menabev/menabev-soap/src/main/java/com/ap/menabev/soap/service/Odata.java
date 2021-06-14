@@ -1,6 +1,7 @@
 package com.ap.menabev.soap.service;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,20 +46,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import com.ap.menabev.dto.InvoiceHeaderCheckDto;
+
+
 public class Odata {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Odata.class);
-	public static ResponseEntity<?> getO() {
+	public static ResponseEntity<?> getPaymentTerms(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
 		try {
 			Map<String, Object> map = getDestination("SD4_DEST");
 			return consumingOdataService(
-					"/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_SupplierCompany?$format=json&$filter=%20Supplier%20eq%20%271000047%27%20and%20CompanyCode%20eq%20%271010%27",
+					"/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_SupplierCompany?$format=json&$filter=%20Supplier%20eq%20%27"+invoiceHeaderCheckDto.getVendorID()+"%27%20and%20CompanyCode%20eq%20%27"+invoiceHeaderCheckDto.getCompanyCode()+"%27",
 					null, "GET", map);
 
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			return null;
+			return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -129,7 +133,7 @@ public class Odata {
 		return null;
 	}
 
-	public static ResponseEntity<String> getOdata() throws URISyntaxException, IOException {
+	public static ResponseEntity<?> getOdata() throws URISyntaxException, IOException {
 		String clientid = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
 		String clientsecret = "cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=";
 		String proxyHost = "10.0.4.5";
@@ -230,7 +234,7 @@ public class Odata {
 
 		HttpClient httpClient = clientBuilder.build();
 		HttpRequestBase httpRequestBase = null;
-		String jsonMessage = null;
+		String jsonMessage = "Empty BODY";
 		HttpResponse httpResponse = null;
 		StringEntity input = null;
 		Header[] json = null;
@@ -259,7 +263,7 @@ public class Odata {
 
 			Header[] headers = getAccessToken(
 					(String) destinationInfo.get("URL")
-							+ "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_SupplierCompany?$format=json&$filter=%20Supplier%20eq%20%271000047%27%20and%20CompanyCode%20eq%20%271010%27",
+							+ url,
 					(String) destinationInfo.get("User"), (String) destinationInfo.get("Password"), httpClient,
 					proxyHost, proxyPort, (String) destinationInfo.get("sap-client"), jwToken);
 			String token = null;
@@ -304,17 +308,11 @@ public class Odata {
 			// }
 			try {
 
-				logger.error("this is requestBase ============" + Arrays.asList(httpRequestBase));
 				httpResponse = httpClient.execute(httpRequestBase);
-				logger.error(
-						"com.incture.utils.HelperClass ============" + Arrays.asList(httpResponse.getAllHeaders()));
-				logger.error("com.incture.utils.HelperClass ============" + httpResponse);
-				logger.error("STEP 4 com.incture.utils.HelperClass ============StatusCode from odata hit="
-						+ httpResponse.getStatusLine().getStatusCode());
 				if (httpResponse.getStatusLine().getStatusCode() == 200) {
 					String dataFromStream = getDataFromStream(httpResponse.getEntity().getContent());
 					logger.error("dataFromStream" + dataFromStream);
-					new ResponseEntity<String>(dataFromStream,
+					return new ResponseEntity<String>(dataFromStream,
 							HttpStatus.OK);
 
 				} else {
@@ -326,32 +324,20 @@ public class Odata {
 							HttpStatus.BAD_REQUEST);
 				}
 
-				logger.error("STEP 5 Result from odata hit ============" + json);
 
 			} catch (IOException e) {
-				System.err.print("IOException : " + e);
-				throw new IOException(
-						"Please Check VPN Connection ......." + e.getMessage() + " on " + e.getStackTrace()[4]);
+				e.printStackTrace();
+				return  new ResponseEntity<String>("Exception in ODATA consumtion block" + e.getMessage(),
+						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-			try {
-
-				logger.error("jsonOutput" + json);
-
-				logger.error("jsonHeaderResponse" + jsonResponse);
-
-			} catch (JSONException e) {
-				System.err.print("JSONException : check " + e + "JSON Object : " + json);
-
-				throw new JSONException(
-						"Exception occured during json conversion" + e.getMessage() + " on " + e.getStackTrace()[4]);
-			}
-
+			
 		}
 
 		return new ResponseEntity<String>(jsonMessage, HttpStatus.OK);
 
 	}
+	
 
 	private static Header[] getAccessToken(String url, String username, String password, HttpClient client,
 			String proxyHost, int proxyPort, String sapClient, String token)
