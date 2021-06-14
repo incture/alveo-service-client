@@ -96,4 +96,5 @@ public class InvoiceHeaderDto {
 	private String invoicePdfId;
 	private String totalBaseRate;
 	private String taxValue;
+	private List<CostAllocationDto> costAllocations;
 }

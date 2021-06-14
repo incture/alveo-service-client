@@ -36,4 +36,8 @@ public interface CostAllocationRepository extends JpaRepository<CostAllocationDo
 	@Query("Delete from CostAllocationDo cd where cd.requestId=:requestId")
 	public Integer deleteCostAllocationDo(@Param("requestId") String requestId);
 	
+	@Query(value = "Select max(ITEM_ID) from INVOICE_ITEM_ACCOUNT_ASSIGNMENT where REQUEST_ID=:requestId"
+			, nativeQuery = true)
+	public String getItemID(@Param("requestId") String requestId);
+	
 }

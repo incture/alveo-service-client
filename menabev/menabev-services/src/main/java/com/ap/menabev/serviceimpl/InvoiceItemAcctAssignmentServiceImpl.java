@@ -109,18 +109,18 @@ public class InvoiceItemAcctAssignmentServiceImpl implements InvoiceItemAcctAssi
 		}
 	}
 
-	private String getSerialNo(String requestId, String itemId) {
+	public String getSerialNo(String requestId, String itemId) {
 		// TODO Auto-generated method stub
 		String serialNo = "";
 		try {
 			serialNo = invoiceItemAcctAssignmentRepository.getSerialNo(requestId, itemId);
 
 			if (ServiceUtil.isEmpty(serialNo)) {
-				return "01";
+				return "0001";
 			}
 			logger.error("[ApAutomation][InvoiceItemAcctAssignmentServiceImpl][getSerialNo][serialNo] = " + serialNo);
 			System.err.println("serialNo " + serialNo);
-			return String.format("%02d", Integer.parseInt(serialNo) + 1);
+			return String.format("%04d", Integer.parseInt(serialNo) + 1);
 		} catch (Exception e) {
 			logger.error(
 					"[ApAutomation][InvoiceItemAcctAssignmentServiceImpl][getSerialNo][Exception] = " + e.getMessage());

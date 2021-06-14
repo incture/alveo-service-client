@@ -17,7 +17,7 @@ import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
 
 @Repository
 public interface InvoiceItemAcctAssignmentRepository extends JpaRepository<InvoiceItemAcctAssignmentDo, String> {
-	@Query(value = "Select max(SERIAL_NO) from APAUTOMATION.INVOICE_ITEM_ACCOUNT_ASSIGNMENT where REQUEST_ID=:requestId"
+	@Query(value = "Select max(SERIAL_NO) from INVOICE_ITEM_ACCOUNT_ASSIGNMENT where REQUEST_ID=:requestId"
 			+ " and ITEM_ID=:itemId", nativeQuery = true)
 	String getSerialNo(@Param("requestId") String requestId, @Param("itemId") String itemId);
 

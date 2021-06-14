@@ -181,8 +181,8 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		try {
 			String itemId = invoiceItemRepository.getItemId();
 			if (ServiceUtil.isEmpty(itemId))
-				return "000001";
-			return String.format("%06d", Integer.parseInt(itemId) + 1);
+				return "0001";
+			return String.format("%04d", Integer.parseInt(itemId) + 1);
 		} catch (Exception e) {
 			logger.error(
 					"[ApAutomation][InvoiceHeaderServiceImpl][getDetailsForFilter][Exception] = " + e.getMessage());

@@ -43,15 +43,15 @@ public class HelperClass {
 
 		System.err.println("com.incture.utils.HelperClass  + Inside consumingOdataService==================");
 		
-		String proxyHost = "connectivityproxy.internal.cf.eu10.hana.ondemand.com";
+		String proxyHost = "10.0.4.5";
+		
 		System.err.println("proxyHost-- " + proxyHost);
 		int proxyPort = 20003;
 		Header[] jsonResponse = null;
 		String objresult = null;
 		
-		JSONObject jsonObj = new JSONObject(System.getenv("VCAP_SERVICES"));
+//		JSONObject jsonObj = new JSONObject(System.getenv("VCAP_SERVICES"));
 		
-		System.err.println("116 - jsonObj =" + jsonObj);
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
 			    new UsernamePasswordCredentials( (String) destinationInfo.get("User"), (String) destinationInfo.get("Password"))); 
@@ -92,7 +92,7 @@ public class HelperClass {
 			}
 			httpRequestBase.addHeader("accept", "application/json");
 			
-			Header[] headers = getAccessToken((String) destinationInfo.get("URL") + "/sap/opu/odata/sap/Z_SALESORDER_STATUS_SRV/likpSet(Vbeln='80000329')", (String) destinationInfo.get("User"),
+			Header[] headers = getAccessToken((String) destinationInfo.get("URL") + "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_SupplierCompany?$format=json&$filter= Supplier eq '1000047' and CompanyCode eq '1010'", (String) destinationInfo.get("User"),
 					(String) destinationInfo.get("Password"),httpClient,  proxyHost, proxyPort,
 					(String) destinationInfo.get("sap-client"),jwToken);
 			String token = null;
@@ -118,7 +118,7 @@ public class HelperClass {
 						(String) destinationInfo.get("Password"));
 				httpRequestBase.addHeader("Authorization", encoded);
 				httpRequestBase.setHeader("Proxy-Authorization","Bearer " +jwToken);
-				httpRequestBase.addHeader("SAP-Connectivity-SCC-Location_ID","incture");
+				httpRequestBase.addHeader("SAP-Connectivity-SCC-Location_ID",(String) destinationInfo.get("CloudConnectorLocationId"));
 				
 			}
 			if (token != null) {

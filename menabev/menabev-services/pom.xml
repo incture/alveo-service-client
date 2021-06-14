@@ -33,5 +33,10 @@
 			<artifactId>menabev-repository</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ap.menabev</groupId>
+			<artifactId>menabev-soap</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

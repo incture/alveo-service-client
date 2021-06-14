@@ -1,7 +1,5 @@
 package com.ap.menabev.dto;
 
-
-
 import lombok.Data;
 
 public @Data class InvoiceItemAcctAssignmentDto {
@@ -17,9 +15,9 @@ public @Data class InvoiceItemAcctAssignmentDto {
 	private String netValue;
 	private String glAccount;
 	private String costCenter;
-	 private String  debitOrCredit;
+	private String debitOrCredit;
 	private String text;
-	private String  taxValue;
-     private String taxPercentage;
+	private String taxValue;
+	private String taxPercentage;
 
 }

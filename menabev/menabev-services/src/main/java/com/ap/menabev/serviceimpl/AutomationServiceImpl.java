@@ -16,16 +16,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ap.menabev.abbyy.ABBYYIntegration;
+import com.ap.menabev.abbyy.ABBYYJSONConverter;
+import com.ap.menabev.dto.InvoiceHeaderDto;
+import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.email.Email;
+import com.ap.menabev.invoice.AttachmentRepository;
+import com.ap.menabev.invoice.CommentRepository;
+import com.ap.menabev.invoice.CostAllocationRepository;
+import com.ap.menabev.invoice.InvoiceHeaderRepository;
+import com.ap.menabev.invoice.InvoiceItemAcctAssignmentRepository;
+import com.ap.menabev.invoice.InvoiceItemRepository;
+import com.ap.menabev.invoice.ReasonForRejectionRepository;
+import com.ap.menabev.invoice.StatusConfigRepository;
 import com.ap.menabev.service.AutomationService;
+import com.ap.menabev.service.InvoiceHeaderService;
+import com.ap.menabev.service.InvoiceItemService;
+import com.ap.menabev.service.SequenceGeneratorService;
 import com.ap.menabev.sftp.SFTPChannelUtil;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 @Service
 public class AutomationServiceImpl implements AutomationService {
@@ -33,6 +46,52 @@ public class AutomationServiceImpl implements AutomationService {
 	Email email;
 	@Autowired
 	ABBYYIntegration abbyyIntegration;
+	@Autowired
+	InvoiceHeaderRepository invoiceHeaderRepository;
+	@Autowired
+	InvoiceItemRepository invoiceItemRepository;
+	@Autowired
+	CostAllocationRepository costAllocationRepository;
+
+	@Autowired
+	EmailServiceImpl emailServiceImpl;
+
+	@Autowired
+	InvoiceItemService itemService;
+
+	@Autowired
+	ReasonForRejectionRepository reasonForRejectionRepository;
+
+	@Autowired
+	AttachmentRepository attachmentRepository;
+
+	@Autowired
+	AttachmentServiceImpl attachmentServiceImpl;
+
+	@Autowired
+	CommentRepository commentRepository;
+
+	@Autowired
+	CommentServiceImpl commentServiceImpl;
+
+	@Autowired
+	StatusConfigRepository statusConfigRepository;
+
+	@Autowired
+	InvoiceItemService invoiceItemService;
+
+	@Autowired
+	InvoiceHeaderService invoiceHeaderService;
+	@Autowired
+	ReasonForRejectionRepository rejectionRepository;
+
+	@Autowired
+	InvoiceItemAcctAssignmentRepository invoiceItemAcctAssignmentRepository;
+	@Autowired
+	InvoiceItemAcctAssignmentServiceImpl invoiceItemAcctAssignmentServiceImpl;
+
+	@Autowired
+	private SequenceGeneratorService seqService;
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AutomationServiceImpl.class);
 
 	public ResponseDto extractInvoiceFromEmail() {
@@ -136,9 +195,13 @@ public class AutomationServiceImpl implements AutomationService {
 		return response;
 	}
 
-	public List<JSONObject> downloadFilesFromSFTPABBYYServer() {
+	@Override
+	public ResponseDto downloadFilesFromSFTPABBYYServer() {
+		ResponseDto response = new ResponseDto();
+		List<InvoiceHeaderDto> headerList = new ArrayList<>();
+
 		List<JSONObject> fileNmaes = new ArrayList<>();
-		
+
 		List<JSONObject> jsonList = new ArrayList<JSONObject>();
 		try {
 			Session session = SFTPChannelUtil.getSession();
@@ -146,40 +209,77 @@ public class AutomationServiceImpl implements AutomationService {
 			channelSftp = SFTPChannelUtil.getJschChannel(session);
 			channelSftp.connect();
 			try {
-				logger.error("Errorrrrrrrrrrrr"+ServiceUtil.isEmpty(channelSftp));
+				logger.error("Errorrrrrrrrrrrr" + ServiceUtil.isEmpty(channelSftp));
 				channelSftp.cd("\\Output\\");
-//				Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
+				// Vector<ChannelSftp.LsEntry> filelist =
+				// channelSftp.ls("*.json");
 				Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
-				logger.error("Vector<ChannelSftp.LsEntry> filelist"+filelist.size());
+				logger.error("Vector<ChannelSftp.LsEntry> filelist" + filelist.size());
 				for (ChannelSftp.LsEntry entry : filelist) {
-					logger.error("INSIDE JSON "+entry.getFilename());
-					if (entry.getFilename().contains(".json")) {
-						logger.error("INSIDE JSON ");
-						InputStream is = channelSftp.get(entry.getFilename());
-						ObjectMapper mapper = new ObjectMapper();
-						Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
-						JSONObject js = new JSONObject(jsonMap);
-						logger.error("Errorrrrrrrrrrrr"+js);
-						JSONObject newObject= js;
-						jsonList.add(newObject);
-						is.close();
+					try {
+						logger.error("INSIDE JSON " + entry.getFilename());
+						if (entry.getFilename().contains(".json")) {
+							logger.error("INSIDE JSON ");
+							InputStream is = channelSftp.get(entry.getFilename());
+							ObjectMapper mapper = new ObjectMapper();
+							Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
+							JSONObject jsonObject = new JSONObject(jsonMap);
+							if (jsonObject.has("Documents")) {
+								InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
+								headerList.add(output);
+							}
+							is.close();
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+						response.setMessage("Error while reading json" + e.getMessage());
+
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				response.setMessage("Error while opening sftp" + e.getMessage());
 			}
-		
-			
-			
-			
-			
-//			fileNmaes = abbyyIntegration.getJsonOutputFromSFTP(channelSftp);
-			
+
+			// fileNmaes = abbyyIntegration.getJsonOutputFromSFTP(channelSftp);
+
 			SFTPChannelUtil.disconnect(session, channelSftp);
+
+			response = saveAllInvoiceDetails(headerList);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return jsonList;
+		return response;
+	}
+
+	private ResponseDto saveAllInvoiceDetails(List<InvoiceHeaderDto> headerList) {
+		// TODO Auto-generated method stub
+		ResponseDto response = null;
+		try {
+			for (InvoiceHeaderDto invoiceHeaderDto : headerList) {
+				invoiceHeaderDto.setLifecycleStatus(ApplicationConstants.LIFE_CYCLE_STATUS_OPEN);
+				invoiceHeaderDto.setChannelType(ApplicationConstants.CHANEL_TYPE_EMAIL);
+				invoiceHeaderDto.setCreatedAtInDB(ServiceUtil.getEpocTime());
+				invoiceHeaderDto.setCreatedByInDb("SYSTEM");
+				List<InvoiceItemDto> invoiceItemList = invoiceHeaderDto.getInvoiceItems();
+				for (InvoiceItemDto invoiceItemDto : invoiceItemList) {
+					invoiceItemDto.setCreatedByInDb("SYSTEM");
+					invoiceItemDto.setCreatedAtInDB(ServiceUtil.getEpocTime());
+					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
+				}
+
+				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
+
+			}
+			return response;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ResponseDto("500", "0", "Error " + e.getMessage());
+
+		}
+
 	}
 
 	@Override
@@ -187,11 +287,12 @@ public class AutomationServiceImpl implements AutomationService {
 		// TODO Auto-generated method stub
 		ResponseDto response = null;
 		try {
-			Message[] emailMessages = email.fetchUnReadMessagesFromSharedMailBox(ApplicationConstants.OUTLOOK_HOST, ApplicationConstants.OUTLOOK_PORT,
-					ApplicationConstants.SHARED_MAIL_ID_ALLIAS, ApplicationConstants.ACCPAY_EMAIL_PASSWORD, ApplicationConstants.INBOX_FOLDER, ApplicationConstants.UNSEEN_FLAGTERM,
-				ApplicationConstants.EMAIL_FROM);
-			
-			logger.error(emailMessages.length+"After reading email");
+			Message[] emailMessages = email.fetchUnReadMessagesFromSharedMailBox(ApplicationConstants.OUTLOOK_HOST,
+					ApplicationConstants.OUTLOOK_PORT, ApplicationConstants.SHARED_MAIL_ID_ALLIAS,
+					ApplicationConstants.ACCPAY_EMAIL_PASSWORD, ApplicationConstants.INBOX_FOLDER,
+					ApplicationConstants.UNSEEN_FLAGTERM, ApplicationConstants.EMAIL_FROM);
+
+			logger.error(emailMessages.length + "After reading email");
 			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders");
 			// Step 2 : Get the attachment pdf file from a message
 			List<File> files = new ArrayList<File>();
@@ -206,8 +307,8 @@ public class AutomationServiceImpl implements AutomationService {
 			channelSftp = SFTPChannelUtil.getJschChannel(session);
 			if (!ServiceUtil.isEmpty(channelSftp)) {
 				channelSftp.connect();
-				if(!ServiceUtil.isEmpty(emailMessages)){
-					
+				if (!ServiceUtil.isEmpty(emailMessages)) {
+
 					for (Message message : emailMessages) {
 						String contentType = message.getContentType();
 						if (contentType.contains("multipart")) {
@@ -225,7 +326,7 @@ public class AutomationServiceImpl implements AutomationService {
 													+ e.getMessage());
 									e.printStackTrace();
 									messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
-									
+
 								}
 							} else {
 								response = new ResponseDto("Done", "200", "No PDF in the Attacment found ");
@@ -233,9 +334,9 @@ public class AutomationServiceImpl implements AutomationService {
 						} else {
 							response = new ResponseDto("Done", "200", "No Attacment found ");
 						}
-						
+
 					}
-				}else{
+				} else {
 					response = new ResponseDto("Failed", "400", "Message is null or empty");
 				}
 

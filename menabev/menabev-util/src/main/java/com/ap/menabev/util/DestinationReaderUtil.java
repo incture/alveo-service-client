@@ -77,7 +77,7 @@ public class DestinationReaderUtil {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
 
-		HttpPost httpPost = new HttpPost(MenabevApplicationConstant.DESTINATION_TOKEN_URL);
+		HttpPost httpPost = new HttpPost(MenabevApplicationConstant.CONECTIVITY_TOKEN_URL);
 		httpPost.addHeader("Content-Type", "application/json");
 
 		// Encoding username and password

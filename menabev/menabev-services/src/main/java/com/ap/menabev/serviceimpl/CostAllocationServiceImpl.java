@@ -95,6 +95,24 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 			return response;
 		}
 	}
+	public String getItemID(String requestId) {
+		// TODO Auto-generated method stub
+		String serialNo = "";
+		try {
+			serialNo = costAllocationRepository.getItemID(requestId);
+
+			if (ServiceUtil.isEmpty(serialNo)) {
+				return "0001";
+			}
+			logger.error("[ApAutomation][InvoiceItemAcctAssignmentServiceImpl][getSerialNo][serialNo] = " + serialNo);
+			System.err.println("serialNo " + serialNo);
+			return String.format("%04d", Integer.parseInt(serialNo) + 1);
+		} catch (Exception e) {
+			logger.error(
+					"[ApAutomation][InvoiceItemAcctAssignmentServiceImpl][getSerialNo][Exception] = " + e.getMessage());
+		}
+		return serialNo;
+	}
 	
 	@Override
 	public List<AllocationForTemplateDto> getCostAllocationForTemplate(List<AllocationDto> allocateTemp) {

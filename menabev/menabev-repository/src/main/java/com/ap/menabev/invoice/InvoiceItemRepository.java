@@ -24,7 +24,7 @@ public interface InvoiceItemRepository extends JpaRepository<InvoiceItemDo, Stri
 	@Query(value = "select * from APAUTOMATION.INVOICE_ITEM order by ITEM_ID limit :limit offset :offset ", nativeQuery = true)
 	List<InvoiceItemDo> findAllByLimit(@Param("limit") int limit, @Param("offset") int offset);
 
-	@Query(value = "Select max(ITEM_ID) from APAUTOMATION.INVOICE_ITEM", nativeQuery = true)
+	@Query(value = "Select max(ITEM_ID) from INVOICE_ITEM", nativeQuery = true)
 	String getItemId();
 
 	@Query(value = "select id from InvoiceItemDo id where id.requestId=:requestId and id.itemId=:itemId ")
