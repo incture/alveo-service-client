@@ -1,5 +1,7 @@
 package com.ap.menabev.controller;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +32,7 @@ import com.ap.menabev.dto.InboxResponseOutputDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.MasterResponseDto;
+import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
@@ -204,5 +207,12 @@ public class InvoiceHeaderController {
 		}
 	
 
+	@PostMapping("/remediation/Users")
+	public ResponseEntity<?> onAccountantNonPoSave(@RequestBody List<PurchaseOrderRemediationInput> create) throws URISyntaxException, IOException{
+		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create,"GRN","/PurchOrdDetailsSet?","PurchaseOrderCreator");
+	}
+	
+	
+	
 
 }

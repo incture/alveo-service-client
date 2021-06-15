@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
@@ -70,6 +74,13 @@ import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.InvoiceItemsDto;
 import com.ap.menabev.dto.ItemMessageDto;
 import com.ap.menabev.dto.MasterResponseDto;
+import com.ap.menabev.dto.OdataOutPutPayload;
+import com.ap.menabev.dto.OdataResponseDto;
+import com.ap.menabev.dto.OdataResultObject;
+import com.ap.menabev.dto.PoDocumentItem;
+import com.ap.menabev.dto.PurchaseOrderRemediationInput;
+import com.ap.menabev.dto.RemediationUser;
+import com.ap.menabev.dto.RemediationUserDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.RuleInputDto;
 import com.ap.menabev.dto.RuleInputProcessLeadDto;
@@ -102,6 +113,7 @@ import com.ap.menabev.util.DestinationReaderUtil;
 import com.ap.menabev.util.HelperClass;
 import com.ap.menabev.util.MenabevApplicationConstant;
 import com.ap.menabev.util.ObjectMapperUtils;
+import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
 import com.ap.menabev.util.WorkflowConstants;
 import com.google.gson.Gson;
@@ -1050,9 +1062,29 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		} else {
 			url.append(key + "=" + value);
 		}
-
+	}	
+	public static void appendParamInOdataUrl(StringBuilder url, String key, String value) {
+			url.append( key + "=" + value);
 	}
-
+	
+	
+	public static void appendValuesInOdataUrl(StringBuilder url,String key, List<String> value){
+		for(int i = 0; i<value.size();i++){
+			if(value.size()==1){
+			url.append(key+"%20eq%20"+"%27"+value.get(i)+"%27");
+			System.out.println("26 ");
+			}
+			else if(i==value.size()-1){
+				url.append(key+"%20eq%20"+"%27"+value.get(i)+"%27");
+				System.out.println("30 ");
+			}else{
+				url.append(key+"%20eq%20"+"%27"+value.get(i)+"%27"+"%20or%20");
+				System.out.println("29 ");
+				
+			}
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private ResponseEntity<?> fetchInvoiceDocHeaderDtoListFromRequestNumber(
 			List<WorkflowTaskOutputDto> invoiceRequestIdListPaginated, FilterHeaderDto filterDto) {
@@ -2564,5 +2596,275 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
+	// get Remediation user details 
+		@Override
+		public ResponseEntity<?> getRemediationUserDetails(List<PurchaseOrderRemediationInput> dtoList,String userListNeeded) throws URISyntaxException, IOException{
+			
+			List<RemediationUser> remediationUserOutput = new ArrayList<RemediationUser>();
+			if(userListNeeded.equals("BUYER")){
+			// get the BUYER details based on poCreatedName in invoiceHeader filed 
+	             ResponseEntity<?>  responseOfBuyer =  odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(dtoList,userListNeeded,"/PurchOrdDetailsSet?","PurchaseOrderCreator");			
+	             if(responseOfBuyer.getStatusCodeValue()==200){
+	            	 RemediationUser grnUsers = (RemediationUser) responseOfBuyer.getBody();
+	            	 remediationUserOutput.add(grnUsers);
+	             }
+	             else {
+	            	 
+	            	 RemediationUser failedResponse = new RemediationUser();
+	            	 failedResponse.setType("BUYER");
+	            	 failedResponse.setMessage(responseOfBuyer.getBody().toString());
+	            	 remediationUserOutput.add(failedResponse);
+	             }
+			}else if(userListNeeded.equals("GRN")){
+				// check if purchaseReq  is empty , than call purchaseGroup.
+				List<PoDocumentItem> itemList = dtoList.stream().flatMap(e -> e.getPoDocumentItem().stream()).collect(Collectors.toList());
+			  if(!itemList.isEmpty() && itemList!=null){
+				List<PoDocumentItem>	 itemUnqiueList = itemList .stream().filter(distinctByKeys(PoDocumentItem::getPreqNum, PoDocumentItem::getPreqItem)).collect(Collectors.toList());
+				List<String> prNumList = new ArrayList<String>();
+				List<String> prItemList = new ArrayList<String>();
+	 			itemUnqiueList.stream().forEach(prNum->{
+	 			      if(!prNum.getPreqNum().isEmpty() && prNum.getPreqNum()!=null){ prNumList.add(prNum.getPreqNum());}
+	 			      if(!prNum.getPreqItem().isEmpty() && prNum.getPreqItem()!=null){ prItemList.add(prNum.getPreqNum());  
+	 			      }});
+				if((prNumList.isEmpty() || prNumList==null)&& (prItemList.isEmpty()||prItemList==null)){
+					 ResponseEntity<?>  responseOfGrnPurGrp =  odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(dtoList,userListNeeded,"/PurchGrpDetailsSet?","PurchasingGroup");
+					System.err.println("responseOfPurGroup "+responseOfGrnPurGrp);
+					 // conver the json response 
+					if(responseOfGrnPurGrp.getStatusCodeValue()==200){
+		            	 RemediationUser grnUsers = (RemediationUser) responseOfGrnPurGrp.getBody();
+		            	 remediationUserOutput.add(grnUsers);
+		             } else {
+		            	 
+		            	 RemediationUser failedResponse = new RemediationUser();
+		            	 failedResponse.setType("GRN");
+		            	 failedResponse.setMessage(responseOfGrnPurGrp.getBody().toString());
+		            	 remediationUserOutput.add(failedResponse);
+		             }
+				}
+				else{
+	 		// get the GRN details based on with requisitionNum and requisitionItm 
+					 ResponseEntity<?>  responseOfGrnPurReqAndItem =	odataGetRemediationDetailsForGrnByPurchReqAndPurchReqItem(prNumList,prItemList,userListNeeded,"/PurchReqDetailsSet?");
+					 System.err.println("responseOfGrnPurReqAndItem "+responseOfGrnPurReqAndItem);
+					 if(responseOfGrnPurReqAndItem.getStatusCodeValue()==200){
+		            	 RemediationUser grnUsers = (RemediationUser) responseOfGrnPurReqAndItem.getBody();
+		            	 remediationUserOutput.add(grnUsers);
+		             } else {
+		            	 
+		            	 RemediationUser failedResponse = new RemediationUser();
+		            	 failedResponse.setType("GRN");
+		            	 failedResponse.setMessage(responseOfGrnPurReqAndItem.getBody().toString());
+		            	 remediationUserOutput.add(failedResponse);
+		             }
+				}
+			  }else {
+				  // return no item available for po
+				  ResponseDto response = new ResponseDto();
+	     			response.setCode("400");
+	     			response.setMessage("No Po Item");
+	     			response.setStatus("Failed");
+	     		return new ResponseEntity<ResponseDto>(response,HttpStatus.BAD_REQUEST);
+			  }
+			}else if(userListNeeded.equals("PURCHASE_LEAD")){
+			
+				// get Purchase Lead Details 
+			}
+			else {
+				// get the BUYER details based on poCreatedName in invoiceHeader filed 
+	            ResponseEntity<?>  responseOfBuyer =  odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(dtoList,userListNeeded,"/PurchOrdDetailsSet?","PurchaseOrderCreator");			
+	            if(responseOfBuyer.getStatusCodeValue()==200){
+	           	 RemediationUser grnUsers = (RemediationUser) responseOfBuyer.getBody();
+	           	 remediationUserOutput.add(grnUsers);
+	            }
+	            else {
+	           	 
+	           	 RemediationUser failedResponse = new RemediationUser();
+	           	 failedResponse.setType("BUYER");
+	           	 failedResponse.setMessage(responseOfBuyer.getBody().toString());
+	           	 remediationUserOutput.add(failedResponse);
+	            }
+
+				// get the GRN details based on with purchaseRequisationNumber 
+	            List<PoDocumentItem> itemList = dtoList.stream().flatMap(e -> e.getPoDocumentItem().stream()).collect(Collectors.toList());
+	  			List<PoDocumentItem>	 itemUnqiueList = itemList .stream().filter(distinctByKeys(PoDocumentItem::getPreqNum, PoDocumentItem::getPreqItem)).collect(Collectors.toList());
+	  			List<String> prNumList = new ArrayList<String>();
+	  			List<String> prItemList = new ArrayList<String>();
+	   			itemUnqiueList.stream().forEach(prNum->{
+	   			      if(!prNum.getPreqNum().isEmpty() && prNum.getPreqNum()!=null){ prNumList.add(prNum.getPreqNum());}
+	   			      if(!prNum.getPreqItem().isEmpty() && prNum.getPreqItem()!=null){ prItemList.add(prNum.getPreqNum());  
+	   			      }});
+	            if((prNumList.isEmpty() || prNumList==null)&& (prItemList.isEmpty()||prItemList==null)){
+					 ResponseEntity<?>  responseOfGrnPurGrp =  odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(dtoList,userListNeeded,"/PurchGrpDetailsSet?","PurchasingGroup");
+					System.err.println("responseOfPurGroup "+responseOfGrnPurGrp);
+					 // conver the json response 
+					if(responseOfGrnPurGrp.getStatusCodeValue()==200){
+		            	 RemediationUser grnUsers = (RemediationUser) responseOfGrnPurGrp.getBody();
+		            	 remediationUserOutput.add(grnUsers);
+		             } else {
+		            	 
+		            	 RemediationUser failedResponse = new RemediationUser();
+		            	 failedResponse.setType("GRN");
+		            	 failedResponse.setMessage(responseOfGrnPurGrp.getBody().toString());
+		            	 remediationUserOutput.add(failedResponse);
+		             }
+				}
+				else{
+			    // get the GRN details based on with requisitionNum and requisitionItm 
+					 ResponseEntity<?>  responseOfGrnPurReqAndItem =	odataGetRemediationDetailsForGrnByPurchReqAndPurchReqItem(prNumList,prItemList,userListNeeded,"/PurchReqDetailsSet?");
+					 System.err.println("responseOfGrnPurReqAndItem "+responseOfGrnPurReqAndItem);
+					 if(responseOfGrnPurReqAndItem.getStatusCodeValue()==200){
+		            	 RemediationUser grnUsers = (RemediationUser) responseOfGrnPurReqAndItem.getBody();
+		            	 remediationUserOutput.add(grnUsers);
+		             } else {
+		            	 
+		            	 RemediationUser failedResponse = new RemediationUser();
+		            	 failedResponse.setType("GRN");
+		            	 failedResponse.setMessage(responseOfGrnPurReqAndItem.getBody().toString());
+		            	 remediationUserOutput.add(failedResponse);
+		             }
+				}
+	            
+				
+				// get the Details of PurchaseLead
+	            
+	            
+			}
+			
+			return new ResponseEntity<List<RemediationUser>>(remediationUserOutput,HttpStatus.OK);
+		}
+
+		
+		 @SafeVarargs
+		private static <T> Predicate<T> distinctByKeys(Function<? super T, ?>... keyExtractors) 
+		  {
+		    final Map<List<?>, Boolean> seen = new ConcurrentHashMap<>();
+		    return t -> 
+		    {
+		      final List<?> keys = Arrays.stream(keyExtractors)
+		                  .map(ke -> ke.apply(t))
+		                  .collect(Collectors.toList());
+		      return seen.putIfAbsent(keys, Boolean.TRUE) == null;
+		    };
+		  }
+		 
+	    @Override
+		public ResponseEntity<?> odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(List<PurchaseOrderRemediationInput> dtoList,String userListNeeded,String entitySet,String param) throws URISyntaxException, IOException {
+			if(!dtoList.isEmpty()&& dtoList!=null){
+				List<String>   createdBy = dtoList.stream().filter(c->!c.getCreatedBy().isEmpty()).map(PurchaseOrderRemediationInput::getCreatedBy).collect(Collectors.toList());
+				// form url
+				if(!createdBy.isEmpty() && createdBy!=null){
+	              String endPointurl = formInputUrl(createdBy,entitySet,param) ;  
+	              // call Destination Service 
+	              Map<String, Object> destinationInfo = OdataHelperClass.getDestination("SD4_DEST");
+				// call odata service 
+	            ResponseEntity<?> responseFromOdata =   OdataHelperClass.consumingOdataService(endPointurl, null,"GET", destinationInfo);	
+	            if(responseFromOdata.getStatusCodeValue()==200){
+	               String jsonOutputString = (String) responseFromOdata.getBody();
+	               RemediationUser remediation = new RemediationUser();
+	               remediation.setType("GRN");
+	               List<RemediationUserDto> remediList = new ArrayList<RemediationUserDto>();
+	               OdataResponseDto  taskDto =     convertStringToJson(jsonOutputString);
+	               OdataOutPutPayload   outResp =  taskDto.getD();
+	                       List<OdataResultObject> resultList   =  outResp.getResults();
+	                       resultList.stream().forEach(r->{
+	                    	   RemediationUserDto reme = new RemediationUserDto();
+	                    	   reme.setUser(r.getEmailID());
+	                    	   remediList.add(reme);
+	                       });
+	                       remediation.setUsers(remediList);     
+		             System.err.println("convertedResponse "+responseFromOdata);
+	            // convert OuputResponse                
+	              return new ResponseEntity<String>(remediation.toString(),HttpStatus.OK);
+	            }else {
+	    			ResponseDto response = new ResponseDto();
+	    			response.setCode("400");
+	    			response.setMessage("Failed Response "+responseFromOdata.getBody());
+	    			response.setStatus("Failed");
+	    		return new ResponseEntity<ResponseDto>(response,HttpStatus.BAD_REQUEST);
+	            }
+				}
+	            else{
+				ResponseDto response = new ResponseDto();
+				response.setCode("200");
+				response.setMessage("No created By found in the POs ");
+				response.setStatus("SUCCESS");
+			return new ResponseEntity<ResponseDto>(response,HttpStatus.BAD_REQUEST);
+	            }
+			}else{
+				
+				ResponseDto response = new ResponseDto();
+				response.setCode("400");
+				response.setMessage("Please provide the po list ");
+				response.setStatus("Bad Request");
+			return new ResponseEntity<ResponseDto>(response,HttpStatus.BAD_REQUEST);
+			}}
+
+	    
+	    @Override
+	   	public ResponseEntity<?> odataGetRemediationDetailsForGrnByPurchReqAndPurchReqItem(List<String> purchaseReqList,List<String> purchaseReqItemList ,String userListNeeded,String entitySet) throws URISyntaxException, IOException {
+	   			// form url
+	                 String endPointurl = formInputUrlForPuchaseReqAndItem(purchaseReqList,purchaseReqItemList,entitySet);
+	                 // call Destination Service 
+	                 Map<String, Object> destinationInfo = OdataHelperClass.getDestination("SD4_DEST");
+	   			// call odata service 
+	               ResponseEntity<?> responseFromOdata =   OdataHelperClass.consumingOdataService(endPointurl, null,"GET", destinationInfo);	
+	               if(responseFromOdata.getStatusCodeValue()==200){
+	                  String jsonOutputString = (String) responseFromOdata.getBody();
+	               // convert OuputResponse  
+	                  RemediationUser remediation = new RemediationUser();
+	                  remediation.setType("GRN");
+	                  List<RemediationUserDto> remediList = new ArrayList<RemediationUserDto>();
+	                  OdataResponseDto  taskDto =     convertStringToJson(jsonOutputString);
+	                  OdataOutPutPayload   outResp =  taskDto.getD();
+	                          List<OdataResultObject> resultList   =  outResp.getResults();
+	                          resultList.stream().forEach(r->{
+	                       	   RemediationUserDto reme = new RemediationUserDto();
+	                       	   reme.setUser(r.getEmailID());
+	                       	   remediList.add(reme);
+	                          });
+	                          remediation.setUsers(remediList);     
+	   	             System.err.println("convertedResponse "+responseFromOdata);
+	               // convert OuputResponse                
+	                 return new ResponseEntity<String>(remediation.toString(),HttpStatus.OK);
+	               }else {
+	       			ResponseDto response = new ResponseDto();
+	       			response.setCode("400");
+	       			response.setMessage("Failed Response "+responseFromOdata.getBody());
+	       			response.setStatus("Failed");
+	       		return new ResponseEntity<ResponseDto>(response,HttpStatus.BAD_REQUEST);
+	               }
+	    }
+		
+		public String formInputUrl(List<String> valueList,String entitySet,String param){
+			StringBuilder urlForm = new StringBuilder();
+			appendParamInOdataUrl(urlForm, "&$filter","" );
+			appendValuesInOdataUrl(urlForm,param,valueList);
+			appendParamInOdataUrl(urlForm, "&$format","json" );
+			urlForm.insert(0, ("/sap/opu/odata/sap/ZP2P_API_GRNUSERDETAILS_SRV"+entitySet));
+			System.err.println("url"+urlForm.toString());
+	                return urlForm.toString();		
+		}
+		
+		public String formInputUrlForPuchaseReqAndItem(List<String> prucReqList,List<String> purchItemReqList,String entitySet){
+			StringBuilder urlForm = new StringBuilder();
+			appendParamInOdataUrl(urlForm, "&$filter","(" );
+			appendValuesInOdataUrl(urlForm,"PurchaseRequisitionNumber",prucReqList);
+			appendParamInOdataUrl(urlForm, ")and","(" );
+			appendValuesInOdataUrl(urlForm,"PurchaseRequisitionItem",prucReqList);
+			appendParamInOdataUrl(urlForm, ")&$format","json" );
+			urlForm.insert(0, ("/sap/opu/odata/sap/ZP2P_API_GRNUSERDETAILS_SRV"+entitySet));
+			System.err.println("url"+urlForm.toString());
+	                return urlForm.toString();		
+		}
+		
+		public OdataResponseDto convertStringToJson(String json){
+			
+			OdataResponseDto  taskDto = new Gson().fromJson(json.toString(),
+					OdataResponseDto.class);
+			
+			
+			return taskDto;
+		}
 
 }

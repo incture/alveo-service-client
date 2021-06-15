@@ -13,8 +13,7 @@ public class InboxResponseOutputDto {
 	private long countOpenTask;
 	private long countMyTask;
 	private long countDraft;
-	private String countMessage;
-	private String ListMessage;
+	private String Message;
 	private String statusCode;
 	private int statusCodeValue;
 	private List<InboxOutputDto> listOfTasks;

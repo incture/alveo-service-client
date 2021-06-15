@@ -166,6 +166,7 @@ public class OdataHelperClass {
 						(String) destinationInfo.get("CloudConnectorLocationId"));
 
 			}
+			
 			if (token != null) {
 				httpRequestBase.addHeader("X-CSRF-Token", token);
 			}
@@ -201,7 +202,7 @@ public class OdataHelperClass {
 				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
 		//use vcap or change when deploying in dev in dev space
 		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
-				"cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=");
+				"c1ac511d-74f8-4a64-a28b-c42bb41c2d2b$Md8ZvS__pg9I_Z_qPNhHrXR7p2zhCP9ByfhO3RYVCt8=");
 		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
 		String data = getDataFromStream(res.getEntity().getContent());
@@ -222,10 +223,10 @@ public class OdataHelperClass {
 		httpGet.setHeader(HttpHeaders.AUTHORIZATION,
 				"Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes()));
 		// Encoding username and password
-		httpGet.addHeader("X-CSRF-Token", "Fetch");
+		httpGet.addHeader("X-CSRF-Token", "fetch");
 		httpGet.addHeader("Content-Type", "application/json");
 		httpGet.addHeader("sap-client", sapClient);
-		httpGet.addHeader("SAP-Connectivity-SCC-Location_ID", "incture");
+		httpGet.addHeader("SAP-Connectivity-SCC-Location_ID", "DEVHEC");
 		HttpResponse response = client.execute(httpGet);
 
 		return response.getAllHeaders();

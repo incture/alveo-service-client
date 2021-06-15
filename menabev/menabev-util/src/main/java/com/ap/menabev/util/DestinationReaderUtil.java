@@ -77,13 +77,17 @@ public class DestinationReaderUtil {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
 
-		HttpPost httpPost = new HttpPost(MenabevApplicationConstant.CONECTIVITY_TOKEN_URL);
-		httpPost.addHeader("Content-Type", "application/json");
+		HttpPost httpPost = new HttpPost("https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+		/*HttpPost httpPost = new HttpPost("https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+		httpPost.addHeader("Content-Type", "application/json");*/
 
 		// Encoding username and password
-		String auth = HelperClass.encodeUsernameAndPassword(MenabevApplicationConstant.CONECTIVITY_CLIENT_ID,
-				MenabevApplicationConstant.CONECTIVITY_CLIENT_SECRET);
+		String auth = HelperClass.encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
+				"cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=");
 		
+		/*String auth = encodeUsernameAndPassword("sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5",
+				"f761e7fd-0dac-4614-b5f5-752d3513b71a$Obl12NQPIxXrGa9-OZiB_wIjmQaB-bb7Dyfq_ccKWfM=");
+		*/
 		
 		httpPost.addHeader("Authorization", auth);
 
@@ -106,7 +110,9 @@ public class DestinationReaderUtil {
 
 		return null;
 	}
-	
+
+		
+
 	public static String getJwtTokenForAuthenticationForSapApi() throws URISyntaxException, IOException {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();

@@ -2,6 +2,8 @@ package com.ap.menabev.service;
 
 
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,6 +19,7 @@ import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.MasterResponseDto;
+import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
@@ -100,5 +103,18 @@ public interface InvoiceHeaderService {
 	public  CompletableFuture<ResponseEntity<?>>  getInboxTaskCounnt(FilterMultipleHeaderSearchDto filterDto);
 	
 	ResponseEntity<?>  getInboxTaskWithMultipleSearch(FilterMultipleHeaderSearchDto filterDto);
+
+	ResponseEntity<?> odataGetRemediationDetailsForGrnByPurchReqAndPurchReqItem(List<String> purchaseReqList,
+			List<String> purchaseReqItemList, String userListNeeded, String entitySet)
+			throws URISyntaxException, IOException;
+
+	ResponseEntity<?> odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(
+			List<PurchaseOrderRemediationInput> dtoList, String userListNeeded, String entitySet, String param)
+			throws URISyntaxException, IOException;
+
+	ResponseEntity<?> getRemediationUserDetails(List<PurchaseOrderRemediationInput> dtoList, String userListNeeded)
+			throws URISyntaxException, IOException;
+
+	
 
 }

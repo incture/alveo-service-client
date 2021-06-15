@@ -8,5 +8,6 @@ import lombok.Data;
 public class RemediationUser {
     private String type;
     private List<RemediationUserDto> users;
+    private String message;
 
 }
