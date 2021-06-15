@@ -6,6 +6,5 @@ import lombok.Data;
 public class OdataResponseDto {
 	
 	private OdataOutPutPayload d;
-	
 
 }

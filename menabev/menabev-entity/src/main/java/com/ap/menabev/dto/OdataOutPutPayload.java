@@ -9,5 +9,4 @@ public class OdataOutPutPayload {
 	
 	private  List<OdataResultObject> results;
 	
-
 }

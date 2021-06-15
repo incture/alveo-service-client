@@ -1068,6 +1068,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	}
 	
 	
+	
 	public static void appendValuesInOdataUrl(StringBuilder url,String key, List<String> value){
 		for(int i = 0; i<value.size();i++){
 			if(value.size()==1){

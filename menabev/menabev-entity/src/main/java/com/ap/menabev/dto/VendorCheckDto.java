@@ -17,5 +17,6 @@ public class VendorCheckDto {
 	private String invoiceReference;
 	private String invoiceAmount;
 	private String invoiceStatus;
+	
 	private List<Messages> messages;
 }
