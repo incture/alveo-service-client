@@ -1,0 +1,97 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout">
+	<Dialog title="{i18n>SearchPOTitle}" contentWidth="70%" class="sapUiSizeCompact">
+		<customHeader>
+			<OverflowToolbar>
+				<Title text="{i18n>SearchPOTitle}"/>
+				<ToolbarSpacer/>
+				<SegmentedButton selectedKey="PO" selectionChange="onChangeSBSearchPO">
+					<items>
+						<SegmentedButtonItem text="PO" key="PO"/>
+						<SegmentedButtonItem text="DO" key="DO"/>
+					</items>
+				</SegmentedButton>
+			</OverflowToolbar>
+		</customHeader>
+		<content>
+			<fb:FilterBar showFilterConfiguration="false" useToolbar="false" showClearOnFB="true" visible="{baseModel>/SearchVisiblity}"
+				search="onSearchPO" clear="onClearSearchPO">
+				<fb:filterItems>
+					<fb:FilterItem name="A" label="{i18n>DocNumber}" visible="{addPOModel>/POFilterVisible}">
+						<fb:control>
+							<Input value="{addPOModel>/documentNumber}" maxLength="10" liveChange="inputLiveChange"/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="B" label="{i18n>DocCategory}" visible="{addPOModel>/POFilterVisible}" visible="false">
+						<fb:control>
+							<Select forceSelection="false" selectedKey="{addPOModel>/documentCategory}" width="100%" enabled="false">
+								<items>
+									<core:ListItem key="F" text="Standard"/>
+									<core:ListItem key="LA" text="Scheduling Agreement"/>
+								</items>
+							</Select>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="C" label="{i18n>VendorId}" visible="{addPOModel>/POFilterVisible}" visible="false">
+						<fb:control>
+							<Input value="{addPOModel>/vendorId}" enabled="false"/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="D" label="{i18n>CompanyCode}" visible="{addPOModel>/POFilterVisible}" visible="false">
+						<fb:control>
+							<Input value="{addPOModel>/companyCode}" enabled="false"/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="E" label="{i18n>DateRange}" visible="{addPOModel>/POFilterVisible}" visible="false">
+						<fb:control>
+							<DateRangeSelection delimiter="{path:'/delimiterDRS1'}" dateValue="{path:'/dateValueDRS1'}" secondDateValue="{path:'/secondDateValueDRS1'}"
+								displayFormat="MM/dd/yyyy" enabled="false"/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="F" label="{i18n>DeliveryNote}" visible="{addPOModel>/DOFilterVisible}">
+						<fb:control>
+							<Input value="{addPOModel>/deliveryNoteNumber}" maxLength="16" liveChange="inputLiveChange"/>
+						</fb:control>
+					</fb:FilterItem>
+				</fb:filterItems>
+			</fb:FilterBar>
+			<Table items="{addPOModel>/result}" class="sapUiSizeCompact" growing="true" growingThreshold="100"
+				sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" alternateRowColors="true" mode="MultiSelect">
+				<columns>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>DocNumber}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>DocCategory}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>VendorId}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>CompanyCode}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+						<Label text="{i18n>DeliveryNote}" design="Bold"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{addPOModel>documentNumber}" textAlign="Center"/>
+							<Text text="{addPOModel>documentCategory}" textAlign="Center"/>
+							<Text text="{addPOModel>vendorId}" textAlign="Center"/>
+							<Text text="{addPOModel>companyCode}" textAlign="Center"/>
+							<Text text="{addPOModel>deliveryNoteNumber}" textAlign="Center"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<beginButton>
+			<Button text="{i18n>Cancel}" type="Reject" press="onCancelAddPO"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>Add}" press="onClickAdd" enabled="false"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
