@@ -70,32 +70,23 @@ sap.ui.define([
 			this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
 			this.getModel("postDataModel").setProperty("/listNonPoItem", []);
 
-			//Test Data for Tax Rate
-			var aTax = [{
-				"taxCode": "I0",
-				"taxCodeDescription": "ProductId",
-				"taxPer": "0",
-				"taxConditionType": "MWVS"
-			}, {
-				"taxCode": "I1",
-				"taxCodeDescription": "test",
-				"taxPer": "15",
-				"taxConditionType": "MWVS"
-			}, {
-				"taxCode": "IE",
-				"taxCodeDescription": "ProductId",
-				"taxPer": "5",
-				"taxConditionType": "MWVS"
-			}];
-			this.setModel(new JSONModel(), "taxCodeModel");
-			this.getModel("taxCodeModel").setProperty("/aTax", aTax);
-			//End of Tax rate test data
-
 			this.getBtnVisibility();
 			this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
 			this.router = oComponent.getRouter();
 			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
 			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+			
+			var oHeader = {
+				"Content-Type": "application/json; charset=utf-8"
+			};
+			var oLanguage = "E";
+			var countryKey = "SA";
+			//To load all OData lookups
+			this.getPaymentTerm(oHeader, oLanguage);
+			this.getPaymentMethod(oHeader, oLanguage);
+			this.getPaymentBlock(oHeader, oLanguage);
+			this.getTaxCode(oHeader, countryKey);
+			this.getCostCenter("1010", oLanguage);
 		},
 
 		getBtnVisibility: function () {
@@ -285,19 +276,19 @@ sap.ui.define([
 
 		//onChange Header level tax
 		onChangeHeaderTax: function (oEvent) {
-			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("taxCodeModel").getObject();
+			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject();
 			var postDataModel = this.getModel("postDataModel"),
 				nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
-				taxCode = taxDetails.taxCode,
-				taxPer = taxDetails.taxPer;
+				taxCode = taxDetails.TxCode,
+				taxPer = taxDetails.TaxRate;
 			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxPer", taxPer);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxConditionType", taxDetails.taxConditionType);
+			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxConditionType", taxDetails.TaxConditionType);
 			if (postDataModel.getProperty("/listNonPoItem")) {
 				var length = postDataModel.getProperty("/listNonPoItem").length;
 				for (var i = 0; i < length; i++) {
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
 					postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxConditionType", taxDetails.taxConditionType);
+					postDataModel.setProperty("/listNonPoItem/" + i + "/taxConditionType", taxDetails.TaxConditionType);
 				}
 			}
 			if (taxDetails) {
@@ -311,20 +302,19 @@ sap.ui.define([
 
 		//onChange CC item level tax
 		onChangeTax: function (oEvent) {
-			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("taxCodeModel").getObject();
+			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject(),
+				sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
 			var postDataModel = this.getModel("postDataModel");
-			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
-			postDataModel.setProperty(sPath + "/taxPer", taxDetails.taxPer);
-			postDataModel.setProperty(sPath + "/taxConditionType", taxDetails.taxConditionType);
+			postDataModel.setProperty(sPath + "/taxPer", taxDetails.TaxRate);
+			postDataModel.setProperty(sPath + "/taxConditionType", taxDetails.TaxConditionType);
 			this.amountCal(oEvent);
 		},
 		//End of Header Filter function
-		
-		
+
 		//this function is to open PDF for Non PO Invoice
-		onPressOpenpdf: function(){
+		onPressOpenpdf: function () {
 			var documentId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
-			this.fnOpenPDF(documentId);             
+			this.fnOpenPDF(documentId);
 		},
 
 		//This function will route to TemplateManagement view
@@ -347,7 +337,6 @@ sap.ui.define([
 				}
 				templateModel.setProperty("/searchValue", "");
 				this.getAllTemplate(); //Call service to fetch the templates
-				this.selectTemplateFragment.open();
 			} else {
 				sap.m.MessageToast.show("Fill Invoice Amount, Tax Code and Tax Value to proceed with Cost Allocation");
 			}
@@ -369,6 +358,7 @@ sap.ui.define([
 				success: function (data, textStatus, jqXHR) {
 					this.busyDialog.close();
 					templateModel.setProperty("/aNonPoTemplate", data);
+					this.selectTemplateFragment.open();
 				}.bind(this),
 				error: function (result, xhr, data) {
 					this.busyDialog.close();
@@ -1434,7 +1424,7 @@ sap.ui.define([
 
 		onDocumentDelete: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var nonPOInvoiceModel =  this.getModel("nonPOInvoiceModel");
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
 			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
 			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
 			var attachments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
@@ -1446,8 +1436,8 @@ sap.ui.define([
 			var sUrl = "/menabevdev/document/delete/" + attachmentId;
 			oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, this.oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
-					busy.close();
-					sap.m.MessageToast.show(oEvent.getSource().getData().message);
+				busy.close();
+				sap.m.MessageToast.show(oEvent.getSource().getData().message);
 				attachments.splice(index, 1);
 				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/attachments", attachments);
 
@@ -1624,6 +1614,14 @@ sap.ui.define([
 			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", sVendorId);
 			nonPOInvoiceModel.refresh();
 		},
+
+		//To open vendor balance
+		onClickVendorBalances: function () {
+			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel"),
+				vendorId = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"),
+				companyCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/companyCode");
+			this.loadVendorBalanceFrag(vendorId, companyCode);
+		}
 
 	});
 

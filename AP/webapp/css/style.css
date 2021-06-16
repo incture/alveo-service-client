@@ -525,10 +525,7 @@
     padding-left: 1rem
 }
 
-.selectedPage {
-    color: #ca42b3;
-}
-
-.nonSelectedPage {
-    color: #0854a0;
+/*to adjust the width of popover suggestions*/
+.glaccount, .sapMPopoverCont {
+    width: auto !important;
 }

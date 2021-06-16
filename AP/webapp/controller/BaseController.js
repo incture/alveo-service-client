@@ -272,6 +272,214 @@ sap.ui.define([
 			});
 		},
 		//End of Open PDF details
+		
+		//Vendor Balances :On click Vendor Balances Btn below function is called to open a fragment VendorBalance
+		loadVendorBalanceFrag: function (vendorId, companyCode) {
+			if (!vendorId || !companyCode) {
+				var sMsg = "Please Enter Vendor Id and Company Code to fetch Vendor Balance!";
+				sap.m.MessageBox.error(sMsg);
+				return;
+			}
+			var vendorBalanceModel = new sap.ui.model.json.JSONModel();
+			this.getView().setModel(vendorBalanceModel, "vendorBalanceModel");
+			var oFragmentName = "com.menabev.AP.fragment.VendorBalance";
+			if (!this.vendorBalanceFragment) {
+				this.vendorBalanceFragment = sap.ui.xmlfragment(oFragmentName, this);
+				this.getView().addDependent(this.vendorBalanceFragment);
+			}
+			this.getVendorBalance(vendorId, companyCode); //Service Call to fetch the Vendor Balance
+		},
+
+		//function call to load Vendor Balances 
+		getVendorBalance: function (vendorId, companyCode) {
+			var vendorBalanceModel = this.getModel("vendorBalanceModel"),
+				currentDate = new Date();
+			currentDate = currentDate.getFullYear() + "" + (currentDate.getMonth() + 1) + "" + currentDate.getDate();
+			var url =
+				"SD4_DEST/sap/opu/odata/sap/ZP2P_API_VENDORBALANCE_SRV/VenBalHeaderSet?$filter=Vendor eq '" + vendorId + "' and CompanyCode eq '" +
+				companyCode + "' and KeyDate eq '" +
+				currentDate + "'&$expand=ToVendorBalance&$format=json";
+			this.busyDialog.open();
+			jQuery.ajax({
+				type: "GET",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					this.busyDialog.close();
+					vendorBalanceModel.setProperty("/", data.d.results[0]);
+					this.vendorBalanceFragment.open();
+				}.bind(this),
+				error: function (error) {
+					this.busyDialog.close();
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
+			});
+		},
+
+		vendorBalancesClose: function () {
+			this.vendorBalanceFragment.close();
+		},
+		
+		//To check if an input value is not a number
+		inputNANCheck: function(oEvent){
+			var oValue = oEvent.getSource().getValue();
+			if (isNaN(oValue)) {
+				oValue = oValue.replace(/[^\d]/g, '');
+				oEvent.getSource().setValue(oValue);
+			}
+		},
+		
+		//Payment Term Data
+		getPaymentTerm: function (oHeader, language) {
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			var oFilter = [];
+			if (language) {
+				oFilter.push(new sap.ui.model.Filter("LanguageKey", sap.ui.model.FilterOperator.EQ, language));
+			}
+			var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			oDataModel.read("/PaymentTermSet", {
+				filters: oFilter,
+				async: false,
+				success: function (oData, oResponse) {
+					oDropDownModel.setProperty("/paymentTermResult", oData.results);
+				}.bind(this),
+				error: function (error) {
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					sap.m.MessageToast.show(errorMsg);
+				}.bind(this)
+			});
+		},
+
+		//Payment Method Data
+		getPaymentMethod: function (oHeader, language) {
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			var oFilter = [];
+			if (language) {
+				oFilter.push(new sap.ui.model.Filter("LanguageKey", sap.ui.model.FilterOperator.EQ, language));
+			}
+			var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			oDataModel.read("/PaymentMethodSet", {
+				filters: oFilter,
+				async: false,
+				success: function (oData, oResponse) {
+					oDropDownModel.setProperty("/paymentMethodResult", oData.results);
+				}.bind(this),
+				error: function (error) {
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					sap.m.MessageToast.show(errorMsg);
+				}.bind(this)
+			});
+		},
+
+		//Payment Block Data
+		getPaymentBlock: function (oHeader, language) {
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			var oFilter = [];
+			if (language) {
+				oFilter.push(new sap.ui.model.Filter("LanguageKey", sap.ui.model.FilterOperator.EQ, language));
+			}
+			var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			oDataModel.read("/PaymentBlockSet", {
+				filters: oFilter,
+				async: false,
+				success: function (oData, oResponse) {
+					oDropDownModel.setProperty("/paymentBlockResult", oData.results);
+				}.bind(this),
+				error: function (error) {
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					sap.m.MessageToast.show(errorMsg);
+				}.bind(this)
+			});
+		},
+
+		//Tax Code Data
+		getTaxCode: function (oHeader, CountryKey) {
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			var oFilter = [];
+			if (CountryKey) {
+				oFilter.push(new sap.ui.model.Filter("CountryKey", sap.ui.model.FilterOperator.EQ, CountryKey));
+			}
+			var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			oDataModel.read("/TaxCodeSet", {
+				filters: oFilter,
+				async: false,
+				success: function (oData, oResponse) {
+					oDropDownModel.setProperty("/taxCodeResult", oData.results);
+				}.bind(this),
+				error: function (error) {
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					sap.m.MessageToast.show(errorMsg);
+				}.bind(this)
+			});
+		},
+
+		//function to get GLAccount based on running search
+		glAccountSuggest: function (oEvent) {
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			var oValue = oEvent.getParameter("suggestValue");
+			var oFilter = [];
+			if (oValue && oValue.length > 2) {
+				oFilter.push(new sap.ui.model.Filter("ChartOfAccounts", sap.ui.model.FilterOperator.Contains, oValue));
+				var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+				oDataModel.read("/GlAccountSet", {
+					filters: oFilter,
+					async: false,
+					success: function (oData, oResponse) {
+						oDropDownModel.setProperty("/GLAccountResult", oData.results);
+					}.bind(this),
+					error: function (error) {
+						var errorMsg = JSON.parse(error.responseText);
+						errorMsg = errorMsg.error.message.value;
+						sap.m.MessageToast.show(errorMsg);
+					}.bind(this)
+				});
+			}
+		},
+
+		glAccountSelected: function (oEvent) {
+			var glAccountDes = oEvent.getParameter("selectedItem").getProperty("additionalText"),
+				sPath = oEvent.getSource().getBindingContext("postDataModel").sPath;
+			var postDataModel = this.getModel("postDataModel");
+			postDataModel.setProperty(sPath + "/materialDescription", glAccountDes);
+			postDataModel.refresh();
+		},
+		
+		//function to get GLAccount based on running search
+		getCostCenter: function (CompanyCode, LanguageKey) {
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel"),
+				currentDate = new Date(),
+				currentMonth = currentDate.getMonth() + 1;
+			if (currentMonth < 10) {
+				currentMonth = '0' + currentMonth;
+			}
+			currentDate = currentDate.getFullYear() + "" + currentMonth + "" + currentDate.getDate();
+			var oFilter = [];
+			oFilter.push(new sap.ui.model.Filter("CompanyCode", sap.ui.model.FilterOperator.EQ, CompanyCode));
+			oFilter.push(new sap.ui.model.Filter("LanguageKey", sap.ui.model.FilterOperator.EQ, LanguageKey));
+			oFilter.push(new sap.ui.model.Filter("StartDate", sap.ui.model.FilterOperator.LE, currentDate));
+			oFilter.push(new sap.ui.model.Filter("EndDate", sap.ui.model.FilterOperator.GE, currentDate));
+			var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			oDataModel.read("/CostCenterSet", {
+				filters: oFilter,
+				async: false,
+				success: function (oData, oResponse) {
+					oDropDownModel.setProperty("/costCenterResult", oData.results);
+				}.bind(this),
+				error: function (error) {
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					sap.m.MessageToast.show(errorMsg);
+				}.bind(this)
+			});
+		},
 
 	});
 

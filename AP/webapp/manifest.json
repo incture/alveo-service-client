@@ -34,6 +34,13 @@
 				"settings": {
 					"localUri": "localService/API_BUSINESS_PARTNER/metadata.xml"
 				}
+			},
+			"ZP2P_API_EC_GL_SRV": {
+				"uri": "/SD4_DEST/sap/opu/odata/sap/ZP2P_API_EC_GL_SRV/",
+				"type": "OData",
+				"settings": {
+					"localUri": "localService/ZP2P_API_EC_GL_SRV/metadata.xml"
+				}
 			}
 		}
 	},
@@ -131,6 +138,16 @@
 					"defaultCountMode": "Request"
 				},
 				"dataSource": "API_BUSINESS_PARTNER",
+				"preload": true
+			},
+			"ZP2P_API_EC_GL_SRV": {
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"settings": {
+					"defaultOperationMode": "Server",
+					"defaultBindingMode": "OneWay",
+					"defaultCountMode": "Request"
+				},
+				"dataSource": "ZP2P_API_EC_GL_SRV",
 				"preload": true
 			}
 		},

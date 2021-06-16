@@ -10,9 +10,9 @@
 			</VBox>
 			<VBox>
 				<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
-				<Input filterSuggests="false" value="{oPOModel>/vendorId}" width="80%" showSuggestion="true" suggest="VendorIdSuggest"  valueState="{oMandatoryModel>/NonPO/vendorIdState}"
-					tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected" suggestionItems="{searchVendorModel>/d/results}" maxLength="10"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}">
+				<Input filterSuggests="false" value="{oPOModel>/vendorId}" width="80%" showSuggestion="true" suggest="VendorIdSuggest"
+					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected"
+					suggestionItems="{searchVendorModel>/d/results}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 					<suggestionItems>
 						<core:ListItem text="{searchVendorModel>Supplier}" additionalText="{searchVendorModel>SupplierName}"/>
 					</suggestionItems>
@@ -20,9 +20,9 @@
 			</VBox>
 			<VBox>
 				<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
-				<Input filterSuggests="false" value="{oPOModel>/vendorName}" width="80%" type="Text" showSuggestion="true" suggest="VendorNameSuggest"  valueState="{oMandatoryModel>/NonPO/vendorNameState}"
-					tooltip="{oPOModel>/vendorName}" suggestionItemSelected="vendorNameSelected" suggestionItems="{searchVendorModel>/d/results}"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}">
+				<Input filterSuggests="false" value="{oPOModel>/vendorName}" width="80%" type="Text" showSuggestion="true" suggest="VendorNameSuggest"
+					valueState="{oMandatoryModel>/NonPO/vendorNameState}" tooltip="{oPOModel>/vendorName}" suggestionItemSelected="vendorNameSelected"
+					suggestionItems="{searchVendorModel>/d/results}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 					<suggestionItems>
 						<core:ListItem text="{searchVendorModel>SupplierName}" additionalText="{searchVendorModel>Supplier}"/>
 					</suggestionItems>
@@ -47,75 +47,75 @@
 				<Label text="{i18n>InvoiceDate}" required="true" class="sapUiTinyMarginTop"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
 					value="{ path:'oPOModel>/documentDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-					valueState="{oMandatoryModel>/NonPO/documentDateState}" change="onInvDateChange"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					valueState="{oMandatoryModel>/NonPO/documentDateState}" change="onInvDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>BASELINEDATE}" required="true"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
-					value="{ path:'oPOModel>/baselineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueState="{oMandatoryModel>/NonPO/baselineDateState}"
-					change="onChangeInvDate" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					value="{ path:'oPOModel>/baselineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
+					valueState="{oMandatoryModel>/NonPO/baselineDateState}" change="onChangeInvDate" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>BatchId}"/>
-				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}" 	valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}" />
+				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"
+					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PostingDate}" required="true"/>
-				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%" 
+				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
 					value="{ path:'oPOModel>/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-					valueState="{oMandatoryModel>/NonPO/postingDateState}" change="onPostingDateChange"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					valueState="{oMandatoryModel>/NonPO/postingDateState}" change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>DueDate}"/>
-				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"  valueState="{oMandatoryModel>/NonPO/dueDateState}"
+				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%" valueState="{oMandatoryModel>/NonPO/dueDateState}"
 					value="{path:'oPOModel>/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
 					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onDueDateChange"/>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PaymentTerms}"/>
-				<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>/paymentTerms}" items="{paymentModel>/d/results}"  valueState="{oMandatoryModel>/NonPO/paymentTermsState}"
-					width="80%" enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentTermsChange">
+				<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>/paymentTerms}" items="{oDropDownModel>/paymentTermResult}"
+					valueState="{oMandatoryModel>/NonPO/paymentTermsState}" width="80%" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
+					change="onPaymentTermsChange">
 					<items>
-						<core:ListItem key="{paymentModel>PaymentTerms}" text="{paymentModel>Vendor}" additionalText="{paymentModel>CompCode}"/>
+						<core:ListItem key="{oDropDownModel>PmntTerm}" text="{oDropDownModel>PmntTermDesc}"/>
 					</items>
 				</Select>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PaymentMethod}"/>
-				<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}" valueState="{oMandatoryModel>/NonPO/paymentMethodState}"
-					items="{paymentMethodModel>/d/results}" width="80%" enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentMethodChange">
+				<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}"
+					valueState="{oMandatoryModel>/NonPO/paymentMethodState}" items="{oDropDownModel>/paymentMethodResult}" width="80%"
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentMethodChange">
 					<items>
-						<core:ListItem key="{paymentMethodModel>PaymentMeth}" text="{paymentMethodModel>PaymentMethDesc}"
-							additionalText="{paymentMethodModel>VdrPaymentMeth}"/>
+						<core:ListItem key="{oDropDownModel>PmntMeth}" text="{oDropDownModel>PmntMethName}"/>
 					</items>
 				</Select>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>PaymentBlock}"/>
 				<Select forceSelection="false" id="paymentBlockComBox" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/paymentBlockState}"
-					selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}" items="{paymentBlockModel>/d/results}" width="80%"
-					enabled="{oVisibilityModel>/NonPOInvoice/editable}"  change="onPaymentBlockChange">
+					selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}" items="{oDropDownModel>/paymentBlockResult}" width="80%"
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentBlockChange">
 					<items>
-						<core:ListItem key="{paymentBlockModel>VdrPaymentBlock}" text="{paymentBlockModel>PaymentBlockDesc}"
-							additionalText="{paymentBlockModel>PaymentBlock}"/>
+						<core:ListItem key="{oDropDownModel>PmntBlk}" text="{oDropDownModel>PmntBlkDesc}"/>
 					</items>
 				</Select>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>TaxCode}"/>
 				<Select forceSelection="false" id="taxCodeId" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/taxCodeState}"
-					selectedKey="{oPOModel>/headerTaxcode}" items="{taxCodeModel>/aTax}" width="80%" change="onTaxCodeChange"
+					selectedKey="{oPOModel>/headerTaxcode}" items="{oDropDownModel>/taxCodeResult}" width="80%" change="onTaxCodeChange"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 					<items>
-						<core:ListItem key="{taxCodeModel>taxCode}" text="{taxCodeModel>taxCode}" additionalText="{taxCodeModel>taxCodeDescription}"/>
+						<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TaxCodeName}"/>
 					</items>
 				</Select>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>UNPLANNEDCOST}"/>
-				<Input value="{oPOModel>/unplannedCost}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}" valueState="{oMandatoryModel>/NonPO/unplannedCostState}"/>
+				<Input value="{oPOModel>/unplannedCost}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"
+					valueState="{oMandatoryModel>/NonPO/unplannedCostState}"/>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>INVOICETYPE}"/>
