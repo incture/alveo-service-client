@@ -107,41 +107,38 @@
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PaymentTerms}"/>
-									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/paymentTerms}"
-										items="{paymentModel>/d/results}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+									<Select forceSelection="false" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/paymentTerms}"
+										items="{oDropDownModel>/paymentTermResult}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
-											<core:ListItem key="{paymentModel>PaymentTerms}" text="{paymentModel>Vendor}" additionalText="{paymentModel>CompCode}"/>
+											<core:ListItem key="{oDropDownModel>PmntTerm}" text="{oDropDownModel>PmntTermDesc}"/>
 										</items>
 									</Select>
 								</VBox>
 								<VBox >
 									<Label text="{i18n>PaymentMethod}"/>
-									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}"
-										items="{paymentMethodModel>/d/results}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+									<Select forceSelection="false" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}"
+										items="{oDropDownModel>/paymentMethodResult}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
-											<core:ListItem key="{paymentMethodModel>PaymentMeth}" text="{paymentMethodModel>PaymentMethDesc}"
-												additionalText="{paymentMethodModel>VdrPaymentMeth}"/>
+											<core:ListItem key="{oDropDownModel>PmntMeth}" text="{oDropDownModel>PmntMethName}"/>
 										</items>
 									</Select>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>PaymentBlock}"/>
-									<Select forceSelection="false" id="paymentBlockComBox" showSecondaryValues="true"
-										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}" items="{paymentBlockModel>/d/results}" width="80%"
-										editable="{oVisibilityModel>/NonPOInvoice/editable}">
+									<Select forceSelection="false" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}"
+										items="{oDropDownModel>/paymentBlockResult}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
-											<core:ListItem key="{paymentBlockModel>VdrPaymentBlock}" text="{paymentBlockModel>PaymentBlockDesc}"
-												additionalText="{paymentBlockModel>PaymentBlock}"/>
+											<core:ListItem key="{oDropDownModel>PmntBlk}" text="{oDropDownModel>PmntBlkDesc}"/>
 										</items>
 									</Select>
 								</VBox>
 								<VBox>
 									<Label text="{i18n>TaxCode}"/>
 									<Select forceSelection="false" id="taxCodeId" showSecondaryValues="true" valueState="{nonPOInvoiceModel>/invoiceDetailUIDto/vstate/taxCode}"
-										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{taxCodeModel>/aTax}" width="80%"
-										change="onChangeHeaderTax" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+										selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{oDropDownModel>/taxCodeResult}" width="80%"
+										change="onChangeHeaderTax" editable="{oVisibilityModel>/NonPOInvoice/editable}" columnRatio="1:3">
 										<items>
-											<core:ListItem key="{taxCodeModel>taxCode}" text="{taxCodeModel>taxCode}" additionalText="{taxCodeModel>taxCodeDescription}"/>
+											<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TaxCodeName}"/>
 										</items>
 									</Select>
 								</VBox>

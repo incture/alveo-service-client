@@ -527,4 +527,7 @@
     padding-left: 1rem
 }
 
-
+/*to adjust the width of popover suggestions*/
+.glaccount, .sapMPopoverCont {
+    width: auto !important;
+}
