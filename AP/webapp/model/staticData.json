@@ -1,7 +1,9 @@
 {
 	"mandatoryFields": {
 		"userDetail": ["userGroup", "firstName", "lastName", "Email", "country", "vendorId", "companyCode", "purchaseOrg"],
-		"createGroup": ["displayName", "description", "groupName"]
+		"createGroup": ["displayName", "description", "groupName"],
+		"PO": ["invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate"],
+		"NonPo": ["invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate"]
 	},
 	"navItems": [{
 		"label": "AP Workbench",
@@ -18,6 +20,10 @@
 	}, {
 		"label": "Config Cockpit",
 		"key": "ConfigCockpit",
+		"icon": "sap-icon://action-settings"
+	}, {
+		"label": "PO",
+		"key": "PO",
 		"icon": "sap-icon://action-settings"
 	}],
 	"userGroups": [{
@@ -62,10 +68,10 @@
 		"value": "10"
 	}],
 	"invoiceType": [{
-		"key": "Credit",
-		"value": "Credit"
+		"key": "NON-PO",
+		"value": "Non PO"
 	}, {
-		"key": "Supplier_Admin",
-		"value": "Supplier_Admin"
+		"key": "PO",
+		"value": "PO"
 	}]
 }

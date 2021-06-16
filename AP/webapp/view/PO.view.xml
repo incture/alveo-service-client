@@ -1,0 +1,54 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.PO"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified">
+	<Page class="sapUiSizeCompact">
+		<customHeader>
+			<OverflowToolbar>
+				<core:Fragment fragmentName="com.menabev.AP.fragment.POHeaderToolbar" type="XML"/>
+			</OverflowToolbar>
+		</customHeader>
+		<content>
+			<l:Splitter id="idMainSplitter" width="100%">
+				<VBox>
+					<Toolbar height="3rem">
+						<!--<Title level="H2" text="{i18n>InvoiceHeaderDetails}" class="headerTitle sapUiTinyMarginBegin"/>-->
+						<ToolbarSpacer/>
+						<Button text="{i18n>VendorBalances}" press="onClickVendorBalances" class="sapUiSizeCompact SecondaryBtn" enabled="false"/>
+						<Button icon="sap-icon://activity-individual" tooltip="{i18n>ActivityLog}" press="onClickActivityLog" class="SecondaryBtn" enabled="false"/>
+						<!--<Button icon="sap-icon://notification-2" tooltip="{i18n>ErrorMessages}" press="onClickErrorMessages" class="SecondaryBtn" enabled="false"/>-->
+						<Button text="{i18n>OpenPdf}" type="Emphasized" id="idOpenPDFBtn" tooltip="Open Pdf" press="onPressOpenpdf"
+							visible="{oPOModel>/openPdfBtnVisible}"/>
+						<!--<Button icon="sap-icon://refresh" press="onPressRefresh" class="SecondaryBtn" enabled="false"/>-->
+					</Toolbar>
+					<IconTabBar>
+						<items>
+							<IconTabFilter text="{i18n>INVOICEHEADERDETAILS}" key="invoiceheaderdetails">
+								<core:Fragment fragmentName="com.menabev.AP.fragment.POHeader" type="XML"/>
+							</IconTabFilter>
+							<IconTabFilter text="{i18n>ITEMDETAILS}" key="itemdetails">
+								<core:Fragment fragmentName="com.menabev.AP.fragment.ItemDetails" type="XML"/>
+							</IconTabFilter>
+							<IconTabFilter text="{i18n>COSTALLOCATION}" key="costallocation">
+								<!--<core:Fragment fragmentName="com.menabev.AP.fragment.Comments" type="XML"/>-->
+							</IconTabFilter>
+						</items>
+					</IconTabBar>
+					<IconTabBar>
+						<items>
+							<IconTabFilter text="{i18n>ATTACHMENTS}" key="attachments">
+								<!--<core:Fragment fragmentName="com.menabev.AP.fragment.Attachment" type="XML"/>-->
+							</IconTabFilter>
+							<IconTabFilter text="{i18n>COMMENTS}" key="comments">
+								<!--<core:Fragment fragmentName="com.menabev.AP.fragment.Comments" type="XML"/>-->
+							</IconTabFilter>
+						</items>
+					</IconTabBar>
+					<VBox>
+						<l:Grid id="grid2" vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
+							<l:content></l:content>
+						</l:Grid>
+					</VBox>
+				</VBox>
+			</l:Splitter>
+		</content>
+	</Page>
+</mvc:View>

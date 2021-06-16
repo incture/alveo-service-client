@@ -197,5 +197,16 @@ com.menabev.AP.formatter.formatter = {
 		} else {
 			return false;
 		}
-	}
+	},
+	setPaginationClass: function (selectedPage, currentPage) {
+		if (selectedPage == currentPage) {
+			this.removeStyleClass("nonSelectedPage");
+			this.addStyleClass("selectedPage");
+		} else {
+			this.removeStyleClass("selectedPage");
+			this.addStyleClass("nonSelectedPage");
+		}
+		return true;
+	},
+
 };

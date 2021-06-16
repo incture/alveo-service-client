@@ -100,6 +100,9 @@
 			"oPaginationModel": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
+			"oPOModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
 			"oDataModel": {
 				"type": "sap.ui.model.odata.ODataModel",
 				"settings": {
@@ -132,11 +135,9 @@
 			}
 		},
 		"resources": {
-			"css": [
-				{
-					"uri": "css/style.css"
-				}
-			]
+			"css": [{
+				"uri": "css/style.css"
+			}]
 		},
 		"routing": {
 			"config": {
@@ -148,71 +149,67 @@
 				"controlId": "AppId",
 				"clearControlAggregation": false
 			},
-			"routes": [
-				{
-					"name": "UploadInvoice",
-					"pattern": "UploadInvoice",
-					"target": [
-						"UploadInvoice"
-					]
-				},
-				{
-					"name": "UserManagement",
-					"pattern": "",
-					"target": [
-						"UserManagement"
-					]
-				},
-				{
-					"name": "Inbox",
-					"pattern": "Inbox",
-					"target": [
-						"Inbox"
-					]
-				},
-				{
-					"name": "CreateUser",
-					"pattern": "CreateUser/{id}",
-					"target": [
-						"CreateUser"
-					]
-				},
-				{
-					"name": "CreateGroup",
-					"pattern": "CreateGroup/{id}",
-					"target": [
-						"CreateGroup"
-					]
-				},
-				{
-					"name": "ConfigCockpit",
-					"pattern": "ConfigCockpit",
-					"target": [
-						"ConfigCockpit"
-					]
-				},
-				{
-					"name": "TemplateManagement",
-					"pattern": "TemplateManagement",
-					"target": [
-						"TemplateManagement"
-					]
-				},
-				{
-					"name": "Dashboard",
-					"pattern": "Dashboard",
-					"target": [
-						"Dashboard"
-					]
-				},
-				{
-					"name": "NonPOInvoice",
-					"pattern": "NonPOInvoice/:id:/:status:",
-					"target": [
-						"NonPOInvoice"
-					]
-				}
-			],
+			"routes": [{
+				"name": "UploadInvoice",
+				"pattern": "UploadInvoice",
+				"target": [
+					"UploadInvoice"
+				]
+			}, {
+				"name": "UserManagement",
+				"pattern": "",
+				"target": [
+					"UserManagement"
+				]
+			}, {
+				"name": "Inbox",
+				"pattern": "Inbox",
+				"target": [
+					"Inbox"
+				]
+			}, {
+				"name": "CreateUser",
+				"pattern": "CreateUser/{id}",
+				"target": [
+					"CreateUser"
+				]
+			}, {
+				"name": "CreateGroup",
+				"pattern": "CreateGroup/{id}",
+				"target": [
+					"CreateGroup"
+				]
+			}, {
+				"name": "ConfigCockpit",
+				"pattern": "ConfigCockpit",
+				"target": [
+					"ConfigCockpit"
+				]
+			}, {
+				"name": "TemplateManagement",
+				"pattern": "TemplateManagement",
+				"target": [
+					"TemplateManagement"
+				]
+			}, {
+				"name": "Dashboard",
+				"pattern": "Dashboard",
+				"target": [
+					"Dashboard"
+				]
+			}, {
+				"name": "NonPOInvoice",
+				"pattern": "NonPOInvoice/:id:/:status:",
+				"target": [
+					"NonPOInvoice"
+				]
+			}, {
+				"name": "PO",
+				"pattern": "PO/:id:/:status:",
+				"target": [
+					"PO"
+				]
+			}],
 			"targets": {
 				"UploadInvoice": {
 					"viewType": "XML",
@@ -249,6 +246,10 @@
 				"Dashboard": {
 					"viewType": "XML",
 					"viewName": "Dashboard"
+				},
+				"PO": {
+					"viewType": "XML",
+					"viewName": "PO"
 				}
 			}
 		}

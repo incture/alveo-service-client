@@ -1,0 +1,23 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons">
+	<Button icon="sap-icon://nav-back" press="onNavBack"/>
+	<Title text="{oPOModel>/requestId}"></Title>
+	<ToolbarSpacer/>
+	<Label text="{i18n>InvoiceAmount}" design="Bold" required="true" class="sapUiLargeMarginBegin "/>
+	<Text
+		text="{path:'oPOModel>/currency',formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"/>
+	<Input change="hdrInvAmtCalu" width="120px" type="Number" value="{oPOModel>/invoiceAmount}"  valueState="{oMandatoryModel>/NonPO/invoiceAmountState}"
+	 editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+	<Label text="{i18n>GrossAmt}" design="Bold"/>
+	<Text
+		text="{path :'oPOModel>/currency', formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"
+		tooltip="{oPOModel>/currency}"/>
+	<Input width="9%" enabled="false" textAlign="Right"  valueState="{oMandatoryModel>/NonPO/grossAmountState}"
+		value="{path: 'oPOModel>/grossAmount', type: 'sap.ui.model.type.Float'}"/>
+	<Label text="{i18n>balance}" design="Bold"/>
+	<Text
+		text="{path :'oPOModel>/currency', formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"
+		tooltip="{oPOModel>/currency}"/>
+	<Input width="9%" enabled="false" textAlign="Right"
+		value="{path:'oPOModel>/balanceAmount', type: 'sap.ui.model.type.Float'}" valueState="{oMandatoryModel>/NonPO/balanceAmountState}"/>
+	<Button icon="sap-icon://process" tooltip="{i18n>showTracker}" visible="false"/>
+</core:FragmentDefinition>

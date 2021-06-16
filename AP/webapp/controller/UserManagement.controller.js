@@ -78,6 +78,7 @@ sap.ui.define([
 			};
 			if (userGroup === "IT_Admin") {
 				var groups = ["Supplier_Admin"];
+				var taskGroups = ["GRN", "Accountant", "Process_Lead", "Buyer"];
 			} else {
 				var groups = ["Supplier_Executive"];
 			}
@@ -87,7 +88,7 @@ sap.ui.define([
 				busy.close();
 				var data = oEvent.getSource().getData();
 				var user, userdata = [],
-					vendorId, groupData;
+					vendorId, groupData, taskGroupData, taskGroupUsers = [];
 				if (data.Resources) {
 					for (var i = 0; i < data.Resources.length; i++) {
 						user = data.Resources[i];
@@ -106,12 +107,23 @@ sap.ui.define([
 										userdata.push(user);
 									}
 								}
+								if (userGroup === "IT_Admin") {
+									taskGroupData = taskGroups.indexOf(user.groups[j].value);
+									if (taskGroupData >= 0) {
+										var obj={
+											"userId":user.emails[0].value,
+											"role":user.groups[j].value
+										};
+										taskGroupUsers.push(obj);
+									}
+								}
 							}
 						}
 					}
 					var count = userdata.length;
 					oUserDetailModel.setProperty("/userCount", count);
 					oUserDetailModel.setProperty("/users", userdata);
+					oUserDetailModel.setProperty("/taskGroupUsers", taskGroupUsers);
 				}
 			});
 		},

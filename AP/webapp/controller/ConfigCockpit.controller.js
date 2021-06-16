@@ -502,6 +502,8 @@ sap.ui.define([
 		onSubmit: function () {
 			var MasterData = this.getView().getModel("oMasterModel").getData();
 			if (!this._fnSubmitValidate(MasterData)) {
+				var busy = new sap.m.BusyDialog();
+				busy.open();
 				$.ajax({
 					type: "POST",
 					url: "/menabevdev/configurationCockpit",
@@ -510,9 +512,11 @@ sap.ui.define([
 					contentType: "application/json",
 					async: true,
 					error: function (err) {
+						busy.close();
 						// sap.m.MessageToast.show("Destination Failed");
 					},
 					success: function (data, textStatus, jqXHR) {
+						busy.close();
 						MessageBox.success(data.message);
 					}
 

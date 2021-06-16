@@ -30,6 +30,7 @@ sap.ui.define([
 					obj.push(navItems[1]);
 					obj.push(navItems[2]);
 					obj.push(navItems[3]);
+					obj.push(navItems[4]);
 					that.oRouter.navTo("UserManagement");
 				} else if (userGroup === "Accountant") {
 					obj.push(navItems[0]);

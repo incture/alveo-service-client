@@ -1,0 +1,53 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+	<Table items="{oPOModel>/users}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20" id="itemdetails">
+		<headerToolbar>
+			<OverflowToolbar>
+				<ToolbarSpacer/>
+				<SearchField liveChange="onSearchUserList" width="20%"></SearchField>
+				<Button text="{i18n>ADDNEWUSER}" press="onAddNewUser" type="Emphasized"></Button>
+				<Button icon="sap-icon://download"></Button>
+				<Button icon="sap-icon://action-settings"></Button>
+			</OverflowToolbar>
+		</headerToolbar>
+		<columns>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%">
+				<Label design="Bold" text="{i18n>DESCRIPTION}" tooltip="{i18n>DESCRIPTION}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>QUANTITY}" tooltip="{i18n>QUANTITY}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>UOM}" tooltip="{i18n>UOM}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>UNITPRICE}" tooltip="{i18n>UNITPRICE}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%">
+				<Label design="Bold" text="{i18n>NETPRICE}" tooltip="{i18n>NETPRICE}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>AVLQTY}" tooltip="{i18n>AVLQTY}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>TAXCODE}" tooltip="{i18n>TAXCODE}"/>
+			</Column>
+			<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+				<Label design="Bold" text="{i18n>ACCASSGN}" tooltip="{i18n>ACCASSGN}"/>
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem>
+				<cells>
+					<Text text="{oPOModel>itemText}"/>
+					<Text text="{oPOModel>invQty}"/>
+					<Text text="{oPOModel>qtyUom}"/>
+					<Text text="{oPOModel>unitPriceOPU}"/>
+					<Text text="{oPOModel>netWorth}"/>
+					<Text text="{oPOModel>displayName}"/>
+					<Text text="{oPOModel>emails/0/value}"/>
+					<Text text="{oPOModel>phoneNumbers/0/value}"/>
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+</core:FragmentDefinition>
