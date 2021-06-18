@@ -426,9 +426,11 @@ sap.ui.define([
 		glAccountSuggest: function (oEvent) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
 			var oValue = oEvent.getParameter("suggestValue");
+			var ChartOfAccounts = "1000";
 			var oFilter = [];
 			if (oValue && oValue.length > 2) {
-				oFilter.push(new sap.ui.model.Filter("ChartOfAccounts", sap.ui.model.FilterOperator.Contains, oValue));
+				oFilter.push(new sap.ui.model.Filter("ChartOfAccounts", sap.ui.model.FilterOperator.EQ, ChartOfAccounts));
+				oFilter.push(new sap.ui.model.Filter("GlAccnt", sap.ui.model.FilterOperator.Contains, oValue));
 				var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
 				oDataModel.read("/GlAccountSet", {
 					filters: oFilter,
