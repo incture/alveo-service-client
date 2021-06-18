@@ -161,25 +161,27 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 						&& "GRN Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
 				boolean conditionIsActive = !ServiceUtil.isEmpty(schedulerConfigurationDto.getIsActive())
 						&& schedulerConfigurationDto.getIsActive();
-				if (isEmailScheduler) {// if email sch
-					SchedulerConfigurationDo entity = null;
-						
-						if(ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())){
-							//new sch rec
-							schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
-							schedulerConfigurationDto.setConfigurationId(configId);
-							entity = schedulerconfigurationRepository
-									.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-						}else{
-							// update the record with new fields
-							schedulerConfigurationDto.setConfigurationId(configId);
-							entity = schedulerconfigurationRepository
-									.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-						}
-					
-					//then anyways start/stop the scheduler  for email
-						schedulerconfigurationRepository.resetFlagIsActive(configId,entity.getScId());
-					// TODO
+				// if email sch
+				SchedulerConfigurationDo entity = null;
+
+				if (ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())) {
+					// new sch rec
+					schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
+					schedulerConfigurationDto.setConfigurationId(configId);
+					entity = schedulerconfigurationRepository
+							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
+				} else {
+					// update the record with new fields
+					schedulerConfigurationDto.setConfigurationId(configId);
+					entity = schedulerconfigurationRepository
+							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
+				}
+
+				// then anyways start/stop the scheduler for email
+				schedulerconfigurationRepository.resetFlagIsActive(configId, entity.getScId());
+				// TODO
+
+				if (isEmailScheduler) {
 					logger.error("Inside Email Scheduler Configuration" + entity);
 					Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
 					Long period = null;
@@ -190,74 +192,73 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 							period = Long.valueOf(milliSecond);
 							logger.error("Inside Email Scheduler Configuration period:::" + period);
 						}
+					}else if("hrs".equalsIgnoreCase(entity.getFrequencyUnit())){
+						Integer milliSecond = entity.getFrequencyNumber() * 60000 * 60;
+						if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
+
+							period = Long.valueOf(milliSecond);
+							logger.error("Inside Email Scheduler Configuration period:::" + period);
+						}
 					}
 					logger.error("Inside Email Scheduler Configuration period:::is empty "
 							+ ServiceUtil.isEmpty(startDate) + " is empty period" + ServiceUtil.isEmpty(period));
 					if (!ServiceUtil.isEmpty(startDate) && !ServiceUtil.isEmpty(period))
 						emailScheduler.reSchedule(startDate, period, entity);
-					
-					
-					
-				} else if (isOcrScheduler) {
-					if (conditionIsActive) {
 
-					} else {
-
-					}
 				} else if (isGRNScheduler) {
-					SchedulerConfigurationDo entity = null;
-					
-					if(ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())){
-						//new sch rec
-						schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
-						schedulerConfigurationDto.setConfigurationId(configId);
-						entity = schedulerconfigurationRepository
-								.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-					}else{
-						// update the record with new fields
-						schedulerConfigurationDto.setConfigurationId(configId);
-						entity = schedulerconfigurationRepository
-								.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-					}
-					schedulerconfigurationRepository.resetFlagIsActive(configId,entity.getScId());
-					
+					logger.error("Inside Email Scheduler Configuration" + entity);
+				} else {
+
 				}
-//
-//				schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
-//				schedulerConfigurationDto.setConfigurationId(configId);
-//				SchedulerConfigurationDo entity = schedulerconfigurationRepository
-//						.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-//				logger.error("Befor  Email Scheduler Configuration entity" + entity);
-//				if (!ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType()) && "Email Scheduler Configuration"
-//						.equalsIgnoreCase(schedulerConfigurationDto.getActionType())) {
-//					// TODO
-//					logger.error("Inside Email Scheduler Configuration" + entity);
-//					Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
-//					Long period = null;
-//					if ("min".equalsIgnoreCase(entity.getFrequencyUnit())) {
-//						Integer milliSecond = entity.getFrequencyNumber() * 60000;
-//						if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
-//
-//							period = Long.valueOf(milliSecond);
-//							logger.error("Inside Email Scheduler Configuration period:::" + period);
-//						}
-//					}
-//					logger.error("Inside Email Scheduler Configuration period:::is empty "
-//							+ ServiceUtil.isEmpty(startDate) + " is empty period" + ServiceUtil.isEmpty(period));
-//					if (!ServiceUtil.isEmpty(startDate) && !ServiceUtil.isEmpty(period))
-//						emailScheduler.reSchedule(startDate, period, entity);
-//
-//				}
-//				if (!ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType()) && "Email Scheduler Configuration"
-//						.equalsIgnoreCase(schedulerConfigurationDto.getActionType())) {
-//
-//				}
+
+				//
+				// schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
+				// schedulerConfigurationDto.setConfigurationId(configId);
+				// SchedulerConfigurationDo entity =
+				// schedulerconfigurationRepository
+				// .save(mapper.map(schedulerConfigurationDto,
+				// SchedulerConfigurationDo.class));
+				// logger.error("Befor Email Scheduler Configuration entity" +
+				// entity);
+				// if
+				// (!ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
+				// && "Email Scheduler Configuration"
+				// .equalsIgnoreCase(schedulerConfigurationDto.getActionType()))
+				// {
+				// // TODO
+				// logger.error("Inside Email Scheduler Configuration" +
+				// entity);
+				// Date startDate = new
+				// SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
+				// Long period = null;
+				// if ("min".equalsIgnoreCase(entity.getFrequencyUnit())) {
+				// Integer milliSecond = entity.getFrequencyNumber() * 60000;
+				// if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
+				//
+				// period = Long.valueOf(milliSecond);
+				// logger.error("Inside Email Scheduler Configuration period:::"
+				// + period);
+				// }
+				// }
+				// logger.error("Inside Email Scheduler Configuration
+				// period:::is empty "
+				// + ServiceUtil.isEmpty(startDate) + " is empty period" +
+				// ServiceUtil.isEmpty(period));
+				// if (!ServiceUtil.isEmpty(startDate) &&
+				// !ServiceUtil.isEmpty(period))
+				// emailScheduler.reSchedule(startDate, period, entity);
+				//
+				// }
+				// if
+				// (!ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
+				// && "Email Scheduler Configuration"
+				// .equalsIgnoreCase(schedulerConfigurationDto.getActionType()))
+				// {
+				//
+				// }
 
 			}
 
-			
-			
-			
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setMessage(ApplicationConstants.UPDATE_SUCCESS);
