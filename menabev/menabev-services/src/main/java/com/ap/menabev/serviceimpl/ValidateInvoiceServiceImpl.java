@@ -44,7 +44,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 		try {
 			if (!ServiceUtil.isEmpty(changeIndicator)) {
-				if (changeIndicator.getIsVendoIdChanged()) {
+				if (!ServiceUtil.isEmpty(changeIndicator.getIsVendoIdChanged()) && changeIndicator.getIsVendoIdChanged()) {
 					logger.error("Inside getIsVendoIdChanged:::"+changeIndicator.getIsVendoIdChanged());
 					// 1. Call VendorCheckAPI
 
@@ -135,7 +135,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
 					return invoiceHeaderCheckDto;
 
-				} else if (changeIndicator.getIsInvoiceRefChanged()) {
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsInvoiceRefChanged()) && changeIndicator.getIsInvoiceRefChanged()) {
 					// 1. Call duplicateCheckAPI
 					//
 
@@ -156,7 +156,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// b. If error, stop processing and send response to UI
 					//
 					// 2. ResetChangeIndicator
-				} else if (changeIndicator.getIsInvoiceDateChanged()) {
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsInvoiceDateChanged()) && changeIndicator.getIsInvoiceDateChanged()) {
 					// 1. Call duplicateCheckAPI
 					//
 					// a. If success, then move on
@@ -181,7 +181,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					return invoiceHeaderCheckDto;
 
 					// a. ResetChagneIndicator-InvoiceDate
-				} else if (changeIndicator.getIsInvoiceAmountChanged()) {
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsInvoiceAmountChanged()) && changeIndicator.getIsInvoiceAmountChanged()) {
 					// SetBalanceAmount = InvoiceAmount - GrossAmount
 					Double balanceAmount = invoiceHeaderCheckDto.getInvoiceAmount()
 							- invoiceHeaderCheckDto.getGrossAmount();
@@ -204,7 +204,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					}
 					return invoiceHeaderCheckDto;
 
-				} else if (changeIndicator.getIsBaselineDateChanged()) {
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsBaselineDateChanged()) && changeIndicator.getIsBaselineDateChanged()) {
 					// 1. Determine Due dates
 					//
 					// a. Call CalculateDueDateOdata and set all the due dates.
@@ -214,12 +214,12 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							invoiceHeaderCheckDto.getChangeIndicator());
 					invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
 					return invoiceHeaderCheckDto;
-				} else if (changeIndicator.getIsPaymentTermsChanged()) {
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsPaymentTermsChanged()) && changeIndicator.getIsPaymentTermsChanged()) {
 					// 1. Get the baseline date from the payment terms data.
 					//
 					// 2. Call CalcaulateDueDateOdata
 					return invoiceHeaderCheckDto;
-				} else if (changeIndicator.getIsTaxCodeChanged()) {
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsTaxCodeChanged()) && changeIndicator.getIsTaxCodeChanged()) {
 					// 1. Calculate systemSuggestedTaxAmount.
 					// 2. If InvTaxAmount > SystemSuggested tax amount
 					if (invoiceHeaderCheckDto.getTaxAmount() > invoiceHeaderCheckDto.getSystemSuggestedtaxAmount()) {
