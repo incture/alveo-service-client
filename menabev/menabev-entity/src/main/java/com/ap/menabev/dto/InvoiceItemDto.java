@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+
 import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
 
 import lombok.Getter;
@@ -16,71 +19,49 @@ import lombok.ToString;
 @ToString
 public class InvoiceItemDto {
 
-	private String Id;
-	private String requestId;
-	private String itemId;
+	private String guid;
 	private String itemCode;
-	private String itemLifeCycleStatus;
-	private String itemLifeCycleStatusText;
+	private String requestId;
 	private String itemText;
-	private String refDocCat;
-	private Long refDocNum;
+	private String refDocCat;//ref_purchasedoc_category
+	private Long refDocNum;//ref_purchase_num
 	private String extItemId;
+	private String articleNum;
 	private Integer customerItemId;
 	private String upcCode;
-	private String invQty;
-	private String qtyUom;
-	private String price;
+	private double invQty;
+	private String uom;
+	private double unitPrice;
 	private String currency;
 	private Integer pricingUnit;
-	private String unit;
-	private String disAmt;
-	private String disPer;
-	private String deposit;
-	private Integer shippingAmt;
-	private String shippingPer;
-	private Integer taxAmt;
-	private Integer taxPer;
-	private String netWorth;
-	private String itemComment;
+	private String orderPriceUnit;
+	private double grossPrice;
+	private double discountValue;
+	private double disPerentage;
+	private String taxCode;
+	private double taxValue;
+	private double taxPercentage;
+	private double netWorth;
 	private Boolean isTwowayMatched;
 	private Boolean isThreewayMatched;
 	private Long matchDocNum;
-	private String matchedBy;
 	private String matchDocItem;
 	private String matchParam;
-	private String unusedField1;
-	private String unusedField2;
-
-	private String createdByInDb;
-	private Long createdAtInDB;
+	private String matchserviceNumber;
+	private String matchpackageNumber;
+	private String matchType;// manuall or Auto posting
 	private String updatedBy;
-	private Long updatedAt;
+	private long updatedAt;
 	private Boolean isSelected;
-	private String isAccAssigned;
+	private String matchedBy;
+    private boolean isAccAssigned;
+    private String itemRequisationNum;
+    private String requisationNum;
+    private String contractNum;
+    private String contractItem;
+    private boolean isDeleted;
+    private String setPoMaterialNum;
 	private List<InvoiceItemAcctAssignmentDto> invItemAcctDtoList;
-
-	/* PO Calculations */
-
-	private BigDecimal poAvlQtyOU;
-
-	private BigDecimal unitPriceOPU;
-
-	private BigDecimal poNetPrice;
-
-	private String poTaxCode;
-	private String poMaterialNum;
-	private String poVendMat;
-	private String poUPC;
-	private BigDecimal poQty;
-	private String poUom;
-	private String amountDifference;
-	private Boolean isDeleted;
-	// private String price2;
-	//
-	// private String invQty2;
-	
-	
-	 private String articleNum;
+	private List<ItemMessageDto> invoiceItemMessages;
 
 }

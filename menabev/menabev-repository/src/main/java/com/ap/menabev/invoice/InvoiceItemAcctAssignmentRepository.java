@@ -12,11 +12,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
+import com.ap.menabev.entity.InvoiceItemAcctAssignmentPkDo;
 
 
 
 @Repository
-public interface InvoiceItemAcctAssignmentRepository extends JpaRepository<InvoiceItemAcctAssignmentDo, String> {
+public interface InvoiceItemAcctAssignmentRepository extends JpaRepository<InvoiceItemAcctAssignmentDo, InvoiceItemAcctAssignmentPkDo> {
 	@Query(value = "Select max(SERIAL_NO) from INVOICE_ITEM_ACCOUNT_ASSIGNMENT where REQUEST_ID=:requestId"
 			+ " and ITEM_ID=:itemId", nativeQuery = true)
 	String getSerialNo(@Param("requestId") String requestId, @Param("itemId") String itemId);

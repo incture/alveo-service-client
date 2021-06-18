@@ -12,14 +12,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.entity.CostAllocationDo;
+import com.ap.menabev.entity.CostAllocationPkDo;
 
 
 
 @Repository
-public interface CostAllocationRepository extends JpaRepository<CostAllocationDo, Integer> {
-	@Query(value = "select count(cd.itemId) from CostAllocationDo cd where cd.requestId=:requestId and cd.itemId=:itemId")
-	public Integer getItemCount(@Param("requestId") String requestId,
-			@Param("itemId") Integer itemId);
+public interface CostAllocationRepository extends JpaRepository<CostAllocationDo, CostAllocationPkDo> {
+	
 	@Query(value="select count(cd.itemId) from CostAllocationDo cd where cd.requestId=:requestId")
 	public Integer getItemCountTotal(@Param("requestId") String requestId);
 	
@@ -36,8 +35,12 @@ public interface CostAllocationRepository extends JpaRepository<CostAllocationDo
 	@Query("Delete from CostAllocationDo cd where cd.requestId=:requestId")
 	public Integer deleteCostAllocationDo(@Param("requestId") String requestId);
 	
-	@Query(value = "Select max(ITEM_ID) from INVOICE_ITEM_ACCOUNT_ASSIGNMENT where REQUEST_ID=:requestId"
+	@Query(value = "Select max(ITEM_ID) from COST_ALLOCATION_ID where REQUEST_ID=:requestId"
 			, nativeQuery = true)
 	public String getItemID(@Param("requestId") String requestId);
+	
+	@Query(value = "Select max(ITEM_ID) COST_ALLOCATION_ID from INVOICE_ITEM_ACCOUNT_ASSIGNMENT"
+			, nativeQuery = true)
+	public String getItemID();
 	
 }

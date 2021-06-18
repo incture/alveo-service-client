@@ -21,6 +21,11 @@ public class InvoiceHeaderRepoFilter implements InvoiceHeaderFilterRepo{
 		// TODO Auto-generated method stub
 		return entityManager.createNativeQuery(query.toString(), InvoiceHeaderDo.class).getResultList();
 	}
+	@SuppressWarnings("unchecked")
+	public List<InvoiceHeaderDo> getFilteredRequestIds(String query) {
+		// TODO Auto-generated method stub
+		return entityManager.createNativeQuery(query.toString(), InvoiceHeaderDo.class).getResultList();
+	}
 	
 
 }

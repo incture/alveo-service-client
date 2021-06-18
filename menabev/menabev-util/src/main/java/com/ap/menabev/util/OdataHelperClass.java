@@ -93,9 +93,6 @@ public class OdataHelperClass {
 			// have to fetch from Connectivity SK through VCAP //TODO
 			String proxyHost = "10.0.4.5";
 			int proxyPort = 20003;
-			Header[] jsonResponse = null;
-			String objresult = null;
-
 			// JSONObject jsonObj = new
 			// JSONObject(System.getenv("VCAP_SERVICES"));
 
@@ -177,7 +174,6 @@ public class OdataHelperClass {
 					httpRequestBase.addHeader("Cookie", tmp);
 				}
 			}
-
 			httpResponse = httpClient.execute(httpRequestBase);
 			if (httpResponse.getStatusLine().getStatusCode() == 200) {
 				String dataFromStream = getDataFromStream(httpResponse.getEntity().getContent());
@@ -186,10 +182,9 @@ public class OdataHelperClass {
 				// logic for 201 //TODO
 				return new ResponseEntity<String>("from block 201", HttpStatus.OK);
 			} else {
-				String responseFromECC = httpResponse.getEntity().toString();
-				return new ResponseEntity<String>("Response from odata call " + httpResponse, HttpStatus.BAD_REQUEST);
+				String responseFromECC = getDataFromStream(httpResponse.getEntity().getContent());
+				return new ResponseEntity<String>(responseFromECC, HttpStatus.BAD_REQUEST);
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new ResponseEntity<String>("Error" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

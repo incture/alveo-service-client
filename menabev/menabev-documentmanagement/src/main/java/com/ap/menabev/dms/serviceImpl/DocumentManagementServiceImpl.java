@@ -2,25 +2,16 @@ package com.ap.menabev.dms.serviceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -32,7 +23,6 @@ import org.apache.chemistry.opencmis.client.api.Repository;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
-import org.apache.chemistry.opencmis.client.util.ContentStreamUtils;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -46,43 +36,17 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.mapping.Array;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.ap.menabev.util.ApplicationConstants;
-import com.ap.menabev.util.ServiceUtil;
-
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
 import com.ap.menabev.dms.dto.DmsGetResponseDto;
 import com.ap.menabev.dms.dto.DmsResponseDto;
 import com.ap.menabev.dms.service.DocumentManagementService;
-import com.ap.menabev.dto.DashBoardDetailsDto;
-import com.ap.menabev.dto.InvoiceBPDto;
-import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
-import com.ap.menabev.dto.InvoiceItemDashBoardDto;
-import com.ap.menabev.dto.InvoiceItemDto;
-import com.ap.menabev.dto.NonPoTemplateItemsDto;
 import com.ap.menabev.dto.ResponseDto;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
+import com.ap.menabev.util.ApplicationConstants;
+import com.ap.menabev.util.ServiceUtil;
 
 @Service
 public class DocumentManagementServiceImpl implements DocumentManagementService {
@@ -503,7 +467,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		return sb.toString();
 	}
 
-	@Override
+	/*@Override
 	public DashBoardDetailsDto extraxtXml(File file) throws SAXException, IOException {
 		System.out.println(file.length());
 		DashBoardDetailsDto dto = new DashBoardDetailsDto();
@@ -718,7 +682,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		}
 
 		return dto;
-	}
+	}*/
 
 	@Override
 	public String getTest() {

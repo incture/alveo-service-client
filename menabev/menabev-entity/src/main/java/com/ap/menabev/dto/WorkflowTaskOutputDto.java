@@ -26,6 +26,7 @@ public @Data class WorkflowTaskOutputDto {
 	private String lastChangedAt;
 	private String requestIds;
 	private String startedAt;
+	private long totalCount;
 	
 
 

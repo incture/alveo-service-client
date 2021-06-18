@@ -1,7 +1,5 @@
 package com.ap.menabev.serviceimpl;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,18 +10,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.ap.menabev.dto.AttachmentDto;
 import com.ap.menabev.dto.AttamentMasterDto;
-import com.ap.menabev.dto.DashBoardDetailsDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.entity.AttachmentDo;
 import com.ap.menabev.invoice.AttachmentRepository;
@@ -208,21 +199,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 	public ResponseEntity<?> downloadPdf(String requestId) {
 		return null;
 	}
-	
-//	public void createPdf(){
-//	     final String uri = "https://ap-automation.cfapps.eu10.hana.ondemand.com/invoiceHeader?requestId=APA-000291";
-//	     RestTemplate restTemplate = new RestTemplate();
-//	     DashBoardDetailsDto result = restTemplate.getForObject(uri, DashBoardDetailsDto.class);      
-//	     System.out.println(result.getBillTo()); 
-//	     
-//		
-//	}
-	
-//	public static void main(String[] args) {
-//		AttachmentServiceImpl obj = new AttachmentServiceImpl();
-//		obj.createPdf();
-//	}
-	
+
 	
 
 

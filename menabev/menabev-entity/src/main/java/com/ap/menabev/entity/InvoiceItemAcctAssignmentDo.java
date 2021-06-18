@@ -1,128 +1,72 @@
 package com.ap.menabev.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@IdClass(InvoiceItemAcctAssignmentPkDo.class)
 @Table(name = "INVOICE_ITEM_ACCOUNT_ASSIGNMENT")
-public @Data class InvoiceItemAcctAssignmentDo {
+public @Data class InvoiceItemAcctAssignmentDo implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@Column(name="INV_ACC_ASS_ID")
 	private String accountAssgnGuid;
+	@Id
 	@Column(name="REQUEST_ID", nullable = false)
 	private String requestId;
+	@Id
 	@Column(name = "ITEM_ID", nullable = false)
-	private String itemId;
-	@Column(name = "DOCUMENT_NUMBER",nullable=false)
-	private String documentNumber;
-	@Column(name = "DOCUMENT_ITEM",nullable=false)
-	private String documentItem;
+	private String itemId; // invoiceItemId
+	@Id
 	@Column(name="SERIAL_NO",nullable=false)
 	private String serialNo;
-	@Column(name="IS_DELETED",nullable=false)
+	@Column(name="IS_DELETED")
 	private boolean isDeleted;
-	@Column(name = "IS_UNPLANNED")
-	private boolean  isUnplanned;
-	@Column(name="CREATED_ON")
-	private Long createdOn;
-	@Column(name="IS_CHANGED")
-	private Boolean isChanged;
+	@Column(name = "IS_PLANNED")
+	private boolean  isPlanned;
 	@Column(name = "QUANTITY")
-	private String qty;
-	@Column(name = "QUANTITY_UNIT")
+	private double qty;
+	@Column(name = "QUANTITY_UNIT",length = 10)
 	private String qtyUnit;
 	@Column(name="DIST_PERC")
 	private double distPerc;
 	@Column(name = "NET_VALUE")
-	private String netValue;
-	@Column(name = "GL_ACCOUNT")
+	private double netValue;
+	@Column(name = "GL_ACCOUNT",length = 10)
 	private String glAccount;
-	@Column(name = "BUSINESS_AREA")
-	private String businessArea;
 	@Column(name = "COST_CENTER")
 	private String costCenter;
-	@Column(name = "DEBIT_OR_CREDIT")
-	 private String  debitOrCredit;
-	@Column(name="TEXT")
-	private String text;
+	@Column(name = "COST_CENTER_TEXT")
+	private String costCenterText;
 	@Column(name="TAX_VALUE")
 	private String  taxValue;
 	@Column(name = "TAX-PERC")
      private String taxPercentage;
-	@Column(name="SD_DOC")
-	private String sdDoc;
-	@Column(name="ITEM_NUMBER")
-	private String itemNumber;
-	@Column(name="SCHED_LINE")
-	private String schedLine;
-	@Column(name="ASSET_NO")
-	private String assetNo;
-	@Column(name="SUB_NUMBER")
+	@Column(name="SUB_NUMBER",length =10)
 	private String subNumber;
-	@Column(name="ORDER_ID")
+	@Column(name="ORDER_ID",length = 15)
 	private String orderId;
-	@Column(name="GR_RCPT")
-	private String grRcpt;
-	@Column(name="UNLOAD_PT")
-	private String unloadPt;
-	@Column(name="CO_AREA")
-	private String coArea;
-	@Column(name="COST_OBJECT")
-	private String costObject;
-	@Column(name="PROFIT_CTR")
+	@Column(name="PROFIT_CTR",length=15)
 	private String profitCtr;
-	@Column(name="WBS_ELEMENT")
-	private String wbsElement;
-	@Column(name="NETWORK")
-	private String network;
-	@Column(name="RLESTKEY")
-	private String rlEstKey;
-	@Column(name="PART_ACCT")
-	private String partAcct;
-	@Column(name="CMMT_ITEM")
-	private String cmmtItem;
-	@Column(name="REC_IND")
-	private String recInd;
-	@Column(name="FUNDS_CTR")
-	private String fundsCtr;
-	@Column(name="FUND")
-	private String fund;
-	@Column(name="FUNC_AREA")
-	private String funcArea;
-	@Column(name="REF_DATE")
-	private String refDate;
-	@Column(name="TAX_CODE")
-	private String taxCode;
-	@Column(name="TAXJURCODE")
-	private String taxjurcode;
-	@Column(name="NONDITAX")
-	private String nondItax;
-	@Column(name="ACT_TYPE")
-	private String acttype;
-	@Column(name="CO_BUS_PROC")
-	private String coBusproc;
-	@Column(name="RES_DOC")
-	private String resDoc;
-	@Column(name="RES_ITEM")
-	private String resItem;
-	@Column(name="ACTIVITY")
-	private String activity;
-	@Column(name="GRANTNBR")
-	private String grantNbr;
-	@Column(name="CMMT_ITEM_LONG")
-	private String cmmtItemLong;
-	@Column(name="FUNC_AREA_LONG")
-	private String funcAreaLong;
-	@Column(name="BUDGET_PERIOD")
-	private String budgetPeriod;
-	@Column(name="FINAL_IND")
-	private String finalInd;
-	@Column(name="FINAL_REASON")
-	private String finalReason;
-	
+    @Column(name="WBS_ELEMENT",length=14)
+    private String wbsElement;
+    @Column(name = "CR_DB_INDICATOR")
+    private String crDbIndicator;
 
 }
 

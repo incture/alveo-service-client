@@ -3,10 +3,12 @@ package com.ap.menabev.util;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainTestClass {
 	
 
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		
 		StringBuilder url = new StringBuilder();
@@ -15,10 +17,22 @@ public class MainTestClass {
 		value.add("ARUN");
 		value.add("SMEGHANA");
 	
+		Long top  = new Long(1);
+		Long skip = new Long(0);
+		
+       List<String> valueList = value.stream().limit(1).skip(1).collect(Collectors.toList());
+		
+		
+		System.err.println("topandSkip "+valueList.toString());
+		
+		
+		
+		
 		
 		
 		               appendValuesInOdataUrl(url,"PurchaseOrderCreator",value);
 		               System.err.println("StringUrl "+url.toString());
+		               
 	}
 
 	public static void appendValuesInOdataUrl(StringBuilder url,String key, List<String> value){

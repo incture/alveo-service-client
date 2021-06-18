@@ -7,15 +7,14 @@ import lombok.Data;
 @Data
 public class InboxResponseOutputDto {
 	
-	private long index;
-	private long pageCount;
-	private String tabType;
-	private long countOpenTask;
-	private long countMyTask;
-	private long countDraft;
+	private long top;
+	private long skip;
+	private long draftCount;
+	private long totalCount;
+	private List<InboxOutputDto> taskList;
+	private List<InboxOutputDto>  draftList;
 	private String Message;
-	private String statusCode;
 	private int statusCodeValue;
-	private List<InboxOutputDto> listOfTasks;
+	
 
 }

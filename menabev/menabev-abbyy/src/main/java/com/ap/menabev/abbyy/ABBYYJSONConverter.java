@@ -45,23 +45,23 @@ public class ABBYYJSONConverter {
 								else if ("OrderNumber".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
 									itemDto.setRefDocNum(new Long((invoiceItem.getString("Value")==""?null:invoiceItem.getString("Value"))==null?0:Long.valueOf(invoiceItem.getString("Value"))));
 								else if ("MaterialNumber".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setPoMaterialNum(invoiceItem.getString("Value"));
+									itemDto.setSetPoMaterialNum(invoiceItem.getString("Value"));
 								else if ("Description".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
 									itemDto.setItemText(invoiceItem.getString("Value"));
 								else if ("Quantity".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setInvQty(String.valueOf(invoiceItem.getInt("Value")));
+									itemDto.setInvQty(invoiceItem.getDouble("Value"));
 								else if ("UnitPrice".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
 									itemDto.setPricingUnit(invoiceItem.getInt("Value"));
 								else if ("DiscountPercentage".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setDisAmt(String.valueOf(invoiceItem.getInt("Value")));
+									itemDto.setDisPerentage(invoiceItem.getDouble("Value"));
 								else if ("DiscountValue".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setDisPer(String.valueOf(invoiceItem.getInt("Value")));
+									itemDto.setDiscountValue(invoiceItem.getDouble("Value"));
 								else if ("TotalPriceNetto".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setPrice(String.valueOf(invoiceItem.getInt("Value")));
+									itemDto.setGrossPrice(invoiceItem.getDouble("Value"));
 								else if ("VATPercentage".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setTaxPer(invoiceItem.getInt("Value"));
+									itemDto.setTaxPercentage(invoiceItem.getInt("Value"));
 								else if ("VATValue".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setTaxAmt(invoiceItem.getInt("Value"));
+									itemDto.setTaxValue(invoiceItem.getInt("Value"));
 
 							}
 
@@ -92,7 +92,7 @@ public class ABBYYJSONConverter {
 					}
 
 					else if ("TotalNetAmount".equalsIgnoreCase(name)) {
-						headerDto.setAmountBeforeTax(String.valueOf(headerObj.getInt("Value")));
+						headerDto.setAmountBeforeTax(headerObj.getInt("Value"));
 					}
 
 				}

@@ -12,12 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ap.menabev.dto.DashBoardDetailsDto;
 import com.ap.menabev.dto.InvoiceItemDto;
-import com.ap.menabev.dto.ManualMatchingDto;
-import com.ap.menabev.service.InvoiceHeaderService;
-import com.ap.menabev.service.InvoiceItemService;
 import com.ap.menabev.dto.ResponseDto;
+import com.ap.menabev.service.InvoiceItemService;
 @RestController
 @RequestMapping("/invoiceItem")
 public class InvoiceItemController {
@@ -31,15 +28,7 @@ public class InvoiceItemController {
 	}
 	
 
-	@PostMapping("/manualMatch")
-	public DashBoardDetailsDto manualMatch(@RequestBody ManualMatchingDto manualMatchingDto) {
-		return itemService.manualMatch(manualMatchingDto);
-	}
-
-	@PostMapping("/unMatchItems")
-	public DashBoardDetailsDto unMatch(@RequestBody DashBoardDetailsDto dashBoardDetailsDto) {
-		return itemService.unMatch(dashBoardDetailsDto);
-	}
+	
 
 
 	@GetMapping("/getAll")
@@ -58,12 +47,7 @@ public class InvoiceItemController {
 		return itemService.findAllByLimit(limit, offset);
 	}
 
-	@PostMapping("/grnCalculations")
-	public DashBoardDetailsDto grnCalculations(@RequestBody DashBoardDetailsDto dashBoardDetailsDto) {
-		// return itemService.grnCalculations(dashBoardDetailsDto);
-		return null;
 
-	}
 
 	// @GetMapping("/getUser")
 	// public static String getUser(@RequestBody HttpServletRequest request){

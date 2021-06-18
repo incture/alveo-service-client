@@ -80,7 +80,7 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 	public ResponseDto delete(Integer id) {
 		ResponseDto response = new ResponseDto();
 		try {
-			costAllocationRepository.deleteById(id);
+			//costAllocationRepository.deleteById(id);
 			response.setMessage("Cost Allocation data deleted Successfully");
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setCode(ApplicationConstants.CODE_SUCCESS);

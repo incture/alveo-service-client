@@ -2,104 +2,84 @@ package com.ap.menabev.entity;
 
 
 
-import java.util.UUID;
+import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
-
-
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "COST_ALLOCATION")
-public @Data class CostAllocationDo {
+@IdClass(CostAllocationPkDo.class)
+public @Data class CostAllocationDo implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@Column(name = "COST_ALLOCATION_ID")
 	private String costAllocationId;
-	
+	@Id
 	@Column(name = "REQUEST_ID", nullable = false)
-    private String requestId; // (FK)
-	
+    private String requestId; 
+	@Id
 	@Column(name = "ITEM_ID", nullable = false)
-	private Integer itemId; // (FK)
-	
-	@Column(name = "SERIAL_NO")
-	private Integer serialNo;
-	
+	private String itemId; 
+	@Column(name = "SUB_NUM" ,length = 10)
+	private String subNum;
 	@Column(name = "DELETE_IND")
 	private Boolean deleteInd;
-	
 	@Column(name = "QUANTITY")
-	private String quantity;
-	
-	@Column(name = "QUANTITY_UNIT")
+	private double quantity;
+	@Column(name = "QUANTITY_UNIT", length = 5)
 	private String quantityUnit;
-	
 	@Column(name = "DISTR_PERC")
-	private String distrPerc;
-	
-	@Column(name = "ORDER-ID")
+	private double distrPerc;
+	@Column(name = "ORDER_ID",length = 5)
 	private String orderId;
-	
 	@Column(name = "NET_VALUE")
-	private String netValue;
-	
-	@Column(name = "GL_ACCOUNT")
+	private double netValue;
+	@Column(name = "GL_ACCOUNT",length = 10)
 	private String glAccount;
-	
-	@Column(name = "COST_CENTER")
+	@Column(name = "GL_ACCOUNT_TEXT",length = 10)
+	private String glAccountText;
+	@Column(name = "COST_CENTER",length = 4)
 	private String costCenter;
-	
-	@Column(name = "ASSET_NO")
+	@Column(name = "COST_CENTER_TEXT",length = 50)
+	private String costCenterText;
+	@Column(name = "ASSET_NO",length = 10)
 	private String assetNo;
-	
-	@Column(name = "SUB_NUMBER")
+	@Column(name = "SUB_NUMBER",length = 10)
 	private String subNumber;
-	
-	@Column(name = "INTERNAL_ORDER_ID")
-	private String internalOrderId;
-	
-	@Column(name = "PROFIT_CENTER")
+	@Column(name = "PROFIT_CENTER",length = 10)
 	private String profitCenter;
-	
-	@Column(name = "WBS_ELEMENT")
+	@Column(name = "WBS_ELEMENT",length = 10)
 	private String wbsElement;
-	
-	@Column(name = "CR_DB_INDICATOR")
+	@Column(name = "CR_DB_INDICATOR",length = 2)
 	private String crDbIndicator;
-	
-	@Column(name="ITEM_TEXT")
-	private String itemText;
-	
-	@Column(name = "TAX_C0DE")
+	@Column(name = "TAX_C0DE",length = 50)
 	private String taxCode;
-	
-	@Column(name = "ACCOUNT_NUM")
+	@Column(name = "ACCOUNT_NUM",length = 50)
 	private String accountNum;
-	
-	@Column(name = "LINE_TEXT")
+	@Column(name = "LINE_TEXT",length = 50)
 	private String lineText;
-	
-	@Column(name ="TAX_VALUE")
+	@Column(name ="TAX_VALUE",length = 50)
 	private String taxValue;
-	@Column(name ="TAX_PER")
+	@Column(name ="TAX_PER",length = 50)
 	private String taxPer;
-	@Column(name ="TAX_RATE")
+	@Column(name ="BASE_RATE",length = 50)
 	private String baseRate;
-	
-	
-	@Column(name ="MATERIAL_DESC")
+	@Column(name ="MATERIAL_DESC",length = 50)
 	private String materialDesc;
 	
 }

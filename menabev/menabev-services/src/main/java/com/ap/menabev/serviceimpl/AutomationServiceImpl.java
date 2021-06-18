@@ -276,17 +276,13 @@ public class AutomationServiceImpl implements AutomationService {
 		ResponseDto response = null;
 		try {
 			for (InvoiceHeaderDto invoiceHeaderDto : headerList) {
-				invoiceHeaderDto.setLifecycleStatus(ApplicationConstants.LIFE_CYCLE_STATUS_OPEN);
 				invoiceHeaderDto.setChannelType(ApplicationConstants.CHANEL_TYPE_EMAIL);
-				invoiceHeaderDto.setCreatedAtInDB(ServiceUtil.getEpocTime());
-				invoiceHeaderDto.setCreatedByInDb("SYSTEM");
+				invoiceHeaderDto.setRequest_created_at(ServiceUtil.getEpocTime());
+				invoiceHeaderDto.setRequest_created_by("SYSTEM");
 				List<InvoiceItemDto> invoiceItemList = invoiceHeaderDto.getInvoiceItems();
 				for (InvoiceItemDto invoiceItemDto : invoiceItemList) {
-					invoiceItemDto.setCreatedByInDb("SYSTEM");
-					invoiceItemDto.setCreatedAtInDB(ServiceUtil.getEpocTime());
 					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
 				}
-
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
 
 			}

@@ -2,47 +2,24 @@ package com.ap.menabev.serviceimpl;
 
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ap.menabev.dto.DashBoardDetailsDto;
-import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
-import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
-import com.ap.menabev.dto.InvoiceItemDashBoardDto;
 import com.ap.menabev.dto.InvoiceItemDto;
-import com.ap.menabev.dto.ManualMatchingDto;
-import com.ap.menabev.dto.PurchaseDocumentItemDto;
 import com.ap.menabev.dto.ResponseDto;
-import com.ap.menabev.entity.InvoiceHeaderDo;
-import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
 import com.ap.menabev.entity.InvoiceItemDo;
-import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.invoice.InvoiceItemAcctAssignmentRepository;
 import com.ap.menabev.invoice.InvoiceItemRepository;
 import com.ap.menabev.service.InvoiceItemService;
-import com.ap.menabev.service.PurchaseDocumentItemService;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 
@@ -92,42 +69,10 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		}
 	}
 
-	@Override
-	public DashBoardDetailsDto saveAll(List<InvoiceItemDto> dtoList) {
-
-		DashBoardDetailsDto boardDetailsDto = new DashBoardDetailsDto();
-		ResponseDto response = new ResponseDto();
-		List<InvoiceItemDo> doList = new ArrayList<>();
-		ModelMapper mapper = new ModelMapper();
-		try {
-			dtoList.forEach(dto -> doList.add(mapper.map(dto, InvoiceItemDo.class)));
-			invoiceItemRepository.saveAll(doList);
-			response.setCode(ApplicationConstants.CODE_SUCCESS);
-			response.setStatus(ApplicationConstants.SUCCESS);
-			response.setMessage(ApplicationConstants.CREATED_SUCCESS);
-			boardDetailsDto.setInvoiceItems(exportDashboradItemDtoList(dtoList));
-			boardDetailsDto.setResponse(response);
-			return boardDetailsDto;
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.setCode(ApplicationConstants.CODE_FAILURE);
-			response.setStatus(ApplicationConstants.FAILURE);
-			response.setMessage(ApplicationConstants.CREATE_FAILURE);
-			boardDetailsDto.setInvoiceItems(new ArrayList<>());
-			boardDetailsDto.setResponse(response);
-			return boardDetailsDto;
-		}
-	}
+	
 
 
-	private List<InvoiceItemDashBoardDto> exportDashboradItemDtoList(List<InvoiceItemDto> dtoList) {
-		ModelMapper mapper = new ModelMapper();
-		List<InvoiceItemDashBoardDto> listDashBoardItemDto = new ArrayList<>();
-		for (InvoiceItemDto dto : dtoList) {
-			listDashBoardItemDto.add(mapper.map(dto, InvoiceItemDashBoardDto.class));
-		}
-		return listDashBoardItemDto;
-	}
+
 
 	@Override
 	public List<InvoiceItemDto> getAll() {
@@ -148,7 +93,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	public ResponseDto delete(String id) {
 		ResponseDto response = new ResponseDto();
 		try {
-			invoiceItemRepository.deleteById(id);
+		//	invoiceItemRepository.deleteById(id);
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setMessage(ApplicationConstants.DELETE_SUCCESS);
@@ -166,20 +111,20 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	public List<InvoiceItemDto> findAllByLimit(int limit, int offset) {
 		if (limit >= 0 && offset >= 0) {
 			List<InvoiceItemDto> dtoList = new ArrayList<>();
-			List<InvoiceItemDo> entityList = invoiceItemRepository.findAllByLimit(limit, offset);
+		/*//	List<InvoiceItemDo> entityList = invoiceItemRepository.findAllByLimit(limit, offset);
 			ModelMapper mapper = new ModelMapper();
 			for (InvoiceItemDo invoiceItemDo : entityList) {
 				dtoList.add(mapper.map(invoiceItemDo, InvoiceItemDto.class));
-			}
+			}*/
 			return dtoList;
 		} else {
 			return getAll();
 		}
 	}
 
-	public String getItemId() {
+	public String getItemId(String requestId) {
 		try {
-			String itemId = invoiceItemRepository.getItemId();
+			String itemId = invoiceItemRepository.getItemId(requestId);
 			if (ServiceUtil.isEmpty(itemId))
 				return "0001";
 			return String.format("%04d", Integer.parseInt(itemId) + 1);
@@ -298,109 +243,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	 * dashBoardDetailsDto; }
 	 */
 	
-	 public  ResponseDto odataPaymentStatus(String sapInvoiceNumber) {
-	        ResponseDto response = new ResponseDto();
-	        
-	        
-	        try {
-
-	 
-
-	            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-	            CloseableHttpClient httpClient = clientBuilder.build();
-	            HttpResponse httpResponse = null;
-	            HttpResponse httpResponse1 = null;
-	            URIBuilder builder = new URIBuilder();
-	            builder.setScheme("http")
-	                .setHost("34.210.142.28:8080//sap/opu/odata/SAP/ZAP_AUTOMATION_SRV/InvoiceStatusReportSet")
-	                .setParameter("$filter", "Invoice eq '" + sapInvoiceNumber + "'")
-	                .setParameter("$format", "json");
-	            HttpGet httpGet = new HttpGet(builder.build());
-	            String userpass = "bopf1" + ":" + "Dec@200";
-//	            String userpass = ApplicationConstants.ODATA_USERNAME + ":" + ApplicationConstants.ODATA_PASSWORD;
-	            httpGet.setHeader(HttpHeaders.AUTHORIZATION,
-	                    "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes()));
-	            // ServicesUtil.unSetupSOCKS();
-	            logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][sapInvoiceNo] = " + sapInvoiceNumber);
-	            logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][httpGet] = " + httpGet);
-	            httpResponse = httpClient.execute(httpGet); // , httpContext);
-	            httpResponse1=httpClient.execute(httpGet);
-	            logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][httpresponse] = " + httpResponse);
-	            String respBody = "";
-	            String result="";
-	            
-	            if (httpResponse != null) {
-	            	
-	                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		             result = EntityUtils.toString(httpResponse1.getEntity());
-	            	InputStream inputStream = httpResponse.getEntity().getContent();
-					byte[] data = new byte[1024];
-					int length = 0;
-					while ((length = inputStream.read(data,0,data.length))!=-1) {
-						bytes.write(data, 0, length);
-					}
-					respBody = new String(bytes.toByteArray(), "UTF-8");
-	                    
-	               
-	            }
-	    
-	       
-	            logger.error(
-	                    "[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][http Status] = " + httpResponse.getStatusLine());
-	            logger.error(
-	                    "[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][httpResponse] = " + httpResponse.getEntity());
-	            logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][respBody]= " + respBody);
-	            logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][result]= " + result);
-
-	 
-
-	            JSONObject node = new JSONObject(respBody);
-	            JSONArray resultsArray = node.getJSONObject("d").getJSONArray("results");
-	            	
-	            for(int i=0; i<resultsArray.length(); i++){
-	                InvoiceHeaderDo newDo = new InvoiceHeaderDo();
-	                String input = resultsArray.getJSONObject(i).getJSONObject("__metadata").getString("id");
-	               // String output = getStringBetweenTwoChars(input, "'", "'");
-	                //newDo.setSapInvoiceNumber(Long.parseLong(output));
-//	                String id = invoiceHeaderRepository.getUuidUsingSAPInvoiceNo(newDo.getSapInvoiceNumber());
-//	                newDo.setId(id);
-//	                logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][id]= " + id);
-//	                newDo = invoiceHeaderRepository.getAllById(id);
-	                newDo.setPaymentStatus( resultsArray.getJSONObject(i).getString("Status"));
-	                newDo.setExtInvNum(resultsArray.getJSONObject(i).getString("Reference"));
-	                String s=null;
-	                if(resultsArray.getJSONObject(i).get("ClearingDate")!=null && !resultsArray.getJSONObject(i).get("ClearingDate").toString().equalsIgnoreCase("null")){
-	                 String r=resultsArray.getJSONObject(i).get("ClearingDate").toString();	
-	                 s=getStringBetweenTwoChars(r, "(", ")");
-	                 s=s;
-	                }
-	            
-	             
-	                newDo.setClearingDate(new Long(s));
-	                newDo.setPaymentBlock(resultsArray.getJSONObject(i).getString("PaymentBlock"));
-	                newDo.setPaymentBlockDesc( resultsArray.getJSONObject(i).getString("PaymentBlockDesc"));
-	                newDo.setClearingAccountingDocument(resultsArray.getJSONObject(i).getString("ClearingAccountingDoc"));
-	                newDo.setAccountingDoc(resultsArray.getJSONObject(i).getString("AccountingDoc"));
-	                logger.error("[ApAutomation][InvoiceHeaderServiceImpl][oDataPaymentStatus][result]= " + newDo);
-
-	 
-
-//	                invoiceHeaderRepository.save(newDo);
-	            }
-	            
-	            response.setCode(ApplicationConstants.SUCCESS);
-	            response.setStatus(ApplicationConstants.SUCCESS);
-	            response.setMessage(" Payment Status Update "+ ApplicationConstants.SUCCESS);
-	        } catch (Exception e) {
-	            response.setCode(ApplicationConstants.CODE_FAILURE);
-	            response.setStatus(ApplicationConstants.FAILURE);
-	            e.printStackTrace();
-	            response.setMessage("UPDATION " +ApplicationConstants.FAILURE + " due to " + e.getMessage());
-	            System.out.println(response);
-	        }
-	        return response;
-	    }
-	 
+	
 	 public  String getStringBetweenTwoChars(String input, String startChar, String endChar) {
 		    try {
 		    	if(!ServiceUtil.isEmpty(input)){
@@ -418,29 +261,6 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		    return input; 
 		}
 
-	@Override
-	public void update(InvoiceItemDashBoardDto dto) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public DashBoardDetailsDto manualMatch(ManualMatchingDto manualMatchingDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DashBoardDetailsDto unMatch(DashBoardDetailsDto dashBoardDetailsDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int updateInvoiceItems(List<InvoiceItemDashBoardDto> itDtoList) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	    
 //	    public static void main(String[] args) {

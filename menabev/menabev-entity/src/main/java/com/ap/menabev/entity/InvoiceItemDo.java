@@ -1,163 +1,121 @@
 package com.ap.menabev.entity;
-import java.math.BigDecimal;
+import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 
 @Entity
 @Table(name = "INVOICE_ITEM")
 @Getter
 @Setter
 @ToString
-public class InvoiceItemDo {
+@NoArgsConstructor
+@AllArgsConstructor
+@IdClass(InvoiceItemPkDo.class)
+public class InvoiceItemDo implements Serializable{
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@Column(name = "ID")
-	private String Id;
-	
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "InvoiceItem")
-//	@GenericGenerator(name = "InvoiceItem", strategy = "com.incture.ap.sequences.InvoiceItemSequenceGenerator", parameters = {
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value = "1"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER, value = ""),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER, value = "%06d"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value = "INVOICE_ITEM_SEQ") })
-	@Column(name = "ITEM_ID", nullable = false)
-	private String itemId;
-	
-	@Column(name = "request_id", nullable = false)
-	private String requestId;
+	private String guid;
+	@Id
 	@Column(name = "ITEM_CODE")
 	private String itemCode;
-	@Column(name="ITEM_LIFECYCLE_STATUS")
-	private String itemLifeCycleStatus;
-	@Column(name = "ITEM_TEXT")
-	private String itemText;
-	@Column(name = "REF_DOC_CAT")
-	private String refDocCat;
-	@Column(name = "REF_DOC_NUM")
-	private Long refDocNum;
-	@Column(name = "EXT_ITEM_ID")
+	@Id
+	@Column(name = "REQUEST_ID", nullable = false)
+	private String requestId;
+	@Column(name = "EXT_ITEM_ID",length = 10)
 	private String extItemId;
-	@Column(name = "CUSTOMER_ITEM_ID")
+	@Column(name = "ITEM_TEXT" , length = 50)
+	private String itemText;
+	@Column(name = "REF_DOC_CAT",length = 2)
+	private String refDocCat;//ref_purchasedoc_category
+	@Column(name = "REF_DOC_NUM",length = 10)
+	private Long refDocNum;//ref_purchase_num
+	@Column(name = "ARTICLE_NUM" ,length = 20)
+	private String articleNum;
+	@Column(name = "CUSTOMER_ITEM_ID" , length = 20)
 	private Integer customerItemId;
-	@Column(name = "UPC_CODE")
+	@Column(name = "UPC_CODE",length = 50)
 	private String upcCode;
 	@Column(name = "INV_QTY")
-	private String invQty;
-	@Column(name = "QTY_UOM")
-	private String qtyUom;
-	@Column(name = "PRICE")
-	private String price;
-	@Column(name = "CURRENCY")
+	private double invQty;
+	@Column(name = "UOM",length = 5)
+	private String uom;
+	@Column(name = "UNIT_PRICE")
+	private double unitPrice;
+	@Column(name = "CURRENCY",length = 5)
 	private String currency;
-	@Column(name = "PRICING_UNIT")
+	@Column(name = "PRICING_UNIT",length = 5)
 	private Integer pricingUnit;
-	@Column(name = "ORDER_PRICE_UNIT")
+	@Column(name = "ORDER_PRICE_UNIT",length = 5)
 	private String orderPriceUnit;
 	@Column(name = "GROSS_PRICE")
-	private String grossPrice;
-	@Column(name = "UNIT")
-	private String unit;
-	@Column(name = "DIS_AMT")
-	private String disAmt;
-	@Column(name = "DIS_PER")
-	private String disPer;
-	@Column(name = "DEPOSIT")
-	private String deposit;
-	@Column(name = "SHIPPING_AMT")
-	private Integer shippingAmt;
-	@Column(name = "SHIPPING_PER")
-	private String shippingPer;
-	@Column(name = "TAX_CODE")
+	private double grossPrice;
+	@Column(name = "DISCOUNT_VALUE")
+	private double discountValue;
+	@Column(name = "DISCOUNT_PERCENTAGE")
+	private double disPerentage;
+	@Column(name = "TAX_CODE", length = 5)
 	private String taxCode;
-	@Column(name = "TAX_AMT")
-	private Integer taxAmt;
-	@Column(name = "TAX_PER")
-	private Integer taxPer;
+	@Column(name = "TAX_VALUE")
+	private double taxValue;
+	@Column(name = "TAX_PERCENTAGE")
+	private double taxPercentage;
 	@Column(name = "NET_WORTH")
-	private String netWorth;
-	@Column(name = "ITEM_COMMENT")
-	private String itemComment;
+	private double netWorth;
 	@Column(name = "IS_TWOWAY_MATCHED")
 	private Boolean isTwowayMatched;
 	@Column(name = "IS_THREEWAY_MATCHED")
 	private Boolean isThreewayMatched;
-	@Column(name = "MATCH_DOC_NUM")
+	@Column(name = "MATCH_DOC_NUM",length = 20)
 	private Long matchDocNum;
-	@Column(name = "MATCH_DOC_ITEM")
+	@Column(name = "MATCH_DOC_ITEM",length = 10)
 	private String matchDocItem;
-	@Column(name = "MATCH_PARAM")
+	@Column(name = "MATCH_PARAM",length = 20)
 	private String matchParam;
-	@Column(name = "UNUSED_FIELD1")
-	private String unusedField1;
-	@Column(name = "UNUSED_FIELD2")
-	private String unusedField2;
-	@Column(name = "MATCH_SERVICE_NUM")
+	@Column(name = "MATCH_SERVICE_NUM",length = 10)
 	private String matchserviceNumber;
-	@Column(name = "MATCH_PACKAGE_NUMBER")
+	@Column(name = "MATCH_PACKAGE_NUMBER",length = 10)
 	private String matchpackageNumber;
 	@Column(name = "MATCH_TYPE")
 	private String matchType;// manuall or Auto posting
-	@Column(name="CREATED_BY_IN_DB")
- 	private String createdByInDb;
- 	@Column(name="CREATED_AT_IN_DB")
-	private Long createdAtInDB;
- 	@Column(name="UPDATED_BY")
+ 	@Column(name="UPDATED_BY",length = 100)
 	private String updatedBy;
  	@Column(name="UPDATED_AT")
-	private Long updatedAt;
+	private long updatedAt;
  	@Column(name = "isSelected")
 	private Boolean isSelected;
- 	
- 	/*PO Calculations*/
- 	@Column(name="PO_AVL_QTY_OU")
-	private BigDecimal poAvlQtyOU;
-	
- 	@Column(name="UNIT_PRICE_OPU")
-	private BigDecimal unitPriceOPU;
-	
- 	@Column(name="PO_NET_PRICE")
-	private BigDecimal poNetPrice;
-	
- 	@Column(name="PO_TAX_CODE")
-	private String poTaxCode;
- 	
- 	@Column(name="PO_MATERIAL_NUM")
-	private String poMaterialNum;
- 	
- 	@Column(name="PO_VEND_MAT")
-	private String poVendMat;
- 	
- 	@Column(name="PO_UPC")
-	private String poUPC;
- 	
-	@Column(name = "PO_QTY")
-	private BigDecimal poQty;
-	@Column(name = "PO_UOM")
-	private String poUom;
- 	
-	
  	@Column(name="MATCHED_By")
 	private String matchedBy;
- 	
- 	@Column(name="AMOUNT_DIFFERENCE")
- 	private String amountDifference;
- 	
- 	@Column(name="IS_DELETED")
- 	private Boolean isDeleted;
-
-    @Column (name="IS_ACC_ASSIGNED",length=1)
-    private String isAccAssigned;
-
-    @Column(name = "ARTICLE_NUM")
-    private String articleNum;
+    @Column (name="IS_ACC_ASSIGNED")
+    private boolean isAccAssigned;
+    @Column(name = "ITEM_REQUISATION_NUM",length =10)
+    private String itemRequisationNum;
+    @Column(name = "REQUISATION_NUM" ,length = 10)
+    private String requisationNum;
+    @Column(name = "CONTRACT_NUM",length = 10)
+    private String contractNum;
+    @Column(name = "CONTRACT_ITEM",length = 10)
+    private String contractItem;
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+    
 
     
 }

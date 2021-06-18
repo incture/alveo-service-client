@@ -1,57 +1,13 @@
 package com.ap.menabev.serviceimpl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.ap.menabev.dto.FilterHeaderDto;
-import com.ap.menabev.dto.InboxCountReponseDto;
-import com.ap.menabev.dto.InboxOutputDto;
-import com.ap.menabev.dto.InboxResponseOutputDto;
-import com.ap.menabev.dto.InvoiceHeaderDto;
-import com.ap.menabev.dto.WorkflowTaskOutputDto;
-import com.ap.menabev.entity.InvoiceHeaderDo;
-import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
-import com.ap.menabev.invoice.InvoiceHeaderRepository;
-import com.ap.menabev.invoice.SchedulerConfigurationRepository;
 import com.ap.menabev.service.TestService;
-import com.ap.menabev.util.DestinationReaderUtil;
-import com.ap.menabev.util.HelperClass;
-import com.ap.menabev.util.MenabevApplicationConstant;
-import com.ap.menabev.util.ObjectMapperUtils;
-import com.ap.menabev.util.ServiceUtil;
-import com.ap.menabev.util.WorkflowConstants;
-import com.google.gson.Gson;
 
 @Service
 public class TestServiceImpl implements TestService {
-	
-	@Autowired
-	SchedulerConfigurationRepository schRepo;
 
 	@Override
 	public String test() {
@@ -68,9 +24,8 @@ public class TestServiceImpl implements TestService {
 
 	@Override
 	public String getCurrent() {
-		String getCurrentServerDate = schRepo.getCurrentServerDate();
-		String date = ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss");
-		return "getCurrentServerDate :"+getCurrentServerDate+" date :"+date;
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

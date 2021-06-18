@@ -1,100 +1,92 @@
 package com.ap.menabev.dto;
 
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
 public class InvoiceHeaderDto {
-
-	private String requestId;
-	private String vendorName;
+	
+	private String guid;
+	private String requestId; //0
+	private long request_created_at;
+	private String request_created_by;
+	private long request_updated_at;
+	private String request_updated_by;
+	private String invoice_ref_number;
+	private String vendorName;//24
 	private String ocrBatchId;
-	private String headerText;
-	private String compCode;
-	private Long refDocNum;
-	private String extInvNum;
-	// added for the tag in xml _InvoiceDate as discussed
-	private Long invoiceDate;
-	private Long dueDate;
-	private LocalDateTime createdAt;
-	private String vendorId;
-	private Integer clerkId;
-	private String clerkEmail;
-	private String channelType;
-	private String refDocCat;
-	private String invoiceType;
-	private double invoiceTotal;
-	private Long sapInvoiceNumber;
-	private String fiscalYear;
-	private String currency;
-	private String paymentTerms;
-	private String taxAmount;
-	private Double shippingCost;
-	private String lifecycleStatus;
-	private String lifecycleStatusText;
-	private Integer version;
-	private String emailFrom;
-	private String invoiceTotalFrom;
-	private String invoiceTotalTo;
-	private String createdAtFrom;
-	private String createdAtTo;
-	private BigInteger createdOn;
-	private Long dueDateFrom;
-	private String dueDateTo;
-	private String grossAmount;
-	private String balance;
-	private String reasonForRejection;// R1,R2,R3
-	private String rejectionText;// Duplicate Invoice,Vendor Id mismatch
-	private String createdByInDb;
-	private Long createdAtInDB;
-	private Long updatedBy;
-	private Long updatedAt;
-	private Long postingDate;
-	private String assignedTo;
+	private String compCode;//7
+	private String extInvNum;//  Invoice Number for NON po, Invoice Reference Number
+	private double invoiceTotal;//2
+	private long sapInvoiceNumber;//13
+	private String invoicePdfId; // add the document id of the invoice pdf to show in oepn pdf .
+	private String street;
+	private String zipCode;
+	private String city;
+	private String countryCode;
+	private String companyCode;//7
+	private long documentDate;
+	private long dueDate;//22
+	private long invoiceDate;// added for the tag in xml _InvoiceDate as discussed.
+	private String vendorId;//4
+	private String channelType;//
+	private String refpurchaseDoc;
+	private String refpurchaseDocCat;
+	private String invoiceType;//12
+	private double invoiceAmount;//2
+	private String fiscalYear;//14
+	private String currency;//15
+	private String paymentTerms;//16
+	private String paymentMethod;//16
+	private double taxAmount;//17
+	private double sysSusgestedTaxAmount;
+	private double shippingCost;//18
+	private String taskStatus;//5
+	private Integer version;//21
+	private double grossAmount;
+	private double balanceAmount;
+	private String reasonForRejection;
+	private long updatedBy;
+	private long updatedAt;
 	private String accountNumber;
-	private String disAmt;
-	private String deposit;
-	private String subTotal;
-	private String clearingAccountingDocument;
-	private Long clearingDate;
-	private String paymentStatus;
+	private long postingDate;
 	private String paymentBlock;
 	private String paymentBlockDesc;
-	private String accountingDoc;
-	private String invoiceDateFrom;
-	private String invoiceDateTo;
-	private Long postingDateFrom;
-	private Long postingDateTo;
-	private String docStatus;
-	private String filterFor;
-	private Boolean balanceCheck;
-	private String validationStatus; /// Exception Status
+	private String workflowId;
+	private String taskId;
 	private String taskOwner;
-	private String forwaredTaskOwner;
-	private boolean isNonPoOrPo;
-	private boolean isClaimed;
-	private String claimedUser;
-	private List<InvoiceItemDto> invoiceItems;
-	private List<AttachmentDto> attachments;
-	private List<CommentDto> comments;
-	private String manualpaymentBlock;
-	private String taskOwnerId; // loggedin userid
+	private String taskGroup;
+	private boolean isnonPoOrPo;
 	private String transactionType;
 	private String deliveryNote;
-	private String amountBeforeTax;
+	private double amountBeforeTax;
 	private String taxCode;
 	private String taxRate;
-	private String surcharge;
-	private String discount;
+	private double taxPercentage;
+	private double surcharge;
+	private double discount;
+	private double invoiceGross;
 	private String vatRegNum;
-	private String unplannedCost;
-	private String plannedCost;
-	private String baseLine;
-	private String invoicePdfId;
-	private String totalBaseRate;
-	private String taxValue;
-	private List<CostAllocationDto> costAllocations;
+	private double unplannedCost;
+	private double plannedCost;
+	private long baseLineDate;
+	private boolean isRejected;
+	private String invoiceStatus;
+	private String invoiceStatusText;
+	private String approvalStatus;
+	private String sapInvocieNumber; 
+	private String processor;
+	private List<InvoiceItemDto> invoiceItems;
+	private List<CostAllocationDto> costAllocation;
+	private List<ActivityLogDto> activityLog;
+	private List<CommentDto> comment;    
+	private List<AttachmentDto> attachment; 
+	private  List<RemediationUser> remediationUserList; 
+    private List<TaxDataDto> taxData;
+	private List<HeaderMessageDto>  headerMessages;
+
+	  
+
+
 }
