@@ -8,6 +8,8 @@ import com.ap.menabev.serviceimpl.FilterMultipleHeaderSearchDto;
 
 public interface TestService {
 	String test();
+	
+	String getCurrent();
 
 	/*public CompletableFuture<ResponseEntity<?>> testAsyncForTaskApiCount(String  dto) throws InterruptedException;
 

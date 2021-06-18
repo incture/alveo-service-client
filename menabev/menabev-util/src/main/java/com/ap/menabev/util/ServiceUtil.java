@@ -75,6 +75,22 @@ public class ServiceUtil {
 		}
 		return false;
 	}
+	public static String getFormattedDateinString(String format){
+		String formattedDate =  null;
+		Date date = new Date();
+		SimpleDateFormat formatter =null;
+		try {
+			formatter = new SimpleDateFormat(format);
+			formattedDate = formatter.format(date);
+		} catch (Exception e) {
+			// TODO: handle exception
+			formatter = new SimpleDateFormat("yyyy-MM-dd");
+			formattedDate = formatter.format(date);
+			e.printStackTrace();
+		}
+		return formattedDate;
+	}
+	
 
 	// public static ResponseDto updateWorkflowTaskStatus(String taskId, String
 	// recipientUsers, String taskStatus,

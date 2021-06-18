@@ -16,8 +16,8 @@ public class SchedulerRunDto {
     private String SchedulerRunID;
 	private String SchedulerName;
 	private String swichtedONby;
-	private Date datetimeSwitchedON;
-	private Date DatetimeSwitchedOFF;
+	private String datetimeSwitchedON;
+	private String DatetimeSwitchedOFF;
 	private String swichtedOFFby;
 	private Integer noOfCycles;
 	private String schedulerConfigID;

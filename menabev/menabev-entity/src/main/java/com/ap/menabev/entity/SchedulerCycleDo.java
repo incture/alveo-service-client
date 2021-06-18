@@ -29,10 +29,10 @@ public class SchedulerCycleDo {
 	private String schedulerCycleID;
 	
 	@Column(name ="START_DATE_TIME")
-	private Date startDateTime;
+	private String startDateTime;
 	
 	@Column(name ="END_DATE_Time")
-	private Date EndDatetime;
+	private String EndDatetime;
 	
 	@Column(name ="NO_OF_EMAIL_PICKED")
 	private Integer nOfEmailspicked;

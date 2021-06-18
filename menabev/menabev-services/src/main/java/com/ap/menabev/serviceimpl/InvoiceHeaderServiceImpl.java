@@ -1116,26 +1116,26 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					Comparator.nullsLast((d1, d2) -> d2.compareTo(d1))));
 			logger.error("After sorting : " + invoiceHeaderList);
 			List<InboxOutputDto> inboxOutputList = new ArrayList<InboxOutputDto>();
-			for (int i = 0; i < invoiceHeaderList.size(); i++) {
-				InboxOutputDto inbox = new InboxOutputDto();
-				inbox = ObjectMapperUtils.map(invoiceHeaderList.get(i), InboxOutputDto.class);
-				WorkflowTaskOutputDto workflowOutPut = map.get(inbox.getRequestId());
-				// if process exist or not null for the filtered requestid
-				if (workflowOutPut.getProcessor() != null && !workflowOutPut.getProcessor().isEmpty()) {
-					inbox.setClaimed(true);
-				} else {
-					inbox.setClaimed(false);
-				}
-
-				inbox.setTaskStatus(workflowOutPut.getStatus());
-				inbox.setTaskId(workflowOutPut.getId());
-				// DecimalFormat df = new DecimalFormat("##.00");
-				// inbox.setInvoiceTotal(df.format(invoiceHeaderList.get(i).getInvoiceTotal()));
-				double invoiceTotal = invoiceHeaderList.get(i).getInvoiceTotal();
-				System.err.println("eror double " + String.format("%.2f", invoiceTotal));
-				inbox.setInvoiceTotal(String.format("%.2f", invoiceTotal));
-				inboxOutputList.add(inbox);
-			}
+//			for (int i = 0; i < invoiceHeaderList.size(); i++) {
+//				InboxOutputDto inbox = new InboxOutputDto();
+//				inbox = ObjectMapperUtils.map(invoiceHeaderList.get(i), InboxOutputDto.class);
+//				WorkflowTaskOutputDto workflowOutPut = map.get(inbox.getRequestId());
+//				// if process exist or not null for the filtered requestid
+//				if (workflowOutPut.getProcessor() != null && !workflowOutPut.getProcessor().isEmpty()) {
+//					inbox.setClaimed(true);
+//				} else {
+//					inbox.setClaimed(false);
+//				}
+//
+//				inbox.setTaskStatus(workflowOutPut.getStatus());
+//				inbox.setTaskId(workflowOutPut.getId());
+//				// DecimalFormat df = new DecimalFormat("##.00");
+//				// inbox.setInvoiceTotal(df.format(invoiceHeaderList.get(i).getInvoiceTotal()));
+//				double invoiceTotal = invoiceHeaderList.get(i).getInvoiceTotal();
+//				System.err.println("eror double " + String.format("%.2f", invoiceTotal));
+//				inbox.setInvoiceTotal(String.format("%.2f", invoiceTotal));
+//				inboxOutputList.add(inbox);
+//			}
 			InboxResponseOutputDto response = new InboxResponseOutputDto();
 
 			response.setPageCount(inboxOutputList.size());
@@ -1207,22 +1207,22 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					Map<String, WorkflowTaskOutputDto> map = checkForClaim(invoiceRequestIdList);
 					logger.error("After sorting : " + paginatedInvoiceList);
 					List<InboxOutputDto> inboxOutputList = new ArrayList<InboxOutputDto>();
-					for (int i = 0; i < paginatedInvoiceList.size(); i++) {
-						InboxOutputDto inbox = new InboxOutputDto();
-						inbox = ObjectMapperUtils.map(paginatedInvoiceList.get(i), InboxOutputDto.class);
-						WorkflowTaskOutputDto workflowOutPut = map.get(inbox.getRequestId());
-						// if process exist or not null for the filtered
-						// requestid
-						if (workflowOutPut.getProcessor() != null && !workflowOutPut.getProcessor().isEmpty()) {
-							inbox.setClaimed(true);
-						} else {
-							inbox.setClaimed(false);
-						}
-						inbox.setTaskStatus(workflowOutPut.getStatus());
-						inbox.setTaskId(workflowOutPut.getId());
-						inbox.setInvoiceTotal(String.format("%.2f", paginatedInvoiceList.get(i).getInvoiceTotal()));
-						inboxOutputList.add(inbox);
-					}
+//					for (int i = 0; i < paginatedInvoiceList.size(); i++) {
+//						InboxOutputDto inbox = new InboxOutputDto();
+//						inbox = ObjectMapperUtils.map(paginatedInvoiceList.get(i), InboxOutputDto.class);
+//						WorkflowTaskOutputDto workflowOutPut = map.get(inbox.getRequestId());
+//						// if process exist or not null for the filtered
+//						// requestid
+//						if (workflowOutPut.getProcessor() != null && !workflowOutPut.getProcessor().isEmpty()) {
+//							inbox.setClaimed(true);
+//						} else {
+//							inbox.setClaimed(false);
+//						}
+//						inbox.setTaskStatus(workflowOutPut.getStatus());
+//						inbox.setTaskId(workflowOutPut.getId());
+//						inbox.setInvoiceTotal(String.format("%.2f", paginatedInvoiceList.get(i).getInvoiceTotal()));
+//						inboxOutputList.add(inbox);
+//					}
 					response.setPageCount(filterDto.getPageCount());
 					response.setTabType(filterDto.getTab());
 					response.setListOfTasks(inboxOutputList);

@@ -134,10 +134,10 @@ public class InvoiceHeaderController {
 		return headerService.getInboxTaskWithMultipleSearch(dto);
 	}
 	
-	@PostMapping("/claimOrRelease")
-	public ResponseEntity<?> claimAndRelease(@RequestBody ClaimAndReleaseDto dto){
-		return headerService.claimTaskOfUser(dto.getTaskID(),dto.getUserId(),dto.isClaim());
-	}
+//	@PostMapping("/claimOrRelease")
+//	public ResponseEntity<?> claimAndRelease(@RequestBody ClaimAndReleaseDto dto){
+//		return headerService.claimTaskOfUser(dto.getTaskID(),dto.getUserId(),dto.isClaim());
+//	}
 
 
 	@GetMapping(params = { "requestId" })

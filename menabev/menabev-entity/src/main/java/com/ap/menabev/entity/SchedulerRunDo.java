@@ -32,10 +32,10 @@ public class SchedulerRunDo {
 	private String swichtedONby;
 	
 	@Column(name="DATE_TIME_SWITCHED_ON")
-	private Date datetimeSwitchedON;
+	private String datetimeSwitchedON;
 	
 	@Column(name="DATE_TIME_SWITCHED_OFF")
-	private Date DatetimeSwitchedOFF;
+	private String DatetimeSwitchedOFF;
 	
 	@Column(name="SWITCHeD_OFF_BY")
 	private String swichtedOFFby;

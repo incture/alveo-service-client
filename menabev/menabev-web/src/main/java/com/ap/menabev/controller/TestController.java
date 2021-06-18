@@ -1,37 +1,60 @@
 package com.ap.menabev.controller;
 
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ap.menabev.email.Email;
+import com.ap.menabev.invoice.SchedulerCycleRepository;
 import com.ap.menabev.service.TestService;
-import com.ap.menabev.util.ApplicationConstants;
-import com.ap.menabev.util.ServiceUtil;
 
 @RestController
 @RequestMapping(value = "/test")
 public class TestController {
-	
+	@Autowired
+	SchedulerCycleRepository schedulerCycleRepository;
 	private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
 	@Autowired
 	TestService testService;
+	@GetMapping
+	public List<Integer> getInt(){
+		 List<Integer> list = new ArrayList<Integer>();
+		try {
+			List<Object[]> oldCycleEntity = schedulerCycleRepository.getMaxResultsBySchedulerRunId("dec96fb9-1ada-4703-b586-c6806b660eb2");
+			
+			
+			for (Object[] objects : oldCycleEntity) {
+				int savedNoOfEmailspicked = 0;
+				int saveNoOfAttachements = 0;
+				int saveNoOfEmailsReadSuccessfully = 0;
+				int saveNoOfPDFs = 0;
+				int savenoOfJSONFiles = 0;
+					savedNoOfEmailspicked = (int) objects[0];
+					saveNoOfEmailsReadSuccessfully = (int) objects[1];
+					saveNoOfAttachements = (int) objects[2];
+					saveNoOfPDFs = (int) objects[3];
+					savenoOfJSONFiles = (int) objects[4];
+					list.addAll(Arrays.asList(savedNoOfEmailspicked,saveNoOfEmailsReadSuccessfully,saveNoOfAttachements,saveNoOfPDFs,savenoOfJSONFiles));
+					logger.error("savedNoOfEmailspicked "+savedNoOfEmailspicked+"saveNoOfEmailsReadSuccessfully"+saveNoOfEmailsReadSuccessfully+"saveNoOfAttachements"+saveNoOfAttachements+"saveNoOfPDFs"+saveNoOfPDFs+"saveNoOfPDFs"+saveNoOfPDFs+"savenoOfJSONFiles"+savenoOfJSONFiles);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			// TODO: handle exception
+		}
+		return list;
+		
+	}
+	
 	
 	@GetMapping("/testService")
 	public String test(){
@@ -39,6 +62,12 @@ public class TestController {
 		System.out.println("autowired = "+testService);
 		return testService.test();
 		
+	}
+	
+	
+	@GetMapping("/getCurrent")
+	public String getCurrent(){
+		return testService.getCurrent();
 	}
 	
 /*	

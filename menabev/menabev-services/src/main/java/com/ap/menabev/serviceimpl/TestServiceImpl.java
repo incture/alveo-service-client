@@ -37,16 +37,21 @@ import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
+import com.ap.menabev.invoice.SchedulerConfigurationRepository;
 import com.ap.menabev.service.TestService;
 import com.ap.menabev.util.DestinationReaderUtil;
 import com.ap.menabev.util.HelperClass;
 import com.ap.menabev.util.MenabevApplicationConstant;
 import com.ap.menabev.util.ObjectMapperUtils;
+import com.ap.menabev.util.ServiceUtil;
 import com.ap.menabev.util.WorkflowConstants;
 import com.google.gson.Gson;
 
 @Service
 public class TestServiceImpl implements TestService {
+	
+	@Autowired
+	SchedulerConfigurationRepository schRepo;
 
 	@Override
 	public String test() {
@@ -60,6 +65,13 @@ public class TestServiceImpl implements TestService {
 	@Autowired
 	InvoiceHeaderRepoFilter invoiceHeaderRepoFilter;
 	*/
+
+	@Override
+	public String getCurrent() {
+		String getCurrentServerDate = schRepo.getCurrentServerDate();
+		String date = ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss");
+		return "getCurrentServerDate :"+getCurrentServerDate+" date :"+date;
+	}
 	
 
 	/*

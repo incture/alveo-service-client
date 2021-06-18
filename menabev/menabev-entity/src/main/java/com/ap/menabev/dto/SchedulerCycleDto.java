@@ -14,8 +14,8 @@ public class SchedulerCycleDto {
 
 	private String schedulerRunID;
 	private String schedulerCycleID;
-	private Date startDateTime;
-	private Date EndDatetime;
+	private String startDateTime;
+	private String EndDatetime;
 	private Integer nOfEmailspicked;
 	private Integer noOfEmailsReadSuccessfully;
 	private Integer noOfAttachements;
