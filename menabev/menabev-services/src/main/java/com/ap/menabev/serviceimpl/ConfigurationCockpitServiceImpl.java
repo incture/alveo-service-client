@@ -157,7 +157,8 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 				boolean isEmailScheduler = !ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
 						&& "Email Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
 				boolean isOcrScheduler = false;
-				boolean isGRNScheduler = false;
+				boolean isGRNScheduler = !ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
+						&& "GRN Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
 				boolean conditionIsActive = !ServiceUtil.isEmpty(schedulerConfigurationDto.getIsActive())
 						&& schedulerConfigurationDto.getIsActive();
 				if (isEmailScheduler) {// if email sch
@@ -204,11 +205,22 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 
 					}
 				} else if (isGRNScheduler) {
-					if (conditionIsActive) {
-
-					} else {
-
+					SchedulerConfigurationDo entity = null;
+					
+					if(ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())){
+						//new sch rec
+						schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
+						schedulerConfigurationDto.setConfigurationId(configId);
+						entity = schedulerconfigurationRepository
+								.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
+					}else{
+						// update the record with new fields
+						schedulerConfigurationDto.setConfigurationId(configId);
+						entity = schedulerconfigurationRepository
+								.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
 					}
+					schedulerconfigurationRepository.resetFlagIsActive(configId,entity.getScId());
+					
 				}
 //
 //				schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
