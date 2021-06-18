@@ -6,8 +6,6 @@ import lombok.Data;
 public class ClaimAndReleaseDto {
 
 	private String taskID;
-	
 	private String userId;
-	
-	private boolean  claim;
+	private InboxOutputDto inbox;
 }
