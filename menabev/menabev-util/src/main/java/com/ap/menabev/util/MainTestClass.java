@@ -1,9 +1,10 @@
 package com.ap.menabev.util;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
 
 public class MainTestClass {
 	
@@ -16,6 +17,23 @@ public class MainTestClass {
 		value.add("DKASYAP");
 		value.add("ARUN");
 		value.add("SMEGHANA");
+		
+		
+			
+			String requestIds="";
+		for(int i = 0;i<value.size();i++){
+			if(i ==value.size()-1){
+				String caps = value.get(i).toUpperCase();
+				System.err.println("capsValue "+caps);
+			requestIds = requestIds + caps;
+			System.err.println("after addition if"+ requestIds + "i ="+ i);
+			}else{
+				requestIds = value.get(i).toUpperCase() +",";
+				System.err.println("after addition else"+ requestIds + "i ="+ i);
+			}
+		
+			}
+		System.err.println("status ="+ requestIds);
 	
 		Long top  = new Long(1);
 		Long skip = new Long(0);
@@ -25,15 +43,38 @@ public class MainTestClass {
 		
 		System.err.println("topandSkip "+valueList.toString());
 		
-		
-		
+		Gson gson = new Gson();
 		
 		
 		
 		               appendValuesInOdataUrl(url,"PurchaseOrderCreator",value);
 		               System.err.println("StringUrl "+url.toString());
 		               
+	
+		              boolean bothEmtpty  =  checkForFilterPrameter("","");
+		              
+		              System.err.println("1.bothEmpty "+bothEmtpty);
+		              boolean bothNull  =  checkForFilterPrameter(null,null);
+		              System.err.println("2.bothNull "+bothNull);
+		              boolean oneIsNull = checkForFilterPrameter("jhsad",null);
+		              System.err.println("3.oneNull "+oneIsNull);
+		              
+		              
+		               
+	
 	}
+	
+	
+	public static boolean   checkForFilterPrameter(String validationStatus , String invoiceType){
+		System.err.println("filterInputDto "+validationStatus +" ,"+  invoiceType);
+				if(ServiceUtil.isEmpty(validationStatus)&&
+				     ServiceUtil.isEmpty(invoiceType)
+				          ){
+		return false;
+		}
+		return true;
+	}
+
 
 	public static void appendValuesInOdataUrl(StringBuilder url,String key, List<String> value){
 		for(int i = 0; i<value.size();i++){

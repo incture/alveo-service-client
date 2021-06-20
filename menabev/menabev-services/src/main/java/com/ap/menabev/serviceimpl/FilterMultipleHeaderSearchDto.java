@@ -15,7 +15,7 @@ public class FilterMultipleHeaderSearchDto {
 	private Long invoiceDateTo;
 	private double invoiceValueFrom;
 	private double  invoiceValueTo;
-	private String taskStatus; // add value only when to see ready or reserved task.
+	private List<String> taskStatus; // add value only when to see ready or reserved task.
 	private long top;
 	private long skip;
 	private  String roleOfUser; 

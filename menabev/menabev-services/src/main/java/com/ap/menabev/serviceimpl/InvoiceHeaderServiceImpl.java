@@ -851,35 +851,32 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							System.err.println("response of outPut" + response);
 							return new ResponseEntity<InboxResponseOutputDto>(response, HttpStatus.OK);
 					} else {
-						ResponseEntity<?> response = new ResponseEntity<String>("No tasks are available.",
+						return  new ResponseEntity<>("No tasks are available.",
 								HttpStatus.OK);
-						return response;
 					}
 				} else {
-					ResponseEntity<?> response = new ResponseEntity<String>("No tasks are available.",
+					return  new ResponseEntity<>("No tasks are available.",
 							HttpStatus.OK);
-					return response;
 				}
 			}
 				}else {
-					ResponseEntity<?> response = new ResponseEntity<String>("No tasks are available.",
+					return  new ResponseEntity<>("No tasks are available.",
 							HttpStatus.OK);
-					return response;
 				}
 			}else {
-				ResponseEntity<?> response = new ResponseEntity<String>("No tasks are available.",
+				
+				
+				return  new ResponseEntity<>("No tasks are available.",
 						HttpStatus.OK);
-				return response;
 			}
 			// else if there are no filterss
 		}catch (Exception e) {
-			ResponseEntity<String> response = new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(),
+			return  new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
-			return response;
 		     }
 		}else {
 			try{
-			if (filterDto.getSkip()>= 0 && filterDto.getTop() > 0) {
+			if (filterDto.getSkip()>= 0 && filterDto.getTop()>0) {
 				if (!ServiceUtil.isEmpty(filterDto.getAssignedTo())) {
 		// call the sap worklfow api with top and skip , userId logged in and fetch the token for count.
 			ResponseEntity<?> responseFromSapApi = fetchWorkflowUserTaksListMultiple(filterDto);
@@ -919,60 +916,54 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 										HttpStatus.OK);
 								return response;
 							} else {
-								ResponseEntity<?> response = new ResponseEntity<String>("No tasks are available.",
+								return new ResponseEntity<>("No tasks are available.",
 										HttpStatus.OK);
-								return response;
 							}
 						} else {
-							ResponseEntity<?> response = new ResponseEntity<String>("No tasks are available.",
+							return new ResponseEntity<>("No tasks are available.",
 									HttpStatus.OK);
-							return response;
 						}
 					} else {
 						return responseFromSapApi;
 					}
 				} else {
-					ResponseEntity<?> response = new ResponseEntity<>(
+					return  new ResponseEntity<>(
 							"INVALID_INPUT" + "Please provide login in user id ", HttpStatus.BAD_REQUEST);
-					return response;
 	        } 
-			}else {					ResponseEntity<?> response = new ResponseEntity<>(
+			}else {		return  new ResponseEntity<>(
 							"INVALID_INPUT" + "Please provide valid top and skip", HttpStatus.BAD_REQUEST);
-					return response;	
 			
 		}
 		}catch (Exception e) {
-			ResponseEntity<String> response = new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(),
+			return  new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
-			return response;
+			
 		               }
 		
 	         }
 		} 
-		ResponseEntity<?> response = new ResponseEntity<String>("Please provide valid Top and Skip.",
+		return  new ResponseEntity<>("Please provide valid Top and Skip.",
 				HttpStatus.OK);
-		return response;
 
 	}		
 	
 	public static boolean   checkForFilterPrameter(FilterMultipleHeaderSearchDto filterDto){
 		System.err.println("filterInputDto "+filterDto);
-				if(ServiceUtil.isEmpty(filterDto.getValidationStatus())||
-				     ServiceUtil.isEmpty(filterDto.getInvoiceType())||
-				          ServiceUtil.isEmpty(filterDto.getVendorId())||
-				           ServiceUtil.isEmpty(filterDto.getDueDateFrom()) ||
-				                  ServiceUtil.isEmpty(filterDto.getDueDateFrom())||
-				                  ServiceUtil.isEmpty(filterDto.getInvoiceDateFrom())||
-				                  ServiceUtil.isEmpty(filterDto.getInvoiceDateFrom())||
-				                 ServiceUtil.isEmpty(filterDto.getInvoiceValueFrom())||
-				                ServiceUtil.isEmpty(filterDto.getExtInvNum())){
+				if(ServiceUtil.isEmpty(filterDto.getValidationStatus())&&
+				     ServiceUtil.isEmpty(filterDto.getInvoiceType())&&
+				          ServiceUtil.isEmpty(filterDto.getVendorId())&&
+				           ServiceUtil.isEmpty(filterDto.getDueDateFrom())&&
+				                  ServiceUtil.isEmpty(filterDto.getDueDateTo())&&
+				                  ServiceUtil.isEmpty(filterDto.getInvoiceDateFrom())&&
+				                  ServiceUtil.isEmpty(filterDto.getInvoiceDateTo())&&
+				                 ServiceUtil.isEmpty(filterDto.getInvoiceValueFrom())&&
+				                 ServiceUtil.isEmpty(filterDto.getInvoiceValueTo())&&
+				                ServiceUtil.isEmpty(filterDto.getExtInvNum())&&
+				                ServiceUtil.isEmpty(filterDto.getRequestId())){
 		return false;
 		}
 		return true;
 	}
-	
-	
-
 	// for multiple
 	public ResponseEntity<?> fetchWorkflowUserTaksListMultiple(FilterMultipleHeaderSearchDto filter) {
 		try {
@@ -980,31 +971,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				 long  totalCoun= 0;
 				List<WorkflowTaskOutputDto> listOfWorkflowTasks = new ArrayList<>();
 					String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
-
 					HttpClient client = HttpClientBuilder.create().build();
-
 					StringBuilder url = new StringBuilder();
-
 					appendParamInUrl(url, WorkflowConstants.WORKFLOW_DEFINATION_ID_KEY,
 							WorkflowConstants.WORKFLOW_DEFINATION_ID_VALUE);
-					
-					if(filter.getTaskStatus().equals("READY")){
-					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
-							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE);
-					}else if(filter.getTaskStatus().equals("RESERVED")){
-						appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
-								WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE);	
-						
-					}else if(filter.getTaskStatus().equals("COMPLETED")){
-						appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
-								WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE);
-					}
-					else{
-						appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
-								WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE + ","
-										+ WorkflowConstants.STATUS_OF_APPROVAL_TASKS_RESERVED_VALUE);
-					}
-					String userID =  formRequesIdValue(filter.getAssignedTo());
+					String status =  formStatusValue(filter.getTaskStatus());
+					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,status);
+					String userID =  formIdValue(filter.getAssignedTo());
 					appendParamInUrl(url, WorkflowConstants.RECIPIENT_USER_KEY, userID);
 					if (filter.getRequestId() != null && !filter.getRequestId().isEmpty()) {
 						appendParamInUrl(url, WorkflowConstants.SUBJECT, filter.getRequestId());
@@ -1013,35 +986,24 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							WorkflowConstants.FIND_COUNT_OF_TASKS_VALUE);
 					appendParamInUrl(url, WorkflowConstants.TOP_KEY, filter.getTop()+"");
 					appendParamInUrl(url, WorkflowConstants.PAGE_NUM_KEY, filter.getSkip()+"");
-
 					url.insert(0, (MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances?"));
-
 					System.err.println("URL : " + url);
-
 					HttpGet httpGet = new HttpGet(url.toString());
-
 					httpGet.addHeader("Content-Type", "application/json");
 					httpGet.addHeader("Authorization", "Bearer " + jwToken);
-
 					HttpResponse response = client.execute(httpGet);
 					String dataFromStream = getDataFromStream(response.getEntity().getContent());
 					if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 					org.apache.http.Header[] headerCountProperty = response.getHeaders("x-total-count");                                                                                                                                                          
-					
-					
 					if (headerCountProperty.length != 0) {
-
 						for (org.apache.http.Header header : headerCountProperty) {
-
 							if (header.getName().equalsIgnoreCase("x-total-count")) {
 								totalCoun = Long.parseLong(header.getValue());
 								logger.error("token --- " + totalCoun);
 							}
-
 						}
 					}
 						JSONArray jsonArray = new JSONArray(dataFromStream);
-
 						for(int i=0;i<jsonArray.length();i++){
 					          Object  jsonObject =  jsonArray.get(i);
  							WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
@@ -1049,7 +1011,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							taskDto.setRequestIds(taskDto.getSubject());
 							taskDto.setTotalCount(totalCoun);
 							listOfWorkflowTasks.add(taskDto);
-
 						}
 						if (!listOfWorkflowTasks.isEmpty()) {
 							return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
@@ -1084,52 +1045,36 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 					appendParamInUrl(url, WorkflowConstants.WORKFLOW_DEFINATION_ID_KEY,
 							WorkflowConstants.WORKFLOW_DEFINATION_ID_VALUE);
-					
-					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,
-							WorkflowConstants.STATUS_OF_APPROVAL_TASKS_VALUE + ","
-									+ WorkflowConstants.STATUS_OF_APPROVAL_TASKS_RESERVED_VALUE);
-					
-					String userID =  formRequesIdValue(filter.getAssignedTo());
+					String status =  formStatusValue(filter.getTaskStatus());
+					appendParamInUrl(url, WorkflowConstants.STATUS_OF_APPROVAL_TASKS_KEY,status);
+					String userID =  formIdValue(filter.getAssignedTo());
 						appendParamInUrl(url, WorkflowConstants.RECIPIENT_USER_KEY, userID);
-						
-						             String requetId =  formRequesIdValue(requesIds);
+						             String requetId =  formIdValue(requesIds);
 					if (filter.getRequestId() != null && !filter.getRequestId().isEmpty()) {
 						appendParamInUrl(url, WorkflowConstants.SUBJECT, requetId);
 					}
-					   
 					appendParamInUrl(url, WorkflowConstants.FIND_COUNT_OF_TASKS_KEY,
 							WorkflowConstants.FIND_COUNT_OF_TASKS_VALUE);
 					appendParamInUrl(url, WorkflowConstants.TOP_KEY, filter.getTop()+"");
 					appendParamInUrl(url, WorkflowConstants.PAGE_NUM_KEY, filter.getSkip()+"");
-
 					url.insert(0, (MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances?"));
-
 					System.err.println("URL : " + url);
-
 					HttpGet httpGet = new HttpGet(url.toString());
-
 					httpGet.addHeader("Content-Type", "application/json");
 					httpGet.addHeader("Authorization", "Bearer " + jwToken);
-
 					HttpResponse response = client.execute(httpGet);
 					String dataFromStream = getDataFromStream(response.getEntity().getContent());
 					if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 					org.apache.http.Header[] headerCountProperty = response.getHeaders("x-total-count");                                                                                                                                                          
-					
-					
 					if (headerCountProperty.length != 0) {
-
 						for (org.apache.http.Header header : headerCountProperty) {
-
 							if (header.getName().equalsIgnoreCase("x-total-count")) {
 								totalCoun = Long.parseLong(header.getValue());
 								logger.error("token --- " + totalCoun);
 							}
-
 						}
 					}
 						JSONArray jsonArray = new JSONArray(dataFromStream);
-
 						for(int i=0;i<jsonArray.length();i++){
 					          Object  jsonObject =  jsonArray.get(i);
  							WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
@@ -1137,7 +1082,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							taskDto.setRequestIds(taskDto.getSubject());
 							taskDto.setTotalCount(totalCoun);
 							listOfWorkflowTasks.add(taskDto);
-
 						}
 						if (!listOfWorkflowTasks.isEmpty()) {
 							return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
@@ -1145,16 +1089,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
 						}
 					} else {
-						return new ResponseEntity<String>("FETCHING FAILED", HttpStatus.CONFLICT);
-
+						return new ResponseEntity<String>("FETCHING FAILED = ", HttpStatus.CONFLICT);
 					}
 			} else {
-				return new ResponseEntity<>("INVALID_INPUT_PLEASE_RETRY" + " with provide USER ID.",
+				return new ResponseEntity<>("INVALID_INPUT_PLEASE_RETRY = " + " with provide USER ID.",
 						HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<>("EXCEPTION_POST_MSG" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-
+			return new ResponseEntity<>("EXCEPTION_POST_MSG = " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -1166,14 +1108,27 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		return false;
 	}
 	
-	public static String formRequesIdValue(List<String> requestId){
+	public static String formStatusValue(List<String> requestId){
+		
+		String requestIds="";
+	for(int i = 0;i<requestId.size();i++){
+		if(i ==requestId.size()-1){
+		requestIds = requestIds + requestId.get(i).toUpperCase();
+		}else{
+			requestIds = requestId.get(i) +",";
+		}
+	
+		}
+		return requestIds;
+	}
+	public static String formIdValue(List<String> requestId){
 		
 		String requestIds="";
 	for(int i = 0;i<requestId.size();i++){
 		if(i ==requestId.size()-1){
 		requestIds = requestIds + requestId.get(i);
 		}else{
-			requestIds = requestIds +",";
+			requestIds = requestId.get(i) +",";
 		}
 	
 		}
@@ -1302,10 +1257,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					System.err.println("response of outPut" + response);
 					return new ResponseEntity<InboxResponseOutputDto>(response, HttpStatus.OK);
 				} else {
-					return new ResponseEntity<String>("No Task Available", HttpStatus.OK);
+					return new ResponseEntity<>("No Task Available", HttpStatus.OK);
 				}
 			} else {
-				return new ResponseEntity<String>("No Task Available", HttpStatus.OK);
+				return new ResponseEntity<>("No Task Available", HttpStatus.OK);
 			}
 		} 
 	
@@ -1421,7 +1376,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		if (invoiceOrderList != null && !invoiceOrderList.isEmpty()) {
 			return new ResponseEntity<List<InvoiceHeaderDo>>(invoiceOrderList, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<String>("No Data Found For Searched Criteria", HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>("No Data Found For Searched Criteria", HttpStatus.NO_CONTENT);
 		}
 	}
 	
