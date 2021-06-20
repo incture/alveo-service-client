@@ -46,7 +46,7 @@
 					<cells>
 						<Input value="{postDataModel>glAccount}" filterSuggests="false"
 							suggestionItems="{path:'oDropDownModel>/GLAccountResult', templateShareable : true }" tooltip="{postDataModel>glCode}"
-							suggestionItemSelected="glAccountSelected" showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue"
+							suggestionItemSelected="glAccountCCSelected" showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue"
 							valueState="{postDataModel>glError}">
 							<suggestionItems>
 								<core:ListItem text="{oDropDownModel>GlAccnt}" additionalText="{oDropDownModel>GlAccountName}"/>

@@ -1,10 +1,11 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
+	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageBox",
 	"sap/m/MessageToast",
 	'sap/ui/model/Filter',
 	'sap/ui/model/FilterOperator'
-], function (Controller, MessageBox, MessageToast, Filter, FilterOperator) {
+], function (Controller, JSONModel, MessageBox, MessageToast, Filter, FilterOperator) {
 	"use strict";
 	return Controller.extend("com.menabev.AP.controller.BaseController", {
 
@@ -434,9 +435,11 @@ sap.ui.define([
 		glAccountSuggest: function (oEvent) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
 			var oValue = oEvent.getParameter("suggestValue");
+			var ChartOfAccounts = "1000";
 			var oFilter = [];
 			if (oValue && oValue.length > 2) {
-				oFilter.push(new sap.ui.model.Filter("ChartOfAccounts", sap.ui.model.FilterOperator.Contains, oValue));
+				oFilter.push(new sap.ui.model.Filter("ChartOfAccounts", sap.ui.model.FilterOperator.EQ, ChartOfAccounts));
+				oFilter.push(new sap.ui.model.Filter("GlAccnt", sap.ui.model.FilterOperator.Contains, oValue));
 				var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
 				oDataModel.read("/GlAccountSet", {
 					filters: oFilter,
@@ -452,7 +455,8 @@ sap.ui.define([
 				});
 			}
 		},
-
+		
+		//this function triggered when CreateEditTemplate fragment glaccount is selected from the suggestions
 		glAccountSelected: function (oEvent) {
 			var glAccountDes = oEvent.getParameter("selectedItem").getProperty("additionalText"),
 				sPath = oEvent.getSource().getBindingContext("postDataModel").sPath;
@@ -460,7 +464,16 @@ sap.ui.define([
 			postDataModel.setProperty(sPath + "/materialDescription", glAccountDes);
 			postDataModel.refresh();
 		},
-
+		
+		//this function triggered when NonPOCostCenter fragment glaccount is selected from the suggestions
+		glAccountCCSelected: function(oEvent){
+			var glAccountDes = oEvent.getParameter("selectedItem").getProperty("additionalText"),
+				sPath = oEvent.getSource().getBindingContext("postDataModel").sPath;
+			var postDataModel = this.getModel("postDataModel");
+			postDataModel.setProperty(sPath + "/materialDesc", glAccountDes);
+			postDataModel.refresh();
+		},
+		
 		//function to get GLAccount based on running search
 		getCostCenter: function (CompanyCode, LanguageKey) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel"),
@@ -489,6 +502,107 @@ sap.ui.define([
 				}.bind(this)
 			});
 		},
+		
+		//Add PO fragment controls
+		onChangeSBSearchPO: function (oEvent) {
+			var oSelectedKey = oEvent.getSource().getSelectedKey();
+			this.fnSearchPOVisibilty(oSelectedKey);
+		},
+
+		fnSearchPOVisibilty: function (selectedKey) {
+			var addPOModel = this.getView().getModel("addPOModel");
+			if (selectedKey === "PO") {
+				addPOModel.setProperty("/POFilterVisible", true);
+				addPOModel.setProperty("/DOFilterVisible", false);
+			} else {
+				addPOModel.setProperty("/POFilterVisible", false);
+				addPOModel.setProperty("/DOFilterVisible", true);
+			}
+			addPOModel.setProperty("/documentNumber", "");
+			addPOModel.setProperty("/documentCategory", "");
+			addPOModel.setProperty("/vendorId", "");
+			addPOModel.setProperty("/companyCode", "");
+			addPOModel.setProperty("/deliveryNoteNumber", "");
+		},
+
+		onClickAddPO: function () {
+			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+				vendorId = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"),
+				companyCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/companyCode");
+			var addPOModel = new JSONModel();
+			this.getView().setModel(addPOModel, "addPOModel");
+			var oFragmentName = "com.menabev.AP.fragment.AddPO";
+			if (!this.addPOFragment) {
+				this.addPOFragment = sap.ui.xmlfragment(oFragmentName, this);
+				this.getView().addDependent(this.addPOFragment);
+			}
+			this.fnSearchPOVisibilty("PO");
+			addPOModel.setProperty("/vendorId", vendorId);
+			addPOModel.setProperty("/companyCode", companyCode);
+			this.addPOFragment.open();
+		},
+
+		onSearchPO: function () {
+			var addPOModel = this.getModel("addPOModel"),
+				bError = false;
+			if (!addPOModel.getProperty("/documentNumber") &&
+				!addPOModel.getProperty("/documentCategory") &&
+				!addPOModel.getProperty("/vendorId") &&
+				!addPOModel.getProperty("/companyCode") &&
+				!addPOModel.getProperty("/deliveryNoteNumber")
+			) {
+				sap.m.MessageToast.show("Enter atleast one search parameter to search");
+				bError = true;
+			}
+			if (!bError)
+				this.getSearchPOData();
+		},
+
+		getSearchPOData: function () {
+			var addPOModel = this.getModel("addPOModel");
+			var payload = {
+				"companyCode": addPOModel.getProperty("/companyCode"),
+				"createdAtRange": "",
+				"deliveryNoteNumber": addPOModel.getProperty("/deliveryNoteNumber"),
+				"documentCategory": addPOModel.getProperty("/documentCategory"),
+				"documentNumber": addPOModel.getProperty("/documentNumber"),
+				"purchaseOrganization": "",
+				"vendorId": addPOModel.getProperty("/vendorId"),
+				"vendorName": addPOModel.getProperty("/vendorName")
+			};
+			var url = "/menabevdev/po/search";
+			this.busyDialog.open();
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					this.busyDialog.close();
+					addPOModel.setProperty("/result", data);
+				}.bind(this),
+				error: function (error) {
+					this.busyDialog.close();
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
+			});
+		},
+
+		onClearSearchPO: function () {
+			var addPOModel = this.getView().getModel("addPOModel");
+			addPOModel.setProperty("/documentNumber", "");
+			addPOModel.setProperty("/documentCategory", "");
+			addPOModel.setProperty("/deliveryNoteNumber", "");
+		},
+
+		onCancelAddPO: function () {
+			this.addPOFragment.close();
+		},
+		//End of Add PO
 
 	});
 
