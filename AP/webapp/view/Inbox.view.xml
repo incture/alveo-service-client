@@ -2,17 +2,21 @@
 	xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<Page showHeader="false" class="sapUiSizeCompact">
 		<content>
-			<fb:FilterBar id="filterBarId" search="SearchInboxData" clear="fnClear" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
+			<fb:FilterBar id="filterBarId" search="onSelectTab" clear="clearFilter" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
 				visible="{baseModel>/SearchVisiblity}">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>Vendor Id}">
 						<fb:control>
-							<Input value="{oTaskInboxModel>/filterParams/vendorId}"/>
+							<Input value="{oTaskInboxModel>/filterParams/vendorId}" maxLength="10"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="B" label="{i18n>inboxRequestID}">
 						<fb:control>
-							<Input value="{oTaskInboxModel>/filterParams/requestId}"/>
+							<MaskInput mask="APA-MMDDYYYY-XXXXXX" placeholderSymbol="_" placeholder="Enter task number">
+								<rules>
+									<MaskInputRule maskFormatSymbol="C" regex="[A-Z0-9]"/>
+								</rules>
+							</MaskInput>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="C" label="{i18n>InvoiceNo}">
@@ -23,51 +27,63 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="D" label="{i18n>InvoiceDateFrom}">
 						<fb:control>
-							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy"
-								value="{oTaskInboxModel>/filterParams/createdAtFrom}" tooltip="Invoice From Date" change="onDateRangeChange"/>
+							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+								value="{oTaskInboxModel>/filterParams/invoiceDateFrom}" tooltip="Invoice From Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="E" label="{i18n>InvoiceDateTo}">
 						<fb:control>
-							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy" value="{oTaskInboxModel>/filterParams/createdAtTo}"
-								tooltip="Invoice To Date" change="onDateRangeChange"/>
+							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" placeholder="mm/dd/yyyy"
+								value="{oTaskInboxModel>/filterParams/invoiceDateTo}" tooltip="Invoice To Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="F" label="{i18n>AssignedTo}">
 						<fb:control>
-							<Input value="{oTaskInboxModel>/filterParams/assignedTo}" tooltip="Invoice Value From"/>
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/assignedTo}" items="{oUserDetailModel>/taskGroupUsers}"
+								showSecondaryValues="true">
+								<core:ListItem key="{oUserDetailModel>userId}" text="{oUserDetailModel>userId}" additionalText="{oUserDetailModel>role}"/>
+							</MultiComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="G" label="{i18n>DueDateFrom}">
 						<fb:control>
-							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy" value="{oTaskInboxModel>/filterParams/dueDateFrom}"
+							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" placeholder="mm/dd/yyyy" value="{oTaskInboxModel>/filterParams/dueDateFrom}"
 								tooltip="Due From Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="H" label="{i18n>DueDateTo}">
 						<fb:control>
-							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="yyyy-MM-dd" placeholder="mm/dd/yyyy" value="{oTaskInboxModel>/filterParams/dueDateTo}"
+							<DatePicker displayFormat="MM/dd/yyyy" valueFormat="MM/dd/yyyy" placeholder="mm/dd/yyyy" value="{oTaskInboxModel>/filterParams/dueDateTo}"
 								tooltip="Due To Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="K" label="{i18n>ProcessStatus}">
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="I" label="{i18n>InvoiceValueFrom}">
 						<fb:control>
-							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/validationStatus}" items="{oDropdownModel>/validationStatus}">
-								<core:Item key="{processModel>statusCode}" text="{processModel>shortText}"/>
+							<Input value="{oTaskInboxModel>/filterParams/invoiceValueFrom}" type="Number" change="onChangeInvoiceValue"/>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="J" label="{i18n>InvoiceValueTo}">
+						<fb:control>
+							<Input value="{oTaskInboxModel>/filterParams/invoiceValueTo}" type="Number" change="onChangeInvoiceValue"/>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="K" label="{i18n>ValidationStatus}">
+						<fb:control>
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/validationStatus}" items="{oDropDownModel>/validationStatus}">
+								<core:Item key="{oDropDownModel>statusCode}" text="{oDropDownModel>shortText}"/>
 							</MultiComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="L" label="{i18n>InvoiceType}">
 						<fb:control>
-							<Select forceSelection="false" selectedKey="{oTaskInboxModel>/filterParams/invoiceType}">
-								<core:Item key="INVOICE" text="Invoice"/>
-								<core:Item key="NONPO" text="Non-PO"/>
-							</Select>
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/invoiceType}" items="{StaticDataModel>/invoiceType}">
+								<core:Item key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+							</MultiComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<IconTabBar expanded="true" headerMode="Inline" select="onSelectTab" selectedKey="{oTaskInboxModel>/selectedFilterTab}">
+			<IconTabBar expanded="true" headerMode="Inline" select="onTabSelectPagination" selectedKey="{oTaskInboxModel>/selectedFilterTab}">
 				<items>
 					<IconTabFilter text="{i18n>OPENTASK}" key="openTask" count="{oTaskInboxModel>/openTaskCount}">
 						<Table items="{oTaskInboxModel>/openTask}" mode="None" class="labelwrapTable" sticky="ColumnHeaders">
@@ -121,23 +137,88 @@
 									<Text text="{oTaskInboxModel>invoiceTotal}"/>
 									<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
 									<Text text="{oTaskInboxModel>validationStatus}"/>
-									<Text text="{oTaskInboxModel>taskStatus}"/>
-									<core:Icon src="sap-icon://locked" tooltip="claim" press="onClaimRelease">
-										<core:layoutData>
-											<FlexItemData growFactor="1"/>
-										</core:layoutData>
-									</core:Icon>
+									<Text text="{oTaskInboxModel>status}"/>
+									<HBox>
+										<core:Icon src="sap-icon://locked" tooltip="claim" press="onClaimRelease"
+											visible="{path:'{oTaskInboxModel>status}', formatter:'com.menabev.AP.formatter.formatter.setClaimVisible'}"/>
+										<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease"
+											visible="{path:'{oTaskInboxModel>status}', formatter:'com.menabev.AP.formatter.formatter.setReleaseVisible'}"/>
+									</HBox>
 								</ColumnListItem>
 							</items>
 						</Table>
 					</IconTabFilter>
-					<IconTabFilter text="{i18n>MYTASK}" key="myTask" count="{oTaskInboxModel>/myTaskCount}">
-						<Table items="{oTaskInboxModel>/myTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+					<!--<IconTabFilter text="{i18n>MYTASK}" key="myTask" count="{oTaskInboxModel>/myTaskCount}">-->
+					<!--	<Table items="{oTaskInboxModel>/myTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">-->
+					<!--		<headerToolbar>-->
+					<!--			<OverflowToolbar>-->
+					<!--				<ToolbarSpacer></ToolbarSpacer>-->
+					<!--				<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"-->
+					<!--					visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>-->
+					<!--				<Button icon="sap-icon://action-settings" type="Emphasized"/>-->
+					<!--			</OverflowToolbar>-->
+					<!--		</headerToolbar>-->
+					<!--		<columns>-->
+					<!--			<Column hAlign="Center">-->
+					<!--				<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--			<Column hAlign="Center">-->
+					<!--				<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">-->
+					<!--				<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">-->
+					<!--				<Label text="{i18n>Invoice Date}" design="Bold"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">-->
+					<!--				<Label text="{i18n>InvoiceType}" design="Bold"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
+					<!--				<Label text="{i18n>Value}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
+					<!--				<Label text="{i18n>DueDate}" design="Bold"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
+					<!--				<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
+					<!--				<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
+					<!--				<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>-->
+					<!--			</Column>-->
+					<!--		</columns>-->
+					<!--		<items>-->
+					<!--			<ColumnListItem>-->
+					<!--				<Link text="{oTaskInboxModel>requestId}" press="onReqIdClaimSelect" wrapping="true"/>-->
+					<!--				<Text text="{oTaskInboxModel>vendorId}-{oTaskInboxModel>vendorName}"/>-->
+					<!--				<Text text="{oTaskInboxModel>extInvNum}"/>-->
+					<!--				<Text text="{path:'oTaskInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>-->
+					<!--				<Text text="{oTaskInboxModel>invoiceType}"/>-->
+					<!--				<Text text="{oTaskInboxModel>invoiceTotal}"/>-->
+					<!--				<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>-->
+					<!--				<Text text="{oTaskInboxModel>validationStatus}"/>-->
+					<!--				<Text text="{oTaskInboxModel>status}"/>-->
+					<!--				<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease">-->
+					<!--					<core:layoutData>-->
+					<!--						<FlexItemData growFactor="1"/>-->
+					<!--					</core:layoutData>-->
+					<!--				</core:Icon>-->
+					<!--			</ColumnListItem>-->
+					<!--		</items>-->
+					<!--	</Table>-->
+					<!--</IconTabFilter>-->
+					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}"
+						visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}">
+						<Table items="{oTaskInboxModel>/draftTask}" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
 									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"
 										visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>
+									<Button text="{i18n>DeleteDraft}" type="Reject" press="onDeleteDraft"/>
 									<Button icon="sap-icon://action-settings" type="Emphasized"/>
 								</OverflowToolbar>
 							</headerToolbar>
@@ -169,7 +250,7 @@
 								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
 								</Column>
 							</columns>
@@ -183,69 +264,7 @@
 									<Text text="{oTaskInboxModel>invoiceTotal}"/>
 									<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
 									<Text text="{oTaskInboxModel>validationStatus}"/>
-									<Text text="{oTaskInboxModel>taskStatus}"/>
-									<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease">
-										<core:layoutData>
-											<FlexItemData growFactor="1"/>
-										</core:layoutData>
-									</core:Icon>
-								</ColumnListItem>
-							</items>
-						</Table>
-					</IconTabFilter>
-					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}" 	visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}">
-						<Table items="{oTaskInboxModel>/draftTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
-							<headerToolbar>
-									<OverflowToolbar>
-									<ToolbarSpacer></ToolbarSpacer>
-									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"
-										visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>
-									<Button icon="sap-icon://action-settings" type="Emphasized"/>
-								</OverflowToolbar>
-							</headerToolbar>
-							<columns>
-								<Column hAlign="Center">
-									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
-								</Column>
-								<Column hAlign="Center">
-									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>Invoice Date}" design="Bold"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceType}" design="Bold"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>Value}" design="Bold" wrapping="true"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>DueDate}" design="Bold"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
-								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
-								</Column>
-							</columns>
-							<items>
-								<ColumnListItem>
-									<Link text="{oTaskInboxModel>requestId}" press="onReqIdClaimSelect" wrapping="true"/>
-									<Text text="{oTaskInboxModel>vendorId}-{oTaskInboxModel>vendorName}"/>
-									<Text text="{oTaskInboxModel>extInvNum}"/>
-									<Text text="{path:'oTaskInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
-									<Text text="{oTaskInboxModel>invoiceType}"/>
-									<Text text="{oTaskInboxModel>invoiceTotal}"/>
-									<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
-									<Text text="{oTaskInboxModel>validationStatus}"/>
-									<Text text="{oTaskInboxModel>taskStatus}"/>
+									<Text text="{oTaskInboxModel>status}"/>
 									<Button icon="sap-icon://delete" press="onDeleteDraft"></Button>
 								</ColumnListItem>
 							</items>
@@ -258,16 +277,18 @@
 			<OverflowToolbar class="pageNumberCls" visible="{oPaginationModel>/pageVisible}">
 				<content>
 					<VBox justifyContent="Center" alignItems="Center" class="pageNumberDivClass" visible="{oPaginationModel>/pagination/paginationVisible}">
-						<HBox>
-							<Label text="{i18n>selectedPage} " class="pagingLabel"></Label>
-							<Text text="{oPaginationModel>/pagination/currentPage}" class="pagingText"></Text>
-						</HBox>
+						<!--<HBox>-->
+						<!--	<Label text="{i18n>selectedPage} " class="pagingLabel"></Label>-->
+						<!--	<Text text="{oPaginationModel>/pagination/currentPage}" class="pagingText"></Text>-->
+						<!--</HBox>-->
 						<HBox class="pageLinkClass">
 							<Button id="idCompPrevButton" icon="sap-icon://nav-back" class="navigateButtonClass sapUiSizeCompact" press="onPrevButtonClick"
 								type="Transparent"
 								visible="{parts:['oPaginationModel>/pagination/currentPage','oPaginationModel>/pagination/TotalPages'],formatter:'com.menabev.AP.formatter.formatter.setLeftPaginationVisible'}"/>
 							<HBox items="{oPaginationModel>/pagination/pages}">
-								<Link text="{oPaginationModel>page}" press="onPagesClick" class="paginationNumbers"/>
+								<Link text="{oPaginationModel>page}" press="onPagesClick"
+									visible="{parts:['oPaginationModel>/pagination/currentPage','oPaginationModel>page','oTaskInboxModel>/selectedFilterTab'],formatter:'com.menabev.AP.formatter.formatter.setPaginationClass'}"
+									class="paginationNumbers"/>
 							</HBox>
 							<Button id="idCompNextButton" icon="sap-icon://navigation-right-arrow" class="navigateButtonClass sapUiSizeCompact"
 								press="onNextButtonClick" type="Transparent"

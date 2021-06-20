@@ -3,8 +3,9 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/ValueState",
 	"sap/m/MessageBox",
-	"sap/m/MessageToast"
-], function (Controller, JSONModel, ValueState, MessageBox, MessageToast) {
+	"sap/m/MessageToast",
+	"com/menabev/AP/formatter/formatter"
+], function (Controller, JSONModel, ValueState, MessageBox, MessageToast, formatter) {
 	"use strict";
 
 	return Controller.extend("com.menabev.AP.controller.ConfigCockpit", {
@@ -502,6 +503,11 @@ sap.ui.define([
 		onSubmit: function () {
 			var MasterData = this.getView().getModel("oMasterModel").getData();
 			if (!this._fnSubmitValidate(MasterData)) {
+				var schedulerConfigurationdto = MasterData.schedulerConfigurationdto;
+				MasterData.schedulerConfigurationdto[0].endDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].endDate);
+				MasterData.schedulerConfigurationdto[1].endDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].endDate);
+				MasterData.schedulerConfigurationdto[0].startDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].startDate);
+				MasterData.schedulerConfigurationdto[1].startDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].startDate);
 				var busy = new sap.m.BusyDialog();
 				busy.open();
 				$.ajax({

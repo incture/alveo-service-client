@@ -27,6 +27,32 @@ com.menabev.AP.formatter.formatter = {
 		return date1;
 	},
 
+	formatSchedulerDate: function (date) {
+		if (!date) {
+			return;
+		}
+		date = new Date(date);
+		var dd = date.getDate();
+		if (dd < 10) {
+			dd = dd.toString();
+			dd = "0" + dd;
+		} else {
+			dd = dd.toString();
+		}
+		var mm = date.getMonth() + 1;
+		if (mm < 10) {
+			mm = mm.toString();
+			mm = "0" + mm;
+		} else {
+			mm = mm.toString();
+		}
+		var yyyy = date.getFullYear();
+		yyyy = yyyy.toString();
+
+		var date1 = yyyy + "-" + mm + "-" + dd;
+		return date1;
+	},
+
 	formatDateTime: function (date) {
 		if (!date) {
 			return;
@@ -208,5 +234,20 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return true;
 	},
+	setClaimVisible: function (status) {
+		if (status === "READY") {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	setReleaseVisible: function (status) {
+		if (status === "RESERVED") {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 };

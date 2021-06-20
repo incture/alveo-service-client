@@ -183,7 +183,7 @@ sap.ui.define([
 				oEvent.getSource().setValueState("None");
 			}
 		},
-		
+
 		//Support function to display error message
 		errorMsg: function (errorMsg) {
 			sap.m.MessageBox.show(
@@ -196,10 +196,10 @@ sap.ui.define([
 				}
 			);
 		},
-		
+
 		//Open PDF Area details
 		//Start of Open PDF details
-		fnOpenPDF: function (documentId) {
+		fnOpenPDF: function (documentId, key) {
 			//service call to load the pdf document
 			// var documentId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
 			this.busyDialog.open();
@@ -214,9 +214,14 @@ sap.ui.define([
 					this.busyDialog.close();
 					this.pdfData = data;
 					if (data.fileAvailability) {
-						this.byId("grid").setDefaultSpan("L6 M6 S12");
-						this.byId("grid2").setDefaultSpan("L6 M6 S12");
-						this.addPDFArea();
+						if (key === "PO") {
+							this.byId("POgrid").setDefaultSpan("L6 M6 S12");
+							this.byId("POgrid2").setDefaultSpan("L6 M6 S12");
+						} else {
+							this.byId("grid").setDefaultSpan("L6 M6 S12");
+							this.byId("grid2").setDefaultSpan("L6 M6 S12");
+						}
+						this.addPDFArea(key);
 					} else {
 						sap.m.MessageToast.show("No PDF is available");
 					}
@@ -235,14 +240,18 @@ sap.ui.define([
 			});
 		},
 
-		addPDFArea: function () {
+		addPDFArea: function (key) {
 			var that = this;
 			var pdfData = this.pdfData;
 			that.pdf = sap.ui.xmlfragment(that.getView().getId(), "com.menabev.AP.fragment.PDF", that);
 			var oPdfFrame = that.pdf.getItems()[1];
 			oPdfFrame.setContent('<embed width="100%" height="859rem" name="plugin" src="data:application/pdf;base64, ' + pdfData.base64 +
 				'" ' + 'type=' + "" + "application/pdf" + " " + 'internalinstanceid="21">');
-			var oSplitter = that.byId("idMainSplitter");
+			if(key){
+			var oSplitter = that.byId("idPOMainSplitter");
+			}else {
+					var oSplitter = that.byId("idMainSplitter");
+			}
 			var oLastContentArea = oSplitter.getContentAreas().pop();
 			if (oSplitter.getContentAreas().length > 1)
 				oSplitter.removeContentArea(oLastContentArea);
@@ -272,7 +281,7 @@ sap.ui.define([
 			});
 		},
 		//End of Open PDF details
-		
+
 		//Vendor Balances :On click Vendor Balances Btn below function is called to open a fragment VendorBalance
 		loadVendorBalanceFrag: function (vendorId, companyCode) {
 			if (!vendorId || !companyCode) {
@@ -323,16 +332,16 @@ sap.ui.define([
 		vendorBalancesClose: function () {
 			this.vendorBalanceFragment.close();
 		},
-		
+
 		//To check if an input value is not a number
-		inputNANCheck: function(oEvent){
+		inputNANCheck: function (oEvent) {
 			var oValue = oEvent.getSource().getValue();
 			if (isNaN(oValue)) {
 				oValue = oValue.replace(/[^\d]/g, '');
 				oEvent.getSource().setValue(oValue);
 			}
 		},
-		
+
 		//Payment Term Data
 		getPaymentTerm: function (oHeader, language) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
@@ -451,7 +460,7 @@ sap.ui.define([
 			postDataModel.setProperty(sPath + "/materialDescription", glAccountDes);
 			postDataModel.refresh();
 		},
-		
+
 		//function to get GLAccount based on running search
 		getCostCenter: function (CompanyCode, LanguageKey) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel"),

@@ -1,9 +1,9 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
-	<l:Grid id="grid" defaultSpan="L3 M6 S12">
+	<l:Grid id="POgrid" defaultSpan="L3 M6 S12">
 		<l:content>
 			<VBox>
 				<Label text="{i18n>TRANSACTION}" required="true"></Label>
-				<Select forceSelection="false" width="80%" items="{oDrop>/userGroups}" selectedKey="{oPOModel>/transactionType}" valueStateText=" "
+				<Select forceSelection="false" width="80%" items="{StaticDataModel>/transactionType}" selectedKey="{oPOModel>/transactionType}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/transactionTypeState}" change="onTransactionChange" enabled="{oVisiblityModel>/editable}">
 					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 				</Select>
@@ -11,20 +11,20 @@
 			<VBox>
 				<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
 				<Input filterSuggests="false" value="{oPOModel>/vendorId}" width="80%" showSuggestion="true" suggest="VendorIdSuggest"
-					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected"
-					suggestionItems="{searchVendorModel>/d/results}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected" change="onVendorIdChange"
+					suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}" maxLength="10">
 					<suggestionItems>
-						<core:ListItem text="{searchVendorModel>Supplier}" additionalText="{searchVendorModel>SupplierName}"/>
+						<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
 					</suggestionItems>
 				</Input>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
-				<Input filterSuggests="false" value="{oPOModel>/vendorName}" width="80%" type="Text" showSuggestion="true" suggest="VendorNameSuggest"
+				<Input filterSuggests="false" value="{oPOModel>/vendorName}" width="80%" type="Text" showSuggestion="true" suggest="VendorIdSuggest" change="onVendorNameChange"
 					valueState="{oMandatoryModel>/NonPO/vendorNameState}" tooltip="{oPOModel>/vendorName}" suggestionItemSelected="vendorNameSelected"
-					suggestionItems="{searchVendorModel>/d/results}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+					suggestionItems="{oDropDownModel>/VendorIdSuggest}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 					<suggestionItems>
-						<core:ListItem text="{searchVendorModel>SupplierName}" additionalText="{searchVendorModel>Supplier}"/>
+						<core:ListItem text="{oDropDownModel>SupplierName}" additionalText="{oDropDownModel>Supplier}"/>
 					</suggestionItems>
 				</Input>
 			</VBox>
@@ -37,6 +37,9 @@
 				<Label text="{i18n>CURRENCY}"/>
 				<Input value="{oPOModel>/currency}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/currencyState}" width="80%"
 					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCurrencyChange"/>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
 			</VBox>
 			<VBox>
 				<Label required="true" text="{i18n>InvoiceNo}" class="sapUiTinyMarginTop"/>
@@ -59,6 +62,9 @@
 				<Label text="{i18n>BatchId}"/>
 				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}"
 					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PostingDate}" required="true"/>
@@ -91,6 +97,9 @@
 						<core:ListItem key="{oDropDownModel>PmntMeth}" text="{oDropDownModel>PmntMethName}"/>
 					</items>
 				</Select>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>PaymentBlock}"/>
@@ -120,12 +129,15 @@
 			<VBox>
 				<Label text="{i18n>INVOICETYPE}"/>
 				<Select forceSelection="false" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/invoiceTypeState}"
-					selectedKey="{oPOModel>/invoiceType}" items="{taxCodeModel>/aTax}" width="80%" change="onChangeInvoiceType"
+					selectedKey="{oPOModel>/invoiceType}" items="{StaticDataModel>/invoiceType}" width="80%" change="onChangeInvoiceType"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 					<items>
-						<core:ListItem key="{taxCodeModel>taxCode}" text="{taxCodeModel>taxCode}" additionalText="{taxCodeModel>taxCodeDescription}"/>
+						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 					</items>
 				</Select>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
 			</VBox>
 		</l:content>
 	</l:Grid>

@@ -1,11 +1,11 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"com/menabev/AP/controller/BaseController",
 	"com/menabev/AP/util/POServices",
 	"com/menabev/AP/formatter/formatter"
-], function (Controller, POServices, formatter) {
+], function (BaseController, POServices, formatter) {
 	"use strict";
 
-	return Controller.extend("com.menabev.AP.controller.PO", {
+	return BaseController.extend("com.menabev.AP.controller.PO", {
 
 		/**
 		 * Called when a controller is instantiated and its View controls (if available) are already created.
@@ -28,6 +28,33 @@ sap.ui.define([
 			oPOModel.attachRequestCompleted(function (oEvent) {
 
 			});
+			var oHeader = {
+				"Content-Type": "application/json; charset=utf-8"
+			};
+			POServices.getPONonPOData("",this,"APA-06162021-00000001");
+			var oLanguage = "E";
+			var countryKey = "SA";
+			//To load all OData lookups
+			this.getPaymentTerm(oHeader, oLanguage);
+			this.getPaymentMethod(oHeader, oLanguage);
+			this.getPaymentBlock(oHeader, oLanguage);
+			this.getTaxCode(oHeader, countryKey);
+			this.getCostCenter("1010", oLanguage);
+		},
+		onVendorIdChange:function(oEvent){
+			
+		},
+		
+		onVendorNameChange:function(oEvent){
+			
+		},
+		
+		getPONonPOData: function (oEvent) {
+			POServices.getPONonPOData(oEvent, this);
+		},
+		
+		VendorIdSuggest: function (oEvent) {
+			POServices.VendorIdSuggest(oEvent, this);
 		},
 
 		onTransactionChange: function (oEvent) {
@@ -76,6 +103,19 @@ sap.ui.define([
 
 		onInvAmtChange: function (oEvent) {
 			POServices.onInvAmtChange(oEvent, this);
+		},
+
+		onClickVendorBalances: function () {
+			var nonPOInvoiceModel = this.getView().getModel("oPOModel"),
+				vendorId = nonPOInvoiceModel.getProperty("/vendorId"),
+				companyCode = nonPOInvoiceModel.getProperty("/companyCode");
+			this.loadVendorBalanceFrag(vendorId, companyCode);
+		},
+
+		onPressOpenpdf: function (oEvent) {
+			var oSelectedBtnKey = oEvent.getSource().getCustomData()[0].getKey();
+			var documentId = this.getModel("oPOModel").getProperty("/invoicePdfId");
+			this.fnOpenPDF(documentId, oSelectedBtnKey);
 		},
 
 		/**

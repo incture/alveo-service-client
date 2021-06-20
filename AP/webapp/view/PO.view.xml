@@ -7,7 +7,7 @@
 			</OverflowToolbar>
 		</customHeader>
 		<content>
-			<l:Splitter id="idMainSplitter" width="100%">
+			<l:Splitter id="idPOMainSplitter" width="100%">
 				<VBox>
 					<Toolbar height="3rem">
 						<!--<Title level="H2" text="{i18n>InvoiceHeaderDetails}" class="headerTitle sapUiTinyMarginBegin"/>-->
@@ -16,7 +16,11 @@
 						<Button icon="sap-icon://activity-individual" tooltip="{i18n>ActivityLog}" press="onClickActivityLog" class="SecondaryBtn" enabled="false"/>
 						<!--<Button icon="sap-icon://notification-2" tooltip="{i18n>ErrorMessages}" press="onClickErrorMessages" class="SecondaryBtn" enabled="false"/>-->
 						<Button text="{i18n>OpenPdf}" type="Emphasized" id="idOpenPDFBtn" tooltip="Open Pdf" press="onPressOpenpdf"
-							visible="{oPOModel>/openPdfBtnVisible}"/>
+							visible="{oPOModel>/openPdfBtnVisible}">
+							<customData>
+								<core:CustomData key="PO" value="PO"/>
+							</customData>
+						</Button>
 						<!--<Button icon="sap-icon://refresh" press="onPressRefresh" class="SecondaryBtn" enabled="false"/>-->
 					</Toolbar>
 					<IconTabBar>
@@ -43,7 +47,7 @@
 						</items>
 					</IconTabBar>
 					<VBox>
-						<l:Grid id="grid2" vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
+						<l:Grid id="POgrid2" vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
 							<l:content></l:content>
 						</l:Grid>
 					</VBox>

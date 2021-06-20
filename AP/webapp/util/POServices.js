@@ -4,6 +4,45 @@ com.menabev.AP.util.POServices = {
 		var oPOModel = oController.oPOModel;
 	},
 
+	VendorIdSuggest: function (oEvent, oController) {
+		var oDataAPIModel = oController.oDataAPIModel;
+		var oDropDownModel = oController.oDropDownModel;
+		var value = oEvent.getParameter("suggestValue");
+		if (value && value.length > 2) {
+			var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true";
+			oDataAPIModel.read(url, {
+				success: function (oData, header) {
+					var data = oData.d.results;
+					oDropDownModel.setProperty("/VendorIdSuggest", data);
+				},
+				error: function (oData) {}
+			});
+		}
+	},
+
+	getPONonPOData: function (oEvent, oController, requestId) {
+		var oPOModel = oController.oPOModel;
+		var sUrl = "/invoiceHeader/getInvoiceByReqId/" + requestId;
+		var oServiceModel = new sap.ui.model.json.JSONModel();
+		var busy = new sap.m.BusyDialog();
+		var oHeader = {
+			"Content-Type": "application/scim+json"
+		};
+		busy.open();
+		oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
+		oServiceModel.attachRequestCompleted(function (oEvent) {
+
+			var oData = oEvent.getSource().getData().invoiceHeaderDto;
+			oPOModel.setProperty("/",oData);
+			// if (oData.messages.messageType === "E") {
+			// 	sap.m.MessageBox.success(oData.messages.messageText, {
+			// 		actions: [sap.m.MessageBox.Action.OK]
+			// 	});
+			// }
+		});
+
+	},
+
 	vendorIdSelected: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
@@ -141,26 +180,26 @@ com.menabev.AP.util.POServices = {
 		oPOModel.setProperty("/changeIndicator/" + transaction, true);
 		var oPayload = {
 			"requestID": "APA-210609-000001",
-			"vendorID": "v2",
-			"companyCode": oPOModel.companyCode,
-			"invoiceReference": oPOModel.invoiceRefNum,
-			"invoiceAmount": oPOModel.invoiceAmount,
-			"grossAmount": oPOModel.grossAmount,
-			"taxAmount": oPOModel.taxAmount,
-			"balanceAmount": oPOModel.balanceAmount,
-			"taxCode": oPOModel.headerTaxcode,
-			"currency": oPOModel.currency,
-			"invoiceDate": oPOModel.documentDate,
-			"postingDate": oPOModel.postingDate,
-			"baselineDate": oPOModel.baselineDate,
-			"dueDate": oPOModel.dueDate,
-			"paymentTerms": oPOModel.paymentTerms,
-			"invoiceStatus": oPOModel.invoiceStatus,
-			"invoiceType": oPOModel.invoiceType,
+			"vendorID": oPOModel.getProperty("/vendorId"),
+			"companyCode": oPOModel.getProperty("/companyCode"),
+			"invoiceReference": oPOModel.getProperty("/invoiceRefNum"),
+			"invoiceAmount": oPOModel.getProperty("/invoiceAmount"),
+			"grossAmount": oPOModel.getProperty("/grossAmount"),
+			"taxAmount": oPOModel.getProperty("/taxAmount"),
+			"balanceAmount": oPOModel.getProperty("/balanceAmount"),
+			"taxCode": oPOModel.getProperty("/headerTaxcode"),
+			"currency": oPOModel.getProperty("/currency"),
+			"invoiceDate": oPOModel.getProperty("/documentDate"),
+			"postingDate": oPOModel.getProperty("/postingDate"),
+			"baselineDate": oPOModel.getProperty("/baselineDate"),
+			"dueDate": oPOModel.getProperty("/dueDate"),
+			"paymentTerms": oPOModel.getProperty("/paymentTerms"),
+			"invoiceStatus": oPOModel.getProperty("/invoiceStatus"),
+			"invoiceType": oPOModel.getProperty("/invoiceType"),
 			"discountedDueDate1": null,
 			"discountedDueDate2": null,
-			"systemSuggestedtaxAmount": oPOModel.systemSuggestedtaxAmount,
-			"changeIndicator": changeIndicator
+			"systemSuggestedtaxAmount": oPOModel.getProperty("/systemSuggestedtaxAmount"),
+			"changeIndicator": oPOModel.getProperty("/changeIndicator")
 		};
 		var sUrl = "/menabevdev/validate/header";
 		var oServiceModel = new sap.ui.model.json.JSONModel();

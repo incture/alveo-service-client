@@ -165,7 +165,7 @@ sap.ui.define([
 				method: "GET",
 				contentType: "application/json",
 				url: sUrl,
-				dataType: "json",
+				dataType: "json",	
 				async: true,
 				success: function (oData, textStatus, jqXHR) {
 					this.busyDialog.close();

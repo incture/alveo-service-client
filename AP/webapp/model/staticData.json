@@ -73,5 +73,15 @@
 	}, {
 		"key": "PO",
 		"value": "PO"
+	}],
+	"transactionType": [{
+		"key": "Invoice",
+		"value": "invoice"
+	}, {
+		"key": "Credit",
+		"value": "credit"
+	}, {
+		"key": "Debit",
+		"value": "debit"
 	}]
 }

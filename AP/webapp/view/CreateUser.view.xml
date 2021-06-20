@@ -19,11 +19,11 @@
 					</VBox>
 					<VBox>
 						<Label text="{i18n>FIRSTNAME}"  required="true"></Label>
-						<Input value="{oUserDetailModel>/createUser/firstName}" maxLength="130" valueStateText=" " valueState="{oMandatoryModel>/createUser/firstNameState}"></Input>
+						<Input value="{oUserDetailModel>/createUser/firstName}" maxLength="64" valueStateText=" " valueState="{oMandatoryModel>/createUser/firstNameState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>LASTNAME}"  required="true"></Label>
-						<Input value="{oUserDetailModel>/createUser/lastName}" maxLength="130" valueStateText=" " valueState="{oMandatoryModel>/createUser/lastNameState}"></Input>
+						<Input value="{oUserDetailModel>/createUser/lastName}" maxLength="46" valueStateText=" " valueState="{oMandatoryModel>/createUser/lastNameState}"></Input>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>EMAIL}"  required="true"></Label>

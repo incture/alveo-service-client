@@ -163,13 +163,13 @@ sap.ui.define([
 				var selectedTabKey = oTaskInboxModel.getProperty("/selectedFilterTab");
 				if (selectedTabKey === "openTask") {
 					oPaginationModel.setProperty("/openTaskPagination/currentPage", selectedPage);
-					this.getInboxData(selectedPage, "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
+					this.getInboxData(selectedPage);
 				} else if (selectedTabKey === "myTask") {
 					oPaginationModel.setProperty("/myTaskPagination/currentPage", selectedPage);
-					this.getInboxData(selectedPage, "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
+					this.getInboxData(selectedPage);
 				} else if (selectedTabKey === "draft") {
 					oPaginationModel.setProperty("/draftedTaskPagination/currentPage", selectedPage);
-					this.getInboxData(selectedPage, "", "DRAFT", "draftTask", "draftCount", "draftedTaskPagination");
+					this.getInboxData(selectedPage);
 				}
 			},
 
@@ -235,12 +235,12 @@ sap.ui.define([
 				});
 			},
 
-			getInboxData: function (pageNo, scroll, taskStatus, object, count, paginationObject) {
+			getInboxData: function (pageNo) {
 				var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup"),
 					oVisibilityModel = this.oVisibilityModel;
 				oVisibilityModel.setProperty("/Inbox", {});
 				var oTaskInboxModel = this.oTaskInboxModel,
-					sUrl = "/menabevdev/invoiceHeader/inboxMultiple",
+					sUrl = "/menabevdev/invoiceHeader/inbox/New",
 					that = this;
 				var oPayload = jQuery.extend(true, {}, oTaskInboxModel.getProperty("/filterParams"));
 				if (oPayload.createdAtFrom) {
@@ -255,10 +255,10 @@ sap.ui.define([
 				if (oPayload.dueDateTo) {
 					oPayload.dueDateTo = new Date(oPayload.dueDateTo).getTime();
 				}
+				var skip = (pageNo - 1) * 10;
 				oPayload.userId = oTaskInboxModel.getProperty("/filterParams/assignedTo");
-				oPayload.indexNum = pageNo;
-				oPayload.pageCount = 2;
-				oPayload.tab = taskStatus;
+				oPayload.skip = skip;
+				oPayload.top = 2;
 				oPayload.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 				var oServiceModel = new sap.ui.model.json.JSONModel();
 				var oHeader = {
@@ -269,31 +269,32 @@ sap.ui.define([
 					var data = oEvent.getSource().getData();
 					var arr = [];
 					if (data.body) {
-						if (!data.body.countOpenTask) {
-							data.body.countOpenTask = 0;
+						if (!data.body.totalCount) {
+							data.body.totalCount = 0;
 						}
-						if (!data.body.countDraft) {
-							data.body.countDraft = 0;
+						if (!data.body.draftCount) {
+							data.body.draftCount = 0;
 						}
-						if (!data.body.countMyTask) {
-							data.body.countMyTask = 0;
-						}
-						oTaskInboxModel.setProperty("/openTaskCount", data.body.countOpenTask);
-						oTaskInboxModel.setProperty("/myTaskCount", data.body.countMyTask);
+						oTaskInboxModel.setProperty("/openTaskCount", data.body.totalCount);
+						// oTaskInboxModel.setProperty("/myTaskCount", data.body.countMyTask);
 						oTaskInboxModel.setProperty("/draftCount", data.body.countDraft);
-						oTaskInboxModel.setProperty("/" + object, {});
-						if (data.body.listOfTasks) {
-							oTaskInboxModel.setProperty("/" + object, data.body.listOfTasks);
+						oTaskInboxModel.setProperty("/openTask", {});
+						oTaskInboxModel.setProperty("/draftTask", {});
+						if (data.body.taskList) {
+							oTaskInboxModel.setProperty("/openTask", data.body.taskList);
 						}
-						that.pagination(data.body.countOpenTask, "openTaskPagination", 1);
-						that.pagination(data.body.countMyTask, "myTaskPagination", 1);
-						that.pagination(data.body.countDraft, "draftedTaskPagination", 1);
+						if (data.body.draftList) {
+							oTaskInboxModel.setProperty("/draftTask", data.body.draftList);
+						}
+						that.pagination(data.body.totalCount, "openTaskPagination", 1);
+						// that.pagination(data.body.countMyTask, "myTaskPagination", 1);
+						that.pagination(data.body.draftCount, "draftedTaskPagination", 1);
 					} else {
 						oTaskInboxModel.setProperty("/openTaskCount", 0);
-						oTaskInboxModel.setProperty("/myTaskCount", 0);
+						// oTaskInboxModel.setProperty("/myTaskCount", 0);
 						oTaskInboxModel.setProperty("/draftCount", 0);
-						oTaskInboxModel.setProperty("/" + object, {});
-						
+						oTaskInboxModel.setProperty("/openTask", {});
+						oTaskInboxModel.setProperty("/draftTask", {});
 					}
 
 				});
@@ -335,24 +336,22 @@ sap.ui.define([
 					bError = true;
 				}
 				if (!bError)
-					this.getInboxData();
+					this.getInboxData(1);
 			},
 			onSelectTab: function (oEvent) {
 				var oTaskInboxModel = this.oTaskInboxModel;
 				var key = oTaskInboxModel.getProperty("/selectedFilterTab");
-				if (key == "openTask") {
-					this.getInboxData(1, "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
-				} else if (key == "myTask") {
-					this.getInboxData(1, "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
-				} else if (key == "draft") {
-					this.getInboxData(1, "", "DRAFT", "draftTask", "draftCount", "draftedTaskPagination");
-				}
+				// if (key == "openTask") {
+					this.getInboxData(1);
+				// } else if (key == "myTask") {
+				// 	this.getInboxData(1);
+				// } else if (key == "draft") {
+				// 	this.getInboxData(1);
+				// }
 			},
 
 			SearchInboxData: function (oEvent) {
-				this.getInboxData(1, "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
-				this.getInboxData(1, "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
-				this.getInboxData(1, "", "DRAFT", "draftTask", "draftCount", "draftedTaskPagination");
+				this.getInboxData(1);
 			},
 			clearFilter: function () {
 				var oTaskInboxModel = this.oTaskInboxModel;
@@ -361,19 +360,20 @@ sap.ui.define([
 				oTaskInboxModel.setProperty("/filterParams/assignedTo", []);
 				oTaskInboxModel.setProperty("/filterParams/vendorId", []);
 				oTaskInboxModel.setProperty("/filterParams/invoiceType", []);
-				this.getInboxData(1, "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
-				this.getInboxData(1, "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
-				this.getInboxData(1, "", "DRAFT", "draftTask", "draftCount", "draftedTaskPagination");
+				this.getInboxData(1);
 			},
 			onClaimRelease: function (oEvent) {
 				var that = this;
+				var oTaskInboxModel = this.oTaskInboxModel;
+				var oContextObj = oEvent.getSource().getBindingContext("oTaskInboxModel").getObject();
+				var sPath = oEvent.getSource().getBindingContext("oTaskInboxModel").getPath();
 				var obj = {
-					"claim": true,
-					"taskID": oEvent.getSource().getBindingContext("oTaskInboxModel").getObject().taskId,
-					"userId": this.oUserDetailModel.getProperty("/loggedInUserMail")
+					"userId": this.oUserDetailModel.getProperty("/loggedInUserMail"),
+					"invoice": oContextObj
 				};
-				if (oEvent.getSource().getTooltip() == "release")
-					obj.claim = false;
+				if (oEvent.getSource().getTooltip() == "claim") {
+					obj.taskID = oContextObj.taskId;
+				}
 				var oServiceModel = new sap.ui.model.json.JSONModel();
 				var sUrl = "/menabevdev/invoiceHeader/claimOrRelease";
 				var busy = new sap.m.BusyDialog();
@@ -384,8 +384,9 @@ sap.ui.define([
 				oServiceModel.loadData(sUrl, JSON.stringify(obj), true, "POST", false, false, oHeader);
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					busy.close();
-					that.getInboxData(1, "", "OPEN ", "openTask", "openTaskCount", "openTaskPagination");
-					that.getInboxData(1, "", "MYTASK", "myTask", "myTaskCount", "myTaskPagination");
+					var data = oEvent.getSource().getData();
+					oTaskInboxModel.setProperty(sPath,data.body);
+					oTaskInboxModel.refresh();
 				});
 
 				// jQuery
@@ -441,7 +442,7 @@ sap.ui.define([
 				var oValue = oEvent.getSource().getValue();
 				oValue = parseFloat(oValue);
 				return oValue.toFixed(2);
-				if(oValue>"99999999.99"){
+				if (oValue > "99999999.99") {
 					sap.m.MessageToast.show("Invoice value cannot be greater 99999999.99");
 				}
 				// oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
@@ -490,7 +491,7 @@ sap.ui.define([
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "DELETE", false, false, oHeader);
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					busy.close();
-					that.getInboxData(1, "", "DRAFT", "draftTask", "draftCount");
+					that.getInboxData(1);
 					sap.m.MessageToast.show(oEvent.getSource().getData().message);
 				});
 			}
