@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.dto.AllocationDto;
 import com.ap.menabev.dto.AllocationForTemplateDto;
@@ -95,6 +97,7 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 			return response;
 		}
 	}
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public String getItemID(String requestId) {
 		// TODO Auto-generated method stub
 		String serialNo = "";
@@ -104,12 +107,12 @@ public class CostAllocationServiceImpl implements CostAllocationService {
 			if (ServiceUtil.isEmpty(serialNo)) {
 				return "0001";
 			}
-			logger.error("[ApAutomation][InvoiceItemAcctAssignmentServiceImpl][getSerialNo][serialNo] = " + serialNo);
+			logger.error("[ApAutomation][CostAllocation][getItemId][itemId] = " + serialNo);
 			System.err.println("serialNo " + serialNo);
 			return String.format("%04d", Integer.parseInt(serialNo) + 1);
 		} catch (Exception e) {
 			logger.error(
-					"[ApAutomation][InvoiceItemAcctAssignmentServiceImpl][getSerialNo][Exception] = " + e.getMessage());
+					"[ApAutomation][CostAllocation][getItemId][Exception] = " + e.getMessage());
 		}
 		return serialNo;
 	}

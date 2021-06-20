@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.ResponseDto;
@@ -122,11 +124,13 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		}
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public String getItemId(String requestId) {
 		try {
 			String itemId = invoiceItemRepository.getItemId(requestId);
-			if (ServiceUtil.isEmpty(itemId))
+			if (ServiceUtil.isEmpty(itemId)){
 				return "0001";
+			}
 			return String.format("%04d", Integer.parseInt(itemId) + 1);
 		} catch (Exception e) {
 			logger.error(

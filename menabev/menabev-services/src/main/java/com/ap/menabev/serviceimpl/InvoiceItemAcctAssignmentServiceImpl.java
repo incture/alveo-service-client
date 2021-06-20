@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.ResponseDto;
@@ -108,7 +110,7 @@ public class InvoiceItemAcctAssignmentServiceImpl implements InvoiceItemAcctAssi
 			return Double.valueOf(0.0);
 		}
 	}
-
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public String getSerialNo(String requestId, String itemId) {
 		// TODO Auto-generated method stub
 		String serialNo = "";

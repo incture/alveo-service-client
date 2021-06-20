@@ -19,7 +19,7 @@ public class CostAllocationPkDo implements Serializable{/**
 	
 	private String costAllocationId;
     private String requestId; 
-	private Integer itemId; 
+	private String itemId; 
 	
 	
 

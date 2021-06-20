@@ -24,9 +24,9 @@ public interface InvoiceItemRepository extends JpaRepository<InvoiceItemDo, Invo
 
 	
 
-	@Query(value = "Select max(ITEM_ID) from INVOICE_ITEM", nativeQuery = true)
+	@Query(value = "Select max(ITEM_CODE) from INVOICE_ITEM", nativeQuery = true)
 	String getItemId();
-	@Query(value = "Select max(ITEM_ID) from INVOICE_ITEM where REQUEST_ID=:requestId", nativeQuery = true)
+	@Query(value = "Select max(ITEM_CODE) from INVOICE_ITEM where REQUEST_ID=:requestId", nativeQuery = true)
 	String getItemId(String requestId);
 	@Query(value = "select i from InvoiceItemDo i where i.requestId=:requestId and i.isDeleted=false")
 	List<InvoiceItemDo> getInvoiceItemDos(@Param("requestId") String requestId);

@@ -43,6 +43,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
@@ -58,7 +59,6 @@ import com.ap.menabev.dto.HeaderMessageDto;
 import com.ap.menabev.dto.InboxOutputDto;
 import com.ap.menabev.dto.InboxResponseOutputDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
-import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.InvoiceItemDto;
@@ -73,7 +73,6 @@ import com.ap.menabev.dto.RemediationUserDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.RuleInputDto;
 import com.ap.menabev.dto.RuleInputProcessLeadDto;
-import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.dto.TriggerWorkflowContext;
 import com.ap.menabev.dto.WorkflowContextDto;
 import com.ap.menabev.dto.WorkflowTaskOutputDto;
@@ -107,7 +106,6 @@ import com.ap.menabev.util.WorkflowConstants;
 import com.google.gson.Gson;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
 public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InvoiceHeaderServiceImpl.class);
@@ -277,7 +275,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						CostAllocationDo costAllocationDo = ObjectMapperUtils.map(costAllocationDto,
 								CostAllocationDo.class);
 						costAllocationDo.setCostAllocationId(UUID.randomUUID().toString());
-						costAllocationDo.setItemId(costAllocationRepository.getItemID());
+						costAllocationDo.setItemId(costAllocationServiceImpl.getItemID(requestId));
 						costAllocationDo.setRequestId(requestId);
 						costAllocationRepository.save(costAllocationDo);
 					}
@@ -360,13 +358,15 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(invoiceDto.getInvoiceHeaderDto(),
 					InvoiceHeaderDo.class);
 			invoiceHeaderDo.setRequestId(requestId);
-			if (!invoiceDto.getInvoiceHeaderDto().getInvoiceStatus().isEmpty()
-					&& invoiceDto.getInvoiceHeaderDto().getInvoiceStatus() != null) {
+			invoiceHeaderDo.setGuid(guid);
+			if (ServiceUtil.isEmpty(invoiceDto.getInvoiceHeaderDto().getInvoiceStatus())) {
 				invoiceHeaderDo.setInvoiceStatus("DRAFT");
+				invoiceHeaderDo.setTaskStatus("DRAFT");
 			}
 			DecimalFormat decim = new DecimalFormat("#.##");
 			Double price2 = Double.parseDouble(decim.format(invoiceHeaderDo.getInvoiceTotal()));
 			invoiceHeaderDo.setInvoiceTotal(price2);
+			System.err.println("line no 371 of InvoiceHeaderServiceImpl.saveOrUpdate()"+invoiceHeaderDo);
 			InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
 			// save invoice item
 			if (invoiceDto.getInvoiceHeaderDto().getInvoiceItems() != null
@@ -375,16 +375,16 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				for (InvoiceItemDto invoiceItemDto : itemlists) {
 					InvoiceItemDo itemDo = ObjectMapperUtils.map(invoiceItemDto, InvoiceItemDo.class);
 					if (!ServiceUtil.isEmpty(itemDo.getGuid())) {
-						logger.error("line no 379 of InvoiceHeaderServiceImpl.saveOrUpdate()");
+					System.err.println("line no 380 of InvoiceHeaderServiceImpl.saveOrUpdate()"+itemDo);
 						itemDo.setUpdatedAt(ServiceUtil.getEpocTime());
 						invoiceItemRepository.save(itemDo);
 					} else {
-						logger.error("line no 267 of InvoiceHeaderServiceImpl.saveOrUpdate()");
+					
 						itemDo.setRequestId(requestId);
 						itemDo.setGuid(UUID.randomUUID().toString());
 						itemDo.setItemCode(invoiceItemServiceImpl.getItemId(requestId));
 						//itemDo.setItem(invoiceItemServiceImpl.getItemId());
-						logger.error("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()");
+						System.err.println("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()"+itemDo);
 						logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()"+itemDo.getItemCode());
 						invoiceItemRepository.save(itemDo);
 					}
@@ -402,6 +402,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								accDo.setSerialNo(invoiceItemAcctAssignmentServiceImpl.getSerialNo(requestId,
 										itemDo.getItemCode()));
 								accDo.setRequestId(requestId);
+								System.err.println("line no 407 of InvoiceHeaderServiceImpl.saveOrUpdate()"+accDo);		
 								invoiceItemAcctAssignmentRepository.save(accDo);
 							}
 						}
@@ -424,8 +425,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							CostAllocationDo costAllocationDo = ObjectMapperUtils.map(costAllocationDto,
 									CostAllocationDo.class);
 							costAllocationDo.setCostAllocationId(UUID.randomUUID().toString());
-							costAllocationDo.setItemId(costAllocationRepository.getItemID());
+							costAllocationDo.setItemId(costAllocationServiceImpl.getItemID(requestId));
 							costAllocationDo.setRequestId(requestId);
+							System.err.println("line no 432 of InvoiceHeaderServiceImpl.saveOrUpdate()"+costAllocationDo);	
 							costAllocationRepository.save(costAllocationDo);
 						}
 					}
@@ -444,6 +446,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							attachmentDto.setRequestId(requestId);
 							attachmentDto.setCreatedAt(ServiceUtil.getEpocTime());
 							AttachmentDo attachmentDo = ObjectMapperUtils.map(attachmentDto, AttachmentDo.class);
+							System.err.println("line no 451 of InvoiceHeaderServiceImpl.saveOrUpdate()"+attachmentDo);
 							attachmentRepository.save(attachmentDo);
 						}
 					}
@@ -464,6 +467,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							commentDto.setCreatedAt(ServiceUtil.getEpocTime());
 							commentDto.setRequestId(requestId);
 							CommentDo commentDo = ObjectMapperUtils.map(commentDto, CommentDo.class);
+							System.err.println("line no 472 of InvoiceHeaderServiceImpl.saveOrUpdate()"+commentDo);
 							commentRepository.save(commentDo);
 						}
 					}
@@ -474,7 +478,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			invoiceDto.setResponseStatus("Invoice " + invoiceSavedDo.getRequestId() + " saved as draft.");
 			return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto, HttpStatus.OK);
 		} catch (Exception e) {
-
 			return new ResponseEntity<String>("Failed due to " + e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -510,8 +513,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				context.setNonPo(true);
 				context.setManualNonPo(true);
 				context.setAccountantGroup(invoiceDto.getInvoiceHeaderDto().getTaskGroup());
-				context.setAccountantUser(invoiceDto.getInvoiceHeaderDto().getTaskOwner());
-				context.setProcessLead(lists.get(0).getUserOrGroup());
+				context.setAccountantUser(lists.get(0).getUserOrGroup());
 
 				ResponseEntity<?> response = triggerWorkflow((WorkflowContextDto) context,
 						"triggerresolutionworkflow.triggerresolutionworkflow");
@@ -523,9 +525,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceHeaderDo.setRequestId(requestId);
 				invoiceHeaderDo.setGuid(UUID.randomUUID().toString());
 				invoiceHeaderDo.setInvoiceStatus("OPEN");
+				invoiceHeaderDo.setTaskStatus("READY");
 				invoiceHeaderDo.setWorkflowId(taskOutputDto.getId());
 				invoiceHeaderDo.setRequest_created_at((ServiceUtil.getEpocTime()));
-				invoiceHeaderDo.setRequest_created_by(lists.get(0).getUserOrGroup());
+				invoiceHeaderDo.setTaskOwner(lists.get(0).getUserOrGroup());
 				DecimalFormat decim = new DecimalFormat("#.##");
 				Double price2 = Double.parseDouble(decim.format(invoiceHeaderDo.getInvoiceTotal()));
 				invoiceHeaderDo.setInvoiceTotal(price2);
@@ -570,7 +573,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					
 					List<CostAllocationDto> costAllocationDtoList = invoiceDto.getInvoiceHeaderDto().getCostAllocation();
 
-					if (!ServiceUtil.isEmpty(costAllocationDtoList)) {
 						// save cost allocation
 
 						for (CostAllocationDto costAllocationDto : costAllocationDtoList) {
@@ -582,12 +584,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								CostAllocationDo costAllocationDo = ObjectMapperUtils.map(costAllocationDto,
 										CostAllocationDo.class);
 								costAllocationDo.setCostAllocationId(UUID.randomUUID().toString());
-								costAllocationDo.setItemId(costAllocationRepository.getItemID());
+								costAllocationDo.setItemId(costAllocationServiceImpl.getItemID(requestId));
 								costAllocationDo.setRequestId(requestId);
 								costAllocationRepository.save(costAllocationDo);
 							}
 						}
-					}
 				}
 				if (invoiceDto.getInvoiceHeaderDto().getAttachment() != null
 						&& !invoiceDto.getInvoiceHeaderDto().getAttachment().isEmpty()) {
@@ -610,7 +611,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						&& !invoiceDto.getInvoiceHeaderDto().getComment().isEmpty()) {
 					
 					List<CommentDto> commentsList = invoiceDto.getInvoiceHeaderDto().getComment();
-					if (!ServiceUtil.isEmpty(commentsList)) {
+				
 
 						for (CommentDto commentDto : commentsList) {
 							if (!ServiceUtil.isEmpty(commentDto.getCommentId())) {
@@ -625,7 +626,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								commentRepository.save(commentDo);
 							}
 						}
-					}
 				}
 				// Update the Activity Log table
 				updateActivityLog();
@@ -735,7 +735,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	@Override
 	public ResponseEntity<?> getInboxUserTask(FilterMultipleHeaderSearchDto filterDto){
 		
-		if (filterDto.getSkip()!=0&& filterDto.getTop()!= 0) {
+		if (filterDto.getSkip() >=0&& filterDto.getTop()> 0) {
 			// check for the filter parameter 
 		boolean filterNeeded = 	checkForFilterPrameter(filterDto);
 		    List<InvoiceHeaderDo> filteredrequestIds = null;
@@ -753,7 +753,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (responseFromSapApi.getStatusCodeValue() == HttpStatus.OK.value()){
 				List<WorkflowTaskOutputDto> listOfWorkflowTasks = (List<WorkflowTaskOutputDto>) responseFromSapApi
 						.getBody();
-				System.err.println("listOfWorkflowTasks :" + listOfWorkflowTasks);
+				System.err.println("listOfWorkflowTasks : filter" + listOfWorkflowTasks);
 			// call the invoice table get all task details for above requestIds and as well Draft of users
 				if (!listOfWorkflowTasks.isEmpty()
 						|| (listOfWorkflowTasks.isEmpty() && filterDto.getRoleOfUser().equals("Accountant"))) {
@@ -763,7 +763,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							
 							draftLists = invoiceHeaderRepository
 									.getInvoiceHeaderDocStatusByUserId(filterDto.getAssignedTo());
-							System.err.println("list of drafts for accountant = " + draftLists);
+							System.err.println("list of drafts by filter " + draftLists);
 						}
 						if (draftLists != null && !draftLists.isEmpty()) {
 							for (int i = 0; i < draftLists.size(); i++) {
@@ -787,8 +787,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						// list of invocie ready reserved 
 						List<InvoiceHeaderDto> readyAndReservedInvoiceList = filterDtoList.parallelStream()
 								.filter(w -> !w.getInvoiceStatus().equals("Draft")).collect(Collectors.toList());
-						System.err.println("Draft list "+ draftDtoList);
-						System.err.println("readyAndReservedTaskList "+readyAndReservedInvoiceList);
+						System.err.println("Draft list after filter"+ draftDtoList);
+						System.err.println("readyAndReservedTaskList after filter"+readyAndReservedInvoiceList);
 							// formMapfor claim
 							Map<String, WorkflowTaskOutputDto> map = checkForClaim(listOfWorkflowTasks);
 							List<InboxOutputDto> inboxOutputList = new ArrayList<InboxOutputDto>();
@@ -810,6 +810,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								inbox.setVendorName(readyAndReservedInvoiceList.get(i).getVendorName());
 								inboxOutputList.add(inbox);
 							}
+							if (filterDto.getRoleOfUser().equals("Accountant")) {
+							if(!ServiceUtil.isEmpty(draftList)){
 							for (int i = 0; i < draftDtoList.size(); i++) {
 								InboxOutputDto inbox = new InboxOutputDto();
 								WorkflowTaskOutputDto workflowOutPut = map.get(draftDtoList.get(i).getRequestId());
@@ -827,7 +829,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								inbox.setVendorName(draftDtoList.get(i).getVendorName());
 								draftList.add(inbox);
 							}
-							response.setDraftCount(draftList.size());
+							
+							
 							// top and skip for draft 
 							int startIndex = (int)filterDto.getSkip();
 							System.err.println("startIndex "+startIndex);
@@ -835,6 +838,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							System.err.println("endIndex "+endIndex);
 						     List<InboxOutputDto>	paginatedDraftLists = draftList.subList(startIndex,endIndex);
 							response.setDraftList(paginatedDraftLists);
+							}}
+							response.setDraftList(Collections.EMPTY_LIST);
+							response.setDraftCount(draftList.size());
 							response.setSkip(filterDto.getSkip());
 							response.setTop(filterDto.getTop());
 							response.setSkip(filterDto.getSkip());
@@ -873,7 +879,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		     }
 		}else {
 			try{
-			if (filterDto.getSkip()!= 0 && filterDto.getTop()!= 0) {
+			if (filterDto.getSkip()>= 0 && filterDto.getTop() > 0) {
 				if (!ServiceUtil.isEmpty(filterDto.getAssignedTo())) {
 		// call the sap worklfow api with top and skip , userId logged in and fetch the token for count.
 			ResponseEntity<?> responseFromSapApi = fetchWorkflowUserTaksListMultiple(filterDto);
@@ -881,7 +887,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			@SuppressWarnings("unchecked")
 			List<WorkflowTaskOutputDto> listOfWorkflowTasks = (List<WorkflowTaskOutputDto>) responseFromSapApi
 					.getBody();
-			System.err.println("listOfWorkflowTasks :" + listOfWorkflowTasks);
+			System.err.println("listOfWorkflowTasks : not in filter" + listOfWorkflowTasks);
 		// call the invoice table get all task details for above requestIds and as well Draft of users
 					List<InvoiceHeaderDo> lists = null;
 						// check condition for accountant role to fetch draft
@@ -892,7 +898,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								// than add the requesId with Draft as docStatus
 									lists = invoiceHeaderRepository
 											.getInvoiceHeaderDocStatusByUserId(filterDto.getAssignedTo());
-									System.err.println("list of drafts for accountant = " + lists);
+									System.err.println("list of drafts not in filter " + lists);
 								}
 								if (lists != null && !lists.isEmpty()) {
 									for (int i = 0; i < lists.size(); i++) {
@@ -905,7 +911,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								}
 							if (!listOfWorkflowTasks.isEmpty() && listOfWorkflowTasks != null) {
 
-								System.err.println("list of workflowIDs  for accountant = " + listOfWorkflowTasks);
+								System.err.println("list of tasks  not in filter" + listOfWorkflowTasks);
 
 								ResponseEntity<?> response = new ResponseEntity<>(
 										fetchInvoiceDocHeaderDtoListFromRequestNumberMultiple(listOfWorkflowTasks,
@@ -959,8 +965,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				                  ServiceUtil.isEmpty(filterDto.getInvoiceDateFrom())||
 				                  ServiceUtil.isEmpty(filterDto.getInvoiceDateFrom())||
 				                 ServiceUtil.isEmpty(filterDto.getInvoiceValueFrom())||
-				                ServiceUtil.isEmpty(filterDto.getExtInvNum().isEmpty())||
-				                ServiceUtil.isEmpty(filterDto.getTaskStatus())){
+				                ServiceUtil.isEmpty(filterDto.getExtInvNum())){
 		return false;
 		}
 		return true;
@@ -1255,32 +1260,35 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						inbox.setVendorName(readyAndReservedInvoiceList.get(i).getVendorName());
 						inboxOutputList.add(inbox);
 					}
-					
-					for (int i = 0; i < draftDtoList.size(); i++) {
-						InboxOutputDto inbox = new InboxOutputDto();
-						WorkflowTaskOutputDto workflowOutPut = map.get(draftDtoList.get(i).getRequestId());
-						inbox = ObjectMapperUtils.map(workflowOutPut, InboxOutputDto.class);
-						inbox.setTaskId(workflowOutPut.getId());
-						inbox.setInvoiceTotal(String.format("%.2f", draftDtoList.get(i).getInvoiceTotal()));
-						inbox.setDueDate( draftDtoList.get(i).getDueDate());
-						inbox.setExtInvNum( draftDtoList.get(i).getExtInvNum());
-						inbox.setInvoiceDate( draftDtoList.get(i).getInvoiceDate());
-						inbox.setInvoiceType(draftDtoList.get(i).getInvoiceType());
-						inbox.setRequestId(draftDtoList.get(i).getRequestId());
-						inbox.setSapInvoiceNumber(draftDtoList.get(i).getSapInvoiceNumber());
-						inbox.setValidationStatus(draftDtoList.get(i).getInvoiceStatus());
-						inbox.setVendorId(draftDtoList.get(i).getVendorId());
-						inbox.setVendorName(draftDtoList.get(i).getVendorName());
-						draftList.add(inbox);
-					}
-					response.setDraftCount(draftList.size());
-					// top and skip for draft 
-					int startIndex = (int)filterDto.getSkip();
-					System.err.println("startIndex "+startIndex);
-					int endIndex = (int)(filterDto.getSkip()+filterDto.getTop())-1;
-					System.err.println("endIndex "+endIndex);
-				     List<InboxOutputDto>	paginatedDraftLists = draftList.subList(startIndex,endIndex);
-					response.setDraftList(paginatedDraftLists);
+					if (filterDto.getRoleOfUser().equals("Accountant")) {
+						if(!ServiceUtil.isEmpty(draftList)){
+						for (int i = 0; i < draftDtoList.size(); i++) {
+							InboxOutputDto inbox = new InboxOutputDto();
+							WorkflowTaskOutputDto workflowOutPut = map.get(draftDtoList.get(i).getRequestId());
+							inbox = ObjectMapperUtils.map(workflowOutPut, InboxOutputDto.class);
+							inbox.setTaskId(workflowOutPut.getId());
+							inbox.setInvoiceTotal(String.format("%.2f", draftDtoList.get(i).getInvoiceTotal()));
+							inbox.setDueDate( draftDtoList.get(i).getDueDate());
+							inbox.setExtInvNum( draftDtoList.get(i).getExtInvNum());
+							inbox.setInvoiceDate( draftDtoList.get(i).getInvoiceDate());
+							inbox.setInvoiceType(draftDtoList.get(i).getInvoiceType());
+							inbox.setRequestId(draftDtoList.get(i).getRequestId());
+							inbox.setSapInvoiceNumber(draftDtoList.get(i).getSapInvoiceNumber());
+							inbox.setValidationStatus(draftDtoList.get(i).getInvoiceStatus());
+							inbox.setVendorId(draftDtoList.get(i).getVendorId());
+							inbox.setVendorName(draftDtoList.get(i).getVendorName());
+							draftList.add(inbox);
+						}
+						
+						
+						// top and skip for draft 
+						int startIndex = (int)filterDto.getSkip();
+						System.err.println("startIndex "+startIndex);
+						int endIndex = (int)(filterDto.getSkip()+filterDto.getTop())-1;
+						System.err.println("endIndex "+endIndex);
+					     List<InboxOutputDto>	paginatedDraftLists = draftList.subList(startIndex,endIndex);
+						response.setDraftList(paginatedDraftLists);
+						}}
 					response.setDraftCount(draftList.size());
 					response.setSkip(filterDto.getSkip());
 					response.setTop(filterDto.getTop());
@@ -1477,7 +1485,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.INVOICE_TYPE IN", "'" + rqstId + "'");
 			// checked
 		}
-		if (dto.getAssignedTo() != null && !dto.getAssignedTo().isEmpty()) {
+		/*if (dto.getAssignedTo() != null && !dto.getAssignedTo().isEmpty()) {
 
 			StringBuffer rqstId = new StringBuffer();
 			for (int i = 0; i < dto.getAssignedTo().size(); i++) {
@@ -1489,7 +1497,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			}
 			filterQueryMap.put(" RR.TASK_OWNER IN", "(" + rqstId + ")");
 			// is EMpty
-		}
+		}*/
 		if (dto.getValidationStatus() != null && !dto.getValidationStatus().isEmpty()) {
 			StringBuffer status = new StringBuffer();
 			for (int i = 0; i < dto.getValidationStatus().size(); i++) {
