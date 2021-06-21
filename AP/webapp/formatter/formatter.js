@@ -248,6 +248,22 @@ com.menabev.AP.formatter.formatter = {
 		} else {
 			return false;
 		}
+	},
+	formatRecipient: function (array) {
+		var len = array.length,
+			val = "";
+		if (len) {
+			val = array[0];
+		}
+		return val;
+	},
+	arraytoString: function (array) {
+		var len = array.length,
+			val = "";
+		for (var i = 0; i < len; i++) {
+			val += array[i] + "\n";
+		}
+		return val;
 	}
 
 };

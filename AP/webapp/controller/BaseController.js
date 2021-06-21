@@ -248,10 +248,10 @@ sap.ui.define([
 			var oPdfFrame = that.pdf.getItems()[1];
 			oPdfFrame.setContent('<embed width="100%" height="859rem" name="plugin" src="data:application/pdf;base64, ' + pdfData.base64 +
 				'" ' + 'type=' + "" + "application/pdf" + " " + 'internalinstanceid="21">');
-			if(key){
-			var oSplitter = that.byId("idPOMainSplitter");
-			}else {
-					var oSplitter = that.byId("idMainSplitter");
+			if (key) {
+				var oSplitter = that.byId("idPOMainSplitter");
+			} else {
+				var oSplitter = that.byId("idMainSplitter");
 			}
 			var oLastContentArea = oSplitter.getContentAreas().pop();
 			if (oSplitter.getContentAreas().length > 1)
@@ -455,7 +455,7 @@ sap.ui.define([
 				});
 			}
 		},
-		
+
 		//this function triggered when CreateEditTemplate fragment glaccount is selected from the suggestions
 		glAccountSelected: function (oEvent) {
 			var glAccountDes = oEvent.getParameter("selectedItem").getProperty("additionalText"),
@@ -464,16 +464,16 @@ sap.ui.define([
 			postDataModel.setProperty(sPath + "/materialDescription", glAccountDes);
 			postDataModel.refresh();
 		},
-		
+
 		//this function triggered when NonPOCostCenter fragment glaccount is selected from the suggestions
-		glAccountCCSelected: function(oEvent){
+		glAccountCCSelected: function (oEvent) {
 			var glAccountDes = oEvent.getParameter("selectedItem").getProperty("additionalText"),
 				sPath = oEvent.getSource().getBindingContext("oPOModel").sPath;
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			oPOModel.setProperty(sPath + "/materialDesc", glAccountDes);
 			oPOModel.refresh();
 		},
-		
+
 		//function to get GLAccount based on running search
 		getCostCenter: function (CompanyCode, LanguageKey) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel"),
@@ -502,7 +502,7 @@ sap.ui.define([
 				}.bind(this)
 			});
 		},
-		
+
 		//Add PO fragment controls
 		onChangeSBSearchPO: function (oEvent) {
 			var oSelectedKey = oEvent.getSource().getSelectedKey();
@@ -622,6 +622,36 @@ sap.ui.define([
 				}
 			});
 		},
+
+		VendorIdSuggest: function (oEvent, oController) {
+			var oDataAPIModel = this.oDataAPIModel;
+			var oDropDownModel = this.oDropDownModel;
+			var value = oEvent.getParameter("suggestValue");
+			if (value && value.length > 2) {
+				var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true";
+				oDataAPIModel.read(url, {
+					success: function (oData, header) {
+						var data = oData.results;
+						oDropDownModel.setProperty("/VendorIdSuggest", data);
+					},
+					error: function (oData) {}
+				});
+			}
+		},
+
+		// vendorIdSelected: function (oEvent, oController) {
+		// 	var oPOModel = this.oPOModel;
+		// 	var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
+		// 		sVendorName = oEvent.getParameter("selectedItem").getProperty("additionalText");
+		// 	oPOModel.setProperty("/vendorName", sVendorName);
+		// 	oPOModel.setProperty("/vendorId", sVendorId);
+		// 	oPOModel.refresh();
+		// 	// this.onHeaderChange(oEvent, oController, "isVendoIdChanged");
+		// },
+
+		onVendorIdChange: function (oEvent) {
+			var a = oEvent.getSource().getValue();
+		}
 
 	});
 

@@ -83,5 +83,18 @@
 	}, {
 		"key": "Debit",
 		"value": "debit"
+	}],
+	"taskStatus": [{
+		"key": "READY",
+		"value": "Ready"
+	}, {
+		"key": "RESERVED",
+		"value": "Reserved"
+	}, {
+		"key": "CANCELLED",
+		"value": "Cancelled"
+	}, {
+		"key": "COMPLETED",
+		"value": "Completed"
 	}]
 }

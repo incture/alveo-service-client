@@ -239,11 +239,11 @@
     border-bottom: none;
 }
 
-.UserIcon:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon,
-:not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon,
-:not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {
-    color: #ffffff;
-}
+/*.UserIcon:not(.sapMBtnDisabled) .sapMBtnBack>.sapMBtnIcon,*/
+/*:not(.sapMBtnDisabled) .sapMBtnTransparent>.sapMBtnIcon,*/
+/*:not(.sapMBtnDisabled) .sapMBtnGhost>.sapMBtnIcon {*/
+/*    color: #ffffff;*/
+/*}*/
 
 .IconTabBG .sapMITBContent {
     padding: 1rem;
