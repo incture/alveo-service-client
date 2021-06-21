@@ -306,7 +306,7 @@ sap.ui.define([
 		POOdataServiceCall: function (PONumber) {
 			this.pFlag = false;
 			var pdfModel = this.getView().getModel("pdfModel"),
-				oDataModel = this.getView().getModel("ZP2P_API_PODETAILS_SRV");
+				oDataModel = this.getView().getModel("oDPODetailsModel");
 			oDataModel.read("/HeaderSet('" + PONumber + "')?$format=json", {
 				async: false,
 				success: function (oData, oResponse) {

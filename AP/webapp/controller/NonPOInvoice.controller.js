@@ -26,13 +26,14 @@ sap.ui.define([
 			this.busyDialog = new sap.m.BusyDialog();
 			this.setModel(new JSONModel(), "nonPOInvoiceModel");
 			this.getModel("nonPOInvoiceModel").setSizeLimit(5000);
-			this.setModel(new JSONModel(), "postDataModel");
 			this.setModel(new JSONModel(), "mRejectModel");
 			this.setModel(new JSONModel(), "taxModel");
 			this.setModel(new JSONModel(), "templateModel");
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
 
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			this.setModel(oPOModel, "oPOModel");
 			var oComponent = this.getOwnerComponent();
 			var initializeModelData = {
 				"invoiceHeader": {
@@ -67,15 +68,15 @@ sap.ui.define([
 				},
 				"vstate": {}
 			};
-			this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
-			this.getModel("postDataModel").setProperty("/listNonPoItem", []);
+			this.getModel("oPOModel").setProperty("/invoiceDetailUIDto", initializeModelData);
+			this.getModel("oPOModel").setProperty("/vstate", {});
 
 			this.getBtnVisibility();
-			this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", false);
+			this.getModel("oPOModel").setProperty("/openPdfBtnVisible", false);
 			this.router = oComponent.getRouter();
 			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
 			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-			
+
 			var oHeader = {
 				"Content-Type": "application/json; charset=utf-8"
 			};
@@ -112,45 +113,90 @@ sap.ui.define([
 			var oArgs = oEvent.getParameter("arguments"),
 				requestId = oArgs.id,
 				status = oArgs.status;
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			if (requestId === "NEW") {
 				var initializeModelData = {
-					"invoiceHeader": {
-						"attachments": [],
-						"balance": "",
-						"balanceCheck": true,
-						"comments": [],
-						"clerkId": 0,
-						"createdAtInDB": 0,
-						"dueDate": "",
-						"extInvNum": "",
-						"grossAmount": "",
-						"invoiceDate": "",
-						"invoiceTotal": "",
-						"manualpaymentBlock": "",
-						"ocrBatchId": "",
-						"paymentBlock": "",
-						"paymentBlockDesc": "",
-						"paymentStatus": "",
-						"paymentTerms": "",
-						"postingDate": "",
-						"sapInvoiceNumber": 0,
-						"shippingCost": 0,
-						"subTotal": "",
-						"taskOwner": "",
-						"taskStatus": "",
-						"taxAmount": "",
-						"taxCode": "",
-						"vendorId": "",
-						"vendorName": "",
-						"taxValue": ""
-					},
-					"vstate": {}
+					"requestId": "",
+					"request_created_at": 0,
+					"request_created_by": "",
+					"request_updated_at": 0,
+					"request_updated_by": "",
+					"invoice_ref_number": "",
+					"vendorName": "",
+					"ocrBatchId": "",
+					"compCode": "",
+					"extInvNum": "",
+					"invoiceTotal": 0,
+					"sapInvoiceNumber": 0,
+					"invoicePdfId": "",
+					"street": "",
+					"zipCode": "",
+					"city": "",
+					"countryCode": "",
+					"companyCode": null,
+					"documentDate": 0,
+					"dueDate": null,
+					"invoiceDate": 0,
+					"vendorId": "",
+					"channelType": "",
+					"refpurchaseDoc": "",
+					"refpurchaseDocCat": "",
+					"invoiceType": "NON-PO",
+					"invoiceAmount": 0,
+					"fiscalYear": "",
+					"currency": "",
+					"paymentTerms": "",
+					"paymentMethod": "",
+					"taxAmount": 0,
+					"sysSusgestedTaxAmount": 0,
+					"shippingCost": 0,
+					"taskStatus": "",
+					"version": 0,
+					"grossAmount": 0,
+					"balanceAmount": 0,
+					"reasonForRejection": "",
+					"updatedBy": 0,
+					"updatedAt": 0,
+					"accountNumber": "",
+					"postingDate": 0,
+					"paymentBlock": "",
+					"paymentBlockDesc": "",
+					"workflowId": "",
+					"taskId": null,
+					"taskOwner": "",
+					"taskGroup": "",
+					"isnonPoOrPo": false,
+					"transactionType": "",
+					"deliveryNote": "",
+					"amountBeforeTax": 0,
+					"taxCode": "",
+					"taxRate": "",
+					"taxPercentage": 0,
+					"surcharge": 0,
+					"discount": 0,
+					"invoiceGross": 0,
+					"vatRegNum": "",
+					"unplannedCost": 0,
+					"plannedCost": 0,
+					"baseLineDate": 0,
+					"invoiceStatus": "",
+					"invoiceStatusText": null,
+					"approvalStatus": "",
+					"sapInvocieNumber": null,
+					"processor": null,
+					"invoiceItems": [],
+					"costAllocation": [],
+					"activityLog": null,
+					"comment": [],
+					"attachment": [],
+					"remediationUserList": null,
+					"taxData": null,
+					"headerMessages": [],
+					"rejected": false
 				};
-				this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", initializeModelData);
-				this.getModel("postDataModel").setProperty("/listNonPoItem", []);
+				oPOModel.setProperty("/", initializeModelData);
+				oPOModel.setProperty("/vstate", {});
 			}
-			// this.busyDialog.open();
-
 			//handle if route has NonPO request Id 
 			else if (requestId) {
 				this.getNonPOData(requestId);
@@ -165,7 +211,7 @@ sap.ui.define([
 				method: "GET",
 				contentType: "application/json",
 				url: sUrl,
-				dataType: "json",	
+				dataType: "json",
 				async: true,
 				success: function (oData, textStatus, jqXHR) {
 					this.busyDialog.close();
@@ -174,14 +220,12 @@ sap.ui.define([
 							invoiceHeader: oData.invoiceHeaderDto,
 							vstate: {}
 						});
-						this.getModel("postDataModel").setProperty("/listNonPoItem", oData.costAllocationDto);
 						var invoicePdfId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
 						if (invoicePdfId) {
 							this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", true);
 						}
 					}
 					this.getModel("nonPOInvoiceModel").refresh();
-					this.getModel("postDataModel").refresh();
 				}.bind(this),
 				error: function (result, xhr, data) {
 					this.busyDialog.close();
@@ -199,48 +243,34 @@ sap.ui.define([
 
 		//function hdrInvAmtCalu is triggered on change of Invoice Amount in the header field
 		hdrInvAmtCalu: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
 				invoiceAmt = oEvent.getParameter("value");
 			if (!invoiceAmt) {
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/invoiceTotal", "Error");
+				oPOModel.setProperty("/vstate/invoiceTotal", "Error");
 			} else {
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/invoiceTotal", "None");
+				oPOModel.setProperty("/vstate/invoiceTotal", "None");
 				invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal", invoiceAmt);
+				oPOModel.setProperty("/invoiceHeader/invoiceTotal", invoiceAmt);
 			}
 			this.calculateBalance();
 		},
 
 		//function getGLaccountValue is triggered on change of GL Account in the Cost Center table
-		//Frag:NonPOCostCenter
+		//Frag:NonPOCostCenter---- //Updated
 		getGLaccountValue: function (oEvent) {
 			var glValue = oEvent.getParameter("value");
-			var postDataModel = this.getModel("postDataModel");
-			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
 			if (glValue === "") {
-				postDataModel.setProperty(sPath + "/glError", "Error");
+				oPOModel.setProperty(sPath + "/glError", "Error");
 			} else {
-				postDataModel.setProperty(sPath + "/glError", "None");
+				oPOModel.setProperty(sPath + "/glError", "None");
 			}
 		},
 
 		/**
 		 * Header Filter function Starts here
 		 */
-		//Vendor ID input filter function
-		fnVendorIdSuggest: function (oEvent) {
-			var searchVendorModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(searchVendorModel, "searchVendorModel");
-			var value = oEvent.getParameter("suggestValue");
-			if (value && value.length > 2) {
-				var url = "DEC_NEW/sap/opu/odata/sap/ZAP_VENDOR_SRV/VendSearchSet?$filter=Search eq '" + value + "'";
-				searchVendorModel.loadData(url, null, true);
-				searchVendorModel.attachRequestCompleted(null, function () {
-					searchVendorModel.refresh();
-				});
-			}
-		},
-
 		//function onChangeVendorId is triggered on change of Vendor ID 
 		onChangeVendorId: function (oEvent) {
 			this.errorHandler(oEvent);
@@ -274,27 +304,26 @@ sap.ui.define([
 			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/dueDate", oEvent.getSource()._getSelectedDate().getTime());
 		},
 
-		//onChange Header level tax
+		//onChange Header level tax -----Updated
 		onChangeHeaderTax: function (oEvent) {
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject();
-			var postDataModel = this.getModel("postDataModel"),
-				nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
 				taxCode = taxDetails.TxCode,
 				taxPer = taxDetails.TaxRate;
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxPer", taxPer);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxConditionType", taxDetails.TaxConditionType);
-			if (postDataModel.getProperty("/listNonPoItem")) {
-				var length = postDataModel.getProperty("/listNonPoItem").length;
+			oPOModel.setProperty("/taxPer", taxPer);
+			oPOModel.setProperty("/taxConditionType", taxDetails.TaxConditionType);
+			if (oPOModel.getProperty("/costAllocation")) {
+				var length = oPOModel.getProperty("/costAllocation").length;
 				for (var i = 0; i < length; i++) {
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxConditionType", taxDetails.TaxConditionType);
+					oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
+					oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPer);
+					oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxDetails.TaxConditionType);
 				}
 			}
 			if (taxDetails) {
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/taxCode", "None");
+				oPOModel.setProperty("/vstate/taxCode", "None");
 			} else {
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/taxCode", "Error");
+				oPOModel.setProperty("/vstate/taxCode", "Error");
 			}
 			this.costAllocationTaxCalc();
 			sap.m.MessageToast.show("Tax Code\r" + taxCode + "\r is applied to all Cost Allocation line items");
@@ -303,17 +332,18 @@ sap.ui.define([
 		//onChange CC item level tax
 		onChangeTax: function (oEvent) {
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject(),
-				sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
-			var postDataModel = this.getModel("postDataModel");
-			postDataModel.setProperty(sPath + "/taxPer", taxDetails.TaxRate);
-			postDataModel.setProperty(sPath + "/taxConditionType", taxDetails.TaxConditionType);
+				sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			oPOModel.setProperty(sPath + "/taxPer", taxDetails.TaxRate);
+			oPOModel.setProperty(sPath + "/taxConditionType", taxDetails.TaxConditionType);
 			this.amountCal(oEvent);
 		},
 		//End of Header Filter function
 
 		//this function is to open PDF for Non PO Invoice
 		onPressOpenpdf: function () {
-			var documentId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var documentId = oPOModel.getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId);
 		},
 
@@ -408,21 +438,21 @@ sap.ui.define([
 		},
 
 		//Frag:SelectTemplate
-		//liveChange of selected Amount in Select Template
+		//liveChange of selected Amount in Preview Template
 		onChangePreviewTotalAmt: function (oEvent) {
 			var totalAmount = oEvent.getParameter("value");
-			var postDataModel = this.getView().getModel("postDataModel");
-			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
 			if (totalAmount === "") {
-				postDataModel.setProperty(sPath + "/glError", "Error");
+				oPOModel.setProperty(sPath + "/glError", "Error");
 			} else {
-				postDataModel.setProperty(sPath + "/glError", "None");
+				oPOModel.setProperty(sPath + "/glError", "None");
 			}
-			var costAllocationList = postDataModel.getProperty(sPath + "/costAllocationList");
+			var costAllocationList = oPOModel.getProperty(sPath + "/costAllocationList");
 			for (var i = 0; i < costAllocationList.length; i++) {
 				var partAmount = (Number(costAllocationList[i].distrPerc) * Number(totalAmount)) / 100,
 					partAmtValue = this.nanValCheck(partAmount).toFixed(2);
-				postDataModel.setProperty(sPath + "/costAllocationList/" + [i] + "/netValue", partAmtValue);
+				oPOModel.setProperty(sPath + "/costAllocationList/" + [i] + "/netValue", partAmtValue);
 			}
 		},
 
@@ -436,7 +466,7 @@ sap.ui.define([
 				//To handle validations
 				var bValidate = false;
 				var aData = this.getModel("templateModel").getProperty(selectedFilters[i]);
-				if (aData.amount === "" || aData.amountError === "Error" || aData.amount === null) {
+				if (!aData.amount || aData.amountError === "Error") {
 					bValidate = true;
 					this.getModel("templateModel").setProperty(selectedFilters[i] + "/amountError", "Error");
 				}
@@ -446,7 +476,6 @@ sap.ui.define([
 				}
 			}
 			if (!bflag) {
-				// postDataModel.setProperty("/listNonPoItem", alistNonPoData);
 				var sMsg = "Please Enter Amount for Selected Templates";
 				sap.m.MessageBox.error(sMsg);
 				return;
@@ -469,7 +498,7 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					this.busyDialog.close();
-					this.getModel("postDataModel").setProperty("/previewListNonPoItem", data);
+					this.getModel("oPOModel").setProperty("/previewListNonPoItem", data);
 					if (!this.previewTemplateDialog) {
 						this.previewTemplateDialog = sap.ui.xmlfragment("previewTemplate", "com.menabev.AP.fragment.PreviewTemplate", this);
 					}
@@ -496,50 +525,47 @@ sap.ui.define([
 			this.previewTemplateDialog.close();
 		},
 
-		//Frag:PreviewTemplate
+		//Frag:PreviewTemplate ---Updated
 		onOkSelectTemplate: function () {
-			var that = this;
-			var previewListNonPoItem = this.getModel("postDataModel").getProperty("/previewListNonPoItem");
+			var previewListNonPoItem = this.getModel("oPOModel").getProperty("/previewListNonPoItem");
 			// var arr = [];
-			var arr = $.extend(true, [], this.getModel("postDataModel").getProperty("/listNonPoItem"));
+			var arr = $.extend(true, [], this.getModel("oPOModel").getProperty("/costAllocation"));
 			for (var i = 0; i < previewListNonPoItem.length; i++) {
 				arr = arr.concat(previewListNonPoItem[i].costAllocationList);
 			}
-			this.getModel("postDataModel").setProperty("/listNonPoItem", arr);
-			var postDataModel = this.getModel("postDataModel");
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
-				taxCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxCode"),
-				taxPer = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxPer"),
-				taxConditionType = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxConditionType");
+			this.getModel("oPOModel").setProperty("/costAllocation", arr);
+			var oPOModel = this.getModel("oPOModel");
+			var taxCode = oPOModel.getProperty("/taxCode"),
+				taxPer = oPOModel.getProperty("/taxPer"),
+				taxConditionType = oPOModel.getProperty("/taxConditionType");
 			for (var i = 0; i < arr.length; i++) {
-				postDataModel.setProperty("/listNonPoItem/" + i + "/taxCode", taxCode);
-				postDataModel.setProperty("/listNonPoItem/" + i + "/taxPer", taxPer);
-				postDataModel.setProperty("/listNonPoItem/" + i + "/taxConditionType", taxConditionType);
+				oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
+				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPer);
+				oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxConditionType);
 			}
-			postDataModel.refresh();
+			oPOModel.refresh();
 			this.costAllocationTaxCalc();
 			this.previewTemplateDialog.close();
 			this.selectTemplateFragment.close();
 		},
 
 		//function addItem triggered when Add Row button is clicked
-		//This function will add an empty row in the Cost Allocation table
+		//This function will add an empty row in the Cost Allocation table ----Updated
 		addItem: function (oEvt) {
 			var mandatoryFeildsForCC = this.fnMandatoryFeildsForCC();
 			if (!mandatoryFeildsForCC) {
-				var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
-					postDataModel = this.getModel("postDataModel"),
-					postDataModelData = postDataModel.getData();
-				if (!postDataModelData.listNonPoItem) {
-					postDataModelData.listNonPoItem = [];
+				var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+					oPOModelData = oPOModel.getData();
+				if (!oPOModelData.costAllocation) {
+					oPOModelData.costAllocation = [];
 				}
-				postDataModelData.listNonPoItem.unshift({
+				oPOModelData.costAllocation.unshift({
 					"templateId": "",
 					"glAccount": "",
 					"costCenter": "",
-					"taxCode": nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader.taxCode,
-					"taxPer": nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader.taxPer,
-					"taxConditionType": nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader.taxConditionType,
+					"taxCode": oPOModel.getData().taxCode,
+					"taxPer": oPOModel.getData().taxPer,
+					"taxConditionType": oPOModel.getData().taxConditionType,
 					"internalOrderId": "",
 					"materialDesc": "",
 					"crDbIndicator": "H",
@@ -552,21 +578,21 @@ sap.ui.define([
 					"wbsElement": null,
 					"isNonPo": true
 				});
-				postDataModel.refresh();
+				oPOModel.refresh();
 			} else {
 				sap.m.MessageToast.show("Fill Invoice Amount, Tax Code and Tax Value to proceed with Cost Allocation");
 			}
 		},
 
 		//function deleteNonPoItemData is triggred when the bin(Delete) icon is clicked in each row in Cost Allocation table
-		//This function is associated with frag:NonPOCostCenter
+		//This function is associated with frag:NonPOCostCenter ----Updated
 		deleteNonPoItemData: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("postDataModel");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			var index = oEvent.getSource().getParent().getBindingContextPath().split("/")[2];
 			var sPath = oEvent.getSource().getParent().getBindingContextPath();
-			var sValue = nonPOInvoiceModel.getProperty(sPath + "/netValue");
-			nonPOInvoiceModel.getData().listNonPoItem.splice(index, 1);
-			nonPOInvoiceModel.refresh();
+			var sValue = oPOModel.getProperty(sPath + "/netValue");
+			oPOModel.getData().costAllocation.splice(index, 1);
+			oPOModel.refresh();
 			if (sValue) {
 				this.amountCal(oEvent);
 			}
@@ -574,65 +600,61 @@ sap.ui.define([
 
 		//Support function amountCal is triggered when an row is deleted in the cost allocation table
 		//Frag:NonPOCostCenter
-		//on Change function that of Amount
+		//on Change function that of Amount ----Updated
 		amountCal: function (oEvent) {
 			if (!that) {
 				var that = this;
 			}
-			var postDataModel = this.getView().getModel("postDataModel");
-			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
-			var amountVal = postDataModel.getProperty(sPath + "/netValue");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var amountVal = oPOModel.getProperty(sPath + "/netValue");
 			if (amountVal === "") {
-				postDataModel.setProperty(sPath + "/amountError", "Error");
+				oPOModel.setProperty(sPath + "/amountError", "Error");
 				sap.m.MessageBox.information("Please enter Amount!");
 			} else {
-				postDataModel.setProperty(sPath + "/amountError", "None");
+				oPOModel.setProperty(sPath + "/amountError", "None");
 			}
 			var sDecValue = parseFloat(amountVal).toFixed(2);
-			postDataModel.setProperty(sPath + "/netValue", sDecValue);
+			oPOModel.setProperty(sPath + "/netValue", sDecValue);
 			this.costAllocationTaxCalc();
-
 		},
 
-		//function costAllocationTaxCalc is used to calculate tax in cost allocation table
+		//function costAllocationTaxCalc is used to calculate tax in cost allocation table ----Updated
 		costAllocationTaxCalc: function () {
-			var postDataModel = this.getModel("postDataModel"),
-				nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
 				that = this;
-			var totalAmt = 0,
-				totalTax = 0,
+			var totalTax = 0,
 				totalBaseRate = 0;
-			if (postDataModel.getProperty("/listNonPoItem")) {
-				var length = postDataModel.getProperty("/listNonPoItem").length;
+			if (oPOModel.getProperty("/costAllocation")) {
+				var length = oPOModel.getProperty("/costAllocation").length;
 				for (var i = 0; i < length; i++) {
 					//Tax Calculations
-					var taxPer = postDataModel.getProperty("/listNonPoItem/" + i + "/taxPer"),
-						netValue = postDataModel.getProperty("/listNonPoItem/" + i + "/netValue");
+					var taxPer = oPOModel.getProperty("/costAllocation/" + i + "/taxPer"),
+						netValue = oPOModel.getProperty("/costAllocation/" + i + "/netValue");
 
 					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxPer) / 100));
 					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxPer)) / 100;
 					totalTax += Number(taxValue.toFixed(2));
-					postDataModel.setProperty("/listNonPoItem/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(2));
-					postDataModel.setProperty("/listNonPoItem/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(2));
+					oPOModel.setProperty("/costAllocation/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(2));
+					oPOModel.setProperty("/costAllocation/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(2));
 
 					//End of Tax Calulations
-					if (baseRate && postDataModel.getProperty("/listNonPoItem/" + i +
+					if (baseRate && oPOModel.getProperty("/costAllocation/" + i +
 							"/crDbIndicator") === "H") {
-						totalBaseRate += that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/baseRate"));
+						totalBaseRate += that.nanValCheck(oPOModel.getProperty("/costAllocation/" + i + "/baseRate"));
 
-					} else if (baseRate && postDataModel.getProperty("/listNonPoItem/" + i +
+					} else if (baseRate && oPOModel.getProperty("/costAllocation/" + i +
 							"/crDbIndicator") === "S") {
-						totalBaseRate -= that.nanValCheck(postDataModel.getProperty("/listNonPoItem/" + i + "/baseRate"));
+						totalBaseRate -= that.nanValCheck(oPOModel.getProperty("/costAllocation/" + i + "/baseRate"));
 					}
 				}
 				totalBaseRate = that.nanValCheck(totalBaseRate).toFixed(2);
 				totalTax = this.nanValCheck(totalTax).toFixed(2);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/totalBaseRate", totalBaseRate);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount", totalTax);
+				oPOModel.setProperty("/totalBaseRate", totalBaseRate);
+				oPOModel.setProperty("/taxAmount", totalTax);
 				this.calculateGrossAmount();
 				this.calculateBalance();
-				nonPOInvoiceModel.refresh();
-				postDataModel.refresh();
+				oPOModel.refresh();
 			}
 		},
 
@@ -650,83 +672,29 @@ sap.ui.define([
 		},
 
 		//Frag:NonPOCostCenter
-		//Suggest function of Cost Center
-		costCenterSuggest: function (oEvent) {
-			var sQuery = oEvent.getSource().getValue();
-			var sUrl =
-				"DEC_NEW/sap/opu/odata/sap/ZAP_NONPO_SEARCH_HELPS_SRV/CostCenterSet?$filter=CompCode eq '0001' and CostCenters eq '*" + sQuery +
-				"*'";
-			var oHeader = {
-				"Content-Type": "application/json; charset=utf-8"
-			};
-			var costCenterModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(costCenterModel, "costCenterModel");
-			costCenterModel.loadData(sUrl, null, true, "Get", false, false, oHeader);
-			costCenterModel.attachRequestCompleted(function (oEvent) {
-				costCenterModel.refresh();
-			});
-		},
-
-		//Frag:NonPOCostCenter
-		//on Change function of Cost Center
+		//on Change function of Cost Center ----Updated
 		onChangeCostCenter: function (oEvent) {
 			var sCostCenter = oEvent.getParameter("value");
-			var postDataModel = this.getView().getModel("postDataModel");
-			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
-			if (sCostCenter === "") {
-				postDataModel.setProperty(sPath + "/costCenterError", "Error");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			if (!sCostCenter) {
+				oPOModel.setProperty(sPath + "/costCenterError", "Error");
 			} else {
-				postDataModel.setProperty(sPath + "/costCenterError", "None");
+				oPOModel.setProperty(sPath + "/costCenterError", "None");
 			}
-		},
-
-		//Frag:NonPOCostCenter
-		//Suggest function of Internal Order
-		internalOrderSuggest: function (oEvent) {
-			var sQuery = oEvent.getSource().getValue();
-			/*	var modelData = this.getView().getModel("nonPOInvoiceModel").getData();
-				var companyCode = modelData.invoiceDetailUIDto.companyCode;*/
-			var sUrl =
-				"DEC_NEW/sap/opu/odata/sap/ZAP_NONPO_SEARCH_HELPS_SRV/InternalOrderSearchSet?$filter=Search eq '4' and ImpCompCode eq '0001'";
-			var oHeader = {
-				"Content-Type": "application/json; charset=utf-8"
-			};
-			var internalOrderModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(internalOrderModel, "internalOrderModel");
-			internalOrderModel.loadData(sUrl, null, true, "Get", false, false, oHeader);
-			internalOrderModel.attachRequestCompleted(function (oEvent) {
-				internalOrderModel.refresh();
-			});
 		},
 
 		//Frag:NonPOCostCenter
 		//on Change function of Text
 		onChangeText: function (oEvent) {
 			var sText = oEvent.getParameter("value");
-			var postDataModel = this.getView().getModel("postDataModel");
-			var sPath = oEvent.getSource().getBindingContext("postDataModel").getPath();
-			if (sText === "") {
-				postDataModel.setProperty(sPath + "/itemTextError", "Error");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			if (!sText) {
+				oPOModel.setProperty(sPath + "/itemTextError", "Error");
 			} else {
-				postDataModel.setProperty(sPath + "/itemTextError", "None");
+				oPOModel.setProperty(sPath + "/itemTextError", "None");
 			}
-		},
-
-		//Frag:NonPOCostCenter
-		//Suggest function of Company Code
-		companyCodeSuggest: function (oEvent) {
-			var sQuery = oEvent.getSource().getValue();
-			var sUrl =
-				"DEC_NEW/sap/opu/odata/sap/ZAP_NONPO_SEARCH_HELPS_SRV/CompanyCodeSet?$filter=subof( '001', CompCode )&$format=json";
-			var oHeader = {
-				"Content-Type": "application/json; charset=utf-8"
-			};
-			var companyCodeModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(companyCodeModel, "companyCodeModel");
-			companyCodeModel.loadData(sUrl, null, true, "Get", false, false, oHeader);
-			companyCodeModel.attachRequestCompleted(function (oEvent) {
-				companyCodeModel.refresh();
-			});
 		},
 
 		//function onDataExportExcel will triggered on click of excel icon
@@ -812,7 +780,8 @@ sap.ui.define([
 				this.taxDetails = sap.ui.xmlfragment("com.menabev.AP.fragment.TaxDetails", this);
 				this.getView().addDependent(this.taxDetails);
 			}
-			this.taxDetails.setModel(this.getModel("postDataModel"), "postDataModel");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			this.taxDetails.setModel(oPOModel, "oPOModel");
 			this.taxDetails.open();
 		},
 
@@ -825,14 +794,9 @@ sap.ui.define([
 			var oSaveData = this.fnCreatePayloadSaveSubmit();
 			oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
 			oSaveData.invoiceHeaderDto.docStatus = "Draft";
-			var postingDate = oSaveData.invoiceHeaderDto.postingDate;
-			if (postingDate) {
-				var sUrl = "/menabevdev/invoiceHeader/accountantSave",
-					sMethod = "POST";
-				this.saveSubmitServiceCall(oSaveData, sMethod, sUrl, "SAVE");
-			} else {
-				sap.m.MessageBox.error("Please Enter Posting Date!");
-			}
+			var sUrl = "/menabevdev/invoiceHeader/accountantSave",
+				sMethod = "POST";
+			this.saveSubmitServiceCall(oSaveData, sMethod, sUrl, "SAVE");
 		},
 
 		//Called on click of Submit Button.
@@ -845,7 +809,7 @@ sap.ui.define([
 				sap.m.MessageBox.error("Please fill all mandatory fields!");
 			}
 			if (validateMandatoryFields) {
-				if (oSubmitData.costAllocationDto.length > 0) {
+				if (oSubmitData.invoiceHeaderDto.costAllocation.length > 0) {
 					bCostAllocation = true;
 				} else {
 					bCostAllocation = false;
@@ -855,26 +819,26 @@ sap.ui.define([
 
 			if (validateMandatoryFields && bCostAllocation) {
 				//COST ALLOCATION VALIDATION START 
-				var postDataModel = this.getView().getModel("postDataModel");
-				var alistNonPoData = $.extend(true, [], postDataModel.getProperty("/listNonPoItem"));
+				var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+				var costAllocation = $.extend(true, [], oPOModel.getProperty("/costAllocation"));
 				var bflag = true;
-				for (var i = 0; i < alistNonPoData.length; i++) {
+				for (var i = 0; i < costAllocation.length; i++) {
 					var bValidate = false;
-					if (!alistNonPoData[i].glAccount || alistNonPoData[i].glError === "Error") {
+					if (!costAllocation[i].glAccount || costAllocation[i].glError === "Error") {
 						bValidate = true;
-						alistNonPoData[i].glError = "Error";
+						costAllocation[i].glError = "Error";
 					}
-					if (!alistNonPoData[i].netValue || alistNonPoData[i].amountError === "Error") {
+					if (!costAllocation[i].netValue || costAllocation[i].amountError === "Error") {
 						bValidate = true;
-						alistNonPoData[i].amountError = "Error";
+						costAllocation[i].amountError = "Error";
 					}
-					if (!alistNonPoData[i].costCenter || alistNonPoData[i].costCenterError === "Error") {
+					if (!costAllocation[i].costCenter || costAllocation[i].costCenterError === "Error") {
 						bValidate = true;
-						alistNonPoData[i].costCenterError = "Error";
+						costAllocation[i].costCenterError = "Error";
 					}
-					if (!alistNonPoData[i].itemText || alistNonPoData[i].itemTextError === "Error") {
+					if (!costAllocation[i].itemText || costAllocation[i].itemTextError === "Error") {
 						bValidate = true;
-						alistNonPoData[i].itemTextError = "Error";
+						costAllocation[i].itemTextError = "Error";
 					}
 					if (bValidate) {
 						bflag = false;
@@ -882,7 +846,7 @@ sap.ui.define([
 					}
 				}
 				if (!bflag) {
-					postDataModel.setProperty("/listNonPoItem", alistNonPoData);
+					oPOModel.setProperty("/costAllocation", costAllocation);
 					var sMsg = "Please Enter Required Fields G/L Account,Amount,Cost Center & Text!";
 					sap.m.MessageBox.error(sMsg);
 					return;
@@ -895,8 +859,8 @@ sap.ui.define([
 						sap.m.MessageBox.error("Balance is not 0");
 						return;
 					}
-					var totalTax = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxAmount");
-					var userInputTaxAmount = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
+					var totalTax = oPOModel.getProperty("/taxAmount");
+					var userInputTaxAmount = oPOModel.getProperty("/taxValue");
 					var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
 					if (this.nanValCheck(taxDifference) !== 0) {
 						sap.m.MessageBox.error("Tax MisMatched");
@@ -914,7 +878,7 @@ sap.ui.define([
 		//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
 		saveSubmitServiceCall: function (oData, sMethod, sUrl, save) {
 			var that = this;
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			this.busyDialog.open();
 			$.ajax({
 				url: sUrl,
@@ -927,7 +891,7 @@ sap.ui.define([
 					this.busyDialog.close();
 					var message = data.responseStatus;
 					var ReqId = data.invoiceHeaderDto.requestId;
-					nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/requestId", ReqId);
+					oPOModel.setProperty("/requestId", ReqId);
 					if (result.status === 200) {
 						sap.m.MessageBox.success(message, {
 							actions: [sap.m.MessageBox.Action.OK],
@@ -959,42 +923,41 @@ sap.ui.define([
 
 		//this function used to form payload for SUBMIT and SAVE
 		fnCreatePayloadSaveSubmit: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
-				nonPOInvoiceModelData = nonPOInvoiceModel.getData();
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+				nonPOInvoiceModelData = oPOModel.getData();
 
-			var objectIsNew = jQuery.extend({}, nonPOInvoiceModelData.invoiceDetailUIDto);
-			var postDataModel = this.getModel("postDataModel");
+			var objectIsNew = jQuery.extend({}, nonPOInvoiceModelData);
 			objectIsNew.costAllocation = [];
 			var reqId = objectIsNew.invoiceHeader.requestId ? objectIsNew.invoiceHeader.requestId : null;
-			if (postDataModel.getData().listNonPoItem) {
-				for (var i = 0; i < postDataModel.getData().listNonPoItem.length; i++) {
-					var itemId = postDataModel.getData().listNonPoItem[i].itemId ? postDataModel.getData().listNonPoItem[i].itemId : null;
-					var costAllocationId = postDataModel.getData().listNonPoItem[i].costAllocationId ? postDataModel.getData().listNonPoItem[i].costAllocationId :
+			if (nonPOInvoiceModelData.costAllocation) {
+				for (var i = 0; i < nonPOInvoiceModelData.costAllocation.length; i++) {
+					var itemId = nonPOInvoiceModelData.costAllocation[i].itemId ? nonPOInvoiceModelData.costAllocation[i].itemId : null;
+					var costAllocationId = nonPOInvoiceModelData.costAllocation[i].costAllocationId ? nonPOInvoiceModelData.costAllocation[i].costAllocationId :
 						null;
 					objectIsNew.costAllocation.push({
-						"accountNum": postDataModel.getData().listNonPoItem[i].accountNum,
+						"accountNum": nonPOInvoiceModelData.costAllocation[i].accountNum,
 						"assetNo": null,
-						"baseRate": postDataModel.getData().listNonPoItem[i].baseRate,
+						"baseRate": nonPOInvoiceModelData.costAllocation[i].baseRate,
 						"costAllocationId": costAllocationId,
-						"costCenter": postDataModel.getData().listNonPoItem[i].costCenter,
-						"crDbIndicator": postDataModel.getData().listNonPoItem[i].crDbIndicator,
+						"costCenter": nonPOInvoiceModelData.costAllocation[i].costCenter,
+						"crDbIndicator": nonPOInvoiceModelData.costAllocation[i].crDbIndicator,
 						"deleteInd": null,
-						"distrPerc": postDataModel.getData().listNonPoItem[i].distrPerc,
-						"glAccount": postDataModel.getData().listNonPoItem[i].glAccount,
-						"internalOrderId": postDataModel.getData().listNonPoItem[i].internalOrderId,
+						"distrPerc": nonPOInvoiceModelData.costAllocation[i].distrPerc,
+						"glAccount": nonPOInvoiceModelData.costAllocation[i].glAccount,
+						"internalOrderId": nonPOInvoiceModelData.costAllocation[i].internalOrderId,
 						"itemId": itemId,
-						"itemText": postDataModel.getData().listNonPoItem[i].itemText,
+						"itemText": nonPOInvoiceModelData.costAllocation[i].itemText,
 						"lineText": "",
-						"materialDesc": postDataModel.getData().listNonPoItem[i].materialDesc,
-						"netValue": postDataModel.getData().listNonPoItem[i].netValue,
+						"materialDesc": nonPOInvoiceModelData.costAllocation[i].materialDesc,
+						"netValue": nonPOInvoiceModelData.costAllocation[i].netValue,
 						"orderId": "",
-						"profitCenter": postDataModel.getData().listNonPoItem[i].profitCenter,
+						"profitCenter": nonPOInvoiceModelData.costAllocation[i].profitCenter,
 						"quantity": "0.00",
 						"quantityUnit": "",
-						"taxCode": postDataModel.getData().listNonPoItem[i].taxCode,
-						"taxPer": postDataModel.getData().listNonPoItem[i].taxPer,
-						"taxValue": postDataModel.getData().listNonPoItem[i].taxValue,
-						"taxConditionType": postDataModel.getData().listNonPoItem[i].taxConditionType,
+						"taxCode": nonPOInvoiceModelData.costAllocation[i].taxCode,
+						"taxPer": nonPOInvoiceModelData.costAllocation[i].taxPer,
+						"taxValue": nonPOInvoiceModelData.costAllocation[i].taxValue,
+						"taxConditionType": nonPOInvoiceModelData.costAllocation[i].taxConditionType,
 						"requestId": reqId,
 						"serialNo": 0,
 						"subNumber": null,
@@ -1003,8 +966,6 @@ sap.ui.define([
 
 				}
 			}
-			objectIsNew.invoiceHeader.postingDate = objectIsNew.invoiceHeader.postingDate ? new Date(objectIsNew.invoiceHeader.postingDate).getTime() :
-				null;
 			var obj = {};
 			var invoiceHeaderDto = {
 				"accountNumber": "",
@@ -1021,7 +982,7 @@ sap.ui.define([
 				"clearingDate": "",
 				"clerkEmail": "",
 				"clerkId": 0,
-				"compCode": "1010", //hardCoded for testing
+				"compCode": objectIsNew.invoiceHeader.compCode,
 				"createdAt": "",
 				"createdAtFrom": "",
 				"createdAtInDB": 0,
@@ -1061,20 +1022,27 @@ sap.ui.define([
 				"paymentBlock": objectIsNew.invoiceHeader.paymentBlock,
 				"paymentBlockDesc": "",
 				"paymentStatus": "",
+				"paymentMethod": "",
 				"paymentTerms": objectIsNew.invoiceHeader.paymentTerms,
 				"plannedCost": "",
+				"processor": "",
 				"postingDate": objectIsNew.invoiceHeader.postingDate,
-				"postingDateFrom": 0,
-				"postingDateTo": 0,
 				"reasonForRejection": "",
-				"refDocCat": "",
-				"refDocNum": 0,
-				"rejectionText": "",
+				"refpurchaseDoc": "",
+				"refpurchaseDocCat": "",
+				"rejected": "",
+				"request_created_at": 0,
+				"request_created_by": "",
+				"request_updated_at": 0,
+				"request_updated_by": "",
 				"requestId": reqId,
 				"sapInvoiceNumber": 0,
 				"shippingCost": 0,
 				"subTotal": "",
+				"street": "",
 				"surcharge": "",
+				"sysSusgestedTaxAmount": "",
+				"taskGroup": "",
 				"taskOwner": objectIsNew.invoiceHeader.taskOwner,
 				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedInUserMail"),
 				"taskStatus": objectIsNew.invoiceHeader.taskStatus,
@@ -1087,24 +1055,24 @@ sap.ui.define([
 				"unplannedCost": "",
 				"updatedAt": 0,
 				"updatedBy": "",
-				"validationStatus": "",
 				"vatRegNum": "",
 				"vendorId": objectIsNew.invoiceHeader.vendorId,
 				"vendorName": objectIsNew.invoiceHeader.vendorName,
-				"version": 0
+				"version": 0,
+				"zipCode": ""
 			};
 			obj.invoiceHeaderDto = invoiceHeaderDto;
 			obj.invoiceHeaderDto.attachments = [];
-			if (nonPOInvoiceModel.getData().docManagerDto && nonPOInvoiceModel.getData().docManagerDto.length > 0) {
-				for (var n = 0; n < nonPOInvoiceModel.getData().docManagerDto.length; n++) {
-					obj.invoiceHeaderDto.attachments.push(nonPOInvoiceModel.getData().docManagerDto[n]);
+			if (oPOModel.getData().docManagerDto && oPOModel.getData().docManagerDto.length > 0) {
+				for (var n = 0; n < oPOModel.getData().docManagerDto.length; n++) {
+					obj.invoiceHeaderDto.attachments.push(oPOModel.getData().docManagerDto[n]);
 				}
 			}
 			obj.invoiceHeaderDto.comments = [];
-			if (nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto && nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length >
+			if (oPOModel.getData().invoiceDetailUIDto.commentDto && oPOModel.getData().invoiceDetailUIDto.commentDto.length >
 				0) {
-				for (var k = 0; k < nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
-					obj.invoiceHeaderDto.comments.push(nonPOInvoiceModel.getData().invoiceDetailUIDto.commentDto[k]);
+				for (var k = 0; k < oPOModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
+					obj.invoiceHeaderDto.comments.push(oPOModel.getData().invoiceDetailUIDto.commentDto[k]);
 				}
 			}
 			obj.invoiceItemAcctAssignmentDto = objectIsNew.invoiceItems;
@@ -1115,33 +1083,19 @@ sap.ui.define([
 		//Called on click of Reject Button.
 		//Frag:RejectDialog will open  
 		onNonPoReject: function () {
-			var mRejectModel = this.getModel("mRejectModel");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			this.rejectDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.RejectDialog", this);
 			this.getView().addDependent(this.rejectDialog);
-			this.rejectDialog.setModel(mRejectModel, "mRejectModel");
+			this.rejectDialog.setModel(oPOModel, "oPOModel");
+			this.getReasonOfRejection();
 			this.rejectDialog.open();
-			// var url = "InctureApDest/rejReason/getAll/EN";
-			// jQuery.ajax({
-			// 	type: "GET",
-			// 	contentType: "application/json",
-			// 	url: url,
-			// 	dataType: "json",
-			// 	async: true,
-			// 	success: function (data, textStatus, jqXHR) {
-			// 		var aRejectData = data;
-			// 		mRejectModel.setProperty("/items", aRejectData);
-			// 	},
-			// 	error: function (err) {
-			// 		sap.m.MessageToast.show(err.statusText);
-			// 	}
-			// });
 		},
 
 		//Frag:RejectDialog
 		onRejectCombo: function (oEvent) {
-			var mRejectModel = this.getView().getModel("mRejectModel");
-			mRejectModel.setProperty("/Textvalue", oEvent.getParameter("selectedItem").getProperty("text"));
-			mRejectModel.setProperty("/Keyvalue", oEvent.getParameter("selectedItem").getProperty("key"));
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			oPOModel.setProperty("/Textvalue", oEvent.getParameter("selectedItem").getProperty("text"));
+			oPOModel.setProperty("/Keyvalue", oEvent.getParameter("selectedItem").getProperty("key"));
 		},
 
 		//Frag:RejectDialog
@@ -1212,28 +1166,28 @@ sap.ui.define([
 			}
 		},
 
-		//Mandatory field check of Upload Invoice Fragment:UploadInvoiceFrag
+		//Mandatory field check of Header Feilds
 		validateMandatoryFields: function (oData) {
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			var key;
 			var flag = true;
 			for (key in oData) {
 				if (mandatoryFields.includes(key)) {
 					if (!oData[key]) {
-						this.getView().getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto/vstate/" + key, "Error");
+						oPOModel.setProperty("/vstate/" + key, "Error");
 						flag = false;
 					} else {
-						this.getView().getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto/vstate/" + key, "None");
+						oPOModel.setProperty("/vstate/" + key, "None");
 					}
 				}
 			}
 			return flag;
-
 		},
 
 		//Mandatory fields validation before adding cost allocation 
 		fnMandatoryFeildsForCC: function () {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
-				nonPOInvoiceModelData = nonPOInvoiceModel.getData().invoiceDetailUIDto.invoiceHeader,
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+				nonPOInvoiceModelData = oPOModel.getData(),
 				bError = false,
 				mandatoryFeildsForCC = ["invoiceTotal", "taxCode", "taxValue"];
 
@@ -1241,14 +1195,13 @@ sap.ui.define([
 			for (key in nonPOInvoiceModelData) {
 				if (mandatoryFeildsForCC.includes(key)) {
 					if (!nonPOInvoiceModelData[key]) {
-						this.getView().getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto/vstate/" + key, "Error");
+						oPOModel.setProperty("/vstate/" + key, "Error");
 						bError = true;
 					} else {
-						this.getView().getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto/vstate/" + key, "None");
+						oPOModel.setProperty("/vstate/" + key, "None");
 					}
 				}
 			}
-
 			return bError;
 		},
 
@@ -1545,25 +1498,25 @@ sap.ui.define([
 		},
 
 		calculateBalance: function () {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
 				that = this,
-				invAmt = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/invoiceTotal"),
-				grossAmount = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount");
+				invAmt = oPOModel.getProperty("/invoiceTotal"),
+				grossAmount = oPOModel.getProperty("/grossAmount");
 			var balance = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
 			balance = that.nanValCheck(balance).toFixed(2);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/balance", balance);
-			nonPOInvoiceModel.refresh();
+			oPOModel.setProperty("/balance", balance);
+			oPOModel.refresh();
 		},
 
 		calculateGrossAmount: function () {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
 				that = this,
-				totalBaseRate = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/totalBaseRate"),
-				userInputTaxAmount = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/taxValue");
-			var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
+				totalBaseRate = oPOModel.getProperty("/totalBaseRate"),
+				userInputTaxAmount = oPOModel.getProperty("/taxValue");
+			var grossAmount = that.nanValChoPOModeleck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
 			grossAmount = that.nanValCheck(grossAmount).toFixed(2);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/grossAmount", grossAmount);
-			nonPOInvoiceModel.refresh();
+			oPOModel.setProperty("/grossAmount", grossAmount);
+			oPOModel.refresh();
 		},
 
 		VendorNameSuggest: function (oEvent) {
@@ -1596,7 +1549,6 @@ sap.ui.define([
 			var value = oEvent.getParameter("suggestValue");
 			// value = value.toUpperCase();
 			if (value && value.length > 2) {
-				// var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=Supplier eq '"+ value +"'";
 				var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=substringof('" + value +
 					"',Supplier) eq true";
 				searchVendorModel.loadData(url, null, true);
@@ -1617,9 +1569,9 @@ sap.ui.define([
 
 		//To open vendor balance
 		onClickVendorBalances: function () {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel"),
-				vendorId = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"),
-				companyCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/companyCode");
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+				vendorId = oPOModel.getProperty("/vendorId"),
+				companyCode = oPOModel.getProperty("/companyCode");
 			this.loadVendorBalanceFrag(vendorId, companyCode);
 		}
 

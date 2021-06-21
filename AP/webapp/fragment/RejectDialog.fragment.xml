@@ -1,20 +1,46 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-	<Dialog class="sapUiSizeCompact" draggable="true" showHeader="false">
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" xmlns:l="sap.ui.layout">
+	<Dialog title="{i18n>Rejection}" class="sapUiSizeCompact" draggable="true">
 		<content>
-			<Toolbar>
-				<Label text="{i18n>confirmRejectMsg}" design="Bold"/>
-				<ToolbarSpacer/>
-			</Toolbar>
-			<HBox>
-				<Label text="{i18n>selectReasonCode}" class="sapUiTinyMarginTop"/>
-				<Select items="{mRejectModel>/items}" selectedKey="{mRejectModel>/selectedKey}" class="sapUiTinyMarginBegin" change="onRejectCombo"
-					forceSelection="false" width="14rem" valueStateText="{mRejectModel>/rejectReasonVState}">
-					<core:Item text="{mRejectModel>rejectionText}" key="{mRejectModel>reasonforRej}"/>
+			<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L6 M6 S12">
+				<l:content>
+					<VBox class="sapUiTinyMargin">
+						<HBox>
+							<Label text="{i18n>InvoiceNumber}" design="Bold" class="sapUiTinyMarginEnd"/>
+							<Text text="{oPOModel>/requestId}"/>
+						</HBox>
+						<HBox>
+							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
+							<Text text="{oPOModel>/invoiceStatus}"/>
+						</HBox>
+						<layoutData>
+							<l:GridData span="XL8 L8 M8 S6"/>
+						</layoutData>
+					</VBox>
+					<HBox class="sapUiTinyMargin">
+						<Label text="{i18n>TotalValue}" design="Bold" class="sapUiTinyMarginEnd"/>
+						<Text text="{oPOModel>/invoiceTotal}"/>
+						<layoutData>
+							<l:GridData span="XL4 L4 M4 S6"/>
+						</layoutData>
+					</HBox>
+				</l:content>
+			</l:Grid>
+			<tnt:InfoLabel text="{i18n>rejectInfoLabelMsg}" renderMode="Narrow" colorScheme="1" displayOnly="true"/>
+			<HBox class="sapUiSmallMargin">
+				<Label text="{i18n>selectReasonCode}" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
+				<Select items="{oDropDownModel>/rejectReasonCodes}" selectedKey="{oPOModel>/selectedKey}" change="onRejectCombo" forceSelection="false"
+					valueStateText="{oPOModel>/rejectReasonVState}" width="10rem">
+					<core:Item text="{oDropDownModel>shortText}" key="{oDropDownModel>statusCode}"/>
 				</Select>
 			</HBox>
+			<l:Grid hSpacing="1" vSpacing="0" defaultSpan="XL12 L12 M12 S12" class="sapUiSmallMarginTopBottom">
+                <Label design="Bold" text="{i18n>Comments}" required="true"/>
+                <TextArea value="{oPOModel>/sComments}" placeholder="{i18n>PleaseEnterComments}" showExceededText="true" maxLength="40" 
+                	width="100%" liveChange="onCommentsLiveChange" valueState="{oPOModel>/sCommentValueState}" valueLiveUpdate="true"/>
+            </l:Grid>
 		</content>
 		<beginButton>
-			<Button text="{i18n>REJECT}" press="onNonPoRejectConfirm"/>
+			<Button text="{i18n>Reject}" type="Reject" press="onNonPoRejectConfirm" enabled="false"/>
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>Cancel}" press="onNonPoRejectCancel"/>

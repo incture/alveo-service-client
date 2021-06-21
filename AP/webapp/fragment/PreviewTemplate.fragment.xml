@@ -1,14 +1,14 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<Dialog title="Preview" class="sapUiSizeCompact" contentWidth="50%">
 		<content>
-			<VBox items="{postDataModel>/previewListNonPoItem}" class="sapUiSmallMargin">
-				<Table id="idNonPo" class="invTabScroll" items="{ path: 'postDataModel>costAllocationList', templateShareable : true }"
+			<VBox items="{oPOModel>/previewListNonPoItem}" class="sapUiSmallMargin">
+				<Table id="idNonPo" class="invTabScroll" items="{ path: 'oPOModel>costAllocationList', templateShareable : true }"
 					sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 					<headerToolbar>
 						<Toolbar>
-							<Label text="{postDataModel>templateName}" design="Bold"/>
+							<Label text="{oPOModel>templateName}" design="Bold"/>
 							<ToolbarSpacer/>
-							<Input value="{postDataModel>amount}" placeholder="{i18n>EnterAmount}" liveChange="onChangePreviewTotalAmt" type="Number" width="25%"/>
+							<Input value="{oPOModel>amount}" placeholder="{i18n>EnterAmount}" liveChange="onChangePreviewTotalAmt" type="Number" width="25%"/>
 						</Toolbar>
 					</headerToolbar>
 					<columns>
@@ -34,12 +34,12 @@
 					<items>
 						<ColumnListItem>
 							<cells>
-								<Text text="{postDataModel>accountNum}"/>
-								<Text text="{postDataModel>glAccount}"/>
-								<Text text="{postDataModel>materialDesc}"/>
-								<Text text="{postDataModel>costCenter}"/>
-								<Text text="{postDataModel>distrPerc}"/>
-								<Text text="{postDataModel>netValue}"/>
+								<Text text="{oPOModel>accountNum}"/>
+								<Text text="{oPOModel>glAccount}"/>
+								<Text text="{oPOModel>materialDesc}"/>
+								<Text text="{oPOModel>costCenter}"/>
+								<Text text="{oPOModel>distrPerc}"/>
+								<Text text="{oPOModel>netValue}"/>
 							</cells>
 						</ColumnListItem>
 					</items>

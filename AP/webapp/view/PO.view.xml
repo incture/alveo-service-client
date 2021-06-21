@@ -54,5 +54,13 @@
 				</VBox>
 			</l:Splitter>
 		</content>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button text="{i18n>SubmitForApproval}" type="Default" tooltip="{i18n>Save}" press="onSubmitForApproval" class="sapUiTinyMarginEnd"/>
+				<Button text="{i18n>SubmitForRemediation}" type="Emphasized" tooltip="{i18n>SubmitForRemediation}" press="onSubmitForRemediation"
+					class="sapUiTinyMarginEnd"/>
+			</Toolbar>
+		</footer>
 	</Page>
 </mvc:View>

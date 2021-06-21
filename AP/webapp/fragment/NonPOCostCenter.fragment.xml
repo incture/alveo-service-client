@@ -1,7 +1,6 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core"
-	controllerName="com.menabev.AP.controller.NonPOInvoice">
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<ScrollContainer vertical="true" horizontal="false">
-		<Table id="idNonPo" class="MNBTable" items="{ path: 'postDataModel>/listNonPoItem', templateShareable : true }"
+		<Table id="idNonPo" class="MNBTable" items="{oPOModel>/costAllocation}"
 			sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 			<columns>
 				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
@@ -44,37 +43,37 @@
 			<items>
 				<ColumnListItem>
 					<cells>
-						<Input value="{postDataModel>glAccount}" filterSuggests="false"
-							suggestionItems="{path:'oDropDownModel>/GLAccountResult', templateShareable : true }" tooltip="{postDataModel>glCode}"
+						<Input value="{oPOModel>glAccount}" filterSuggests="false"
+							suggestionItems="{path:'oDropDownModel>/GLAccountResult', templateShareable : true }"
 							suggestionItemSelected="glAccountCCSelected" showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue"
-							valueState="{postDataModel>glError}">
+							valueState="{oPOModel>glError}">
 							<suggestionItems>
 								<core:ListItem text="{oDropDownModel>GlAccnt}" additionalText="{oDropDownModel>GlAccountName}"/>
 							</suggestionItems>
 						</Input>
-						<Text text="{postDataModel>materialDesc}"/>
-						<Select selectedKey="{postDataModel>crDbIndicator}" change="amountCal"
+						<Text text="{oPOModel>materialDesc}"/>
+						<Select selectedKey="{oPOModel>crDbIndicator}" change="amountCal"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<core:Item text="Debit" key="H"/>
 							<core:Item text="Credit" key="S"/>
 						</Select>
-						<Input type="Number" value="{postDataModel>netValue}" change="amountCal" valueState="{postDataModel>amountError}"
+						<Input type="Number" value="{oPOModel>netValue}" change="amountCal" valueState="{oPOModel>amountError}"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
-						<Text text="{postDataModel>baseRate}" textAlign="Center"/>
-						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{postDataModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
-							valueState="{postDataModel>costCenterError}" change="onChangeCostCenter">
+						<Text text="{oPOModel>baseRate}" textAlign="Center"/>
+						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
+							valueState="{oPOModel>costCenterError}" change="onChangeCostCenter">
 							<items>
 								<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" 
 									additionalText="{oDropDownModel>CostCenterName}"/>
 							</items>
 						</Select>
-						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{postDataModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
+						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
 							change="onChangeTax">
 							<items>
 								<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TaxCodeName}"/>
 							</items>
 						</Select>
-						<Input value="{postDataModel>internalOrderId}" tooltip="{postDataModel>internalOrderId}" visible="false"
+						<Input value="{oPOModel>internalOrderId}" tooltip="{oPOModel>internalOrderId}" visible="false"
 							suggestionItems="{path:'internalOrderModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
 							suggest="internalOrderSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
@@ -82,11 +81,11 @@
 									additionalText="{internalOrderModel>IntOrdDesc}"/>
 							</suggestionItems>
 						</Input>
-						<Input value="{postDataModel>profitCentre}" tooltip="{postDataModel>profitCentre}" visible="false"
+						<Input value="{oPOModel>profitCentre}" tooltip="{oPOModel>profitCentre}" visible="false"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
-						<Input value="{postDataModel>itemText}" tooltip="{postDataModel>text}" valueState="{postDataModel>itemTextError}" change="onChangeText"
+						<Input value="{oPOModel>itemText}" tooltip="{oPOModel>text}" valueState="{oPOModel>itemTextError}" change="onChangeText"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
-						<Input value="{postDataModel>companyCode}" tooltip="{postDataModel>companyCode}" visible="false"
+						<Input value="{oPOModel>companyCode}" tooltip="{oPOModel>companyCode}" visible="false"
 							suggestionItems="{path:'companyCodeModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
 							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>

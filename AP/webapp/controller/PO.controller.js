@@ -117,6 +117,28 @@ sap.ui.define([
 			var documentId = this.getModel("oPOModel").getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId, oSelectedBtnKey);
 		},
+		
+		onSubmitForRemediation: function () {
+			var oPOModel = this.getModel("oPOModel");
+			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
+			this.getView().addDependent(this.SubmitDialog);
+			this.SubmitDialog.setModel(oPOModel, "oPOModel");
+			oPOModel.setProperty("/submitTypeTitle", "Submit For Remediation");
+			this.SubmitDialog.open();
+		},
+		
+		onSubmitForApproval: function () {
+			var oPOModel = this.getModel("oPOModel");
+			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
+			this.getView().addDependent(this.SubmitDialog);
+			this.SubmitDialog.setModel(oPOModel, "oPOModel");
+			oPOModel.setProperty("/submitTypeTitle", "Submit For Approval");
+			this.SubmitDialog.open();
+		},
+		
+		onCancelSubmitDialog: function () {
+			this.SubmitDialog.close();
+		},
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered

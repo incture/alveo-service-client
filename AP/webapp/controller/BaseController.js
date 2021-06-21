@@ -468,10 +468,10 @@ sap.ui.define([
 		//this function triggered when NonPOCostCenter fragment glaccount is selected from the suggestions
 		glAccountCCSelected: function(oEvent){
 			var glAccountDes = oEvent.getParameter("selectedItem").getProperty("additionalText"),
-				sPath = oEvent.getSource().getBindingContext("postDataModel").sPath;
-			var postDataModel = this.getModel("postDataModel");
-			postDataModel.setProperty(sPath + "/materialDesc", glAccountDes);
-			postDataModel.refresh();
+				sPath = oEvent.getSource().getBindingContext("oPOModel").sPath;
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			oPOModel.setProperty(sPath + "/materialDesc", glAccountDes);
+			oPOModel.refresh();
 		},
 		
 		//function to get GLAccount based on running search
@@ -603,6 +603,25 @@ sap.ui.define([
 			this.addPOFragment.close();
 		},
 		//End of Add PO
+		
+		//To get the Reason of Rejection list details 
+		getReasonOfRejection: function(){
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			var url = "/menabevdev/codesAndtexts/get/uuId=/statusCode=/type=ROR/language=";
+			jQuery.ajax({
+				type: "GET",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					oDropDownModel.setProperty("/rejectReasonCodes", data);
+				},
+				error: function (err) {
+					sap.m.MessageToast.show(err.statusText);
+				}
+			});
+		},
 
 	});
 
