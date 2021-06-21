@@ -73,12 +73,7 @@ public class CodesAndtextsServiceImpl implements CodesAndTextsService {
 		System.out.println("Final Query ::::: "+finalQuery);
 		
 		Query queryForOutput = entityManager.createQuery(finalQuery);
-//		List<CodesAndTextsDo> dos =(List<CodesAndTextsDo>) queryForOutput.getResultList();
-//        for(CodesAndTextsDo cAndTDo : dos){
-//        	CodesAndTextsDto dto = new CodesAndTextsDto();
-//        	dto = mapper.map(cAndTDo, CodesAndTextsDto.class);
-//        	returnDto.add(dto);
-//        }
+
 		 List<Object[]> dos = queryForOutput.getResultList();
 	        for(Object[] cAndTDo : dos){
 	        	CodesAndTextsDto dto = new CodesAndTextsDto();

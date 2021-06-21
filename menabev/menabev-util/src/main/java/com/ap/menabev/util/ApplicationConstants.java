@@ -93,6 +93,33 @@ public interface ApplicationConstants {
 	String FILTER_FOR_ISR = "InvoiceStatusReport";
 	String REJECTED = "15";
 	String PAYMENT_PENDING = "Pending For Approval";
+	//---------------------------------------------------//
+	//Submit Constants 
+	String ACCOUNTANT_SUBMIT_FOR_REMEDIATION = "ASR";
+	String ACCOUNTANT_SUBMIT_FOR_APPROVAL = "ASA";
+	String ACCOUNTANT_REJECT = "AR";
+	String NEW_INVOICE = "00";
+	String DRAFT_INVOICE = "01";
+	String OPEN_INVOICE = "02";
+	String DUPLICATE_INVOICE = "03";
+	String PO_MISSING_OR_INVALID ="04";  
+	String NO_GRN = "05";
+	String PARTIAL_GRN = "06";
+	String UOM_MISMATCH = "07";
+	String ITEM_MISMATCH = "08";
+	String QTY_MISMATCH = "09";
+	String PRICE_MISMATCH = "10";
+	String PRICE_OR_QTY_MISMATCH  = "11";
+	String BALANCE_MISMATCH = "12";
+	String READY_TO_POST = "13";
+	String SAP_POSTED = "14";
+	String PAID ="15";
+	String UNPAID ="16";
+	String DUPLICATE = "A";
+    String NOT_AN_INVOICE = "B";
+    String PRICE_IS_NOT_RIGHT = "C";
+    String QTY_IS_NOT_RIGHT = "D";
+    String VAT_CODE_MISMATCH = "E";
 	// ----------------------------------------------------------//
 	// QA DataBase Details
 	// String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";

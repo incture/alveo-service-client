@@ -7,5 +7,5 @@ public class ClaimAndReleaseDto {
 
 	private String taskID;
 	private String userId;
-	private InboxOutputDto inbox;
+	private InboxOutputDto invoice;
 }

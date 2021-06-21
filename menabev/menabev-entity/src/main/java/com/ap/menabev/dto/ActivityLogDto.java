@@ -1,11 +1,7 @@
 package com.ap.menabev.dto;
 
-import java.util.Date;
+import java.util.List;
 import java.util.UUID;
-
-import javax.persistence.Column;
-
-import com.sap.db.jdbc.packet.LOB;
 
 import lombok.Data;
 
@@ -28,10 +24,11 @@ public class ActivityLogDto {
 	private String processor;// 255
 	private String activityId;// 20
 	private String actionCode;// 2
+	private String actionCodeText;
 	private String invoiceStatusCode;// 2
 	private String invoiceStatusText;// 50
-	private String commentsGuid;
-	private String attachmentGuid;
+	private List<String> comments;
+	private List<String> attachments;
 	private Long createdAt;
 	private String createdBy;
 	private Long updatedAt;

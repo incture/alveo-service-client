@@ -13,7 +13,7 @@ import lombok.Data;
 
 
 @Entity
-@Table(name = "ACTIVITY_LOG")
+@Table(name = "ACTIVITY_LOGS")
 @Data
 public class ActivityLogDo {
 
@@ -67,11 +67,6 @@ private String invoiceStatusCode;//2
 @Column(name = "INVOICE_STATUS_TEXT",length=50)
 private String invoiceStatusText;//50
 
-@Column(name = "COMMENTS_GUID")
-private String commentsGuid;
-
-@Column(name = "ATTACHMENT_GUID")
-private String attachmentGuid;
 
 @Column(name = "CREATED_AT")
 private Long createdAt;

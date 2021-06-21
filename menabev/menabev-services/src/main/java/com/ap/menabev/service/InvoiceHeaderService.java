@@ -14,6 +14,7 @@ import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
+import com.ap.menabev.dto.InvoiceSubmitDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
@@ -52,6 +53,7 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> getRemediationUserDetails(List<PurchaseOrderRemediationInput> dtoList, String userListNeeded)
 			throws URISyntaxException, IOException;
 	public ResponseEntity<?> getInboxUserTask(FilterMultipleHeaderSearchDto filterDto);
-	ResponseEntity<?> getInvoiceDetail(String requestId);	
+	ResponseEntity<?> getInvoiceDetail(String requestId);
+	ResponseEntity<?> accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit);	
 
 }

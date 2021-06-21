@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ap.menabev.dto.ClaimAndReleaseDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
+import com.ap.menabev.dto.DeleteDraftInputDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
@@ -77,8 +78,8 @@ public class InvoiceHeaderController {
 		return headerService.getInvoiceComments(requestId);
 	}
 	@DeleteMapping("/delete")
-	public ResponseEntity<?> delete(@RequestBody List<String> requestId) {
-		return headerService.deleteDraft(requestId);
+	public ResponseEntity<?> delete(@RequestBody DeleteDraftInputDto delete) {
+		return headerService.deleteDraft(delete.getRequestId());
 	}
 	@PostMapping("/inbox/tasks")
 	public ResponseEntity<?> getinboxTaskNew(@RequestBody FilterMultipleHeaderSearchDto dto) {

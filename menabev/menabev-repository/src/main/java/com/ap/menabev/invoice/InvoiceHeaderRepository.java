@@ -37,6 +37,9 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo,I
 	@Query(value = "select i from InvoiceHeaderDo i where i.requestId=:requestId")
 	InvoiceHeaderDo getInvoiceHeader(@Param("requestId") String requestId);
 	
+	
+	@Transactional
+	@Modifying(clearAutomatically=true)
 	@Query(value = "Delete from InvoiceHeaderDo i where i.requestId=:requestId")
 	int deleteInvoiceHeader(@Param("requestId") String requestId);
 	

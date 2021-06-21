@@ -11,7 +11,7 @@ import lombok.ToString;
 public class CostAllocationDto {
     private String costAllocationId;
     private String requestId; // (FK)
-	private Integer itemId; // (FK)
+	private String itemId; // (FK)
 	private Integer serialNo;
 	private Boolean deleteInd;
 	private String quantity;
