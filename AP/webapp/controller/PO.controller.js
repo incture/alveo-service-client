@@ -156,7 +156,12 @@ sap.ui.define([
 
 		onNonPoSubmit: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onSubmit(oEvent, this, MandatoryFileds);
+			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds);
+		},
+		
+		onNonPoSave: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onNonPoSave(oEvent, this);
 		},
 
 		/**

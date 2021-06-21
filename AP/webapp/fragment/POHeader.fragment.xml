@@ -9,7 +9,7 @@
 				</Select>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
+				<Label text="{i18n>VendorId}" required="true"/>
 				<Input filterSuggests="false" value="{oPOModel>/vendorId}" width="80%" showSuggestion="true" suggest="VendorIdSuggest"
 					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected" change="onVendorIdChange"
 					suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}">
@@ -19,7 +19,7 @@
 				</Input>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>VendorName}" class="sapUiTinyMarginTop"/>
+				<Label text="{i18n>VendorName}"/>
 				<Input filterSuggests="false" value="{oPOModel>/vendorName}" width="80%" type="Text" showSuggestion="true" suggest="VendorIdSuggest" change="onVendorNameChange"
 					valueState="{oMandatoryModel>/NonPO/vendorNameState}" tooltip="{oPOModel>/vendorName}" suggestionItemSelected="vendorNameSelected"
 					suggestionItems="{oDropDownModel>/VendorIdSuggest}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
@@ -42,12 +42,12 @@
 				</layoutData>
 			</VBox>
 			<VBox>
-				<Label required="true" text="{i18n>InvoiceNo}" class="sapUiTinyMarginTop"/>
+				<Label required="true" text="{i18n>InvoiceNo}"/>
 				<Input value="{oPOModel>/invoiceRefNum}" width="80%" change="onInvRefChange" maxLength="16"
 					valueState="{oMandatoryModel>/NonPO/invoiceRefNumState}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox id="idDate">
-				<Label text="{i18n>InvoiceDate}" required="true" class="sapUiTinyMarginTop"/>
+				<Label text="{i18n>InvoiceDate}" required="true"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
 					value="{ path:'oPOModel>/documentDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
 					valueState="{oMandatoryModel>/NonPO/documentDateState}" change="onInvDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>

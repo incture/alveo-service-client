@@ -289,7 +289,7 @@ sap.ui.define([
 						}
 						oTaskInboxModel.setProperty("/openTaskCount", data.totalCount);
 						// oTaskInboxModel.setProperty("/myTaskCount", data.body.countMyTask);
-						oTaskInboxModel.setProperty("/draftCount", data.countDraft);
+						oTaskInboxModel.setProperty("/draftCount", data.draftCount);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
 						if (data.taskList) {

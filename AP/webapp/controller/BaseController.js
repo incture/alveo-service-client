@@ -197,7 +197,7 @@ sap.ui.define([
 				}
 			);
 		},
-		
+
 		getBtnVisibility: function () {
 			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 			oVisibilityModel.setProperty("/NonPOInvoice", {});
@@ -215,7 +215,7 @@ sap.ui.define([
 				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
 			}
 		},
-		
+
 		//Open PDF Area details
 		//Start of Open PDF details
 		fnOpenPDF: function (documentId, key) {
@@ -621,9 +621,9 @@ sap.ui.define([
 			this.addPOFragment.close();
 		},
 		//End of Add PO
-		
+
 		//To get the Reason of Rejection list details 
-		getReasonOfRejection: function(){
+		getReasonOfRejection: function () {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
 			var url = "/menabevdev/codesAndtexts/get/uuId=/statusCode=/type=ROR/language=";
 			jQuery.ajax({
@@ -640,6 +640,279 @@ sap.ui.define([
 				}
 			});
 		},
+
+		onNonPoReject: function () {
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			this.rejectDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.RejectDialog", this);
+			this.getView().addDependent(this.rejectDialog);
+			this.rejectDialog.setModel(oPOModel, "oPOModel");
+			this.getReasonOfRejection();
+			this.rejectDialog.open();
+		},
+
+		//Frag:RejectDialog
+		onRejectCombo: function (oEvent) {
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			oPOModel.setProperty("/Textvalue", oEvent.getParameter("selectedItem").getProperty("text"));
+			oPOModel.setProperty("/Keyvalue", oEvent.getParameter("selectedItem").getProperty("key"));
+		},
+
+		//Frag:RejectDialog
+		onNonPoRejectCancel: function () {
+			this.rejectDialog.close();
+		},
+
+		//Frag:RejectDialog
+		onNonPoRejectConfirm: function () {
+			var mRejectModel = this.getView().getModel("mRejectModel");
+			var rejectReasonVState = "None";
+			var selKey = mRejectModel.getProperty("/selectedKey");
+			if (selKey) {
+				rejectReasonVState = "None";
+				var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel"),
+					nonPOInvoiceModelData = nonPOInvoiceModel.getData();
+				var objectIsNew = jQuery.extend({}, nonPOInvoiceModelData.invoiceDetailUIDto);
+				objectIsNew.invoiceHeader.postingDate = objectIsNew.invoiceHeader.postingDate ? new Date(objectIsNew.invoiceHeader.postingDate).getTime() :
+					null;
+				objectIsNew.invoiceHeader.reasonForRejection = mRejectModel.getProperty("/Keyvalue");
+				objectIsNew.invoiceHeader.rejectionText = mRejectModel.getProperty("/Textvalue");
+				var jsonData = objectIsNew.invoiceHeader;
+				var url = "InctureApDest/invoiceHeader/updateLifeCycleStatus";
+				var that = this;
+				this.busyDialog.open();
+				$.ajax({
+					url: url,
+					method: "PUT",
+					async: false,
+					headers: {
+						"X-CSRF-Token": this.getCSRFToken()
+					},
+					contentType: 'application/json',
+					dataType: "json",
+					data: JSON.stringify(jsonData),
+					success: function (data, xhr, result) {
+						this.busyDialog.close();
+						var message = data.responseStatus;
+						if (result.status === 200) {
+							mRejectModel.setProperty("/selectedKey", "");
+							sap.m.MessageBox.success(message, {
+								actions: [sap.m.MessageBox.Action.OK],
+								onClose: function (sAction) {
+									that.router.navTo("Inbox");
+								}
+							});
+						} else {
+							sap.m.MessageBox.information(message, {
+								actions: [sap.m.MessageBox.Action.OK]
+							});
+						}
+					}.bind(this),
+					error: function (result, xhr, data) {
+						this.busyDialog.close();
+						var errorMsg = "";
+						if (result.status === 504) {
+							errorMsg = "Request timed-out. Please refresh your page";
+							this.errorMsg(errorMsg);
+						} else {
+							errorMsg = data;
+							this.errorMsg(errorMsg);
+						}
+					}.bind(this)
+				});
+			} else {
+				sap.m.MessageBox.error("Please select Reason Code");
+				mRejectModel.setProperty("/mRejectModel", "error");
+			}
+		},
+		
+			onPostComment: function () {
+			var nonPOInvoiceModel = this.oPOModel;
+			var oUserDetailModel = this.oUserDetailModel;
+			var comments = nonPOInvoiceModel.getProperty("/comments");
+			var userComment = nonPOInvoiceModel.getProperty("/commments");
+			if (!userComment) {
+				this.resourceBundle.getText("FILL_COMMENT");
+				return;
+			}
+			var obj = {
+				"createdAt": new Date().getTime(),
+				"user": oUserDetailModel.getProperty("/loggedinUserDetail/name/familyName"),
+				"comment": nonPOInvoiceModel.getProperty("/commments"),
+				"createdBy": oUserDetailModel.getProperty("/loggedInUserMail")
+			};
+			comments.push(obj);
+			nonPOInvoiceModel.setProperty("/comments", comments);
+			nonPOInvoiceModel.setProperty("/commments", "");
+		},
+		createReqid: function () {
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			var sUrl = "/menabevdev/invoiceHeader?sequnceCode=APA";
+			oServiceModel.loadData(sUrl, "", false, "GET", false, false, this.oHeader);
+			busy.close();
+			var ReqId = oServiceModel.getData().message;
+			return ReqId;
+		},
+
+		handleUploadComplete: function (oEvent) {
+			var that = this;
+			var oUserDetailModel = this.oUserDetailModel;
+			var nonPOInvoiceModel = this.oPOModel;
+			var attachments = nonPOInvoiceModel.getProperty("/attachments");
+			var upfile = oEvent.getParameters().files[0];
+			var upFileName = upfile.name;
+			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
+			var allowedTypes = ["pdf", "doc", "docx", "jpg", "jpeg", "png", "xlsx", "xls", "csv"];
+			var requestId = nonPOInvoiceModel.getProperty("/requestId");
+			if (!requestId) {
+				requestId = this.createReqid();
+				nonPOInvoiceModel.setProperty("/requestId", requestId);
+			}
+			if (!allowedTypes.includes(fileType.toLowerCase())) {
+				MessageBox.error(that.resourceBundle.getText("msgFileType"));
+				return;
+			}
+			if (upfile.size > 2097152) {
+				MessageBox.error(that.resourceBundle.getText("msgFileSize"));
+				return;
+			}
+			if (upFileName.length > 60) {
+				MessageBox.error(that.resourceBundle.getText("msgFileName"));
+				return;
+			}
+			var sUrl = "/menabevdev/document/upload";
+			var oFormData = new FormData;
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+
+			oFormData.set("requestId", requestId);
+			oFormData.set("file", upfile);
+			jQuery.ajax({
+				url: sUrl,
+				method: "POST",
+				timeout: 0,
+				headers: {
+					"Accept": "application/json"
+				},
+				enctype: "multipart/form-data",
+				contentType: false,
+				processData: false,
+				crossDomain: true,
+				cache: false,
+				data: oFormData,
+				success: function (success) {
+					busy.close();
+					var errorMsg = "";
+					// if (success.status === "Error") {
+					// 	errorMsg = "Request timed-out. Please contact your administrator";
+					// 	that.errorMsg(errorMsg);
+					// } else {
+					var obj = {
+						"attachmentId": success.documentId,
+						"createdAt": new Date().getTime(),
+						"createdBy": oUserDetailModel.getProperty("/loggedInUserMail"),
+						"fileName": success.documentName,
+						"fileType": "",
+						"requestId": requestId
+					};
+					attachments.push(obj);
+					nonPOInvoiceModel.setProperty("/attachments", attachments);
+					MessageBox.success(success.response.message, {
+						actions: [MessageBox.Action.OK],
+						onClose: function (sAction) {
+							if (sAction === MessageBox.Action.OK) {}
+						}
+					});
+				},
+				error: function (fail) {
+					busy.close();
+					var errorMsg = "";
+					if (fail.status === 504) {
+						errorMsg = "Request timed-out. Please contact your administrator";
+						that.errorMsg(errorMsg);
+					} else {
+						errorMsg = fail.responseJSON.message;
+						that.errorMsg(errorMsg);
+					}
+				}
+			});
+
+		},
+
+		onDocumentDownload: function (oEvent) {
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var nonPOInvoiceModel = this.oPOModel;
+			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
+			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
+
+			var parts = sPath.split("/");
+			var index = parts[parts.length - 1];
+			var documentId = obj.attachmentId;
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			var sUrl = "/menabevdev/document/download/" + documentId;
+			oServiceModel.loadData(sUrl, "", true, "GET", false, false, this.oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				var Base64 = oEvent.getSource().getData().base64;
+				var fileName = oEvent.getSource().getData().documentName;
+				if (fileName && fileName.split(".") && fileName.split(".")[fileName.split(".").length - 1]) {
+					var fileType = fileName.split(".")[fileName.split(".").length - 1].toLowerCase();
+				}
+				if (!jQuery.isEmptyObject(Base64)) {
+					var u8_2 = new Uint8Array(atob(Base64).split("").map(function (c) {
+						return c.charCodeAt(0);
+					}));
+					var a = document.createElement("a");
+					document.body.appendChild(a);
+					a.style = "display: none";
+					var blob = new Blob([u8_2], {
+						type: "application/" + fileType,
+						name: fileName
+					});
+					var url = window.URL.createObjectURL(blob);
+
+					a.href = url;
+					// if (fileType === "pdf") {
+					// 	// a.target = "_blank";
+					// 	window.open(url, fileName, "width=900px, height=600px, scrollbars=yes");
+					// } else {
+					a.download = fileName;
+					a.click();
+					// }
+
+					// window.URL.revokeObjectURL(url);
+					// }
+				}
+				busy.close();
+			});
+			oServiceModel.attachRequestFailed(function (oEvent) {
+				busy.close();
+			});
+		},
+
+		onDocumentDelete: function (oEvent) {
+			var oServiceModel = new sap.ui.model.json.JSONModel();
+			var nonPOInvoiceModel = this.oPOModel;
+			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
+			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
+			var attachments = nonPOInvoiceModel.getProperty("/attachments");
+			var parts = sPath.split("/");
+			var index = parts[parts.length - 1];
+			var attachmentId = obj.attachmentId;
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			var sUrl = "/menabevdev/document/delete/" + attachmentId;
+			oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, this.oHeader);
+			oServiceModel.attachRequestCompleted(function (oEvent) {
+				busy.close();
+				sap.m.MessageToast.show(oEvent.getSource().getData().message);
+				attachments.splice(index, 1);
+				nonPOInvoiceModel.setProperty("/attachments", attachments);
+
+			});
+		},
+
 
 		VendorIdSuggest: function (oEvent, oController) {
 			var oDataAPIModel = this.oDataAPIModel;

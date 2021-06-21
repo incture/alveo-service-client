@@ -19,6 +19,8 @@ sap.ui.define([
 			};
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			this.oDropDownModel = oDropDownModel;
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
@@ -67,6 +69,7 @@ sap.ui.define([
 		getUserDetails: function (admin) {
 			var that = this;
 			var oUserDetailModel = this.oUserDetailModel;
+			var oDropDownModel = this.oDropDownModel;
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			var loggedinUserVendorId = oUserDetailModel.setProperty("/loggedinUserVendorId");
@@ -110,9 +113,9 @@ sap.ui.define([
 								if (userGroup === "IT_Admin") {
 									taskGroupData = taskGroups.indexOf(user.groups[j].value);
 									if (taskGroupData >= 0) {
-										var obj={
-											"userId":user.emails[0].value,
-											"role":user.groups[j].value
+										var obj = {
+											"userId": user.emails[0].value,
+											"role": user.groups[j].value
 										};
 										taskGroupUsers.push(obj);
 									}
@@ -123,7 +126,7 @@ sap.ui.define([
 					var count = userdata.length;
 					oUserDetailModel.setProperty("/userCount", count);
 					oUserDetailModel.setProperty("/users", userdata);
-					oUserDetailModel.setProperty("/taskGroupUsers", taskGroupUsers);
+					oDropDownModel.setProperty("/taskGroupUsers", taskGroupUsers);
 				}
 			});
 		},

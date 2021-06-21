@@ -83,7 +83,7 @@ com.menabev.AP.util.POServices = {
 	onCompanyCodeChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isCompanyCodeChanged");
 	},
-	
+
 	onInvRefChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isInvoiceRefChanged");
 	},
@@ -293,5 +293,154 @@ com.menabev.AP.util.POServices = {
 				});
 			}
 		});
-	}
+	},
+
+	onNonPoSave: function (oEvent, oController, status) {
+		var oPOModel = oController.oPOModel;
+		var oSaveData = oPOModel.getData();
+		oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
+		oSaveData.invoiceHeaderDto.docStatus = "Draft";
+		var sUrl = "/menabevdev/invoiceHeader/accountantSave",
+			sMethod = "POST";
+		this.saveSubmitServiceCall(oController, oSaveData, sMethod, sUrl, "SAVE");
+	},
+
+	//Called on click of Submit Button.
+	onNonPoSubmit: function (oEvent, oController, MandatoryFileds) {
+		var oPOModel = oController.oPOModel;
+		var oSubmitData = oPOModel.getData();
+		var bCostAllocation = false;
+		//Header Mandatory feilds validation
+
+		var manLength = MandatoryFileds.length;
+		var data, count = 0;
+		for (var i = 0; i < manLength; i++) {
+			data = oPOModel.getProperty("/" + MandatoryFileds[i]);
+			if (data) {
+				oPOModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
+			} else {
+				count += 1;
+				oPOModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
+			}
+		}
+		oPOModel.refresh();
+		if (count) {
+			// message = resourceBundle.getText("MANDATORYFIELDERROR");
+			var message = "Please fill all Mandatory fields";
+			sap.m.MessageToast.show(message);
+			return;
+		} else {
+			if (oSubmitData.costAllocation.length > 0) {
+				bCostAllocation = true;
+			} else {
+				bCostAllocation = false;
+				sap.m.MessageBox.error("Please Enter Cost Allocation Details!");
+			}
+		}
+
+		if (!count && bCostAllocation) {
+			//COST ALLOCATION VALIDATION START 
+			var costAllocation = $.extend(true, [], oPOModel.getProperty("/costAllocation"));
+			var bflag = true;
+			for (var i = 0; i < costAllocation.length; i++) {
+				var bValidate = false;
+				if (!costAllocation[i].glAccount || costAllocation[i].glError === "Error") {
+					bValidate = true;
+					costAllocation[i].glError = "Error";
+				}
+				if (!costAllocation[i].netValue || costAllocation[i].amountError === "Error") {
+					bValidate = true;
+					costAllocation[i].amountError = "Error";
+				}
+				if (!costAllocation[i].costCenter || costAllocation[i].costCenterError === "Error") {
+					bValidate = true;
+					costAllocation[i].costCenterError = "Error";
+				}
+				if (!costAllocation[i].itemText || costAllocation[i].itemTextError === "Error") {
+					bValidate = true;
+					costAllocation[i].itemTextError = "Error";
+				}
+				if (bValidate) {
+					bflag = false;
+					continue;
+				}
+			}
+			if (!bflag) {
+				oPOModel.setProperty("/costAllocation", costAllocation);
+				var sMsg = "Please Enter Required Fields G/L Account,Amount,Cost Center & Text!";
+				sap.m.MessageBox.error(sMsg);
+				return;
+			} else {
+				//COST ALLOCATION VALIDATION END
+				oSubmitData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
+				oSubmitData.invoiceHeaderDto.docStatus = "Created";
+				var balance = oSubmitData.invoiceHeaderDto.balance;
+				if (this.nanValCheck(balance) !== 0) {
+					sap.m.MessageBox.error("Balance is not 0");
+					return;
+				}
+				var totalTax = oPOModel.getProperty("/taxAmount");
+				var userInputTaxAmount = oPOModel.getProperty("/taxValue");
+				var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
+				if (this.nanValCheck(taxDifference) !== 0) {
+					sap.m.MessageBox.error("Tax MisMatched");
+					return;
+				}
+
+				var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
+					sMethod = "POST";
+				this.saveSubmitServiceCall(oSubmitData, sMethod, sUrl);
+			}
+		}
+
+	},
+
+	//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
+	saveSubmitServiceCall: function (oController, oData, sMethod, sUrl, save) {
+		var that = this;
+		var oPOModel = oController.oPOModel;
+		var busy = new sap.m.BusyDialog();
+
+		var oServiceModel = new sap.ui.model.json.JSONModel();
+		var busy = new sap.m.BusyDialog();
+		var oHeader = {
+			"Content-Type": "application/scim+json"
+		};
+		oServiceModel.loadData(sUrl, JSON.stringify(oData), true, sMethod, false, false, oHeader);
+		oServiceModel.attachRequestCompleted(function (oEvent) {
+			busy.close();
+			var oData = oEvent.getSource().getData();
+			var ReqId = oData.requestId;
+			oPOModel.setProperty("/requestId", ReqId);
+			var message;
+			if (oData.status === 200) {
+				sap.m.MessageBox.success(message, {
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (sAction) {
+						if (!save) {
+							that.router.navTo("Inbox");
+						}
+					}
+				});
+			} else {
+				sap.m.MessageBox.information(message, {
+					actions: [sap.m.MessageBox.Action.OK]
+				});
+			}
+		});
+		oServiceModel.attachRequestFailed(function (oEvent) {
+			busy.close();
+			var oData = oEvent.getSource().getData();
+			var errorMsg = "";
+			if (oData.status === 504) {
+				errorMsg = "Request timed-out. Please refresh your page";
+				// this.errorMsg(errorMsg);
+			} else {
+				// errorMsg = data;
+				// this.errorMsg(errorMsg);
+			}
+		});
+	},
+
+
 };
