@@ -22,7 +22,8 @@ com.menabev.AP.util.POServices = {
 
 	getPONonPOData: function (oEvent, oController, requestId) {
 		var oPOModel = oController.oPOModel;
-		var sUrl = "/invoiceHeader/getInvoiceByReqId/" + requestId;
+		var oVisibilityModel = oController.oVisibilityModel;
+		var sUrl = "/menabevdev/invoiceHeader/getInvoiceByReqId/" + requestId;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
 		var busy = new sap.m.BusyDialog();
 		var oHeader = {
@@ -31,9 +32,15 @@ com.menabev.AP.util.POServices = {
 		busy.open();
 		oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
+			busy.close();
+			var oData = oEvent.getSource().getData();
+			oPOModel.setProperty("/", oData);
+			if (oData.invoicePdfId) {
+				oVisibilityModel.setProperty("/openPdfBtnVisible", true);
+			} else {
+				oVisibilityModel.setProperty("/openPdfBtnVisible", false);
+			}
 
-			var oData = oEvent.getSource().getData().invoiceHeaderDto;
-			oPOModel.setProperty("/",oData);
 			// if (oData.messages.messageType === "E") {
 			// 	sap.m.MessageBox.success(oData.messages.messageText, {
 			// 		actions: [sap.m.MessageBox.Action.OK]
@@ -53,6 +60,16 @@ com.menabev.AP.util.POServices = {
 		this.onHeaderChange(oEvent, oController, "isVendoIdChanged");
 	},
 
+	onVendorNameChange: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel;
+		var sVendorName = oEvent.getParameter("selectedItem").getProperty("text"),
+			sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText");
+		oPOModel.setProperty("/vendorName", sVendorName);
+		oPOModel.setProperty("/vendorId", sVendorId);
+		oPOModel.refresh();
+		this.onHeaderChange(oEvent, oController, "isVendoIdChanged");
+	},
+
 	vendorNameSelected: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText"),
@@ -66,6 +83,7 @@ com.menabev.AP.util.POServices = {
 	onCompanyCodeChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isCompanyCodeChanged");
 	},
+	
 	onInvRefChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isInvoiceRefChanged");
 	},
@@ -134,6 +152,27 @@ com.menabev.AP.util.POServices = {
 		oPOModel.setProperty("/dueDate", date);
 	},
 
+	onSubmit: function (oEvent, oController, MandatoryFileds, type) {
+		var oPOModel = oController.oPOModel;
+		var manLength = MandatoryFileds.length;
+		var data, count = 0;
+		for (var i = 0; i < manLength; i++) {
+			data = oPOModel.getProperty("/" + MandatoryFileds[i]);
+			if (data) {
+				oPOModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
+			} else {
+				count += 1;
+				oPOModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
+			}
+		}
+		oPOModel.refresh();
+		if (count) {
+			// message = resourceBundle.getText("MANDATORYFIELDERROR");
+			var message = "Please fill all Mandatory fields";
+			sap.m.MessageToast.show(message);
+		}
+	},
+
 	onPaymentTermsChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isPaymentTermsChanged");
 	},
@@ -155,6 +194,42 @@ com.menabev.AP.util.POServices = {
 
 	onInvAmtChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
+	},
+
+	hdrInvAmtCalu: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel,
+			oMandatoryModel = oController.oMandatoryModel,
+			invoiceAmt = oEvent.getParameter("value");
+		if (!invoiceAmt) {
+			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "Error");
+		} else {
+			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "None");
+			invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
+			oPOModel.setProperty("/invoiceAmount", invoiceAmt);
+		}
+		this.calculateBalance();
+	},
+
+	calculateBalance: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel,
+			that = this,
+			invAmt = oPOModel.getProperty("/invoiceTotal"),
+			grossAmount = oPOModel.getProperty("/grossAmount");
+		var balance = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
+		balance = that.nanValCheck(balance).toFixed(2);
+		oPOModel.setProperty("/balance", balance);
+		oPOModel.refresh();
+		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
+	},
+	nanValCheck: function (value) {
+		if (!value || isNaN(value)) {
+			return 0;
+		} else if (Number(value) === 0 || parseFloat(value) === -0) {
+			return 0;
+		} else if (!isNaN(value)) {
+			return parseFloat(value);
+		}
+		return value;
 	},
 
 	onHeaderChange: function (oEvent, oController, transaction) {

@@ -19,6 +19,10 @@ sap.ui.define([
 			this.oUserDetailModel = oUserDetailModel;
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			this.oPOModel = oPOModel;
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			this.oVisibilityModel = oVisibilityModel;
+			var oMandatoryModel = this.getOwnerComponent().getModel("oMandatoryModel");
+			this.oMandatoryModel = oMandatoryModel;
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			oPOModel.loadData("model/UIDataModel.json");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
@@ -31,28 +35,33 @@ sap.ui.define([
 			var oHeader = {
 				"Content-Type": "application/json; charset=utf-8"
 			};
-			POServices.getPONonPOData("",this,"APA-06162021-00000001");
+			POServices.getPONonPOData("", this, "APA-06162021-00000001");
 			var oLanguage = "E";
 			var countryKey = "SA";
 			//To load all OData lookups
+			this.getBtnVisibility();
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
 			this.getTaxCode(oHeader, countryKey);
 			this.getCostCenter("1010", oLanguage);
 		},
-		onVendorIdChange:function(oEvent){
-			
+
+		hdrInvAmtCalu: function (oEvent) {
+			POServices.hdrInvAmtCalu(oEvent, this);
 		},
-		
-		onVendorNameChange:function(oEvent){
-			
+		onVendorIdChange: function (oEvent) {
+
 		},
-		
+
+		onVendorNameChange: function (oEvent) {
+
+		},
+
 		getPONonPOData: function (oEvent) {
 			POServices.getPONonPOData(oEvent, this);
 		},
-		
+
 		VendorIdSuggest: function (oEvent) {
 			POServices.VendorIdSuggest(oEvent, this);
 		},
@@ -106,7 +115,7 @@ sap.ui.define([
 		},
 
 		onClickVendorBalances: function () {
-			var nonPOInvoiceModel = this.getView().getModel("oPOModel"),
+			var nonPOInvoiceModel = this.oPOModel,
 				vendorId = nonPOInvoiceModel.getProperty("/vendorId"),
 				companyCode = nonPOInvoiceModel.getProperty("/companyCode");
 			this.loadVendorBalanceFrag(vendorId, companyCode);
@@ -116,6 +125,11 @@ sap.ui.define([
 			var oSelectedBtnKey = oEvent.getSource().getCustomData()[0].getKey();
 			var documentId = this.getModel("oPOModel").getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId, oSelectedBtnKey);
+		},
+
+		onNonPoSubmit: function (oEvent) {
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onSubmit(oEvent, this, MandatoryFileds);
 		},
 
 		/**

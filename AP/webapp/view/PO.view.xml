@@ -12,7 +12,7 @@
 					<Toolbar height="3rem">
 						<!--<Title level="H2" text="{i18n>InvoiceHeaderDetails}" class="headerTitle sapUiTinyMarginBegin"/>-->
 						<ToolbarSpacer/>
-						<Button text="{i18n>VendorBalances}" press="onClickVendorBalances" class="sapUiSizeCompact SecondaryBtn" enabled="false"/>
+						<Button text="{i18n>VendorBalances}" press="onClickVendorBalances" class="sapUiSizeCompact SecondaryBtn" />
 						<Button icon="sap-icon://activity-individual" tooltip="{i18n>ActivityLog}" press="onClickActivityLog" class="SecondaryBtn" enabled="false"/>
 						<!--<Button icon="sap-icon://notification-2" tooltip="{i18n>ErrorMessages}" press="onClickErrorMessages" class="SecondaryBtn" enabled="false"/>-->
 						<Button text="{i18n>OpenPdf}" type="Emphasized" id="idOpenPDFBtn" tooltip="Open Pdf" press="onPressOpenpdf"
@@ -39,10 +39,10 @@
 					<IconTabBar>
 						<items>
 							<IconTabFilter text="{i18n>ATTACHMENTS}" key="attachments">
-								<!--<core:Fragment fragmentName="com.menabev.AP.fragment.Attachment" type="XML"/>-->
+								<core:Fragment fragmentName="com.menabev.AP.fragment.Attachment" type="XML"/>
 							</IconTabFilter>
 							<IconTabFilter text="{i18n>COMMENTS}" key="comments">
-								<!--<core:Fragment fragmentName="com.menabev.AP.fragment.Comments" type="XML"/>-->
+								<core:Fragment fragmentName="com.menabev.AP.fragment.Comments" type="XML"/>
 							</IconTabFilter>
 						</items>
 					</IconTabBar>
@@ -54,5 +54,11 @@
 				</VBox>
 			</l:Splitter>
 		</content>
+		<footer>
+			<OverflowToolbar>
+				<ToolbarSpacer/>
+				<core:Fragment fragmentName="com.menabev.AP.fragment.PONonPOfooter" type="XML"/>
+			</OverflowToolbar>
+		</footer>
 	</Page>
 </mvc:View>

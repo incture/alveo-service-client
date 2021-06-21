@@ -8,7 +8,7 @@
 					<Label text="MenaBev" design="Bold"/>
 					<Label text="{StaticDataModel>/selectedApp}"></Label>
 					<ToolbarSpacer/>
-					<Button icon="sap-icon://customer" type="Transparent" class="UserIcon" tooltip="{i18n>PROFILE}" press="onUserDetailPressed"></Button>
+					<Button icon="sap-icon://customer" type="Emphasized" class="UserIcon" tooltip="{i18n>PROFILE}" press="onUserDetailPressed"></Button>
 				</OverflowToolbar>
 			</customHeader>
 			<content>

@@ -2,17 +2,24 @@
 	xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<Page showHeader="false" class="sapUiSizeCompact">
 		<content>
-			<fb:FilterBar id="filterBarId" search="onSelectTab" clear="clearFilter" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
+			<fb:FilterBar id="filterBarId" search="onSearch" clear="clearFilter" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
 				visible="{baseModel>/SearchVisiblity}">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>Vendor Id}">
 						<fb:control>
-							<Input value="{oTaskInboxModel>/filterParams/vendorId}" maxLength="10"/>
+							<Input filterSuggests="false" value="{oTaskInboxModel>/filterParams/vendorId}" showSuggestion="true" suggest="VendorIdSuggest"
+								suggestionItemSelected="vendorIdSelected" change="onVendorIdChange" suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10"
+								editable="{oVisibilityModel>/NonPOInvoice/editable}">
+								<suggestionItems>
+									<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
+								</suggestionItems>
+							</Input>
+							<!--<Input value="{oTaskInboxModel>/filterParams/vendorId}" maxLength="10"/>-->
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="B" label="{i18n>inboxRequestID}">
 						<fb:control>
-							<MaskInput mask="APA-MMDDYYYY-XXXXXX" placeholderSymbol="_" placeholder="Enter task number">
+							<MaskInput mask="CCC-CCCCCCCC-CCCCCCCC" placeholderSymbol="_" placeholder="Enter task number" value="{oTaskInboxModel>/filterParams/requestId}">
 								<rules>
 									<MaskInputRule maskFormatSymbol="C" regex="[A-Z0-9]"/>
 								</rules>
@@ -21,8 +28,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="C" label="{i18n>InvoiceNo}">
 						<fb:control>
-							<Input value="{oTaskInboxModel>/filterParams/extInvNum}" maxSuggestionWidth="16rem" startSuggestion="3" showSuggestion="true"
-								filterSuggests="false"/>
+							<Input value="{oTaskInboxModel>/filterParams/extInvNum}" maxLength="16"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="D" label="{i18n>InvoiceDateFrom}">
@@ -81,6 +87,13 @@
 							</MultiComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="M" label="{i18n>TaskStatus}">
+						<fb:control>
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/taskStatus}" items="{StaticDataModel>/taskStatus}">
+								<core:Item key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+							</MultiComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<IconTabBar expanded="true" headerMode="Inline" select="onTabSelectPagination" selectedKey="{oTaskInboxModel>/selectedFilterTab}">
@@ -120,8 +133,14 @@
 								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" >
+									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
@@ -130,19 +149,21 @@
 							<items>
 								<ColumnListItem>
 									<Link text="{oTaskInboxModel>requestId}" press="onReqIdOpenSelect" wrapping="true"/>
-									<Text text="{oTaskInboxModel>vendorId}-{oTaskInboxModel>vendorName}"/>
-									<Text text="{oTaskInboxModel>extInvNum}"/>
-									<Text text="{path:'oTaskInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
-									<Text text="{oTaskInboxModel>invoiceType}"/>
-									<Text text="{oTaskInboxModel>invoiceTotal}"/>
-									<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
-									<Text text="{oTaskInboxModel>validationStatus}"/>
-									<Text text="{oTaskInboxModel>status}"/>
+									<Label text="{oTaskInboxModel>vendorId}-{oTaskInboxModel>vendorName}" wrapping="true"/>
+									<Label text="{oTaskInboxModel>extInvNum}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}" wrapping="true"/>
+									<Label text="{oTaskInboxModel>invoiceType}" wrapping="true"/>
+									<Label text="{oTaskInboxModel>invoiceTotal}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} " wrapping="true"/>
+									<Label text="{oTaskInboxModel>validationStatus}" wrapping="true"/>
+									<Label text="{oTaskInboxModel>status}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}" tooltip="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}" tooltip="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
 									<HBox>
 										<core:Icon src="sap-icon://locked" tooltip="claim" press="onClaimRelease"
-											visible="{path:'{oTaskInboxModel>status}', formatter:'com.menabev.AP.formatter.formatter.setClaimVisible'}"/>
+											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setClaimVisible'}"/>
 										<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease"
-											visible="{path:'{oTaskInboxModel>status}', formatter:'com.menabev.AP.formatter.formatter.setReleaseVisible'}"/>
+											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setReleaseVisible'}"/>
 									</HBox>
 								</ColumnListItem>
 							</items>

@@ -12,7 +12,7 @@
 				<Label text="{i18n>VendorId}" required="true" class="sapUiTinyMarginTop"/>
 				<Input filterSuggests="false" value="{oPOModel>/vendorId}" width="80%" showSuggestion="true" suggest="VendorIdSuggest"
 					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected" change="onVendorIdChange"
-					suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}" maxLength="10">
+					suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 					<suggestionItems>
 						<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
 					</suggestionItems>
@@ -56,7 +56,7 @@
 				<Label text="{i18n>BASELINEDATE}" required="true"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
 					value="{ path:'oPOModel>/baselineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-					valueState="{oMandatoryModel>/NonPO/baselineDateState}" change="onChangeInvDate" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					valueState="{oMandatoryModel>/NonPO/baselineDateState}" change="onBaseLineDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>BatchId}"/>

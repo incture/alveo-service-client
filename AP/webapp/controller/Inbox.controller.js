@@ -1,14 +1,14 @@
 sap.ui.define([
-		"sap/ui/core/mvc/Controller",
+		"com/menabev/AP/controller/BaseController",
 		"com/menabev/AP/formatter/formatter",
 	],
 	/**
 	 * @param {typeof sap.ui.core.mvc.Controller} Controller
 	 */
-	function (Controller, formatter) {
+	function (BaseController, formatter) {
 		"use strict";
 
-		return Controller.extend("com.menabev.AP.controller.Inbox", {
+		return BaseController.extend("com.menabev.AP.controller.Inbox", {
 			onInit: function () {
 				var that = this;
 				var oTaskInboxModel = this.getOwnerComponent().getModel("oTaskInboxModel");
@@ -23,6 +23,8 @@ sap.ui.define([
 				this.StaticDataModel = StaticDataModel;
 				var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 				this.oUserDetailModel = oUserDetailModel;
+				var oDataAPIModel = this.getOwnerComponent().getModel("oDataAPIModel");
+				this.oDataAPIModel = oDataAPIModel;
 				this.setFilterBar();
 				this.getProcessStatus();
 				this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
@@ -36,8 +38,8 @@ sap.ui.define([
 						oPaginationModel.setProperty("/myTaskPagination/paginationVisible", false);
 						oPaginationModel.setProperty("/draftedTaskPagination/paginationVisible", false);
 						oPaginationModel.setProperty("/pagination/paginationVisible", false);
-						oTaskInboxModel.getProperty("/filterParams", {});
-						oTaskInboxModel.getProperty("/selectedFilterTab", "openTask");
+						oTaskInboxModel.setProperty("/filterParams", {});
+						oTaskInboxModel.setProperty("/selectedFilterTab", "openTask");
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/myTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
@@ -183,13 +185,13 @@ sap.ui.define([
 				oPaginationModel.setProperty("/pagination/currentPage", selectedPage);
 				if (selectedTabKey === "GROUP_TASK") {
 					oPaginationModel.setProperty("/openTaskPagination/currentPage", selectedPage);
-					this.getAllGroupTasks(selectedPage);
+					this.getInboxData(selectedPage);
 				} else if (selectedTabKey === "MY_TASK") {
 					oPaginationModel.setProperty("/myTaskPagination/currentPage", selectedPage);
-					this.getAllMyTasks(selectedPage);
+					this.getInboxData(selectedPage);
 				} else {
 					oPaginationModel.setProperty("/draftedTaskPagination/currentPage", selectedPage);
-					this.getAllTasks(selectedPage);
+					this.getInboxData(selectedPage);
 				}
 			},
 
@@ -203,13 +205,13 @@ sap.ui.define([
 				oPaginationModel.setProperty("/pagination/currentPage", selectedPage);
 				if (selectedTabKey === "GROUP_TASK") {
 					oPaginationModel.setProperty("/openTaskPagination/currentPage", selectedPage);
-					this.getAllGroupTasks(selectedPage);
+					this.getInboxData(selectedPage);
 				} else if (selectedTabKey === "MY_TASK") {
 					oPaginationModel.setProperty("/myTaskPagination/currentPage", selectedPage);
-					this.getAllMyTasks(selectedPage);
+					this.getInboxData(selectedPage);
 				} else {
 					oPaginationModel.setProperty("/draftedTaskPagination/currentPage", selectedPage);
-					this.getAllTasks(selectedPage);
+					this.getInboxData(selectedPage);
 				}
 			},
 
@@ -240,14 +242,14 @@ sap.ui.define([
 					oVisibilityModel = this.oVisibilityModel;
 				oVisibilityModel.setProperty("/Inbox", {});
 				var oTaskInboxModel = this.oTaskInboxModel,
-					sUrl = "/menabevdev/invoiceHeader/inbox/New",
+					sUrl = "/menabevdev/invoiceHeader/inbox/tasks",
 					that = this;
 				var oPayload = jQuery.extend(true, {}, oTaskInboxModel.getProperty("/filterParams"));
-				if (oPayload.createdAtFrom) {
-					oPayload.createdAtFrom = new Date(oPayload.createdAtFrom).getTime();
+				if (oPayload.invoiceDateFrom) {
+					oPayload.invoiceDateFrom = new Date(oPayload.invoiceDateFrom).getTime();
 				}
-				if (oPayload.createdAtTo) {
-					oPayload.createdAtTo = new Date(oPayload.createdAtTo).getTime();
+				if (oPayload.invoiceDateTo) {
+					oPayload.invoiceDateTo = new Date(oPayload.invoiceDateTo).getTime();
 				}
 				if (oPayload.dueDateFrom) {
 					oPayload.dueDateFrom = new Date(oPayload.dueDateFrom).getTime();
@@ -256,7 +258,17 @@ sap.ui.define([
 					oPayload.dueDateTo = new Date(oPayload.dueDateTo).getTime();
 				}
 				var skip = (pageNo - 1) * 10;
-				oPayload.userId = oTaskInboxModel.getProperty("/filterParams/assignedTo");
+				var assignedTo = oTaskInboxModel.getProperty("/filterParams/assignedTo");
+				if (!assignedTo) {
+					assignedTo = [];
+					assignedTo.push(this.oUserDetailModel.getProperty("/loggedInUserMail"));
+				}
+				var vendor = oPayload.vendorId;
+				var vendorId = [];
+				if (vendor) {
+					vendorId.push(vendor);
+				}
+				oPayload.assignedTo = assignedTo;
 				oPayload.skip = skip;
 				oPayload.top = 2;
 				oPayload.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
@@ -268,49 +280,54 @@ sap.ui.define([
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					var data = oEvent.getSource().getData();
 					var arr = [];
-					if (data.body) {
-						if (!data.body.totalCount) {
-							data.body.totalCount = 0;
+					if (data.message == "SUCCESS") {
+						if (!data.totalCount) {
+							data.totalCount = 0;
 						}
-						if (!data.body.draftCount) {
-							data.body.draftCount = 0;
+						if (!data.draftCount) {
+							data.draftCount = 0;
 						}
-						oTaskInboxModel.setProperty("/openTaskCount", data.body.totalCount);
+						oTaskInboxModel.setProperty("/openTaskCount", data.totalCount);
 						// oTaskInboxModel.setProperty("/myTaskCount", data.body.countMyTask);
-						oTaskInboxModel.setProperty("/draftCount", data.body.countDraft);
+						oTaskInboxModel.setProperty("/draftCount", data.countDraft);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
-						if (data.body.taskList) {
-							oTaskInboxModel.setProperty("/openTask", data.body.taskList);
+						if (data.taskList) {
+							oTaskInboxModel.setProperty("/openTask", data.taskList);
 						}
-						if (data.body.draftList) {
-							oTaskInboxModel.setProperty("/draftTask", data.body.draftList);
+						if (data.draftList) {
+							oTaskInboxModel.setProperty("/draftTask", data.draftList);
 						}
-						that.pagination(data.body.totalCount, "openTaskPagination", 1);
+						that.pagination(data.totalCount, "openTaskPagination", 1);
 						// that.pagination(data.body.countMyTask, "myTaskPagination", 1);
-						that.pagination(data.body.draftCount, "draftedTaskPagination", 1);
+						that.pagination(data.draftCount, "draftedTaskPagination", 1);
 					} else {
+						sap.m.MessageBox.information(data.message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
 						oTaskInboxModel.setProperty("/openTaskCount", 0);
-						// oTaskInboxModel.setProperty("/myTaskCount", 0);
 						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
+
 					}
 
 				});
 
 			},
+
 			onSearch: function () {
 				var oTaskInboxModel = this.oTaskInboxModel,
 					taskDataFilterModelData = oTaskInboxModel.getProperty("/filterParams"),
 					bError = false;
-				if ((!taskDataFilterModelData.createdAtFrom && taskDataFilterModelData.createdAtTo) || (taskDataFilterModelData.createdAtFrom &&
-						taskDataFilterModelData.createdAtTo)) {
+				if ((!taskDataFilterModelData.invoiceDateFrom && taskDataFilterModelData.invoiceDateTo) || (taskDataFilterModelData.invoiceDateFrom &&
+						!taskDataFilterModelData.invoiceDateTo)) {
 					sap.m.MessageToast.show("Fill both invoice From Date and to date to proceed");
 					bError = true;
 				}
 				if ((!taskDataFilterModelData.dueDateFrom && taskDataFilterModelData.dueDateTo) || (taskDataFilterModelData.dueDateFrom &&
-						taskDataFilterModelData.dueDateTo)) {
+						!taskDataFilterModelData.dueDateTo)) {
 					sap.m.MessageToast.show("Fill both due From Date and to date to proceed");
 					bError = true;
 				}
@@ -319,30 +336,45 @@ sap.ui.define([
 					sap.m.MessageToast.show("Fill both invoice From value and to value to proceed");
 					bError = true;
 				}
-				if (!oTaskInboxModel.getProperty("/requestId") &&
-					!oTaskInboxModel.getProperty("/invoiceTotalFrom") &&
-					!oTaskInboxModel.getProperty("/invoiceTotalTo") &&
-					!oTaskInboxModel.getProperty("/dueDateFrom") &&
-					!oTaskInboxModel.getProperty("/dueDateTo") &&
-					!oTaskInboxModel.getProperty("/createdAtFrom") &&
-					!oTaskInboxModel.getProperty("/createdAtTo") &&
-					!oTaskInboxModel.getProperty("/extInvNum") &&
-					!oTaskInboxModel.getProperty("/assignedTo") &&
-					!oTaskInboxModel.getProperty("/vendorId") &&
-					!oTaskInboxModel.getProperty("/invoiceType") &&
-					!oTaskInboxModel.getProperty("/validationStatus")
-				) {
-					sap.m.MessageToast.show("Enter Atleast one search parameter to search");
+				if (!taskDataFilterModelData.assignedTo.length) {
+					sap.m.MessageToast.show("Please select atleast one assigned to user");
 					bError = true;
 				}
+				// if (!oTaskInboxModel.getProperty("/filterParams/requestId") &&
+				// 	!oTaskInboxModel.getProperty("/filterParams/invoiceTotalFrom") &&
+				// 	!oTaskInboxModel.getProperty("/invoiceTotalTo") &&
+				// 	!oTaskInboxModel.getProperty("/dueDateFrom") &&
+				// 	!oTaskInboxModel.getProperty("/dueDateTo") &&
+				// 	!oTaskInboxModel.getProperty("/invoiceDateFrom") &&
+				// 	!oTaskInboxModel.getProperty("/invoiceDateTo") &&
+				// 	!oTaskInboxModel.getProperty("/extInvNum") &&
+				// 	!oTaskInboxModel.getProperty("/assignedTo") &&
+				// 	!oTaskInboxModel.getProperty("/vendorId") &&
+				// 	!oTaskInboxModel.getProperty("/invoiceType") &&
+				// 	!oTaskInboxModel.getProperty("/validationStatus")
+				// ) {
+				// 	sap.m.MessageToast.show("Enter Atleast one search parameter to search");
+				// 	bError = true;
+				// }
 				if (!bError)
 					this.getInboxData(1);
 			},
+
+			vendorIdSelected: function (oEvent, oController) {
+				var oTaskInboxModel = this.oTaskInboxModel;
+				var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
+					sVendorName = oEvent.getParameter("selectedItem").getProperty("additionalText");
+				oTaskInboxModel.setProperty("/filterParams/vendorName", sVendorName);
+				oTaskInboxModel.setProperty("/filterParams/vendorId", sVendorId);
+				oTaskInboxModel.refresh();
+				// this.onHeaderChange(oEvent, oController, "isVendoIdChanged");
+			},
+
 			onSelectTab: function (oEvent) {
 				var oTaskInboxModel = this.oTaskInboxModel;
 				var key = oTaskInboxModel.getProperty("/selectedFilterTab");
 				// if (key == "openTask") {
-					this.getInboxData(1);
+				this.getInboxData(1);
 				// } else if (key == "myTask") {
 				// 	this.getInboxData(1);
 				// } else if (key == "draft") {
@@ -353,15 +385,20 @@ sap.ui.define([
 			SearchInboxData: function (oEvent) {
 				this.getInboxData(1);
 			},
+
 			clearFilter: function () {
+				var assignedTo = [];
+				assignedTo.push(this.oUserDetailModel.getProperty("/loggedInUserMail"));
 				var oTaskInboxModel = this.oTaskInboxModel;
 				oTaskInboxModel.setProperty("/filterParams", {});
 				oTaskInboxModel.setProperty("/filterParams/validationStatus", []);
-				oTaskInboxModel.setProperty("/filterParams/assignedTo", []);
+				oTaskInboxModel.setProperty("/filterParams/assignedTo", assignedTo);
 				oTaskInboxModel.setProperty("/filterParams/vendorId", []);
-				oTaskInboxModel.setProperty("/filterParams/invoiceType", []);
+				oTaskInboxModel.setProperty("/filterParams/invoiceType", ["PO"]);
+				oTaskInboxModel.setProperty("/filterParams/taskStatus", ["READY", "RESERVED"]);
 				this.getInboxData(1);
 			},
+
 			onClaimRelease: function (oEvent) {
 				var that = this;
 				var oTaskInboxModel = this.oTaskInboxModel;
@@ -385,7 +422,7 @@ sap.ui.define([
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					busy.close();
 					var data = oEvent.getSource().getData();
-					oTaskInboxModel.setProperty(sPath,data.body);
+					oTaskInboxModel.setProperty(sPath, data.body);
 					oTaskInboxModel.refresh();
 				});
 
@@ -408,11 +445,25 @@ sap.ui.define([
 				// 	});
 
 			},
+
 			onDateRangeChange: function (oEvent) {
+				var data = oEvent.getSource().getValue();
+				if (!data) {
+					oEvent.getSource().setDateValue(null);
+				}
+				var dateVal = new Date(data);
+				var day = dateVal.getDate();
+				if (!day) {
+					sap.m.MessageToast.show("Please enter valid date");
+					oEvent.getSource().setValue("");
+					return;
+				} else {
+					oEvent.getSource().setDateValue(dateVal);
+				}
 				var filterData = this.oTaskInboxModel.getData().filterParams;
 				var invDateFrom, invDateTo, dueDateFrom, dueDateTo;
-				invDateFrom = filterData.createdAtFrom;
-				invDateTo = filterData.createdAtTo;
+				invDateFrom = filterData.invoiceDateFrom;
+				invDateTo = filterData.invoiceDateTo;
 				dueDateFrom = filterData.dueDateFrom;
 				dueDateTo = filterData.dueDateTo;
 				if (invDateFrom && invDateTo) {
@@ -441,8 +492,8 @@ sap.ui.define([
 					invValTo = filterData.invoiceValueTo;
 				var oValue = oEvent.getSource().getValue();
 				oValue = parseFloat(oValue);
-				return oValue.toFixed(2);
-				if (oValue > "99999999.99") {
+				oValue = oValue.toFixed(2);
+				if (oValue > 99999999.99) {
 					sap.m.MessageToast.show("Invoice value cannot be greater 99999999.99");
 				}
 				// oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
@@ -479,7 +530,7 @@ sap.ui.define([
 			triggerDeleteDraft: function (reqId) {
 				var that = this;
 				var oServiceModel = new sap.ui.model.json.JSONModel();
-				var sUrl = "/menabevdev/delete/";
+				var sUrl = "/menabevdev/invoiceHeader/delete";
 				var busy = new sap.m.BusyDialog();
 				busy.open();
 				var oHeader = {
