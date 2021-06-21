@@ -781,13 +781,18 @@ sap.ui.define([
 		},
 
 		//Called when the save button is clicked.
-		onNonPoSave: function () {
-			var oSaveData = this.fnCreatePayloadSaveSubmit();
-			oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
-			oSaveData.invoiceHeaderDto.docStatus = "Draft";
-			var sUrl = "/menabevdev/invoiceHeader/accountantSave",
-				sMethod = "POST";
-			this.saveSubmitServiceCall(oSaveData, sMethod, sUrl, "SAVE");
+		// onNonPoSave: function () {
+		// 	var oSaveData = this.fnCreatePayloadSaveSubmit();
+		// 	oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
+		// 	oSaveData.invoiceHeaderDto.docStatus = "Draft";
+		// 	var sUrl = "/menabevdev/invoiceHeader/accountantSave",
+		// 		sMethod = "POST";
+		// 	this.saveSubmitServiceCall(oSaveData, sMethod, sUrl, "SAVE");
+		// },
+		
+		onNonPoSave: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onNonPoSave(oEvent, this);
 		},
 
 		//Called on click of Submit Button.

@@ -257,7 +257,7 @@ sap.ui.define([
 				if (oPayload.dueDateTo) {
 					oPayload.dueDateTo = new Date(oPayload.dueDateTo).getTime();
 				}
-				var skip = (pageNo - 1) * 10;
+				var skip = (pageNo - 1) * 2;
 				var assignedTo = oTaskInboxModel.getProperty("/filterParams/assignedTo");
 				if (!assignedTo) {
 					assignedTo = [];
