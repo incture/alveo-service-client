@@ -1,4 +1,5 @@
 package com.ap.menabev.entity;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -14,7 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "INVOICE_ITEM")
 @Getter
@@ -23,9 +23,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(InvoiceItemPkDo.class)
-public class InvoiceItemDo implements Serializable{
+public class InvoiceItemDo implements Serializable {
 
-	
 	/**
 	 * 
 	 */
@@ -39,31 +38,31 @@ public class InvoiceItemDo implements Serializable{
 	@Id
 	@Column(name = "REQUEST_ID", nullable = false)
 	private String requestId;
-	@Column(name = "EXT_ITEM_ID",length = 10)
+	@Column(name = "EXT_ITEM_ID", length = 10)
 	private String extItemId;
-	@Column(name = "ITEM_TEXT" , length = 50)
+	@Column(name = "ITEM_TEXT", length = 50)
 	private String itemText;
-	@Column(name = "REF_DOC_CAT",length = 2)
-	private String refDocCat;//ref_purchasedoc_category
-	@Column(name = "REF_DOC_NUM",length = 10)
-	private Long refDocNum;//ref_purchase_num
-	@Column(name = "ARTICLE_NUM" ,length = 20)
+	@Column(name = "REF_DOC_CAT", length = 2)
+	private String refDocCat;// ref_purchasedoc_category
+	@Column(name = "REF_DOC_NUM", length = 10)
+	private Long refDocNum;// ref_purchase_num
+	@Column(name = "ARTICLE_NUM", length = 20)
 	private String articleNum;
-	@Column(name = "CUSTOMER_ITEM_ID" , length = 20)
+	@Column(name = "CUSTOMER_ITEM_ID", length = 20)
 	private Integer customerItemId;
-	@Column(name = "UPC_CODE",length = 50)
+	@Column(name = "UPC_CODE", length = 50)
 	private String upcCode;
 	@Column(name = "INV_QTY")
 	private double invQty;
-	@Column(name = "UOM",length = 5)
+	@Column(name = "UOM", length = 5)
 	private String uom;
 	@Column(name = "UNIT_PRICE")
 	private double unitPrice;
-	@Column(name = "CURRENCY",length = 5)
+	@Column(name = "CURRENCY", length = 5)
 	private String currency;
-	@Column(name = "PRICING_UNIT",length = 5)
+	@Column(name = "PRICING_UNIT", length = 5)
 	private Integer pricingUnit;
-	@Column(name = "ORDER_PRICE_UNIT",length = 5)
+	@Column(name = "ORDER_PRICE_UNIT", length = 5)
 	private String orderPriceUnit;
 	@Column(name = "GROSS_PRICE")
 	private double grossPrice;
@@ -83,39 +82,94 @@ public class InvoiceItemDo implements Serializable{
 	private Boolean isTwowayMatched;
 	@Column(name = "IS_THREEWAY_MATCHED")
 	private Boolean isThreewayMatched;
-	@Column(name = "MATCH_DOC_NUM",length = 20)
+	@Column(name = "MATCH_DOC_NUM", length = 20)
 	private Long matchDocNum;
-	@Column(name = "MATCH_DOC_ITEM",length = 10)
+	@Column(name = "MATCH_DOC_ITEM", length = 10)
 	private String matchDocItem;
-	@Column(name = "MATCH_PARAM",length = 20)
+	@Column(name = "MATCH_PARAM", length = 20)
 	private String matchParam;
-	@Column(name = "MATCH_SERVICE_NUM",length = 10)
+	@Column(name = "MATCH_SERVICE_NUM", length = 10)
 	private String matchserviceNumber;
-	@Column(name = "MATCH_PACKAGE_NUMBER",length = 10)
+	@Column(name = "MATCH_PACKAGE_NUMBER", length = 10)
 	private String matchpackageNumber;
 	@Column(name = "MATCH_TYPE")
 	private String matchType;// manuall or Auto posting
- 	@Column(name="UPDATED_BY",length = 100)
+	@Column(name = "UPDATED_BY", length = 100)
 	private String updatedBy;
- 	@Column(name="UPDATED_AT")
+	@Column(name = "UPDATED_AT")
 	private long updatedAt;
- 	@Column(name = "isSelected")
+	@Column(name = "isSelected")
 	private Boolean isSelected;
- 	@Column(name="MATCHED_By")
+	@Column(name = "MATCHED_By")
 	private String matchedBy;
-    @Column (name="IS_ACC_ASSIGNED")
-    private boolean isAccAssigned;
-    @Column(name = "ITEM_REQUISATION_NUM",length =10)
-    private String itemRequisationNum;
-    @Column(name = "REQUISATION_NUM" ,length = 10)
-    private String requisationNum;
-    @Column(name = "CONTRACT_NUM",length = 10)
-    private String contractNum;
-    @Column(name = "CONTRACT_ITEM",length = 10)
-    private String contractItem;
-    @Column(name = "IS_DELETED")
-    private boolean isDeleted;
-    
+	@Column(name = "IS_ACC_ASSIGNED")
+	private boolean isAccAssigned;
+	@Column(name = "ITEM_REQUISATION_NUM", length = 10)
+	private String itemRequisationNum;
+	@Column(name = "REQUISATION_NUM", length = 10)
+	private String requisationNum;
+	@Column(name = "CONTRACT_NUM", length = 10)
+	private String contractNum;
+	@Column(name = "CONTRACT_ITEM", length = 10)
+	private String contractItem;
+	@Column(name = "IS_DELETED")
+	private boolean isDeleted;
 
-    
+	// Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by
+	// Prashant Kumar
+	@Column(name = "ACC_ASSIGNMENT_CAT")
+	private String accAssignmentCat;
+	@Column(name = "ITEM_STATUS_CODE")
+	private String itemStatusCode;
+	@Column(name = "ITEM_STATUS_TEXT")
+	private String itemStatusText;
+	@Column(name = "AVL_QTY_UOM")
+	private double alvQtyUOM;
+	@Column(name = "PO_UNIT_PRICE_UOM")
+	private double poUnitPriceUOM;
+	@Column(name = "AVL_QTY_OPU")
+	private double alvQtyOPU;
+	@Column(name = "AVL_QTY_OU")
+	private double alvQtyOU;
+	@Column(name = "PO_UNIT_PRICE_OPU")
+	private double poUnitPriceOPU;
+	@Column(name = "PO_UNIT_PRICE_OU")
+	private double poUnitPriceOU;
+	@Column(name = "ORDER_UNIT")
+	private String orderUnit;
+	// @Column(name = "IS_DELETED")
+	// private String orderPriceUnit;
+	@Column(name = "ORDER_UNIT_ISO")
+	private String orderUnitISO;
+	@Column(name = "ORDER_PRICE_UNIT_ISO")
+	private String orderPriceUnitISO;
+	@Column(name = "ITEM_CATEGORY")
+	private String itemCategory;
+	@Column(name = "ACCOUNT_ASSIGNMENT_CAT")
+	private String accountAssignmentCat;
+	@Column(name = "PRODUCT_TYPE")
+	private String productType;
+	@Column(name = "PO_MAT_NUM")
+	private String poMatNum;
+	@Column(name = "PO_ITEM_TEXT")
+	private String poItemText;
+	@Column(name = "PO_QTY_OU")
+	private double poQtyOU;
+	@Column(name = "PO_QTY_OPU")
+	private double poQtyOPU;
+	@Column(name = "PO_TAX_CODE")
+	private String poTaxCode;
+	@Column(name = "GR_FLAG")
+	private boolean grFlag;
+	@Column(name = "GR_BSD_IV")
+	private boolean grBsdIv;
+	@Column(name = "SRV_BSD_IV")
+	private boolean srvBsdIv;
+	@Column(name = "IV_FLAG")
+	private boolean ivFlag;
+	@Column(name = "CONV_NUM_1")
+	private int convNum1;
+	@Column(name = "CONV_DEN_1")
+	private int convDen1;
+
 }

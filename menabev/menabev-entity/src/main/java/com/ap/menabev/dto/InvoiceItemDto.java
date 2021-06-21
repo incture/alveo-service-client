@@ -63,5 +63,38 @@ public class InvoiceItemDto {
     private String setPoMaterialNum;
 	private List<InvoiceItemAcctAssignmentDto> invItemAcctDtoList;
 	private List<ItemMessageDto> invoiceItemMessages;
+	
+	
+	//Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by Prashant Kumar
+	
+	private String accAssignmentCat;
+	private String itemStatusCode;
+	private String itemStatusText;
+	private double alvQtyUOM;
+	private double poUnitPriceUOM;
+	private double alvQtyOPU;
+	private double alvQtyOU;
+	private double poUnitPriceOPU;
+	private double poUnitPriceOU;
+	private String orderUnit;
+//	private String orderPriceUnit;
+	private String orderUnitISO;
+	private String orderPriceUnitISO;
+	private String itemCategory;
+	private String accountAssignmentCat;
+	private String productType;
+	private String poMatNum;
+	private String poItemText;
+	private double poQtyOU; 
+	private double poQtyOPU; 
+	private String poTaxCode;
+	private boolean grFlag;
+	private boolean grBsdIv;
+	private boolean srvBsdIv;
+	private boolean ivFlag;
+	private int convNum1;
+	private int convDen1;
+	
+	
 
 }
