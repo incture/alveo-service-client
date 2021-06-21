@@ -95,11 +95,14 @@ com.menabev.AP.util.POServices = {
 	onInvDateChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
+		if (!date) {
+			oEvent.getSource().setValue(null);
+		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
 		if (!day) {
 			sap.m.MessageToast.show("Please enter valid date");
-			oEvent.getSource().setValue("");
+			oEvent.getSource().setValue(null);
 			return;
 		} else {
 			date = dateVal.getTime();
@@ -111,11 +114,14 @@ com.menabev.AP.util.POServices = {
 	onBaseLineDateChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
+		if (!date) {
+			oEvent.getSource().setValue(null);
+		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
 		if (!day) {
 			sap.m.MessageToast.show("Please enter valid date");
-			oEvent.getSource().setValue("");
+			oEvent.getSource().setValue(null);
 			return;
 		} else {
 			date = dateVal.getTime();
@@ -126,11 +132,14 @@ com.menabev.AP.util.POServices = {
 	onPostingDateChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
+		if (!date) {
+			oEvent.getSource().setValue(null);
+		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
 		if (!day) {
 			sap.m.MessageToast.show("Please enter valid date");
-			oEvent.getSource().setValue("");
+			oEvent.getSource().setValue(null);
 			return;
 		} else {
 			date = dateVal.getTime();
@@ -140,11 +149,14 @@ com.menabev.AP.util.POServices = {
 	onDueDateChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
+		if (!date) {
+			oEvent.getSource().setValue(null);
+		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
 		if (!day) {
 			sap.m.MessageToast.show("Please enter valid date");
-			oEvent.getSource().setValue("");
+			oEvent.getSource().setValue(null);
 			return;
 		} else {
 			date = dateVal.getTime();
@@ -207,7 +219,7 @@ com.menabev.AP.util.POServices = {
 			invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
 			oPOModel.setProperty("/invoiceAmount", invoiceAmt);
 		}
-		this.calculateBalance();
+		this.calculateBalance(oEvent, oController);
 	},
 
 	calculateBalance: function (oEvent, oController) {
@@ -262,7 +274,7 @@ com.menabev.AP.util.POServices = {
 			"grossAmount": oPOModel.getProperty("/grossAmount"),
 			"taxAmount": oPOModel.getProperty("/taxAmount"),
 			"balanceAmount": oPOModel.getProperty("/balanceAmount"),
-			"taxCode": oPOModel.getProperty("/headerTaxcode"),
+			"taxCode": oPOModel.getProperty("/taxCode"),
 			"currency": oPOModel.getProperty("/currency"),
 			"invoiceDate": oPOModel.getProperty("/documentDate"),
 			"postingDate": oPOModel.getProperty("/postingDate"),
@@ -287,7 +299,7 @@ com.menabev.AP.util.POServices = {
 			var oData = oEvent.getSource().getData();
 			changeIndicator = oData.changeIndicator;
 			oPOModel.setProperty("/changeIndicator", changeIndicator);
-			if (oData.messages.messageType === "E") {
+			if (oData.messages && oData.messages.messageType === "E") {
 				sap.m.MessageBox.success(oData.messages.messageText, {
 					actions: [sap.m.MessageBox.Action.OK]
 				});
@@ -298,16 +310,15 @@ com.menabev.AP.util.POServices = {
 	onNonPoSave: function (oEvent, oController, status) {
 		var oPOModel = oController.oPOModel;
 		var oSaveData = oPOModel.getData();
-		oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
-		oSaveData.invoiceHeaderDto.docStatus = "Draft";
 		var sUrl = "/menabevdev/invoiceHeader/accountantSave",
 			sMethod = "POST";
-		this.saveSubmitServiceCall(oController, oSaveData, sMethod, sUrl, "SAVE");
+		this.saveSubmitServiceCall(oController, oSaveData, sMethod, sUrl, "SAVE", "Draft");
 	},
 
 	//Called on click of Submit Button.
 	onNonPoSubmit: function (oEvent, oController, MandatoryFileds) {
 		var oPOModel = oController.oPOModel;
+		var oMandatoryModel = oController.oMandatoryModel;
 		var oSubmitData = oPOModel.getData();
 		var bCostAllocation = false;
 		//Header Mandatory feilds validation
@@ -317,13 +328,13 @@ com.menabev.AP.util.POServices = {
 		for (var i = 0; i < manLength; i++) {
 			data = oPOModel.getProperty("/" + MandatoryFileds[i]);
 			if (data) {
-				oPOModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
+				oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
 			} else {
 				count += 1;
-				oPOModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
+				oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
 			}
 		}
-		oPOModel.refresh();
+		oMandatoryModel.refresh();
 		if (count) {
 			// message = resourceBundle.getText("MANDATORYFIELDERROR");
 			var message = "Please fill all Mandatory fields";
@@ -396,7 +407,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
-	saveSubmitServiceCall: function (oController, oData, sMethod, sUrl, save) {
+	saveSubmitServiceCall: function (oController, oData, sMethod, sUrl, save, draft) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var busy = new sap.m.BusyDialog();
@@ -406,7 +417,14 @@ com.menabev.AP.util.POServices = {
 		var oHeader = {
 			"Content-Type": "application/scim+json"
 		};
-		oServiceModel.loadData(sUrl, JSON.stringify(oData), true, sMethod, false, false, oHeader);
+		var oPayload = {
+			"invoiceHeaderDto": oData
+		};
+		oPayload.invoiceHeaderDto.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
+		if (draft) {
+			oPayload.invoiceHeaderDto.docStatus = "Draft";
+		}
+		oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, sMethod, false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			busy.close();
 			var oData = oEvent.getSource().getData();
@@ -441,6 +459,5 @@ com.menabev.AP.util.POServices = {
 			}
 		});
 	},
-
 
 };

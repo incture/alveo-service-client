@@ -30,12 +30,20 @@ sap.ui.define([
 			this.StaticDataModel = StaticDataModel;
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			this.oDropDownModel = oDropDownModel;
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			this.oPOModel = oPOModel;
 			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 			this.oVisibilityModel = oVisibilityModel;
 			var oMandatoryModel = this.getOwnerComponent().getModel("oMandatoryModel");
 			this.oMandatoryModel = oMandatoryModel;
+			var oDataModel = this.getOwnerComponent().getModel("oDataModel");
+			this.oDataModel = oDataModel;
+			var oDPODetailsModel = this.getOwnerComponent().getModel("oDPODetailsModel");
+			this.oDPODetailsModel = oDPODetailsModel;
+			var oDataAPIModel = this.getOwnerComponent().getModel("oDataAPIModel");
+			this.oDataAPIModel = oDataAPIModel;
 
 			this.setModel(new JSONModel(), "templateModel");
 
@@ -43,7 +51,7 @@ sap.ui.define([
 			this.router = this.getOwnerComponent().getRouter();
 			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
 			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-
+			oMandatoryModel.setProperty("/NonPO", {});
 			var oHeader = {
 				"Content-Type": "application/json; charset=utf-8"
 			};
@@ -220,6 +228,16 @@ sap.ui.define([
 		/**
 		 * Header Filter function Starts here
 		 */
+
+		onPostingDateChange: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onPostingDateChange(oEvent, this);
+		},
+
+		onDueDateChange: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onDueDateChange(oEvent, this);
+		},
 		hdrInvAmtCalu: function (oEvent) {
 			POServices.hdrInvAmtCalu(oEvent, this);
 		},
@@ -781,13 +799,9 @@ sap.ui.define([
 		},
 
 		//Called when the save button is clicked.
-		onNonPoSave: function () {
-			var oSaveData = this.fnCreatePayloadSaveSubmit();
-			oSaveData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
-			oSaveData.invoiceHeaderDto.docStatus = "Draft";
-			var sUrl = "/menabevdev/invoiceHeader/accountantSave",
-				sMethod = "POST";
-			this.saveSubmitServiceCall(oSaveData, sMethod, sUrl, "SAVE");
+		onNonPoSave: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onNonPoSave(oEvent, this);
 		},
 
 		//Called on click of Submit Button.
@@ -865,7 +879,7 @@ sap.ui.define([
 		// 	}
 
 		// },
-			onNonPoSubmit: function (oEvent) {
+		onNonPoSubmit: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/NonPo");
 			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds);
 		},
@@ -1181,20 +1195,21 @@ sap.ui.define([
 
 		//Mandatory fields validation before adding cost allocation 
 		fnMandatoryFeildsForCC: function () {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+			var oMandatoryModel = this.oMandatoryModel;
+			var oPOModel = this.oPOModel,
 				nonPOInvoiceModelData = oPOModel.getData(),
 				bError = false,
-				mandatoryFeildsForCC = ["invoiceTotal", "taxCode", "taxValue"];
+				mandatoryFeildsForCC = ["invoiceTotal", "taxCode", "taxValue"],
+				manLength = mandatoryFeildsForCC.length, data;
 
 			var key;
-			for (key in nonPOInvoiceModelData) {
-				if (mandatoryFeildsForCC.includes(key)) {
-					if (!nonPOInvoiceModelData[key]) {
-						oPOModel.setProperty("/vstate/" + key, "Error");
-						bError = true;
-					} else {
-						oPOModel.setProperty("/vstate/" + key, "None");
-					}
+			for (var i = 0; i < manLength; i++) {
+				data = oPOModel.getProperty("/" + mandatoryFeildsForCC[i]);
+				if (data) {
+					oMandatoryModel.setProperty("/NonPO/" + mandatoryFeildsForCC[i] + "State", "None");
+				} else {
+					oMandatoryModel.setProperty("/NonPO/" + mandatoryFeildsForCC[i] + "State", "Error");
+					bError = true;
 				}
 			}
 			return bError;
@@ -1320,7 +1335,7 @@ sap.ui.define([
 				that = this,
 				totalBaseRate = oPOModel.getProperty("/totalBaseRate"),
 				userInputTaxAmount = oPOModel.getProperty("/taxValue");
-			var grossAmount = that.nanValChoPOModeleck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
+			var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
 			grossAmount = that.nanValCheck(grossAmount).toFixed(2);
 			oPOModel.setProperty("/grossAmount", grossAmount);
 			oPOModel.refresh();

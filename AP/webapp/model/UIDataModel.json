@@ -21,7 +21,7 @@
 	"paymentBlock": "",
 	"unplannedCost": "",
 	"invoiceAmount": 200.00,
-	"headerTaxcode": "",
+	"taxCode": "",
 	"taxAmount": 50.00,
 	"systemSuggestedtaxAmount": "",
 	"grossAmount": 150.00,

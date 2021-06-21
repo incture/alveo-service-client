@@ -1,6 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified">
 	<Table id="SupplierQualDoc" fixedLayout="false" class="openRequestTable custBox" inset="false"
-		items="{nonPOInvoiceModel>/invoiceDetailUIDto/invoiceHeader/attachments}" alternateRowColors="true" growing="true" growingThreshold="20"
+		items="{oPOModel>/attachments}" alternateRowColors="true" growing="true" growingThreshold="20"
 		updateFinished="onUpdateFinishedDocTable">
 		<headerToolbar >
 			<Toolbar visible="{oDropdownModel>/isEditable}">

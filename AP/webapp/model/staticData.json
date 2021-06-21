@@ -2,8 +2,12 @@
 	"mandatoryFields": {
 		"userDetail": ["userGroup", "firstName", "lastName", "Email", "country", "vendorId", "companyCode", "purchaseOrg"],
 		"createGroup": ["displayName", "description", "groupName"],
-		"PO": ["invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate"],
-		"NonPo": ["invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate"]
+		"PO": ["companyCode", "taxCode", "invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate", "currency", "transactionType",
+			"invoiceType"
+		],
+		"NonPo": ["companyCode", "taxCode", "invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate", "currency", "transactionType",
+			"invoiceType"
+		]
 	},
 	"navItems": [{
 		"label": "AP Workbench",

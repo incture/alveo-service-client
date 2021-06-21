@@ -765,6 +765,9 @@ sap.ui.define([
 			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
 			var allowedTypes = ["pdf", "doc", "docx", "jpg", "jpeg", "png", "xlsx", "xls", "csv"];
 			var requestId = nonPOInvoiceModel.getProperty("/requestId");
+			if(!attachments){
+				attachments=[];
+			}
 			if (!requestId) {
 				requestId = this.createReqid();
 				nonPOInvoiceModel.setProperty("/requestId", requestId);
@@ -843,8 +846,8 @@ sap.ui.define([
 		onDocumentDownload: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var nonPOInvoiceModel = this.oPOModel;
-			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
-			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var obj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 
 			var parts = sPath.split("/");
 			var index = parts[parts.length - 1];
@@ -894,8 +897,8 @@ sap.ui.define([
 		onDocumentDelete: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var nonPOInvoiceModel = this.oPOModel;
-			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
-			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var obj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 			var attachments = nonPOInvoiceModel.getProperty("/attachments");
 			var parts = sPath.split("/");
 			var index = parts[parts.length - 1];
@@ -924,6 +927,7 @@ sap.ui.define([
 					success: function (oData, header) {
 						var data = oData.results;
 						oDropDownModel.setProperty("/VendorIdSuggest", data);
+						oDropDownModel.refresh();
 					},
 					error: function (oData) {}
 				});

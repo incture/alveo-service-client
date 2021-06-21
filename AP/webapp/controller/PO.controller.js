@@ -13,16 +13,28 @@ sap.ui.define([
 		 * @memberOf com.menabev.AP.view.PO
 		 */
 		onInit: function () {
+			var that = this;
 			var StaticDataModel = this.getOwnerComponent().getModel("StaticDataModel");
 			this.StaticDataModel = StaticDataModel;
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			this.oPOModel = oPOModel;
+			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
+			this.oDropDownModel = oDropDownModel;
 			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 			this.oVisibilityModel = oVisibilityModel;
 			var oMandatoryModel = this.getOwnerComponent().getModel("oMandatoryModel");
 			this.oMandatoryModel = oMandatoryModel;
+			var oDataModel = this.getOwnerComponent().getModel("oDataModel");
+			this.oDataModel = oDataModel;
+			var oDPODetailsModel = this.getOwnerComponent().getModel("oDPODetailsModel");
+			this.oDPODetailsModel = oDPODetailsModel;
+			var oDataAPIModel = this.getOwnerComponent().getModel("oDataAPIModel");
+			this.oDataAPIModel = oDataAPIModel;
+			var ZP2P_API_EC_GL_SRV = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			this.ZP2P_API_EC_GL_SRV = ZP2P_API_EC_GL_SRV;
+			oMandatoryModel.setProperty("/NonPO",{});
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			oPOModel.loadData("model/UIDataModel.json");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
@@ -31,7 +43,7 @@ sap.ui.define([
 					var oArgs = oEvent.getParameter("arguments"),
 						requestId = oArgs.id,
 						status = oArgs.status;
-					POServices.getPONonPOData("", this, requestId);
+					POServices.getPONonPOData("", that, requestId);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -158,10 +170,20 @@ sap.ui.define([
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds);
 		},
-		
+
 		onNonPoSave: function (oEvent) {
 			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			POServices.onNonPoSave(oEvent, this);
+		},
+
+		onPostingDateChange: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onNonPoSave(oEvent, this);
+		},
+
+		onDueDateChange: function (oEvent) {
+			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onDueDateChange(oEvent, this);
 		},
 
 		/**

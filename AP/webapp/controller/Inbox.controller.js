@@ -223,17 +223,25 @@ sap.ui.define([
 
 			onReqIdOpenSelect: function (oEvent) {
 				var reqId = oEvent.getSource().getText();
-				this.oRouter.navTo("NonPOInvoice", {
-					id: reqId,
-					status: "OPEN"
-				});
+				var oContextObj = oEvent.getSource().getBindingContext("oTaskInboxModel").getObject();
+				if (oContextObj.invoiceType === "NON-PO") {
+					this.oRouter.navTo("NonPOInvoice", {
+						id: reqId,
+						status: oContextObj.status
+					});
+				} else {
+					this.oRouter.navTo("PO", {
+						id: reqId,
+						status: oContextObj.status
+					});
+				}
 			},
 
 			onReqIdClaimSelect: function (oEvent) {
 				var reqId = oEvent.getSource().getText();
 				this.oRouter.navTo("NonPOInvoice", {
 					id: reqId,
-					status: "CLAIMED"
+					status: "Draft"
 				});
 			},
 
@@ -257,7 +265,7 @@ sap.ui.define([
 				if (oPayload.dueDateTo) {
 					oPayload.dueDateTo = new Date(oPayload.dueDateTo).getTime();
 				}
-				var skip = (pageNo - 1) * 10;
+				var skip = (pageNo - 1) * 2;
 				var assignedTo = oTaskInboxModel.getProperty("/filterParams/assignedTo");
 				if (!assignedTo) {
 					assignedTo = [];
@@ -405,11 +413,11 @@ sap.ui.define([
 				var oContextObj = oEvent.getSource().getBindingContext("oTaskInboxModel").getObject();
 				var sPath = oEvent.getSource().getBindingContext("oTaskInboxModel").getPath();
 				var obj = {
-					"userId": this.oUserDetailModel.getProperty("/loggedInUserMail"),
+					"taskID": oContextObj.taskId,
 					"invoice": oContextObj
 				};
 				if (oEvent.getSource().getTooltip() == "claim") {
-					obj.taskID = oContextObj.taskId;
+					obj.userId = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				}
 				var oServiceModel = new sap.ui.model.json.JSONModel();
 				var sUrl = "/menabevdev/invoiceHeader/claimOrRelease";
@@ -422,7 +430,9 @@ sap.ui.define([
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					busy.close();
 					var data = oEvent.getSource().getData();
-					oTaskInboxModel.setProperty(sPath, data.body);
+					oTaskInboxModel.setProperty(sPath, data.inbox);
+					var message = data.message;
+					sap.m.MessageToast.show(message);
 					oTaskInboxModel.refresh();
 				});
 
