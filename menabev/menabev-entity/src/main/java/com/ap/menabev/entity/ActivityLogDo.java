@@ -21,10 +21,6 @@ public class ActivityLogDo {
 @Column(name = "GUID")
 private String guid = UUID.randomUUID().toString();
 
-
-@Column(name = "WORKFLOW_TASK_ID")
-private String workflowTaskId;
-
 @Column(name = "REQUEST_ID")
 private String requestId;
 
