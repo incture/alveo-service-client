@@ -197,7 +197,25 @@ sap.ui.define([
 				}
 			);
 		},
-
+		
+		getBtnVisibility: function () {
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			oVisibilityModel.setProperty("/NonPOInvoice", {});
+			oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
+			oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
+			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			if (loggedinUserGroup === "Process_Lead") {
+				oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
+				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
+			}
+			if (loggedinUserGroup === "Accountant") {
+				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
+				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
+			}
+		},
+		
 		//Open PDF Area details
 		//Start of Open PDF details
 		fnOpenPDF: function (documentId, key) {

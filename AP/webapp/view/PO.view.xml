@@ -16,7 +16,7 @@
 						<Button icon="sap-icon://activity-individual" tooltip="{i18n>ActivityLog}" press="onClickActivityLog" class="SecondaryBtn" enabled="false"/>
 						<!--<Button icon="sap-icon://notification-2" tooltip="{i18n>ErrorMessages}" press="onClickErrorMessages" class="SecondaryBtn" enabled="false"/>-->
 						<Button text="{i18n>OpenPdf}" type="Emphasized" id="idOpenPDFBtn" tooltip="Open Pdf" press="onPressOpenpdf"
-							visible="{oPOModel>/openPdfBtnVisible}">
+							visible="{oVisibilityModel>/openPdfBtnVisible}">
 							<customData>
 								<core:CustomData key="PO" value="PO"/>
 							</customData>

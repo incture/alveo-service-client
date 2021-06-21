@@ -1,6 +1,7 @@
 sap.ui.define([
 	"com/menabev/AP/controller/BaseController",
 	"sap/ui/model/json/JSONModel",
+	"com/menabev/AP/util/POServices",
 	"sap/m/MessageBox",
 	"com/menabev/AP/formatter/formatter",
 	"sap/ui/core/util/Export",
@@ -9,7 +10,8 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/core/Fragment"
-], function (BaseController, JSONModel, MessageBox, formatter, Export, ExportTypeCSV, History, Filter, FilterOperator, Fragment) {
+], function (BaseController, JSONModel, POServices, MessageBox, formatter, Export, ExportTypeCSV, History, Filter, FilterOperator,
+	Fragment) {
 	"use strict";
 
 	var mandatoryFields = ["invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate"];
@@ -24,56 +26,21 @@ sap.ui.define([
 		onInit: function () {
 
 			this.busyDialog = new sap.m.BusyDialog();
-			this.setModel(new JSONModel(), "nonPOInvoiceModel");
-			this.getModel("nonPOInvoiceModel").setSizeLimit(5000);
-			this.setModel(new JSONModel(), "mRejectModel");
-			this.setModel(new JSONModel(), "taxModel");
-			this.setModel(new JSONModel(), "templateModel");
+			var StaticDataModel = this.getOwnerComponent().getModel("StaticDataModel");
+			this.StaticDataModel = StaticDataModel;
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
-
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
-			this.setModel(oPOModel, "oPOModel");
-			var oComponent = this.getOwnerComponent();
-			var initializeModelData = {
-				"invoiceHeader": {
-					"attachments": [],
-					"balance": "",
-					"balanceCheck": true,
-					"comments": [],
-					"clerkId": 0,
-					"createdAtInDB": 0,
-					"dueDate": "",
-					"extInvNum": "",
-					"grossAmount": "",
-					"invoiceDate": "",
-					"invoiceTotal": "",
-					"manualpaymentBlock": "",
-					"ocrBatchId": "",
-					"paymentBlock": "",
-					"paymentBlockDesc": "",
-					"paymentStatus": "",
-					"paymentTerms": "",
-					"postingDate": "",
-					"sapInvoiceNumber": 0,
-					"shippingCost": 0,
-					"subTotal": "",
-					"taskOwner": "",
-					"taskStatus": "",
-					"taxAmount": "",
-					"taxCode": "",
-					"vendorId": "",
-					"vendorName": "",
-					"taxValue": ""
-				},
-				"vstate": {}
-			};
-			this.getModel("oPOModel").setProperty("/invoiceDetailUIDto", initializeModelData);
-			this.getModel("oPOModel").setProperty("/vstate", {});
+			this.oPOModel = oPOModel;
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			this.oVisibilityModel = oVisibilityModel;
+			var oMandatoryModel = this.getOwnerComponent().getModel("oMandatoryModel");
+			this.oMandatoryModel = oMandatoryModel;
+
+			this.setModel(new JSONModel(), "templateModel");
 
 			this.getBtnVisibility();
-			this.getModel("oPOModel").setProperty("/openPdfBtnVisible", false);
-			this.router = oComponent.getRouter();
+			this.router = this.getOwnerComponent().getRouter();
 			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
 			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
@@ -88,24 +55,6 @@ sap.ui.define([
 			this.getPaymentBlock(oHeader, oLanguage);
 			this.getTaxCode(oHeader, countryKey);
 			this.getCostCenter("1010", oLanguage);
-		},
-
-		getBtnVisibility: function () {
-			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
-			oVisibilityModel.setProperty("/NonPOInvoice", {});
-			oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
-			oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
-			oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
-			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
-			if (loggedinUserGroup === "Process_Lead") {
-				oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
-				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", true);
-				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
-			}
-			if (loggedinUserGroup === "Accountant") {
-				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
-				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
-			}
 		},
 
 		onRouteMatched: function (oEvent) {
@@ -195,65 +144,65 @@ sap.ui.define([
 					"rejected": false
 				};
 				oPOModel.setProperty("/", initializeModelData);
-				oPOModel.setProperty("/vstate", {});
+				this.oVisibilityModel.setProperty("/openPdfBtnVisible", false);
 			}
 			//handle if route has NonPO request Id 
 			else if (requestId) {
-				this.getNonPOData(requestId);
+				POServices.getPONonPOData("", this, requestId);
 			}
 		},
 
 		//Service call to load Non PO data
 		//Parameter: requestId
-		getNonPOData: function (requestId) {
-			var sUrl = "/menabevdev/invoiceHeader/getInvoiceByRequestId/" + requestId;
-			jQuery.ajax({
-				method: "GET",
-				contentType: "application/json",
-				url: sUrl,
-				dataType: "json",
-				async: true,
-				success: function (oData, textStatus, jqXHR) {
-					this.busyDialog.close();
-					if (oData.responseStatus === "Success") {
-						this.getModel("nonPOInvoiceModel").setProperty("/invoiceDetailUIDto", {
-							invoiceHeader: oData.invoiceHeaderDto,
-							vstate: {}
-						});
-						var invoicePdfId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
-						if (invoicePdfId) {
-							this.getModel("nonPOInvoiceModel").setProperty("/openPdfBtnVisible", true);
-						}
-					}
-					this.getModel("nonPOInvoiceModel").refresh();
-				}.bind(this),
-				error: function (result, xhr, data) {
-					this.busyDialog.close();
-					var errorMsg = "";
-					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please refresh your page";
-						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = data;
-						this.errorMsg(errorMsg);
-					}
-				}.bind(this)
-			});
-		},
+		// getNonPOData: function (requestId) {
+		// 	var sUrl = "/menabevdev/invoiceHeader/getInvoiceByRequestId/" + requestId;
+		// 	jQuery.ajax({
+		// 		method: "GET",
+		// 		contentType: "application/json",
+		// 		url: sUrl,
+		// 		dataType: "json",
+		// 		async: true,
+		// 		success: function (oData, textStatus, jqXHR) {
+		// 			this.busyDialog.close();
+		// 			if (oData.responseStatus === "Success") {
+		// 				this.oPOModel.setProperty("/invoiceDetailUIDto", {
+		// 					invoiceHeader: oData.invoiceHeaderDto,
+		// 					vstate: {}
+		// 				});
+		// 				var invoicePdfId = this.oPOModel.getProperty("/invoicePdfId");
+		// 				if (invoicePdfId) {
+		// 					this.oPOModel.setProperty("/openPdfBtnVisible", true);
+		// 				}
+		// 			}
+		// 			this.oPOModel.refresh();
+		// 		}.bind(this),
+		// 		error: function (result, xhr, data) {
+		// 			this.busyDialog.close();
+		// 			var errorMsg = "";
+		// 			if (result.status === 504) {
+		// 				errorMsg = "Request timed-out. Please refresh your page";
+		// 				this.errorMsg(errorMsg);
+		// 			} else {
+		// 				errorMsg = data;
+		// 				this.errorMsg(errorMsg);
+		// 			}
+		// 		}.bind(this)
+		// 	});
+		// },
 
 		//function hdrInvAmtCalu is triggered on change of Invoice Amount in the header field
-		hdrInvAmtCalu: function (oEvent) {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-				invoiceAmt = oEvent.getParameter("value");
-			if (!invoiceAmt) {
-				oPOModel.setProperty("/vstate/invoiceTotal", "Error");
-			} else {
-				oPOModel.setProperty("/vstate/invoiceTotal", "None");
-				invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
-				oPOModel.setProperty("/invoiceHeader/invoiceTotal", invoiceAmt);
-			}
-			this.calculateBalance();
-		},
+		// hdrInvAmtCalu: function (oEvent) {
+		// 	var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+		// 		invoiceAmt = oEvent.getParameter("value");
+		// 	if (!invoiceAmt) {
+		// 		oPOModel.setProperty("/vstate/invoiceTotal", "Error");
+		// 	} else {
+		// 		oPOModel.setProperty("/vstate/invoiceTotal", "None");
+		// 		invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
+		// 		oPOModel.setProperty("/invoiceHeader/invoiceTotal", invoiceAmt);
+		// 	}
+		// 	this.calculateBalance();
+		// },
 
 		//function getGLaccountValue is triggered on change of GL Account in the Cost Center table
 		//Frag:NonPOCostCenter---- //Updated
@@ -271,37 +220,86 @@ sap.ui.define([
 		/**
 		 * Header Filter function Starts here
 		 */
-		//function onChangeVendorId is triggered on change of Vendor ID 
-		onChangeVendorId: function (oEvent) {
-			this.errorHandler(oEvent);
+		hdrInvAmtCalu: function (oEvent) {
+			POServices.hdrInvAmtCalu(oEvent, this);
+		},
+		
+		onVendorIdChange: function (oEvent) {
+
 		},
 
-		searchVendorAddr: function (oEvt) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sVendorName = oEvt.getParameter("selectedItem").getProperty("additionalText");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", sVendorName);
-			nonPOInvoiceModel.refresh();
+		onVendorNameChange: function (oEvent) {
+
 		},
 
-		onChangeInvDate: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/invoiceDate", oEvent.getSource()._getSelectedDate().getTime());
-			this.errorHandler(oEvent);
+		getPONonPOData: function (oEvent) {
+			POServices.getPONonPOData(oEvent, this);
 		},
 
-		onChangeInvNumber: function (oEvent) {
-			this.errorHandler(oEvent);
+		VendorIdSuggest: function (oEvent) {
+			POServices.VendorIdSuggest(oEvent, this);
 		},
 
-		onPostingDateChange: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/postingDate", oEvent.getSource()._getSelectedDate().getTime());
-			this.errorHandler(oEvent);
+		onTransactionChange: function (oEvent) {
+			POServices.onTransactionChange(oEvent, this);
 		},
 
-		onDueDateChange: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/dueDate", oEvent.getSource()._getSelectedDate().getTime());
+		vendorIdSelected: function (oEvent) {
+			POServices.vendorIdSelected(oEvent, this);
+		},
+
+		onCompanyCodeChange: function (oEvent) {
+			POServices.onCompanyCodeChange(oEvent, this);
+		},
+
+		onInvRefChange: function (oEvent) {
+			POServices.onInvRefChange(oEvent, this);
+		},
+
+		onCurrencyChange: function (oEvent) {
+			POServices.onCurrencyChange(oEvent, this);
+		},
+
+		onInvDateChange: function (oEvent) {
+			POServices.onInvDateChange(oEvent, this);
+		},
+
+		onBaseLineDateChange: function (oEvent) {
+			POServices.onBaseLineDateChange(oEvent, this);
+		},
+
+		onPaymentTermsChange: function (oEvent) {
+			POServices.onPaymentTermsChange(oEvent, this);
+		},
+
+		onInvTypeChange: function (oEvent) {
+			POServices.onInvTypeChange(oEvent, this);
+		},
+
+		onTaxCodeChange: function (oEvent) {
+			POServices.onTaxCodeChange(oEvent, this);
+		},
+
+		onTaxAmtChange: function (oEvent) {
+			POServices.onTaxAmtChange(oEvent, this);
+		},
+
+		onInvAmtChange: function (oEvent) {
+			POServices.onInvAmtChange(oEvent, this);
+		},
+		
+		//To open vendor balance
+		onClickVendorBalances: function () {
+			var nonPOInvoiceModel = this.oPOModel,
+				vendorId = nonPOInvoiceModel.getProperty("/vendorId"),
+				companyCode = nonPOInvoiceModel.getProperty("/companyCode");
+			this.loadVendorBalanceFrag(vendorId, companyCode);
+		},
+
+		onPressOpenpdf: function (oEvent) {
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
+			var documentId = oPOModel.getProperty("/invoicePdfId");
+			this.fnOpenPDF(documentId);
 		},
 
 		//onChange Header level tax -----Updated
@@ -328,7 +326,8 @@ sap.ui.define([
 			this.costAllocationTaxCalc();
 			sap.m.MessageToast.show("Tax Code\r" + taxCode + "\r is applied to all Cost Allocation line items");
 		},
-
+		//End of Header Filter function
+		
 		//onChange CC item level tax
 		onChangeTax: function (oEvent) {
 			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject(),
@@ -337,14 +336,6 @@ sap.ui.define([
 			oPOModel.setProperty(sPath + "/taxPer", taxDetails.TaxRate);
 			oPOModel.setProperty(sPath + "/taxConditionType", taxDetails.TaxConditionType);
 			this.amountCal(oEvent);
-		},
-		//End of Header Filter function
-
-		//this function is to open PDF for Non PO Invoice
-		onPressOpenpdf: function () {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
-			var documentId = oPOModel.getProperty("/invoicePdfId");
-			this.fnOpenPDF(documentId);
 		},
 
 		//This function will route to TemplateManagement view
@@ -498,7 +489,7 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					this.busyDialog.close();
-					this.getModel("oPOModel").setProperty("/previewListNonPoItem", data);
+					this.oPOModel.setProperty("/previewListNonPoItem", data);
 					if (!this.previewTemplateDialog) {
 						this.previewTemplateDialog = sap.ui.xmlfragment("previewTemplate", "com.menabev.AP.fragment.PreviewTemplate", this);
 					}
@@ -527,14 +518,14 @@ sap.ui.define([
 
 		//Frag:PreviewTemplate ---Updated
 		onOkSelectTemplate: function () {
-			var previewListNonPoItem = this.getModel("oPOModel").getProperty("/previewListNonPoItem");
+			var previewListNonPoItem = this.oPOModel.getProperty("/previewListNonPoItem");
 			// var arr = [];
-			var arr = $.extend(true, [], this.getModel("oPOModel").getProperty("/costAllocation"));
+			var arr = $.extend(true, [], this.oPOModel.getProperty("/costAllocation"));
 			for (var i = 0; i < previewListNonPoItem.length; i++) {
 				arr = arr.concat(previewListNonPoItem[i].costAllocationList);
 			}
-			this.getModel("oPOModel").setProperty("/costAllocation", arr);
-			var oPOModel = this.getModel("oPOModel");
+			this.oPOModel.setProperty("/costAllocation", arr);
+			var oPOModel = this.oPOModel;
 			var taxCode = oPOModel.getProperty("/taxCode"),
 				taxPer = oPOModel.getProperty("/taxPer"),
 				taxConditionType = oPOModel.getProperty("/taxConditionType");
@@ -972,7 +963,7 @@ sap.ui.define([
 				"accountingDoc": "",
 				"amountBeforeTax": "",
 				"assignedTo": "",
-				"balance": objectIsNew.invoiceHeader.balance,
+				"balance": objectIsNew.balance,
 				"balanceCheck": true,
 				"baseLine": "",
 				"channelType": "",
@@ -982,7 +973,7 @@ sap.ui.define([
 				"clearingDate": "",
 				"clerkEmail": "",
 				"clerkId": 0,
-				"compCode": objectIsNew.invoiceHeader.compCode,
+				"compCode": objectIsNew.compCode,
 				"createdAt": "",
 				"createdAtFrom": "",
 				"createdAtInDB": 0,
@@ -995,22 +986,22 @@ sap.ui.define([
 				"disAmt": "",
 				"discount": "",
 				"docStatus": "",
-				"dueDate": objectIsNew.invoiceHeader.dueDate,
+				"dueDate": objectIsNew.dueDate,
 				"dueDateFrom": "",
 				"dueDateTo": "",
 				"emailFrom": "",
-				"extInvNum": objectIsNew.invoiceHeader.extInvNum,
+				"extInvNum": objectIsNew.extInvNum,
 				"filterFor": "",
 				"fiscalYear": "",
 				"forwaredTaskOwner": "",
-				"grossAmount": objectIsNew.invoiceHeader.grossAmount,
+				"grossAmount": objectIsNew.grossAmount,
 				"headerText": "",
-				"invoiceDate": objectIsNew.invoiceHeader.invoiceDate,
+				"invoiceDate": objectIsNew.invoiceDate,
 				"invoiceDateFrom": "",
 				"invoiceDateTo": "",
 				"invoiceItems": [],
-				"invoicePdfId": objectIsNew.invoiceHeader.invoicePdfId,
-				"invoiceTotal": Number(objectIsNew.invoiceHeader.invoiceTotal),
+				"invoicePdfId": objectIsNew.invoicePdfId,
+				"invoiceTotal": Number(objectIsNe.invoiceTotal),
 				"invoiceTotalFrom": "",
 				"invoiceTotalTo": "",
 				"invoiceType": "NON-PO",
@@ -1018,15 +1009,15 @@ sap.ui.define([
 				"lifecycleStatusText": "",
 				"manualpaymentBlock": "",
 				"nonPoOrPo": true,
-				"ocrBatchId": objectIsNew.invoiceHeader.ocrBatchId,
-				"paymentBlock": objectIsNew.invoiceHeader.paymentBlock,
+				"ocrBatchId": objectIsNe.ocrBatchId,
+				"paymentBlock": objectIsNew.paymentBlock,
 				"paymentBlockDesc": "",
 				"paymentStatus": "",
 				"paymentMethod": "",
-				"paymentTerms": objectIsNew.invoiceHeader.paymentTerms,
+				"paymentTerms": objectIsNew.paymentTerms,
 				"plannedCost": "",
 				"processor": "",
-				"postingDate": objectIsNew.invoiceHeader.postingDate,
+				"postingDate": objectIsNew.postingDate,
 				"reasonForRejection": "",
 				"refpurchaseDoc": "",
 				"refpurchaseDocCat": "",
@@ -1043,21 +1034,21 @@ sap.ui.define([
 				"surcharge": "",
 				"sysSusgestedTaxAmount": "",
 				"taskGroup": "",
-				"taskOwner": objectIsNew.invoiceHeader.taskOwner,
+				"taskOwner": objectIsNew.taskOwner,
 				"taskOwnerId": this.oUserDetailModel.getProperty("/loggedInUserMail"),
-				"taskStatus": objectIsNew.invoiceHeader.taskStatus,
-				"taxAmount": objectIsNew.invoiceHeader.taxAmount,
-				"taxCode": objectIsNew.invoiceHeader.taxCode,
-				"taxRate": objectIsNew.invoiceHeader.taxPer,
-				"taxValue": objectIsNew.invoiceHeader.taxValue,
-				"totalBaseRate": objectIsNew.invoiceHeader.totalBaseRate,
+				"taskStatus": objectIsNew.taskStatus,
+				"taxAmount": objectIsNew.taxAmount,
+				"taxCode": objectIsNew.taxCode,
+				"taxRate": objectIsNew.taxPer,
+				"taxValue": objectIsNew.taxValue,
+				"totalBaseRate": objectIsNew.totalBaseRate,
 				"transactionType": "",
 				"unplannedCost": "",
 				"updatedAt": 0,
 				"updatedBy": "",
 				"vatRegNum": "",
-				"vendorId": objectIsNew.invoiceHeader.vendorId,
-				"vendorName": objectIsNew.invoiceHeader.vendorName,
+				"vendorId": objectIsNew.vendorId,
+				"vendorName": objectIsNew.vendorName,
 				"version": 0,
 				"zipCode": ""
 			};
@@ -1210,9 +1201,9 @@ sap.ui.define([
 		},
 
 		onPostComment: function () {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			var nonPOInvoiceModel = this.oPOModel;
 			var oUserDetailModel = this.oUserDetailModel;
-			var comments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/comments");
+			var comments = nonPOInvoiceModel.getProperty("/comments");
 			var userComment = nonPOInvoiceModel.getProperty("/commments");
 			if (!userComment) {
 				this.resourceBundle.getText("FILL_COMMENT");
@@ -1225,7 +1216,7 @@ sap.ui.define([
 				"createdBy": oUserDetailModel.getProperty("/loggedInUserMail")
 			};
 			comments.push(obj);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/comments", comments);
+			nonPOInvoiceModel.setProperty("/comments", comments);
 			nonPOInvoiceModel.setProperty("/commments", "");
 		},
 		createReqid: function () {
@@ -1242,16 +1233,16 @@ sap.ui.define([
 		handleUploadComplete: function (oEvent) {
 			var that = this;
 			var oUserDetailModel = this.oUserDetailModel;
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			var attachments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
+			var nonPOInvoiceModel = this.oPOModel;
+			var attachments = nonPOInvoiceModel.getProperty("/attachments");
 			var upfile = oEvent.getParameters().files[0];
 			var upFileName = upfile.name;
 			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
 			var allowedTypes = ["pdf", "doc", "docx", "jpg", "jpeg", "png", "xlsx", "xls", "csv"];
-			var requestId = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/requestId");
+			var requestId = nonPOInvoiceModel.getProperty("/requestId");
 			if (!requestId) {
 				requestId = this.createReqid();
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/requestId", requestId);
+				nonPOInvoiceModel.setProperty("/requestId", requestId);
 			}
 			if (!allowedTypes.includes(fileType.toLowerCase())) {
 				MessageBox.error(that.resourceBundle.getText("msgFileType"));
@@ -1301,7 +1292,7 @@ sap.ui.define([
 						"requestId": requestId
 					};
 					attachments.push(obj);
-					nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/attachments", attachments);
+					nonPOInvoiceModel.setProperty("/attachments", attachments);
 					MessageBox.success(success.response.message, {
 						actions: [MessageBox.Action.OK],
 						onClose: function (sAction) {
@@ -1326,7 +1317,7 @@ sap.ui.define([
 
 		onDocumentDownload: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			var nonPOInvoiceModel = this.oPOModel;
 			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
 			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
 
@@ -1377,10 +1368,10 @@ sap.ui.define([
 
 		onDocumentDelete: function (oEvent) {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			var nonPOInvoiceModel = this.oPOModel;
 			var sPath = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getPath();
 			var obj = oEvent.getSource().getBindingContext("nonPOInvoiceModel").getObject();
-			var attachments = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/attachments");
+			var attachments = nonPOInvoiceModel.getProperty("/attachments");
 			var parts = sPath.split("/");
 			var index = parts[parts.length - 1];
 			var attachmentId = obj.attachmentId;
@@ -1392,20 +1383,20 @@ sap.ui.define([
 				busy.close();
 				sap.m.MessageToast.show(oEvent.getSource().getData().message);
 				attachments.splice(index, 1);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/attachments", attachments);
+				nonPOInvoiceModel.setProperty("/attachments", attachments);
 
 			});
 		},
 
 		onChangeUserInputTaxAmount: function (oEvent) {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
+			var nonPOInvoiceModel = this.oPOModel,
 				userInputTaxAmount = oEvent.getParameter("value");
 			if (!userInputTaxAmount) {
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/taxValue", "Error");
+				nonPOInvoiceModel.setProperty("/vstate/taxValue", "Error");
 			} else {
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/vstate/taxValue", "None");
+				nonPOInvoiceModel.setProperty("/vstate/taxValue", "None");
 				userInputTaxAmount = (parseFloat(userInputTaxAmount)).toFixed(2);
-				nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/taxValue", userInputTaxAmount);
+				nonPOInvoiceModel.setProperty("/taxValue", userInputTaxAmount);
 			}
 			this.calculateGrossAmount();
 			this.calculateBalance();
@@ -1413,15 +1404,15 @@ sap.ui.define([
 
 		//Vendor search valuehelp request
 		onValueHelpRequested: function () {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
+			var nonPOInvoiceModel = this.oPOModel;
 			if (!this.vendorValueHelp) {
 				this.vendorValueHelp = sap.ui.xmlfragment("com.menabev.AP.fragment.VendorValueHelp", this);
 				this.getView().addDependent(this.vendorValueHelp);
 			}
 			var vendorSearchModel = new JSONModel();
 			this.getView().setModel(vendorSearchModel, "vendorSearchModel");
-			vendorSearchModel.setProperty("/vendorId", nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"));
-			vendorSearchModel.setProperty("/vendorName", nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorName"));
+			vendorSearchModel.setProperty("/vendorId", nonPOInvoiceModel.getProperty("/vendorId"));
+			vendorSearchModel.setProperty("/vendorName", nonPOInvoiceModel.getProperty("/vendorName"));
 			vendorSearchModel.setProperty("/VATRegistration", "");
 			this.fnVendorIdServiceCall();
 			this.vendorValueHelp.open();
@@ -1487,9 +1478,9 @@ sap.ui.define([
 			var sPath = oEvent.getSource().getSelectedContextPaths()[0],
 				vendorSearchModel = this.getView().getModel("vendorSearchModel"),
 				selectedObject = vendorSearchModel.getProperty(sPath);
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", selectedObject.Supplier);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", selectedObject.SupplierName);
+			var nonPOInvoiceModel = this.oPOModel;
+			nonPOInvoiceModel.setProperty("/vendorId", selectedObject.Supplier);
+			nonPOInvoiceModel.setProperty("/vendorName", selectedObject.SupplierName);
 			this.vendorValueHelp.close();
 		},
 
@@ -1518,62 +1509,6 @@ sap.ui.define([
 			oPOModel.setProperty("/grossAmount", grossAmount);
 			oPOModel.refresh();
 		},
-
-		VendorNameSuggest: function (oEvent) {
-			var searchVendorModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(searchVendorModel, "searchVendorModel");
-			var value = oEvent.getParameter("suggestValue");
-			value = value.toUpperCase();
-			if (value && value.length > 2) {
-				var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=substringof('" + value +
-					"',SupplierName) eq true";
-				searchVendorModel.loadData(url, null, true);
-				searchVendorModel.attachRequestCompleted(null, function (oEvt) {
-					searchVendorModel.refresh();
-				});
-			}
-		},
-
-		vendorNameSelected: function (oEvt) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sVendorId = oEvt.getParameter("selectedItem").getProperty("additionalText"),
-				sVendorName = oEvt.getParameter("selectedItem").getProperty("text");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", sVendorName);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", sVendorId);
-			nonPOInvoiceModel.refresh();
-		},
-
-		VendorIdSuggest: function (oEvent) {
-			var searchVendorModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(searchVendorModel, "searchVendorModel");
-			var value = oEvent.getParameter("suggestValue");
-			// value = value.toUpperCase();
-			if (value && value.length > 2) {
-				var url = "SD4_DEST/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter=substringof('" + value +
-					"',Supplier) eq true";
-				searchVendorModel.loadData(url, null, true);
-				searchVendorModel.attachRequestCompleted(null, function (oEvt) {
-					searchVendorModel.refresh();
-				});
-			}
-		},
-
-		vendorIdSelected: function (oEvt) {
-			var nonPOInvoiceModel = this.getView().getModel("nonPOInvoiceModel");
-			var sVendorId = oEvt.getParameter("selectedItem").getProperty("text"),
-				sVendorName = oEvt.getParameter("selectedItem").getProperty("additionalText");
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorName", sVendorName);
-			nonPOInvoiceModel.setProperty("/invoiceDetailUIDto/invoiceHeader/vendorId", sVendorId);
-			nonPOInvoiceModel.refresh();
-		},
-
-		//To open vendor balance
-		onClickVendorBalances: function () {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-				vendorId = oPOModel.getProperty("/vendorId"),
-				companyCode = oPOModel.getProperty("/companyCode");
-			this.loadVendorBalanceFrag(vendorId, companyCode);
-		}
 
 	});
 

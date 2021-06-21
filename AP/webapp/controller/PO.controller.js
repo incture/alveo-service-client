@@ -27,7 +27,12 @@ sap.ui.define([
 			oPOModel.loadData("model/UIDataModel.json");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
-				if (oEvent.getParameter("name") === "PO") {}
+				if (oEvent.getParameter("name") === "PO") {
+					var oArgs = oEvent.getParameter("arguments"),
+						requestId = oArgs.id,
+						status = oArgs.status;
+					POServices.getPONonPOData("", this, requestId);
+				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
 
@@ -35,7 +40,7 @@ sap.ui.define([
 			var oHeader = {
 				"Content-Type": "application/json; charset=utf-8"
 			};
-			POServices.getPONonPOData("", this, "APA-06162021-00000001");
+
 			var oLanguage = "E";
 			var countryKey = "SA";
 			//To load all OData lookups
@@ -126,7 +131,7 @@ sap.ui.define([
 			var documentId = this.getModel("oPOModel").getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId, oSelectedBtnKey);
 		},
-		
+
 		onSubmitForRemediation: function () {
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
@@ -135,7 +140,7 @@ sap.ui.define([
 			oPOModel.setProperty("/submitTypeTitle", "Submit For Remediation");
 			this.SubmitDialog.open();
 		},
-		
+
 		onSubmitForApproval: function () {
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
@@ -144,7 +149,7 @@ sap.ui.define([
 			oPOModel.setProperty("/submitTypeTitle", "Submit For Approval");
 			this.SubmitDialog.open();
 		},
-		
+
 		onCancelSubmitDialog: function () {
 			this.SubmitDialog.close();
 		},
