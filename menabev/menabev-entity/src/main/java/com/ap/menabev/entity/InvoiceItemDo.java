@@ -124,17 +124,17 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "ITEM_STATUS_TEXT")
 	private String itemStatusText;
 	@Column(name = "AVL_QTY_UOM")
-	private double alvQtyUOM;
+	private Double alvQtyUOM;
 	@Column(name = "PO_UNIT_PRICE_UOM")
-	private double poUnitPriceUOM;
+	private Double poUnitPriceUOM;
 	@Column(name = "AVL_QTY_OPU")
-	private double alvQtyOPU;
+	private Double alvQtyOPU;
 	@Column(name = "AVL_QTY_OU")
-	private double alvQtyOU;
+	private Double alvQtyOU;
 	@Column(name = "PO_UNIT_PRICE_OPU")
-	private double poUnitPriceOPU;
+	private Double poUnitPriceOPU;
 	@Column(name = "PO_UNIT_PRICE_OU")
-	private double poUnitPriceOU;
+	private Double poUnitPriceOU;
 	@Column(name = "ORDER_UNIT")
 	private String orderUnit;
 	// @Column(name = "IS_DELETED")
@@ -154,22 +154,22 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "PO_ITEM_TEXT")
 	private String poItemText;
 	@Column(name = "PO_QTY_OU")
-	private double poQtyOU;
+	private Double poQtyOU;
 	@Column(name = "PO_QTY_OPU")
-	private double poQtyOPU;
+	private Double poQtyOPU;
 	@Column(name = "PO_TAX_CODE")
 	private String poTaxCode;
 	@Column(name = "GR_FLAG")
-	private boolean grFlag;
+	private Boolean grFlag;
 	@Column(name = "GR_BSD_IV")
-	private boolean grBsdIv;
+	private Boolean grBsdIv;
 	@Column(name = "SRV_BSD_IV")
-	private boolean srvBsdIv;
+	private Boolean srvBsdIv;
 	@Column(name = "IV_FLAG")
-	private boolean ivFlag;
+	private Boolean ivFlag;
 	@Column(name = "CONV_NUM_1")
-	private int convNum1;
+	private Integer convNum1;
 	@Column(name = "CONV_DEN_1")
-	private int convDen1;
+	private Integer convDen1;
 
 }

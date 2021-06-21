@@ -89,7 +89,7 @@ public class InvoiceHeaderDto {
 	
 	//Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by Prashant Kumar
 	private InvoiceChangeIndicator changeIndicators;
-	private long emailReceivedAt;
+	private Long emailReceivedAt;
 
 	  
 

@@ -70,12 +70,12 @@ public class InvoiceItemDto {
 	private String accAssignmentCat;
 	private String itemStatusCode;
 	private String itemStatusText;
-	private double alvQtyUOM;
-	private double poUnitPriceUOM;
-	private double alvQtyOPU;
-	private double alvQtyOU;
-	private double poUnitPriceOPU;
-	private double poUnitPriceOU;
+	private Double alvQtyUOM;
+	private Double poUnitPriceUOM;
+	private Double alvQtyOPU;
+	private Double alvQtyOU;
+	private Double poUnitPriceOPU;
+	private Double poUnitPriceOU;
 	private String orderUnit;
 //	private String orderPriceUnit;
 	private String orderUnitISO;
@@ -85,15 +85,15 @@ public class InvoiceItemDto {
 	private String productType;
 	private String poMatNum;
 	private String poItemText;
-	private double poQtyOU; 
-	private double poQtyOPU; 
+	private Double poQtyOU; 
+	private Double poQtyOPU; 
 	private String poTaxCode;
-	private boolean grFlag;
-	private boolean grBsdIv;
-	private boolean srvBsdIv;
-	private boolean ivFlag;
-	private int convNum1;
-	private int convDen1;
+	private Boolean grFlag;
+	private Boolean grBsdIv;
+	private Boolean srvBsdIv;
+	private Boolean ivFlag;
+	private Integer convNum1;
+	private Integer convDen1;
 	
 	
 

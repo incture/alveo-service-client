@@ -24,6 +24,7 @@ import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
+
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
@@ -44,96 +45,122 @@ public class InvoiceHeaderController {
 	@Autowired
 	private SequenceGeneratorService seqService;
 
+	@PostMapping("/saveAPI")
+	public InvoiceHeaderDto saveAPI(@RequestBody InvoiceHeaderDto dto) {
+		return headerService.saveAPI(dto);
+	}
+
 	@PostMapping("/saveOrUpdate")
 	public ResponseDto saveOrUpdate(@RequestBody InvoiceHeaderDto dto) {
 		return headerService.saveOrUpdate(dto);
 	}
+
 	@GetMapping("/getAll")
 	public List<InvoiceHeaderDto> getAll() {
 		return headerService.getAll();
 	}
+
 	@GetMapping("/getInvoiceByReqId/{requestId}")
 	@ResponseBody
 	public ResponseEntity<?> getByInvoiceRequestIdCorrection(@PathVariable String requestId) {
 		return headerService.getInvoiceDetail(requestId);
 	}
+
 	@GetMapping("/getInvoiceByReqId/{requestId}/item")
 	public ResponseEntity<?> getByInvoiceRequestIdItem(@PathVariable String requestId) {
 		return headerService.getInvoiceItemDetail(requestId);
 	}
+
 	@GetMapping("/getInvoiceByReqId/{requestId}/costAllocation")
 	public ResponseEntity<?> getByInvoiceRequestIdCostAllocation(@PathVariable String requestId) {
 		return headerService.getCostAllocationDetail(requestId);
 	}
+
 	@GetMapping("/getInvoiceByReqId/{requestId}/invoiceItemAcctAssignment")
 	public ResponseEntity<?> getByInvoiceRequestIdInvoiceItemAcct(@PathVariable String requestId) {
 		return headerService.getInvoiceAcctAssinment(requestId);
 	}
+
 	@GetMapping("/getInvoiceByReqId/{requestId}/attachment")
 	public ResponseEntity<?> getByInvoiceRequestIdAttachment(@PathVariable String requestId) {
 		return headerService.getInvoiceAttachment(requestId);
 	}
+
 	@GetMapping("/getInvoiceByReqId/{requestId}/comment")
 	public ResponseEntity<?> getByInvoiceRequestIdComment(@PathVariable String requestId) {
 		return headerService.getInvoiceComments(requestId);
 	}
+
 	@DeleteMapping("/delete")
 	public ResponseEntity<?> delete(@RequestBody DeleteDraftInputDto delete) {
 		return headerService.deleteDraft(delete.getRequestId());
 	}
+
 	@PostMapping("/inbox/tasks")
 	public ResponseEntity<?> getinboxTaskNew(@RequestBody FilterMultipleHeaderSearchDto dto) {
 		return headerService.getInboxUserTask(dto);
 	}
+
 	@PostMapping("/inboxMultiple")
-	public ResponseEntity<?> getinboxTaskByPageNo(@RequestBody FilterMultipleHeaderSearchDto dto) throws InterruptedException, ExecutionException {
+	public ResponseEntity<?> getinboxTaskByPageNo(@RequestBody FilterMultipleHeaderSearchDto dto)
+			throws InterruptedException, ExecutionException {
 		return headerService.getInboxTaskWithMultipleSearch(dto);
 	}
+
 	@PostMapping("/claimOrRelease")
-	public ResponseEntity<?> claimAndRelease(@RequestBody ClaimAndReleaseDto dto){
+	public ResponseEntity<?> claimAndRelease(@RequestBody ClaimAndReleaseDto dto) {
 		return headerService.claimTaskOfUser(dto);
 	}
+
 	@PostMapping("/headerCheck")
 	public InvoiceHeaderDashBoardDto headerCheck(@RequestBody HeaderCheckDto headerCheckDto) {
 		return headerService.headerCheck(headerCheckDto);
-		
-		
+
 	}
+
 	@GetMapping("/getByDates")
-	public List<InvoiceHeaderDo> getByDates(@RequestParam("from") String from ,@RequestParam("to") String to){
+	public List<InvoiceHeaderDo> getByDates(@RequestParam("from") String from, @RequestParam("to") String to) {
 		return repo.findByInvoiceDateBetween(from, to);
 	}
+
 	@PostMapping("/accountantSubmit")
-	public ResponseEntity<?> onAccountantNonPoSubmit(@RequestBody CreateInvoiceHeaderDto create){
+	public ResponseEntity<?> onAccountantNonPoSubmit(@RequestBody CreateInvoiceHeaderDto create) {
 		return headerService.submitForNonPo(create);
 	}
+
 	@PostMapping("/accountantSave")
-	public ResponseEntity<?> onAccountantNonPoSave(@RequestBody CreateInvoiceHeaderDto create){
+	public ResponseEntity<?> onAccountantNonPoSave(@RequestBody CreateInvoiceHeaderDto create) {
 		return headerService.save(create);
 	}
+
 	@GetMapping(params = { "sequnceCode" })
-	public ResponseDto getCurrentSequnceOfInvoice(@RequestParam(name = "sequnceCode") String sequnceCode){
-	ResponseDto response = new ResponseDto();
-	String sequencId = 	seqService.getSequenceNoByMappingId(
-			MenabevApplicationConstant.INVOICE_SEQUENCE,"INV"
-			);
-	response.setCode("200");
-	response.setMessage(sequencId);
-	response.setStatus("Success");
+	public ResponseDto getCurrentSequnceOfInvoice(@RequestParam(name = "sequnceCode") String sequnceCode) {
+		ResponseDto response = new ResponseDto();
+		String sequencId = seqService.getSequenceNoByMappingId(MenabevApplicationConstant.INVOICE_SEQUENCE, "INV");
+		response.setCode("200");
+		response.setMessage(sequencId);
+		response.setStatus("Success");
 		return response;
-		}
+	}
+
 	@PostMapping("/remediationBuyer/Users")
-	public ResponseEntity<?> remediationBuyer(@RequestBody List<PurchaseOrderRemediationInput> create) throws URISyntaxException, IOException{
-		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create,"BUYER","/PurchOrdDetailsSet?","PurchaseOrderCreator");
+	public ResponseEntity<?> remediationBuyer(@RequestBody List<PurchaseOrderRemediationInput> create)
+			throws URISyntaxException, IOException {
+		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create, "BUYER",
+				"/PurchOrdDetailsSet?", "PurchaseOrderCreator");
 	}
+
 	@PostMapping("/remediationGRNWithNoPR/Users")
-	public ResponseEntity<?> remediationGrnWithPurchGrp(@RequestBody List<PurchaseOrderRemediationInput> create) throws URISyntaxException, IOException{
-		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create,"GRN","/PurchGrpDetailsSet?","PurchasingGroup");
+	public ResponseEntity<?> remediationGrnWithPurchGrp(@RequestBody List<PurchaseOrderRemediationInput> create)
+			throws URISyntaxException, IOException {
+		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create, "GRN",
+				"/PurchGrpDetailsSet?", "PurchasingGroup");
 	}
+
 	@PostMapping("/remediation/Users")
-	public ResponseEntity<?> remediationBuyerWithPrNumandPrItem(@RequestBody List<PurchaseOrderRemediationInput> create) throws URISyntaxException, IOException{
-		return headerService.getRemediationUserDetails(create,"ALL");
+	public ResponseEntity<?> remediationBuyerWithPrNumandPrItem(@RequestBody List<PurchaseOrderRemediationInput> create)
+			throws URISyntaxException, IOException {
+		return headerService.getRemediationUserDetails(create, "ALL");
 	}
-	
 
 }

@@ -54,6 +54,7 @@ public interface InvoiceHeaderService {
 			throws URISyntaxException, IOException;
 	public ResponseEntity<?> getInboxUserTask(FilterMultipleHeaderSearchDto filterDto);
 	ResponseEntity<?> getInvoiceDetail(String requestId);
-	ResponseEntity<?> accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit);	
+	ResponseEntity<?> accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit);
+	InvoiceHeaderDto saveAPI(InvoiceHeaderDto dto);	
 
 }

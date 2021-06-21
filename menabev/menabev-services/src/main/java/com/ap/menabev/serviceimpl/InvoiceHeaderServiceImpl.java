@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,7 +43,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
@@ -59,6 +57,7 @@ import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.HeaderMessageDto;
 import com.ap.menabev.dto.InboxOutputDto;
 import com.ap.menabev.dto.InboxResponseOutputDto;
+import com.ap.menabev.dto.InvoiceChangeIndicator;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
@@ -108,7 +107,7 @@ import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
 import com.ap.menabev.util.WorkflowConstants;
 import com.google.gson.Gson;
-
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
@@ -200,6 +199,210 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			return new ResponseEntity<ResponseDto>(reponse, HttpStatus.OK);
 		}
 
+	}
+
+
+@Override
+	public InvoiceHeaderDto saveAPI(InvoiceHeaderDto dto) {
+		InvoiceChangeIndicator changeIndicators = dto.getChangeIndicators();
+		List<HeaderMessageDto> headerMessageDtoList = new ArrayList<HeaderMessageDto>();
+		String requestId = null;
+		try {
+			if (!ServiceUtil.isEmpty(changeIndicators)) {
+				boolean isHeaderChange = changeIndicators.isHeaderChange();
+				boolean isAttachementsChange = changeIndicators.isAttachementsChange();
+				boolean isActivityLog = changeIndicators.isActivityLog();
+				boolean isCommentChange = changeIndicators.isCommentChange();
+				boolean isCostAllocationChange = changeIndicators.isCostAllocationChange();
+				boolean isItemChange = changeIndicators.isItemChange();
+
+				if (!(isActivityLog && isAttachementsChange && isHeaderChange && isCommentChange
+						&& isCostAllocationChange && isItemChange)) {
+					HeaderMessageDto headerMessageDto = new HeaderMessageDto();
+					headerMessageDto.setMessageId(1);
+					headerMessageDto.setMessageNumber("01");
+					headerMessageDto.setMessageText("No Changes were made to DB");
+					headerMessageDto.setMessageType("");
+					headerMessageDto.setMsgClass("Invoice Header");
+					headerMessageDtoList.add(headerMessageDto);
+
+				}
+
+				if (isHeaderChange) {
+					HeaderMessageDto headerMessageDto = new HeaderMessageDto();
+
+					if (!ServiceUtil.isEmpty(dto.getRequestId())) {
+						requestId = dto.getRequestId();
+						InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
+						invoiceHeaderDo.setUpdatedAt(ServiceUtil.getEpocTime());
+						InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+						headerMessageDto.setMessageText("Header Fileds updated");
+						headerMessageDto.setMessageType("Updated");
+					} else {
+						requestId = seqService.getSequenceNoByMappingId(MenabevApplicationConstant.INVOICE_SEQUENCE,
+								"INV");
+						InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
+						invoiceHeaderDo.setRequestId(requestId);
+						invoiceHeaderDo.setGuid(UUID.randomUUID().toString());
+						if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
+							invoiceHeaderDo.setInvoiceStatus("OPEN");
+						}
+						InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+						headerMessageDto.setMessageText("Header Fileds saved");
+						headerMessageDto.setMessageType("Saved");
+					}
+					headerMessageDto.setMessageId(2);
+					headerMessageDto.setMessageNumber("02");
+
+					headerMessageDto.setMsgClass("Invoice Header");
+					dto.setHeaderMessages(headerMessageDtoList);
+				}
+				if (isItemChange) {
+					// call 3-way match
+					// check in if if three way matched
+					List<InvoiceItemDto> itemList = dto.getInvoiceItems();
+					if (!ServiceUtil.isEmpty(itemList)) {
+						for (InvoiceItemDto invoiceItemDto : itemList) {
+							InvoiceItemDo itemDo = ObjectMapperUtils.map(invoiceItemDto, InvoiceItemDo.class);
+							if (!ServiceUtil.isEmpty(itemDo.getGuid())) {
+								logger.error("line no 263 of InvoiceHeaderServiceImpl.saveOrUpdate()");
+								itemDo.setUpdatedAt(ServiceUtil.getEpocTime());
+								invoiceItemRepository.save(itemDo);
+							} else {
+								requestId = dto.getRequestId();
+								logger.error("line no 267 of InvoiceHeaderServiceImpl.saveOrUpdate()");
+								itemDo.setRequestId(requestId);
+								itemDo.setGuid(UUID.randomUUID().toString());
+								itemDo.setItemCode(invoiceItemServiceImpl.getItemId(requestId));
+								// itemDo.setItem(invoiceItemServiceImpl.getItemId());
+								logger.error("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()");
+								logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()"
+										+ itemDo.getItemCode());
+								invoiceItemRepository.save(itemDo);
+							}
+							List<InvoiceItemAcctAssignmentDto> itemAccAssignmentList = invoiceItemDto
+									.getInvItemAcctDtoList();
+							if (!ServiceUtil.isEmpty(itemAccAssignmentList)) {
+
+								for (InvoiceItemAcctAssignmentDto accDto : itemAccAssignmentList) {
+									InvoiceItemAcctAssignmentDo accDo = ObjectMapperUtils.map(accDto,
+											InvoiceItemAcctAssignmentDo.class);
+									if (!ServiceUtil.isEmpty(accDo.getAccountAssgnGuid())) {
+										invoiceItemAcctAssignmentRepository.save(accDo);
+									} else {
+										accDo.setAccountAssgnGuid(UUID.randomUUID().toString());
+										accDo.setItemId(itemDo.getItemCode());
+										accDo.setSerialNo(invoiceItemAcctAssignmentServiceImpl.getSerialNo(requestId,
+												itemDo.getItemCode()));
+										accDo.setRequestId(requestId);
+										// accDo.setCreatedOn(ServiceUtil.getEpocTime());
+										invoiceItemAcctAssignmentRepository.save(accDo);
+									}
+								}
+							}
+
+						}
+
+					}
+
+				}
+				if (isCommentChange) {
+					HeaderMessageDto headerMessageDto = null;
+					headerMessageDto = new HeaderMessageDto();
+					if (!ServiceUtil.isEmpty(dto.getRequestId())) {
+						requestId = dto.getRequestId();
+						InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
+						invoiceHeaderDo.setUpdatedAt(ServiceUtil.getEpocTime());
+						InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+						headerMessageDto.setMessageText("Header Updated");
+						headerMessageDto.setMessageType("Updated");
+						headerMessageDto.setMessageId(2);
+						headerMessageDto.setMessageNumber("02");
+						headerMessageDto.setMsgClass("Header");
+						headerMessageDtoList.add(headerMessageDto);
+					} else {
+						requestId = seqService.getSequenceNoByMappingId(MenabevApplicationConstant.INVOICE_SEQUENCE,
+								"INV");
+						InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
+						invoiceHeaderDo.setRequestId(requestId);
+						invoiceHeaderDo.setGuid(UUID.randomUUID().toString());
+						if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
+							invoiceHeaderDo.setInvoiceStatus("OPEN");
+						}
+						InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+						headerMessageDto.setMessageText("Header Saved");
+						headerMessageDto.setMessageType("Saved");
+						headerMessageDto.setMessageId(2);
+						headerMessageDto.setMessageNumber("02");
+						headerMessageDto.setMsgClass("Header");
+						headerMessageDtoList.add(headerMessageDto);
+
+					}
+
+					List<CommentDto> commentsList = dto.getComment();
+					if (!ServiceUtil.isEmpty(commentsList)) {
+						headerMessageDto = new HeaderMessageDto();
+						for (CommentDto commentDto : commentsList) {
+							if (!ServiceUtil.isEmpty(commentDto.getCommentId())) {
+								commentDto.setUpdatedAt(ServiceUtil.getEpocTime());
+								CommentDo commentDo = ObjectMapperUtils.map(commentDto, CommentDo.class);
+								commentRepository.save(commentDo);
+								headerMessageDto.setMessageText("Comments Updated");
+								headerMessageDto.setMessageType("Updated");
+								headerMessageDto.setMessageId(9);
+								headerMessageDto.setMessageNumber("09");
+								headerMessageDto.setMsgClass("Comments");
+								headerMessageDtoList.add(headerMessageDto);
+							} else {
+								commentDto.setCommentId(UUID.randomUUID().toString());
+								commentDto.setCreatedAt(ServiceUtil.getEpocTime());
+								commentDto.setRequestId(requestId);
+								CommentDo commentDo = ObjectMapperUtils.map(commentDto, CommentDo.class);
+								commentRepository.save(commentDo);
+								headerMessageDto.setMessageText("Comments Saved");
+								headerMessageDto.setMessageType("Saved");
+								headerMessageDto.setMessageId(9);
+								headerMessageDto.setMessageNumber("09");
+								headerMessageDto.setMsgClass("Comments");
+								headerMessageDtoList.add(headerMessageDto);
+							}
+						}
+
+					}
+				}
+
+				changeIndicators.setActivityLog(false);
+				changeIndicators.setAttachementsChange(false);
+				changeIndicators.setCommentChange(false);
+				changeIndicators.setCostAllocationChange(false);
+				changeIndicators.setHeaderChange(false);
+				changeIndicators.setItemChange(false);
+				dto.setChangeIndicators(changeIndicators);
+
+			} else {
+
+				HeaderMessageDto headerMessageDto = new HeaderMessageDto();
+				headerMessageDto.setMessageId(1);
+				headerMessageDto.setMessageNumber("01");
+				headerMessageDto.setMessageText("No Changes were made to DB");
+				headerMessageDto.setMessageType("");
+				headerMessageDto.setMsgClass("Invoice Header");
+				headerMessageDtoList.add(headerMessageDto);
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			HeaderMessageDto headerMessageDto = new HeaderMessageDto();
+			headerMessageDto.setMessageId(0);
+			headerMessageDto.setMessageNumber("00");
+			headerMessageDto.setMessageText(e.getMessage());
+			headerMessageDto.setMessageType("Error in save api");
+			headerMessageDto.setMsgClass("Error");
+			headerMessageDtoList.add(headerMessageDto);
+		}
+		dto.setHeaderMessages(headerMessageDtoList);
+		return dto;
 	}
 
 	@Override

@@ -168,7 +168,7 @@ public class InvoiceHeaderDo implements Serializable {
 	private String approvalStatus;
 	//Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by Prashant Kumar
 	@Column(name = "EMAIL_RECEIVED_AT")
-	private long emailReceivedAt;
+	private Long emailReceivedAt;
 	
 	
 }
