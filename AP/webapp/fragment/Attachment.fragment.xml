@@ -1,12 +1,12 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified">
 	<Table id="SupplierQualDoc" fixedLayout="false" class="openRequestTable custBox" inset="false"
-		items="{oPOModel>/attachments}" alternateRowColors="true" growing="true" growingThreshold="20"
+		items="{oPOModel>/attachment}" alternateRowColors="true" growing="true" growingThreshold="20"
 		updateFinished="onUpdateFinishedDocTable">
 		<headerToolbar >
 			<Toolbar visible="{oDropdownModel>/isEditable}">
 				<ToolbarSpacer/>
 				<u:FileUploader id="fileUploader" name="myFileUpload" icon="sap-icon://upload" iconOnly="true" buttonOnly="true" tooltip="Upload"
-					change="handleUploadComplete" class="customButton" enabled="{oDropdownModel>/isEditable}" value="{nonPOInvoiceModel>/uploadedDoc}"/>
+					change="handleUploadComplete" class="customButton" enabled="{oDropdownModel>/isEditable}" value="{oPOModel>/uploadedDoc}"/>
 			</Toolbar>
 		</headerToolbar>
 		<columns>
@@ -26,9 +26,9 @@
 		<items>
 			<ColumnListItem>
 				<cells>
-					<Text text="{nonPOInvoiceModel>fileName}"/>
-					<Text text="{path:'nonPOInvoiceModel>createdAt',formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
-					<Text text="{nonPOInvoiceModel>createdBy}"/>
+					<Text text="{oPOModel>fileName}"/>
+					<Text text="{path:'oPOModel>createdAt',formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
+					<Text text="{oPOModel>createdBy}"/>
 					<HBox>
 						<Button type="Emphasized" icon="sap-icon://download" press="onDocumentDownload"/>
 						<Button type="Reject" icon="sap-icon://delete" press="onDocumentDelete" class="deleteBtn"/>

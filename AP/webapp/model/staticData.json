@@ -98,7 +98,7 @@
 		"key": "CANCELLED",
 		"value": "Cancelled"
 	}, {
-		"key": "COMPLETED",
-		"value": "Completed"
+		"key": "DRAFT",
+		"value": "Draft"
 	}]
 }
