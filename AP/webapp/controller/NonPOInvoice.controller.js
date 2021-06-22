@@ -70,6 +70,7 @@ sap.ui.define([
 			var oArgs = oEvent.getParameter("arguments"),
 				requestId = oArgs.id,
 				status = oArgs.status;
+			this.oMandatoryModel.setProperty("/NonPO", {});
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			if (requestId === "NEW") {
 				var initializeModelData = {
@@ -90,10 +91,10 @@ sap.ui.define([
 					"zipCode": "",
 					"city": "",
 					"countryCode": "",
-					"companyCode": null,
+					"companyCode": "1010",
 					"documentDate": 0,
 					"dueDate": null,
-					"invoiceDate": 0,
+					"invoiceDate": new Date().getTime(),
 					"vendorId": "",
 					"channelType": "",
 					"refpurchaseDoc": "",
@@ -101,7 +102,7 @@ sap.ui.define([
 					"invoiceType": "NON-PO",
 					"invoiceAmount": 0,
 					"fiscalYear": "",
-					"currency": "",
+					"currency": "SAR",
 					"paymentTerms": "",
 					"paymentMethod": "",
 					"taxAmount": 0,
@@ -123,7 +124,7 @@ sap.ui.define([
 					"taskOwner": "",
 					"taskGroup": "",
 					"isnonPoOrPo": false,
-					"transactionType": "",
+					"transactionType": "Invoice",
 					"deliveryNote": "",
 					"amountBeforeTax": 0,
 					"taxCode": "",
@@ -135,7 +136,7 @@ sap.ui.define([
 					"vatRegNum": "",
 					"unplannedCost": 0,
 					"plannedCost": 0,
-					"baseLineDate": 0,
+					"baseLineDate": new Date().getTime(),
 					"invoiceStatus": "",
 					"invoiceStatusText": null,
 					"approvalStatus": "",
@@ -310,7 +311,7 @@ sap.ui.define([
 		onClickVendorBalances: function () {
 			var nonPOInvoiceModel = this.oPOModel,
 				vendorId = nonPOInvoiceModel.getProperty("/vendorId"),
-				companyCode = nonPOInvoiceModel.getProperty("/companyCode");
+				companyCode = nonPOInvoiceModel.getProperty("/compCode");
 			this.loadVendorBalanceFrag(vendorId, companyCode);
 		},
 
@@ -1165,8 +1166,8 @@ sap.ui.define([
 				userInputTaxAmount = (parseFloat(userInputTaxAmount)).toFixed(2);
 				oPOModel.setProperty("/taxValue", userInputTaxAmount);
 			}
-			this.calculateGrossAmount(oEvent, this);
-			this.calculateBalance(oEvent, this);
+			POServices.calculateGrossAmount(oEvent, this);
+			POServices.calculateBalance(oEvent, this);
 		},
 
 		//Vendor search valuehelp request

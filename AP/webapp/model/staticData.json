@@ -2,10 +2,10 @@
 	"mandatoryFields": {
 		"userDetail": ["userGroup", "firstName", "lastName", "Email", "country", "vendorId", "companyCode", "purchaseOrg"],
 		"createGroup": ["displayName", "description", "groupName"],
-		"PO": ["companyCode", "taxCode", "invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate", "currency", "transactionType",
+		"PO": ["compCode", "taxCode", "invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate", "currency", "transactionType",
 			"invoiceType"
 		],
-		"NonPo": ["companyCode", "taxCode", "invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate", "currency", "transactionType",
+		"NonPo": ["compCode", "taxCode", "invoiceTotal", "vendorId", "extInvNum", "invoiceDate", "postingDate", "currency", "transactionType",
 			"invoiceType"
 		]
 	},

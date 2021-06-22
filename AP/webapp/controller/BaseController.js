@@ -185,7 +185,7 @@ sap.ui.define([
 			}
 		},
 		errorHandlerselect: function (oEvent) {
-			var input = oEvent.getSource().getSelectedkey();
+			var input = oEvent.getSource().getSelectedKey();
 			if (!input) {
 				oEvent.getSource().setValueState("Error");
 			} else {
@@ -736,20 +736,24 @@ sap.ui.define([
 		onPostComment: function () {
 			var nonPOInvoiceModel = this.oPOModel;
 			var oUserDetailModel = this.oUserDetailModel;
-			var comments = nonPOInvoiceModel.getProperty("/comments");
+			var comment = nonPOInvoiceModel.getProperty("/comment");
 			var userComment = nonPOInvoiceModel.getProperty("/commments");
+			if (!comment) {
+				comment = [];
+			}
 			if (!userComment) {
 				this.getResourceBundle.getText("FILL_COMMENT");
 				return;
 			}
 			var obj = {
+				"requestId": nonPOInvoiceModel.getProperty("/requestId"),
 				"createdAt": new Date().getTime(),
 				"user": oUserDetailModel.getProperty("/loggedinUserDetail/name/familyName"),
 				"comment": nonPOInvoiceModel.getProperty("/commments"),
 				"createdBy": oUserDetailModel.getProperty("/loggedInUserMail")
 			};
-			comments.push(obj);
-			nonPOInvoiceModel.setProperty("/comments", comments);
+			comment.push(obj);
+			nonPOInvoiceModel.setProperty("/comment", comment);
 			nonPOInvoiceModel.setProperty("/commments", "");
 		},
 		createReqid: function () {
@@ -767,7 +771,7 @@ sap.ui.define([
 			var that = this;
 			var oUserDetailModel = this.oUserDetailModel;
 			var nonPOInvoiceModel = this.oPOModel;
-			var attachment = nonPOInvoiceModel.getProperty("/attachments");
+			var attachment = nonPOInvoiceModel.getProperty("/attachment");
 			var upfile = oEvent.getParameters().files[0];
 			var upFileName = upfile.name;
 			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
@@ -828,7 +832,7 @@ sap.ui.define([
 						"requestId": requestId
 					};
 					attachment.push(obj);
-					nonPOInvoiceModel.setProperty("/attachments", attachments);
+					nonPOInvoiceModel.setProperty("/attachment", attachment);
 					MessageBox.success(success.response.message, {
 						actions: [MessageBox.Action.OK],
 						onClose: function (sAction) {
@@ -953,6 +957,19 @@ sap.ui.define([
 
 		onVendorIdChange: function (oEvent) {
 			var a = oEvent.getSource().getValue();
+		},
+
+		onCancelChanges: function () {
+			var that = this;
+			var message = this.getResourceBundle.getText("CancelChanges");
+			sap.m.MessageBox.success(message, {
+				actions: [sap.m.MessageBox.Action.OK],
+				onClose: function (e) {
+					if (e === "OK") {
+						that.oRouter.navTo("Inbox");
+					}
+				}
+			});
 		}
 
 	});

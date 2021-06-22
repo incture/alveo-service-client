@@ -264,6 +264,13 @@ com.menabev.AP.formatter.formatter = {
 			val += array[i] + "\n";
 		}
 		return val;
-	}
+	},
+	batchIDVisible: function (editable, invType) {
+		if (editable && invType === "PO") {
+			return true;
+		} else {
+			return false;
+		}
+	},
 
 };

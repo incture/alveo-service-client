@@ -40,6 +40,7 @@ sap.ui.define([
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
 				if (oEvent.getParameter("name") === "PO") {
+					that.oMandatoryModel.setProperty("/NonPO", {});
 					var oArgs = oEvent.getParameter("arguments"),
 						requestId = oArgs.id,
 						status = oArgs.status;
@@ -134,7 +135,7 @@ sap.ui.define([
 		onClickVendorBalances: function () {
 			var nonPOInvoiceModel = this.oPOModel,
 				vendorId = nonPOInvoiceModel.getProperty("/vendorId"),
-				companyCode = nonPOInvoiceModel.getProperty("/companyCode");
+				companyCode = nonPOInvoiceModel.getProperty("/compCode");
 			this.loadVendorBalanceFrag(vendorId, companyCode);
 		},
 

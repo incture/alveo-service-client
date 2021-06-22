@@ -5,8 +5,8 @@
 				<Label text="{i18n>TRANSACTION}" required="true"></Label>
 				<Select forceSelection="false" width="80%" items="{StaticDataModel>/transactionType}" selectedKey="{oPOModel>/transactionType}"
 					valueStateText=" " valueState="{oMandatoryModel>/NonPO/transactionTypeState}" change="onTransactionChange"
-					enabled="{oVisiblityModel>/editable}">
-					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					enabled="{oVisiblityModel>/editable}" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}" />
 				</Select>
 			</VBox>
 			<VBox>
@@ -16,7 +16,7 @@
 					change="onVendorIdChange" suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10"
 					editable="{oVisibilityModel>/NonPOInvoice/editable}">
 					<suggestionItems>
-						<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
+						<core:ListItem key="{oDropDownModel>Supplier}" text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
 					</suggestionItems>
 				</Input>
 			</VBox>
@@ -33,12 +33,12 @@
 			</VBox>
 			<VBox>
 				<Label text="{i18n>COMPANYCODE}" required="true"/>
-				<Input value="{oPOModel>/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/companyCodeState}" width="80%"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCompanyCodeChange"/>
+				<Input value="{oPOModel>/compCode}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/compCodeState}" width="80%"
+					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCompanyCodeChange" maxLength="4"/>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>CURRENCY}" required="true"/>
-				<Input value="{oPOModel>/currency}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/currencyState}" width="80%"
+				<Input value="{oPOModel>/currency}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/currencyState}" width="80%" maxLength="3"
 					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCurrencyChange"/>
 				<layoutData>
 					<l:GridData linebreak="true"/>
@@ -58,16 +58,8 @@
 			<VBox >
 				<Label text="{i18n>BASELINEDATE}"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
-					value="{ path:'oPOModel>/baselineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/baselineDateState}" change="onBaseLineDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
-			</VBox>
-			<VBox>
-				<Label text="{i18n>BatchId}"/>
-				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
+					value="{ path:'oPOModel>/baseLineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
+					valueState="{oMandatoryModel>/NonPO/baseLineDateState}" change="onBaseLineDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PostingDate}" required="true"/>
@@ -138,6 +130,14 @@
 						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 					</items>
 				</Select>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
+			</VBox>
+			<VBox>
+				<Label text="{i18n>BatchId}"/>
+				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{parts:['oVisibilityModel>/NonPOInvoice/editable','oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'" valueStateText=" "
+					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
 				<layoutData>
 					<l:GridData linebreak="true"/>
 				</layoutData>

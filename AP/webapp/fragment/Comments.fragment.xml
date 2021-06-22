@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons">
-	<TextArea value="{oPOModel>/commments}" maxLength="100" cols="150" placeholder="Enter your comments"></TextArea>
+	<TextArea value="{oPOModel>/commments}" maxLength="255" cols="150" placeholder="Enter your comments"></TextArea>
 	<Button text="POST" press="onPostComment"></Button>
 	<comm:Timeline growingThreshold="20" showFilterBar="false" sortOldestFirst="false"
 		content="{oPOModel>/comment}">

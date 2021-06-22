@@ -2,6 +2,7 @@ jQuery.sap.declare("com.menabev.AP.util.POServices");
 com.menabev.AP.util.POServices = {
 	onTransactionChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
+		oController.errorHandlerselect(oEvent);
 	},
 
 	VendorIdSuggest: function (oEvent, oController) {
@@ -51,7 +52,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	vendorIdSelected: function (oEvent, oController) {
-		oController.errorHandlerInput(oEvent);
+		// oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
 			sVendorName = oEvent.getParameter("selectedItem").getProperty("additionalText");
@@ -62,7 +63,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onVendorNameChange: function (oEvent, oController) {
-		oController.errorHandlerInput(oEvent);
+		// oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorName = oEvent.getParameter("selectedItem").getProperty("text"),
 			sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText");
@@ -73,7 +74,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	vendorNameSelected: function (oEvent, oController) {
-		oController.errorHandlerInput(oEvent);
+		// oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText"),
 			sVendorName = oEvent.getParameter("selectedItem").getProperty("text");
@@ -136,7 +137,7 @@ com.menabev.AP.util.POServices = {
 		} else {
 			date = dateVal.getTime();
 		}
-		oPOModel.setProperty("/baselineDate", date);
+		oPOModel.setProperty("/baseLineDate", date);
 		this.onHeaderChange(oEvent, oController, "isBaselineDateChanged");
 	},
 	onPostingDateChange: function (oEvent, oController) {
@@ -293,7 +294,7 @@ com.menabev.AP.util.POServices = {
 		var oPayload = {
 			"requestID": "APA-210609-000001",
 			"vendorID": oPOModel.getProperty("/vendorId"),
-			"companyCode": oPOModel.getProperty("/companyCode"),
+			"companyCode": oPOModel.getProperty("/compCode"),
 			"invoiceReference": oPOModel.getProperty("/extInvNum"),
 			"invoiceTotal": oPOModel.getProperty("/invoiceTotal"),
 			"grossAmount": oPOModel.getProperty("/grossAmount"),
@@ -303,7 +304,7 @@ com.menabev.AP.util.POServices = {
 			"currency": oPOModel.getProperty("/currency"),
 			"invoiceDate": oPOModel.getProperty("/invoiceDate"),
 			"postingDate": oPOModel.getProperty("/postingDate"),
-			"baselineDate": oPOModel.getProperty("/baselineDate"),
+			"baselineDate": oPOModel.getProperty("/baseLineDate"),
 			"dueDate": oPOModel.getProperty("/dueDate"),
 			"paymentTerms": oPOModel.getProperty("/paymentTerms"),
 			"invoiceStatus": oPOModel.getProperty("/invoiceStatus"),
@@ -325,7 +326,7 @@ com.menabev.AP.util.POServices = {
 			changeIndicator = oData.changeIndicator;
 			oPOModel.setProperty("/changeIndicator", changeIndicator);
 			oPOModel.setProperty("/vendorId", oData.vendorID);
-			oPOModel.setProperty("/companyCode", oData.companyCode);
+			oPOModel.setProperty("/compCode", oData.companyCode);
 			oPOModel.setProperty("/extInvNum", oData.invoiceReference);
 			oPOModel.setProperty("/invoiceTotal", oData.invoiceTotal);
 			oPOModel.setProperty("/grossAmount", oData.grossAmount);
@@ -335,7 +336,7 @@ com.menabev.AP.util.POServices = {
 			oPOModel.setProperty("/currency", oData.currency);
 			oPOModel.setProperty("/invoiceDate", oData.invoiceDate);
 			oPOModel.setProperty("/postingDate", oData.postingDate);
-			oPOModel.setProperty("/baselineDate", oData.baselineDate);
+			oPOModel.setProperty("/baseLineDate", oData.baselineDate);
 			oPOModel.setProperty("/dueDate", oData.dueDate);
 			oPOModel.setProperty("/paymentTerms", oData.paymentTerms);
 			oPOModel.setProperty("/invoiceStatus", oData.invoiceStatus);
@@ -396,19 +397,19 @@ com.menabev.AP.util.POServices = {
 			var bflag = true;
 			for (var i = 0; i < costAllocation.length; i++) {
 				var bValidate = false;
-				if (!costAllocation[i].glAccount || costAllocation[i].glError === "Error") {
+				if (!costAllocation[i].glAccount) {
 					bValidate = true;
 					costAllocation[i].glError = "Error";
 				}
-				if (!costAllocation[i].netValue || costAllocation[i].amountError === "Error") {
+				if (!costAllocation[i].netValue) {
 					bValidate = true;
 					costAllocation[i].amountError = "Error";
 				}
-				if (!costAllocation[i].costCenter || costAllocation[i].costCenterError === "Error") {
+				if (!costAllocation[i].costCenter) {
 					bValidate = true;
 					costAllocation[i].costCenterError = "Error";
 				}
-				if (!costAllocation[i].itemText || costAllocation[i].itemTextError === "Error") {
+				if (!costAllocation[i].itemText) {
 					bValidate = true;
 					costAllocation[i].itemTextError = "Error";
 				}
@@ -424,9 +425,9 @@ com.menabev.AP.util.POServices = {
 				return;
 			} else {
 				//COST ALLOCATION VALIDATION END
-				oSubmitData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
-				oSubmitData.invoiceHeaderDto.docStatus = "Created";
-				var balanceAmount = oSubmitData.invoiceHeaderDto.balanceAmount;
+				oSubmitData.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
+				oSubmitData.docStatus = "Created";
+				var balanceAmount = oSubmitData.balanceAmount;
 				if (this.nanValCheck(balanceAmount) !== 0) {
 					sap.m.MessageBox.error("Balance is not 0");
 					return;
@@ -441,7 +442,7 @@ com.menabev.AP.util.POServices = {
 
 				var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
 					sMethod = "POST";
-				this.saveSubmitServiceCall(oSubmitData, sMethod, sUrl);
+				this.saveSubmitServiceCall(oController, oSubmitData, sMethod, sUrl);
 			}
 		}
 

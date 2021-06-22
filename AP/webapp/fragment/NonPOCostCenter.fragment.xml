@@ -42,7 +42,7 @@
 			<items>
 				<ColumnListItem>
 					<cells>
-						<Input value="{oPOModel>glAccount}" filterSuggests="false"
+						<Input value="{oPOModel>glAccount}" filterSuggests="false" maxLength="10"
 							suggestionItems="{path:'oDropDownModel>/GLAccountResult', templateShareable : true }" suggestionItemSelected="glAccountCCSelected"
 							showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue" valueState="{oPOModel>glError}"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}">
@@ -59,7 +59,7 @@
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Text text="{oPOModel>baseRate}" textAlign="Center"/>
 						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
-							valueState="{oPOModel>costCenterError}" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+							valueState="{oPOModel>costCenterError}" change="errorHandlerselect" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 							<items>
 								<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
 							</items>
@@ -81,7 +81,7 @@
 						<Input value="{oPOModel>profitCentre}" tooltip="{oPOModel>profitCentre}" visible="false"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Input value="{oPOModel>itemText}" tooltip="{oPOModel>text}" valueState="{oPOModel>itemTextError}" change="onChangeText"
-							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+							editable="{oVisibilityModel>/NonPOInvoice/editable}" maxLength="50"/>
 						<Input value="{oPOModel>companyCode}" tooltip="{oPOModel>companyCode}" visible="false"
 							suggestionItems="{path:'companyCodeModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
 							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
