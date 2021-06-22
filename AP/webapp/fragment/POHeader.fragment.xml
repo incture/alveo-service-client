@@ -5,7 +5,7 @@
 				<Label text="{i18n>TRANSACTION}" required="true"></Label>
 				<Select forceSelection="false" width="80%" items="{StaticDataModel>/transactionType}" selectedKey="{oPOModel>/transactionType}"
 					valueStateText=" " valueState="{oMandatoryModel>/NonPO/transactionTypeState}" change="onTransactionChange"
-					enabled="{oVisiblityModel>/editable}" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+					 enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}" />
 				</Select>
 			</VBox>
@@ -136,7 +136,7 @@
 			</VBox>
 			<VBox>
 				<Label text="{i18n>BatchId}"/>
-				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{parts:['oVisibilityModel>/NonPOInvoice/editable','oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'" valueStateText=" "
+				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{parts:['oVisibilityModel>/NonPOInvoice/editable','oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
 				<layoutData>
 					<l:GridData linebreak="true"/>

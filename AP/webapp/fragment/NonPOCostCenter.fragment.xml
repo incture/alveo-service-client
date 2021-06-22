@@ -72,7 +72,7 @@
 						</Select>
 						<Input value="{oPOModel>internalOrderId}" tooltip="{oPOModel>internalOrderId}" visible="false"
 							editable="{oVisibilityModel>/NonPOInvoice/editable}" suggestionItems="{path:'internalOrderModel>/d/results', templateShareable : true}"
-							filterSuggests="false" showSuggestion="true" suggest="internalOrderSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+							filterSuggests="false" showSuggestion="true" suggest="internalOrderSuggest">
 							<suggestionItems>
 								<core:ListItem text="{path:'internalOrderModel>IntOrdNumber', formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
 									additionalText="{internalOrderModel>IntOrdDesc}"/>
@@ -84,7 +84,7 @@
 							editable="{oVisibilityModel>/NonPOInvoice/editable}" maxLength="50"/>
 						<Input value="{oPOModel>companyCode}" tooltip="{oPOModel>companyCode}" visible="false"
 							suggestionItems="{path:'companyCodeModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
-							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{companyCodeModel>CompCodeDesc}"
 									additionalText="{path : 'companyCodeModel>CompCode' , formatter:'com.menabev.AP.formatter.formatter.removeZero'}"/>
