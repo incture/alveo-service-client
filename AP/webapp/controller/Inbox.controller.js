@@ -284,8 +284,11 @@ sap.ui.define([
 				var oHeader = {
 					"Content-Type": "application/scim+json"
 				};
+				var busy = new sap.m.BusyDialog();
+				busy.open();
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, oHeader);
 				oServiceModel.attachRequestCompleted(function (oEvent) {
+					busy.close();
 					var data = oEvent.getSource().getData();
 					var arr = [];
 					if (data.message == "SUCCESS") {
@@ -318,7 +321,6 @@ sap.ui.define([
 						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
-						
 
 					}
 

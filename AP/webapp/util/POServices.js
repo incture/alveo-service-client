@@ -51,6 +51,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	vendorIdSelected: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
 			sVendorName = oEvent.getParameter("selectedItem").getProperty("additionalText");
@@ -61,6 +62,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onVendorNameChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorName = oEvent.getParameter("selectedItem").getProperty("text"),
 			sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText");
@@ -71,6 +73,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	vendorNameSelected: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText"),
 			sVendorName = oEvent.getParameter("selectedItem").getProperty("text");
@@ -81,18 +84,22 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onCompanyCodeChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		this.onHeaderChange(oEvent, oController, "isCompanyCodeChanged");
 	},
 
 	onInvRefChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		this.onHeaderChange(oEvent, oController, "isInvoiceRefChanged");
 	},
 
 	onCurrencyChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		this.onHeaderChange(oEvent, oController, "isCurrencyChanged");
 	},
 
 	onInvDateChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
 		if (!date) {
@@ -113,6 +120,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onBaseLineDateChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
 		if (!date) {
@@ -132,6 +140,7 @@ com.menabev.AP.util.POServices = {
 		this.onHeaderChange(oEvent, oController, "isBaselineDateChanged");
 	},
 	onPostingDateChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
 		if (!date) {
@@ -150,6 +159,7 @@ com.menabev.AP.util.POServices = {
 		oPOModel.setProperty("/postingDate", date);
 	},
 	onDueDateChange: function (oEvent, oController) {
+		oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var date = oEvent.getSource().getValue();
 		if (!date) {
@@ -190,17 +200,24 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onPaymentTermsChange: function (oEvent, oController) {
+		// oController.errorHandlerselect(oEvent);
 		this.onHeaderChange(oEvent, oController, "isPaymentTermsChanged");
 	},
 
-	onPaymentMethodChange: function (oEvent, oController) {},
-	onPaymentBlockChange: function (oEvent, oController) {},
+	onPaymentMethodChange: function (oEvent, oController) {
+		// oController.errorHandlerselect(oEvent);
+	},
+	onPaymentBlockChange: function (oEvent, oController) {
+		// oController.errorHandlerselect(oEvent);
+	},
 
 	onInvTypeChange: function (oEvent, oController) {
+		// oController.errorHandlerselect(oEvent);
 		this.onHeaderChange(oEvent, oController, "isInvoiceTypeChanged");
 	},
 
 	onTaxCodeChange: function (oEvent, oController) {
+		oController.errorHandlerselect(oEvent);
 		this.onHeaderChange(oEvent, oController, "isTaxCodeChanged");
 		this.onChangeHeaderTax(oEvent, oController);
 	},
@@ -415,8 +432,6 @@ com.menabev.AP.util.POServices = {
 	saveSubmitServiceCall: function (oController, oData, sMethod, sUrl, save, draft) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
-		var busy = new sap.m.BusyDialog();
-
 		var oServiceModel = new sap.ui.model.json.JSONModel();
 		var busy = new sap.m.BusyDialog();
 		var oHeader = {
@@ -429,14 +444,15 @@ com.menabev.AP.util.POServices = {
 		if (draft) {
 			oPayload.invoiceHeaderDto.docStatus = "Draft";
 		}
+		busy.open();
 		oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, sMethod, false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			busy.close();
 			var oData = oEvent.getSource().getData();
-			var ReqId = oData.invoiceHeaderDto.requestId;
-			oPOModel.setProperty("/requestId", ReqId);
 			var message = oData.responseStatus;
 			if (oData.status === 200) {
+				var ReqId = oData.invoiceHeaderDto.requestId;
+				oPOModel.setProperty("/", oData.invoiceHeaderDto);
 				sap.m.MessageBox.success(message, {
 					actions: [sap.m.MessageBox.Action.OK],
 					onClose: function (sAction) {

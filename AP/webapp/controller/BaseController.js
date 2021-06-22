@@ -176,8 +176,16 @@ sap.ui.define([
 		},
 
 		//Input error handler
-		errorHandler: function (oEvent) {
+		errorHandlerInput: function (oEvent) {
 			var input = oEvent.getParameter("value");
+			if (!input) {
+				oEvent.getSource().setValueState("Error");
+			} else {
+				oEvent.getSource().setValueState("None");
+			}
+		},
+		errorHandlerselect: function (oEvent) {
+			var input = oEvent.getSource().getSelectedkey();
 			if (!input) {
 				oEvent.getSource().setValueState("Error");
 			} else {
@@ -724,8 +732,8 @@ sap.ui.define([
 				mRejectModel.setProperty("/mRejectModel", "error");
 			}
 		},
-		
-			onPostComment: function () {
+
+		onPostComment: function () {
 			var nonPOInvoiceModel = this.oPOModel;
 			var oUserDetailModel = this.oUserDetailModel;
 			var comments = nonPOInvoiceModel.getProperty("/comments");
@@ -765,8 +773,8 @@ sap.ui.define([
 			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
 			var allowedTypes = ["pdf", "doc", "docx", "jpg", "jpeg", "png", "xlsx", "xls", "csv"];
 			var requestId = nonPOInvoiceModel.getProperty("/requestId");
-			if(!attachments){
-				attachments=[];
+			if (!attachments) {
+				attachments = [];
 			}
 			if (!requestId) {
 				requestId = this.createReqid();
@@ -915,7 +923,6 @@ sap.ui.define([
 
 			});
 		},
-
 
 		VendorIdSuggest: function (oEvent, oController) {
 			var oDataAPIModel = this.oDataAPIModel;
