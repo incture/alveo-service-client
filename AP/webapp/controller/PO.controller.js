@@ -40,6 +40,7 @@ sap.ui.define([
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
 				if (oEvent.getParameter("name") === "PO") {
+					that.oMandatoryModel.setProperty("/NonPO", {});
 					var oArgs = oEvent.getParameter("arguments"),
 						requestId = oArgs.id,
 						status = oArgs.status;

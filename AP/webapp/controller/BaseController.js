@@ -185,7 +185,7 @@ sap.ui.define([
 			}
 		},
 		errorHandlerselect: function (oEvent) {
-			var input = oEvent.getSource().getSelectedkey();
+			var input = oEvent.getSource().getSelectedKey();
 			if (!input) {
 				oEvent.getSource().setValueState("Error");
 			} else {

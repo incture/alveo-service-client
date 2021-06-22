@@ -14,7 +14,7 @@
 					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected" change="onVendorIdChange"
 					suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 					<suggestionItems>
-						<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
+						<core:ListItem key="{oDropDownModel>Supplier}" text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
 					</suggestionItems>
 				</Input>
 			</VBox>

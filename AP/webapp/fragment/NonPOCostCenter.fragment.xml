@@ -61,7 +61,7 @@
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Text text="{oPOModel>baseRate}" textAlign="Center"/>
 						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
-							valueState="{oPOModel>costCenterError}">
+							valueState="{oPOModel>costCenterError}" change="errorHandlerselect">
 							<items>
 								<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" 
 									additionalText="{oDropDownModel>CostCenterName}"/>

@@ -2,6 +2,7 @@ jQuery.sap.declare("com.menabev.AP.util.POServices");
 com.menabev.AP.util.POServices = {
 	onTransactionChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
+		oController.errorHandlerselect(oEvent);
 	},
 
 	VendorIdSuggest: function (oEvent, oController) {
@@ -51,7 +52,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	vendorIdSelected: function (oEvent, oController) {
-		oController.errorHandlerInput(oEvent);
+		// oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
 			sVendorName = oEvent.getParameter("selectedItem").getProperty("additionalText");
@@ -62,7 +63,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onVendorNameChange: function (oEvent, oController) {
-		oController.errorHandlerInput(oEvent);
+		// oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorName = oEvent.getParameter("selectedItem").getProperty("text"),
 			sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText");
@@ -73,7 +74,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	vendorNameSelected: function (oEvent, oController) {
-		oController.errorHandlerInput(oEvent);
+		// oController.errorHandlerInput(oEvent);
 		var oPOModel = oController.oPOModel;
 		var sVendorId = oEvent.getParameter("selectedItem").getProperty("additionalText"),
 			sVendorName = oEvent.getParameter("selectedItem").getProperty("text");
@@ -377,19 +378,19 @@ com.menabev.AP.util.POServices = {
 			var bflag = true;
 			for (var i = 0; i < costAllocation.length; i++) {
 				var bValidate = false;
-				if (!costAllocation[i].glAccount || costAllocation[i].glError === "Error") {
+				if (!costAllocation[i].glAccount) {
 					bValidate = true;
 					costAllocation[i].glError = "Error";
 				}
-				if (!costAllocation[i].netValue || costAllocation[i].amountError === "Error") {
+				if (!costAllocation[i].netValue) {
 					bValidate = true;
 					costAllocation[i].amountError = "Error";
 				}
-				if (!costAllocation[i].costCenter || costAllocation[i].costCenterError === "Error") {
+				if (!costAllocation[i].costCenter) {
 					bValidate = true;
 					costAllocation[i].costCenterError = "Error";
 				}
-				if (!costAllocation[i].itemText || costAllocation[i].itemTextError === "Error") {
+				if (!costAllocation[i].itemText) {
 					bValidate = true;
 					costAllocation[i].itemTextError = "Error";
 				}
@@ -405,9 +406,9 @@ com.menabev.AP.util.POServices = {
 				return;
 			} else {
 				//COST ALLOCATION VALIDATION END
-				oSubmitData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
-				oSubmitData.invoiceHeaderDto.docStatus = "Created";
-				var balanceAmount = oSubmitData.invoiceHeaderDto.balanceAmount;
+				oSubmitData.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
+				oSubmitData.docStatus = "Created";
+				var balanceAmount = oSubmitData.balanceAmount;
 				if (this.nanValCheck(balanceAmount) !== 0) {
 					sap.m.MessageBox.error("Balance is not 0");
 					return;
@@ -422,7 +423,7 @@ com.menabev.AP.util.POServices = {
 
 				var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
 					sMethod = "POST";
-				this.saveSubmitServiceCall(oSubmitData, sMethod, sUrl);
+				this.saveSubmitServiceCall(oController, oSubmitData, sMethod, sUrl);
 			}
 		}
 

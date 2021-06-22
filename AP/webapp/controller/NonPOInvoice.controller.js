@@ -70,6 +70,7 @@ sap.ui.define([
 			var oArgs = oEvent.getParameter("arguments"),
 				requestId = oArgs.id,
 				status = oArgs.status;
+			this.oMandatoryModel.setProperty("/NonPO", {});
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			if (requestId === "NEW") {
 				var initializeModelData = {
@@ -1165,8 +1166,8 @@ sap.ui.define([
 				userInputTaxAmount = (parseFloat(userInputTaxAmount)).toFixed(2);
 				oPOModel.setProperty("/taxValue", userInputTaxAmount);
 			}
-			this.calculateGrossAmount(oEvent, this);
-			this.calculateBalance(oEvent, this);
+			POServices.calculateGrossAmount(oEvent, this);
+			POServices.calculateBalance(oEvent, this);
 		},
 
 		//Vendor search valuehelp request
