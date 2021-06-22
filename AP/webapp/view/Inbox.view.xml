@@ -45,9 +45,9 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="F" label="{i18n>AssignedTo}">
 						<fb:control>
-							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/assignedTo}" items="{oUserDetailModel>/taskGroupUsers}"
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/assignedTo}" items="{oDropDownModel>/taskGroupUsers}"
 								showSecondaryValues="true">
-								<core:ListItem key="{oUserDetailModel>userId}" text="{oUserDetailModel>userId}" additionalText="{oUserDetailModel>role}"/>
+								<core:ListItem key="{oDropDownModel>userId}" text="{oDropDownModel>userId}" additionalText="{oDropDownModel>role}"/>
 							</MultiComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

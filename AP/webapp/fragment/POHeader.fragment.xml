@@ -80,7 +80,7 @@
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PaymentTerms}"/>
-				<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>/paymentTerms}" items="{oDropDownModel>/paymentTermResult}"
+				<Select forceSelection="false"  selectedKey="{oPOModel>/paymentTerms}" items="{oDropDownModel>/paymentTermResult}"
 					valueState="{oMandatoryModel>/NonPO/paymentTermsState}" width="80%" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
 					change="onPaymentTermsChange">
 					<items>
@@ -90,7 +90,7 @@
 			</VBox>
 			<VBox >
 				<Label text="{i18n>PaymentMethod}"/>
-				<Select forceSelection="false" showSecondaryValues="true" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}"
+				<Select forceSelection="false" selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentMethod}"
 					valueState="{oMandatoryModel>/NonPO/paymentMethodState}" items="{oDropDownModel>/paymentMethodResult}" width="80%"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentMethodChange">
 					<items>
@@ -103,7 +103,7 @@
 			</VBox>
 			<VBox>
 				<Label text="{i18n>PaymentBlock}"/>
-				<Select forceSelection="false" id="paymentBlockComBox" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/paymentBlockState}"
+				<Select forceSelection="false"   valueState="{oMandatoryModel>/NonPO/paymentBlockState}"
 					selectedKey="{nonPOInvoiceModel>/invoiceDetailUIDto/paymentBlock}" items="{oDropDownModel>/paymentBlockResult}" width="80%"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentBlockChange">
 					<items>
@@ -113,11 +113,11 @@
 			</VBox>
 			<VBox>
 				<Label text="{i18n>TaxCode}"/>
-				<Select forceSelection="false" id="taxCodeId" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/taxCodeState}"
-					selectedKey="{oPOModel>/headerTaxcode}" items="{oDropDownModel>/taxCodeResult}" width="80%" change="onTaxCodeChange"
+				<Select forceSelection="false"  showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/taxCodeState}"
+					selectedKey="{oPOModel>/taxCode}" items="{oDropDownModel>/taxCodeResult}" width="80%" change="onTaxCodeChange"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 					<items>
-						<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TaxCodeName}"/>
+						<core:ListItem key="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TxCode}" text="{oDropDownModel>TaxCodeName}"/>
 					</items>
 				</Select>
 			</VBox>
