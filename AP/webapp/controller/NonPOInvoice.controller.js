@@ -319,31 +319,6 @@ sap.ui.define([
 			var documentId = oPOModel.getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId);
 		},
-
-		//onChange Header level tax -----Updated
-		onChangeHeaderTax: function (oEvent) {
-			var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject();
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-				taxCode = taxDetails.TxCode,
-				taxPer = taxDetails.TaxRate;
-			oPOModel.setProperty("/taxPer", taxPer);
-			oPOModel.setProperty("/taxConditionType", taxDetails.TaxConditionType);
-			if (oPOModel.getProperty("/costAllocation")) {
-				var length = oPOModel.getProperty("/costAllocation").length;
-				for (var i = 0; i < length; i++) {
-					oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
-					oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPer);
-					oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxDetails.TaxConditionType);
-				}
-			}
-			if (taxDetails) {
-				oPOModel.setProperty("/vstate/taxCode", "None");
-			} else {
-				oPOModel.setProperty("/vstate/taxCode", "Error");
-			}
-			this.costAllocationTaxCalc();
-			sap.m.MessageToast.show("Tax Code\r" + taxCode + "\r is applied to all Cost Allocation line items");
-		},
 		//End of Header Filter function
 
 		//onChange CC item level tax
@@ -545,15 +520,15 @@ sap.ui.define([
 			this.oPOModel.setProperty("/costAllocation", arr);
 			var oPOModel = this.oPOModel;
 			var taxCode = oPOModel.getProperty("/taxCode"),
-				taxPer = oPOModel.getProperty("/taxPer"),
+				taxPercentage = oPOModel.getProperty("/taxPercentage"),
 				taxConditionType = oPOModel.getProperty("/taxConditionType");
 			for (var i = 0; i < arr.length; i++) {
 				oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
-				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPer);
+				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPercentage);
 				oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxConditionType);
 			}
 			oPOModel.refresh();
-			this.costAllocationTaxCalc();
+			POServices.costAllocationTaxCalc("", this);
 			this.previewTemplateDialog.close();
 			this.selectTemplateFragment.close();
 		},
@@ -573,7 +548,7 @@ sap.ui.define([
 					"glAccount": "",
 					"costCenter": "",
 					"taxCode": oPOModel.getData().taxCode,
-					"taxPer": oPOModel.getData().taxPer,
+					"taxPer": oPOModel.getData().taxPercentage,
 					"taxConditionType": oPOModel.getData().taxConditionType,
 					"internalOrderId": "",
 					"materialDesc": "",
@@ -625,46 +600,7 @@ sap.ui.define([
 			}
 			var sDecValue = parseFloat(amountVal).toFixed(2);
 			oPOModel.setProperty(sPath + "/netValue", sDecValue);
-			this.costAllocationTaxCalc();
-		},
-
-		//function costAllocationTaxCalc is used to calculate tax in cost allocation table ----Updated
-		costAllocationTaxCalc: function () {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-				that = this;
-			var totalTax = 0,
-				totalBaseRate = 0;
-			if (oPOModel.getProperty("/costAllocation")) {
-				var length = oPOModel.getProperty("/costAllocation").length;
-				for (var i = 0; i < length; i++) {
-					//Tax Calculations
-					var taxPer = oPOModel.getProperty("/costAllocation/" + i + "/taxPer"),
-						netValue = oPOModel.getProperty("/costAllocation/" + i + "/netValue");
-
-					var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxPer) / 100));
-					var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxPer)) / 100;
-					totalTax += Number(taxValue.toFixed(2));
-					oPOModel.setProperty("/costAllocation/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(2));
-					oPOModel.setProperty("/costAllocation/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(2));
-
-					//End of Tax Calulations
-					if (baseRate && oPOModel.getProperty("/costAllocation/" + i +
-							"/crDbIndicator") === "H") {
-						totalBaseRate += that.nanValCheck(oPOModel.getProperty("/costAllocation/" + i + "/baseRate"));
-
-					} else if (baseRate && oPOModel.getProperty("/costAllocation/" + i +
-							"/crDbIndicator") === "S") {
-						totalBaseRate -= that.nanValCheck(oPOModel.getProperty("/costAllocation/" + i + "/baseRate"));
-					}
-				}
-				totalBaseRate = that.nanValCheck(totalBaseRate).toFixed(2);
-				totalTax = this.nanValCheck(totalTax).toFixed(2);
-				oPOModel.setProperty("/totalBaseRate", totalBaseRate);
-				oPOModel.setProperty("/taxAmount", totalTax);
-				this.calculateGrossAmount();
-				this.calculateBalance();
-				oPOModel.refresh();
-			}
+			POServices.costAllocationTaxCalc(oEvent, this);
 		},
 
 		//Support function to validate Amount field in Cost Allocation table based on the Debit/Credit changed
@@ -1317,28 +1253,6 @@ sap.ui.define([
 
 		onCloseVendorValueHelp: function () {
 			this.vendorValueHelp.close();
-		},
-
-		calculateBalance: function () {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-				that = this,
-				invAmt = oPOModel.getProperty("/invoiceTotal"),
-				grossAmount = oPOModel.getProperty("/grossAmount");
-			var balance = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
-			balance = that.nanValCheck(balance).toFixed(2);
-			oPOModel.setProperty("/balance", balance);
-			oPOModel.refresh();
-		},
-
-		calculateGrossAmount: function () {
-			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-				that = this,
-				totalBaseRate = oPOModel.getProperty("/totalBaseRate"),
-				userInputTaxAmount = oPOModel.getProperty("/taxValue");
-			var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
-			grossAmount = that.nanValCheck(grossAmount).toFixed(2);
-			oPOModel.setProperty("/grossAmount", grossAmount);
-			oPOModel.refresh();
 		},
 
 	});

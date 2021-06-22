@@ -64,7 +64,7 @@ sap.ui.define([
 				var oTaskInboxModel = this.oTaskInboxModel;
 				var oServiceModel = new sap.ui.model.json.JSONModel();
 				var oUserDetailModel = this.oUserDetailModel;
-				var sUrl = "/menabevdev/codesAndtexts/get/uuId=/statusCode=/type=/language=";
+				var sUrl = "/menabevdev/codesAndtexts/get/uuId=/statusCode=/type=IES/language=";
 				var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 				var userMail = oUserDetailModel.getProperty("/loggedInUserMail");
 				var oHeader = {

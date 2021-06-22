@@ -29,12 +29,12 @@
 				</Input>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>COMPANYCODE}"/>
+				<Label text="{i18n>COMPANYCODE}" required="true"/>
 				<Input value="{oPOModel>/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/companyCodeState}" width="80%"
 					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCompanyCodeChange"/>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>CURRENCY}"/>
+				<Label text="{i18n>CURRENCY}" required="true"/>
 				<Input value="{oPOModel>/currency}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/currencyState}" width="80%"
 					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCurrencyChange"/>
 				<layoutData>
@@ -43,17 +43,17 @@
 			</VBox>
 			<VBox>
 				<Label required="true" text="{i18n>InvoiceNo}"/>
-				<Input value="{oPOModel>/invoiceRefNum}" width="80%" change="onInvRefChange" maxLength="16"
-					valueState="{oMandatoryModel>/NonPO/invoiceRefNumState}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+				<Input value="{oPOModel>/extInvNum}" width="80%" change="onInvRefChange" maxLength="16"
+					valueState="{oMandatoryModel>/NonPO/extInvNumState}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox id="idDate">
 				<Label text="{i18n>InvoiceDate}" required="true"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
-					value="{ path:'oPOModel>/documentDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
-					valueState="{oMandatoryModel>/NonPO/documentDateState}" change="onInvDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					value="{ path:'oPOModel>/invoiceDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
+					valueState="{oMandatoryModel>/NonPO/invoiceDateState}" change="onInvDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
 			<VBox >
-				<Label text="{i18n>BASELINEDATE}" required="true"/>
+				<Label text="{i18n>BASELINEDATE}"/>
 				<DatePicker valueFormat="yyyy-MM-dd" displayFormat="MM/dd/YYYY" width="80%"
 					value="{ path:'oPOModel>/baselineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}"
 					valueState="{oMandatoryModel>/NonPO/baselineDateState}" change="onBaseLineDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
@@ -112,7 +112,7 @@
 				</Select>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>TaxCode}"/>
+				<Label text="{i18n>TaxCode}" required="true"/>
 				<Select forceSelection="false"  showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/taxCodeState}"
 					selectedKey="{oPOModel>/taxCode}" items="{oDropDownModel>/taxCodeResult}" width="80%" change="onTaxCodeChange"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
@@ -127,7 +127,7 @@
 					valueState="{oMandatoryModel>/NonPO/unplannedCostState}"/>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>INVOICETYPE}"/>
+				<Label text="{i18n>INVOICETYPE}" required="true"/>
 				<Select forceSelection="false" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/invoiceTypeState}"
 					selectedKey="{oPOModel>/invoiceType}" items="{StaticDataModel>/invoiceType}" width="80%" change="onChangeInvoiceType"
 					enabled="{oVisibilityModel>/NonPOInvoice/editable}">

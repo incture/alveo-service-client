@@ -97,6 +97,7 @@ com.menabev.AP.util.POServices = {
 		var date = oEvent.getSource().getValue();
 		if (!date) {
 			oEvent.getSource().setValue(null);
+			return;
 		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
@@ -107,7 +108,7 @@ com.menabev.AP.util.POServices = {
 		} else {
 			date = dateVal.getTime();
 		}
-		oPOModel.setProperty("/documentDate", date);
+		oPOModel.setProperty("/invoiceDate", date);
 		this.onHeaderChange(oEvent, oController, "isInvoiceDateChanged");
 	},
 
@@ -116,6 +117,7 @@ com.menabev.AP.util.POServices = {
 		var date = oEvent.getSource().getValue();
 		if (!date) {
 			oEvent.getSource().setValue(null);
+			return;
 		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
@@ -134,6 +136,7 @@ com.menabev.AP.util.POServices = {
 		var date = oEvent.getSource().getValue();
 		if (!date) {
 			oEvent.getSource().setValue(null);
+			return;
 		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
@@ -151,6 +154,7 @@ com.menabev.AP.util.POServices = {
 		var date = oEvent.getSource().getValue();
 		if (!date) {
 			oEvent.getSource().setValue(null);
+			return;
 		}
 		var dateVal = new Date(date);
 		var day = dateVal.getDate();
@@ -198,6 +202,7 @@ com.menabev.AP.util.POServices = {
 
 	onTaxCodeChange: function (oEvent, oController) {
 		this.onHeaderChange(oEvent, oController, "isTaxCodeChanged");
+		this.onChangeHeaderTax(oEvent, oController);
 	},
 
 	onTaxAmtChange: function (oEvent, oController) {
@@ -217,7 +222,7 @@ com.menabev.AP.util.POServices = {
 		} else {
 			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "None");
 			invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
-			oPOModel.setProperty("/invoiceAmount", invoiceAmt);
+			oPOModel.setProperty("/invoiceTotal", invoiceAmt);
 		}
 		this.calculateBalance(oEvent, oController);
 	},
@@ -227,9 +232,9 @@ com.menabev.AP.util.POServices = {
 			that = this,
 			invAmt = oPOModel.getProperty("/invoiceTotal"),
 			grossAmount = oPOModel.getProperty("/grossAmount");
-		var balance = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
-		balance = that.nanValCheck(balance).toFixed(2);
-		oPOModel.setProperty("/balance", balance);
+		var balanceAmount = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
+		balanceAmount = that.nanValCheck(balanceAmount).toFixed(2);
+		oPOModel.setProperty("/balanceAmount", balanceAmount);
 		oPOModel.refresh();
 		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
 	},
@@ -269,14 +274,14 @@ com.menabev.AP.util.POServices = {
 			"requestID": "APA-210609-000001",
 			"vendorID": oPOModel.getProperty("/vendorId"),
 			"companyCode": oPOModel.getProperty("/companyCode"),
-			"invoiceReference": oPOModel.getProperty("/invoiceRefNum"),
-			"invoiceAmount": oPOModel.getProperty("/invoiceAmount"),
+			"invoiceReference": oPOModel.getProperty("/extInvNum"),
+			"invoiceTotal": oPOModel.getProperty("/invoiceTotal"),
 			"grossAmount": oPOModel.getProperty("/grossAmount"),
 			"taxAmount": oPOModel.getProperty("/taxAmount"),
 			"balanceAmount": oPOModel.getProperty("/balanceAmount"),
 			"taxCode": oPOModel.getProperty("/taxCode"),
 			"currency": oPOModel.getProperty("/currency"),
-			"invoiceDate": oPOModel.getProperty("/documentDate"),
+			"invoiceDate": oPOModel.getProperty("/invoiceDate"),
 			"postingDate": oPOModel.getProperty("/postingDate"),
 			"baselineDate": oPOModel.getProperty("/baselineDate"),
 			"dueDate": oPOModel.getProperty("/dueDate"),
@@ -385,8 +390,8 @@ com.menabev.AP.util.POServices = {
 				//COST ALLOCATION VALIDATION END
 				oSubmitData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				oSubmitData.invoiceHeaderDto.docStatus = "Created";
-				var balance = oSubmitData.invoiceHeaderDto.balance;
-				if (this.nanValCheck(balance) !== 0) {
+				var balanceAmount = oSubmitData.invoiceHeaderDto.balanceAmount;
+				if (this.nanValCheck(balanceAmount) !== 0) {
 					sap.m.MessageBox.error("Balance is not 0");
 					return;
 				}
@@ -428,9 +433,9 @@ com.menabev.AP.util.POServices = {
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			busy.close();
 			var oData = oEvent.getSource().getData();
-			var ReqId = oData.requestId;
+			var ReqId = oData.invoiceHeaderDto.requestId;
 			oPOModel.setProperty("/requestId", ReqId);
-			var message;
+			var message = oData.responseStatus;
 			if (oData.status === 200) {
 				sap.m.MessageBox.success(message, {
 					actions: [sap.m.MessageBox.Action.OK],
@@ -458,6 +463,81 @@ com.menabev.AP.util.POServices = {
 				// this.errorMsg(errorMsg);
 			}
 		});
+	},
+
+	//onChange Header level tax
+	onChangeHeaderTax: function (oEvent, oController) {
+		var taxDetails = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject();
+		var oPOModel = oController.oPOModel,
+			taxCode = taxDetails.TxCode,
+			taxPercentage = taxDetails.TaxRate;
+		oPOModel.setProperty("/taxPercentage", taxPercentage);
+		oPOModel.setProperty("/taxConditionType", taxDetails.TaxConditionType);
+		if (oPOModel.getProperty("/costAllocation")) {
+			var length = oPOModel.getProperty("/costAllocation").length;
+			for (var i = 0; i < length; i++) {
+				oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
+				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPercentage);
+				oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxDetails.TaxConditionType);
+			}
+		}
+		if (taxDetails) {
+			oController.oMandatoryModel.setProperty("/NonPO/taxCodeState", "None");
+		} else {
+			oController.oMandatoryModel.setProperty("/NonPO/taxCodeState", "Error");
+		}
+		this.costAllocationTaxCalc(oEvent, oController);
+		sap.m.MessageToast.show("Tax Code\r" + taxCode + "\r is applied to all Cost Allocation line items");
+	},
+
+	//function costAllocationTaxCalc is used to calculate tax in cost allocation table
+	costAllocationTaxCalc: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel,
+			that = this;
+		var totalTax = 0,
+			totalBaseRate = 0;
+		if (oPOModel.getProperty("/costAllocation")) {
+			var length = oPOModel.getProperty("/costAllocation").length;
+			for (var i = 0; i < length; i++) {
+				//Tax Calculations
+				var taxPer = oPOModel.getProperty("/costAllocation/" + i + "/taxPer"),
+					netValue = oPOModel.getProperty("/costAllocation/" + i + "/netValue");
+
+				var baseRate = that.nanValCheck(netValue) / (1 + (that.nanValCheck(taxPer) / 100));
+				var taxValue = (that.nanValCheck(baseRate) * that.nanValCheck(taxPer)) / 100;
+				totalTax += Number(taxValue.toFixed(2));
+				oPOModel.setProperty("/costAllocation/" + i + "/taxValue", that.nanValCheck(taxValue).toFixed(2));
+				oPOModel.setProperty("/costAllocation/" + i + "/baseRate", that.nanValCheck(baseRate).toFixed(2));
+
+				//End of Tax Calulations
+				if (baseRate && oPOModel.getProperty("/costAllocation/" + i +
+						"/crDbIndicator") === "H") {
+					totalBaseRate += that.nanValCheck(oPOModel.getProperty("/costAllocation/" + i + "/baseRate"));
+
+				} else if (baseRate && oPOModel.getProperty("/costAllocation/" + i +
+						"/crDbIndicator") === "S") {
+					totalBaseRate -= that.nanValCheck(oPOModel.getProperty("/costAllocation/" + i + "/baseRate"));
+				}
+			}
+			totalBaseRate = that.nanValCheck(totalBaseRate).toFixed(2);
+			totalTax = this.nanValCheck(totalTax).toFixed(2);
+			oPOModel.setProperty("/totalBaseRate", totalBaseRate);
+			oPOModel.setProperty("/taxAmount", totalTax);
+			this.calculateGrossAmount();
+			this.calculateBalance();
+			oPOModel.refresh();
+		}
+	},
+
+	calculateGrossAmount: function () {
+		var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+			that = this,
+			totalBaseRate = oPOModel.getProperty("/totalBaseRate"),
+			userInputTaxAmount = oPOModel.getProperty("/taxValue");
+		var grossAmount = that.nanValCheck(totalBaseRate) + that.nanValCheck(userInputTaxAmount);
+		grossAmount = that.nanValCheck(grossAmount).toFixed(2);
+		oPOModel.setProperty("/grossAmount", grossAmount);
+		oPOModel.refresh();
 	},
 
 };
