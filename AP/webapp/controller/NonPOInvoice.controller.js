@@ -254,9 +254,9 @@ sap.ui.define([
 			POServices.getPONonPOData(oEvent, this);
 		},
 
-		VendorIdSuggest: function (oEvent) {
-			POServices.VendorIdSuggest(oEvent, this);
-		},
+		// VendorIdSuggest: function (oEvent) {
+		// 	POServices.VendorIdSuggest(oEvent, this);
+		// },
 
 		onTransactionChange: function (oEvent) {
 			POServices.onTransactionChange(oEvent, this);
@@ -1156,17 +1156,17 @@ sap.ui.define([
 		},
 
 		onChangeUserInputTaxAmount: function (oEvent) {
-			var nonPOInvoiceModel = this.oPOModel,
+			var oPOModel = this.oPOModel,
 				userInputTaxAmount = oEvent.getParameter("value");
 			if (!userInputTaxAmount) {
-				nonPOInvoiceModel.setProperty("/vstate/taxValue", "Error");
+				this.oMandatoryModel.setProperty("NonPO/taxValueState", "Error");
 			} else {
-				nonPOInvoiceModel.setProperty("/vstate/taxValue", "None");
+				this.oMandatoryModel.setProperty("NonPO/taxValueState", "None");
 				userInputTaxAmount = (parseFloat(userInputTaxAmount)).toFixed(2);
-				nonPOInvoiceModel.setProperty("/taxValue", userInputTaxAmount);
+				oPOModel.setProperty("/taxValue", userInputTaxAmount);
 			}
-			this.calculateGrossAmount();
-			this.calculateBalance();
+			this.calculateGrossAmount(oEvent, this);
+			this.calculateBalance(oEvent, this);
 		},
 
 		//Vendor search valuehelp request

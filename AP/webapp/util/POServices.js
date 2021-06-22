@@ -539,14 +539,14 @@ com.menabev.AP.util.POServices = {
 			totalTax = this.nanValCheck(totalTax).toFixed(2);
 			oPOModel.setProperty("/totalBaseRate", totalBaseRate);
 			oPOModel.setProperty("/taxAmount", totalTax);
-			this.calculateGrossAmount();
-			this.calculateBalance();
+			this.calculateGrossAmount(oEvent, oController);
+			this.calculateBalance(oEvent, oController);
 			oPOModel.refresh();
 		}
 	},
 
-	calculateGrossAmount: function () {
-		var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+	calculateGrossAmount: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel,
 			that = this,
 			totalBaseRate = oPOModel.getProperty("/totalBaseRate"),
 			userInputTaxAmount = oPOModel.getProperty("/taxValue");
