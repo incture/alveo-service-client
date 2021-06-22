@@ -89,7 +89,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			query = query + "extInvNum like '"+dto.getInvoiceReference()+"' and ";
 		}
 		if(!ServiceUtil.isEmpty(dto.getInvoiceDate())){
-			query = query + "invoiceDate like '"+dto.getInvoiceDate()+"' and ";
+			query = query + "invoiceDate ="+dto.getInvoiceDate()+" and ";
 		}
 		if(!ServiceUtil.isEmpty(dto.getInvoiceAmount())){
 			query = query + "grossAmount like '"+dto.getInvoiceAmount()+"' and ";

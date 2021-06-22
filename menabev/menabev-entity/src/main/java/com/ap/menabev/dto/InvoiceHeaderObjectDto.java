@@ -15,7 +15,7 @@ public class InvoiceHeaderObjectDto {
 
 	private String companyCode;
 
-	private String invoiceDate;
+	private Long invoiceDate;
 
 	private String invoiceReference;
 
