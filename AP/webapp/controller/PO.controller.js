@@ -79,9 +79,9 @@ sap.ui.define([
 			POServices.getPONonPOData(oEvent, this);
 		},
 
-		VendorIdSuggest: function (oEvent) {
-			POServices.VendorIdSuggest(oEvent, this);
-		},
+		// VendorIdSuggest: function (oEvent) {
+		// 	POServices.VendorIdSuggest(oEvent, this);
+		// },
 
 		onTransactionChange: function (oEvent) {
 			POServices.onTransactionChange(oEvent, this);
