@@ -270,6 +270,9 @@ com.menabev.AP.util.POServices = {
 		var oPOModel = oController.oPOModel;
 		var changeIndicator = oPOModel.getProperty("/changeIndicator");
 		if (!changeIndicator) {
+			oPOModel.setProperty("/changeIndicator", {});
+		}
+		if (!changeIndicator) {
 			changeIndicator = {
 				"isHeaderChanged": null,
 				"isVendoIdChanged": true,
@@ -321,6 +324,22 @@ com.menabev.AP.util.POServices = {
 			var oData = oEvent.getSource().getData();
 			changeIndicator = oData.changeIndicator;
 			oPOModel.setProperty("/changeIndicator", changeIndicator);
+			oPOModel.setProperty("/vendorId", oData.vendorID);
+			oPOModel.setProperty("/companyCode", oData.companyCode);
+			oPOModel.setProperty("/extInvNum", oData.invoiceReference);
+			oPOModel.setProperty("/invoiceTotal", oData.invoiceTotal);
+			oPOModel.setProperty("/grossAmount", oData.grossAmount);
+			oPOModel.setProperty("/taxAmount", oData.taxAmount);
+			oPOModel.setProperty("/balanceAmount", oData.balanceAmount);
+			oPOModel.setProperty("/taxCode", oData.taxCode);
+			oPOModel.setProperty("/currency", oData.currency);
+			oPOModel.setProperty("/invoiceDate", oData.invoiceDate);
+			oPOModel.setProperty("/postingDate", oData.postingDate);
+			oPOModel.setProperty("/baselineDate", oData.baselineDate);
+			oPOModel.setProperty("/dueDate", oData.dueDate);
+			oPOModel.setProperty("/paymentTerms", oData.paymentTerms);
+			oPOModel.setProperty("/invoiceStatus", oData.invoiceStatus);
+			oPOModel.setProperty("/invoiceType", oData.invoiceType);
 			if (oData.messages && oData.messages.messageType === "E") {
 				sap.m.MessageBox.success(oData.messages.messageText, {
 					actions: [sap.m.MessageBox.Action.OK]
@@ -457,7 +476,7 @@ com.menabev.AP.util.POServices = {
 					actions: [sap.m.MessageBox.Action.OK],
 					onClose: function (sAction) {
 						if (!save) {
-							that.router.navTo("Inbox");
+							oController.router.navTo("Inbox");
 						}
 					}
 				});

@@ -1,7 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<ScrollContainer vertical="true" horizontal="false">
-		<Table id="idNonPo" class="MNBTable" items="{oPOModel>/costAllocation}"
-			sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+		<Table id="idNonPo" class="MNBTable" items="{oPOModel>/costAllocation}" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
 			<columns>
 				<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
 					<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
@@ -44,16 +43,15 @@
 				<ColumnListItem>
 					<cells>
 						<Input value="{oPOModel>glAccount}" filterSuggests="false"
-							suggestionItems="{path:'oDropDownModel>/GLAccountResult', templateShareable : true }"
-							suggestionItemSelected="glAccountCCSelected" showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue"
-							valueState="{oPOModel>glError}">
+							suggestionItems="{path:'oDropDownModel>/GLAccountResult', templateShareable : true }" suggestionItemSelected="glAccountCCSelected"
+							showSuggestion="true" suggest="glAccountSuggest" change="getGLaccountValue" valueState="{oPOModel>glError}"
+							editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{oDropDownModel>GlAccnt}" additionalText="{oDropDownModel>GlAccountName}"/>
 							</suggestionItems>
 						</Input>
 						<Text text="{oPOModel>materialDesc}"/>
-						<Select selectedKey="{oPOModel>crDbIndicator}" change="amountCal"
-							editable="{oVisibilityModel>/NonPOInvoice/editable}">
+						<Select selectedKey="{oPOModel>crDbIndicator}" change="amountCal" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 							<core:Item text="Debit" key="H"/>
 							<core:Item text="Credit" key="S"/>
 						</Select>
@@ -61,21 +59,20 @@
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Text text="{oPOModel>baseRate}" textAlign="Center"/>
 						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
-							valueState="{oPOModel>costCenterError}">
+							valueState="{oPOModel>costCenterError}" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 							<items>
-								<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" 
-									additionalText="{oDropDownModel>CostCenterName}"/>
+								<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
 							</items>
 						</Select>
 						<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
-							change="onChangeTax">
+							change="onChangeTax" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 							<items>
 								<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TaxCodeName}"/>
 							</items>
 						</Select>
 						<Input value="{oPOModel>internalOrderId}" tooltip="{oPOModel>internalOrderId}" visible="false"
-							suggestionItems="{path:'internalOrderModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
-							suggest="internalOrderSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+							editable="{oVisibilityModel>/NonPOInvoice/editable}" suggestionItems="{path:'internalOrderModel>/d/results', templateShareable : true}"
+							filterSuggests="false" showSuggestion="true" suggest="internalOrderSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{path:'internalOrderModel>IntOrdNumber', formatter:'com.menabev.AP.formatter.formatter.removeZero'}"
 									additionalText="{internalOrderModel>IntOrdDesc}"/>
@@ -87,7 +84,7 @@
 							editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 						<Input value="{oPOModel>companyCode}" tooltip="{oPOModel>companyCode}" visible="false"
 							suggestionItems="{path:'companyCodeModel>/d/results', templateShareable : true}" filterSuggests="false" showSuggestion="true"
-							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}">
+							suggest="companyCodeSuggest" editable="{oVisibilityModel>/NonPOInvoice/editable}" editable="{oVisibilityModel>/NonPOInvoice/editable}">
 							<suggestionItems>
 								<core:ListItem text="{companyCodeModel>CompCodeDesc}"
 									additionalText="{path : 'companyCodeModel>CompCode' , formatter:'com.menabev.AP.formatter.formatter.removeZero'}"/>

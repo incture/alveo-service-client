@@ -8,8 +8,7 @@
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>Vendor Id}">
 						<fb:control>
 							<Input filterSuggests="false" value="{oTaskInboxModel>/filterParams/vendorId}" showSuggestion="true" suggest="VendorIdSuggest"
-								suggestionItemSelected="vendorIdSelected" change="onVendorIdChange" suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10"
-								editable="{oVisibilityModel>/NonPOInvoice/editable}">
+								suggestionItemSelected="vendorIdSelected" change="onVendorIdChange" suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10">
 								<suggestionItems>
 									<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
 								</suggestionItems>
@@ -19,7 +18,8 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="B" label="{i18n>inboxRequestID}">
 						<fb:control>
-							<MaskInput mask="CCC-CCCCCCCC-CCCCCCCC" placeholderSymbol="_" placeholder="Enter task number" value="{oTaskInboxModel>/filterParams/requestId}">
+							<MaskInput mask="CCC-CCCCCCCC-CCCCCCCC" placeholderSymbol="_" placeholder="Enter task number"
+								value="{oTaskInboxModel>/filterParams/requestId}">
 								<rules>
 									<MaskInputRule maskFormatSymbol="C" regex="[A-Z0-9]"/>
 								</rules>
@@ -45,8 +45,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="F" label="{i18n>AssignedTo}">
 						<fb:control>
-							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/assignedTo}" items="{oDropDownModel>/taskGroupUsers}"
-								showSecondaryValues="true">
+							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/assignedTo}" items="{oDropDownModel>/taskGroupUsers}" showSecondaryValues="true">
 								<core:ListItem key="{oDropDownModel>userId}" text="{oDropDownModel>userId}" additionalText="{oDropDownModel>role}"/>
 							</MultiComboBox>
 						</fb:control>
@@ -136,7 +135,7 @@
 								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" >
+								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
@@ -157,8 +156,10 @@
 									<Label text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} " wrapping="true"/>
 									<Label text="{oTaskInboxModel>validationStatus}" wrapping="true"/>
 									<Label text="{oTaskInboxModel>status}" wrapping="true"/>
-									<Label text="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}" tooltip="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
-									<Label text="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}" tooltip="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}"
+										tooltip="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}"
+										tooltip="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
 									<HBox>
 										<core:Icon src="sap-icon://locked" tooltip="claim" press="onClaimRelease"
 											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setClaimVisible'}"/>

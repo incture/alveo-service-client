@@ -739,7 +739,7 @@ sap.ui.define([
 			var comments = nonPOInvoiceModel.getProperty("/comments");
 			var userComment = nonPOInvoiceModel.getProperty("/commments");
 			if (!userComment) {
-				this.resourceBundle.getText("FILL_COMMENT");
+				this.getResourceBundle.getText("FILL_COMMENT");
 				return;
 			}
 			var obj = {
@@ -767,29 +767,29 @@ sap.ui.define([
 			var that = this;
 			var oUserDetailModel = this.oUserDetailModel;
 			var nonPOInvoiceModel = this.oPOModel;
-			var attachments = nonPOInvoiceModel.getProperty("/attachments");
+			var attachment = nonPOInvoiceModel.getProperty("/attachments");
 			var upfile = oEvent.getParameters().files[0];
 			var upFileName = upfile.name;
 			var fileType = upfile.name.split(".")[upfile.name.split(".").length - 1];
 			var allowedTypes = ["pdf", "doc", "docx", "jpg", "jpeg", "png", "xlsx", "xls", "csv"];
 			var requestId = nonPOInvoiceModel.getProperty("/requestId");
-			if (!attachments) {
-				attachments = [];
+			if (!attachment) {
+				attachment = [];
 			}
 			if (!requestId) {
 				requestId = this.createReqid();
 				nonPOInvoiceModel.setProperty("/requestId", requestId);
 			}
 			if (!allowedTypes.includes(fileType.toLowerCase())) {
-				MessageBox.error(that.resourceBundle.getText("msgFileType"));
+				MessageBox.error(that.getResourceBundle.getText("msgFileType"));
 				return;
 			}
 			if (upfile.size > 2097152) {
-				MessageBox.error(that.resourceBundle.getText("msgFileSize"));
+				MessageBox.error(that.getResourceBundle.getText("msgFileSize"));
 				return;
 			}
 			if (upFileName.length > 60) {
-				MessageBox.error(that.resourceBundle.getText("msgFileName"));
+				MessageBox.error(that.getResourceBundle.getText("msgFileName"));
 				return;
 			}
 			var sUrl = "/menabevdev/document/upload";
@@ -827,7 +827,7 @@ sap.ui.define([
 						"fileType": "",
 						"requestId": requestId
 					};
-					attachments.push(obj);
+					attachment.push(obj);
 					nonPOInvoiceModel.setProperty("/attachments", attachments);
 					MessageBox.success(success.response.message, {
 						actions: [MessageBox.Action.OK],
