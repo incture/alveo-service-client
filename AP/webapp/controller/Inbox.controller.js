@@ -306,9 +306,9 @@ sap.ui.define([
 						if (data.draftList) {
 							oTaskInboxModel.setProperty("/draftTask", data.draftList);
 						}
-						that.pagination(data.totalCount, "openTaskPagination", 1);
+						that.pagination(data.totalCount, "openTaskPagination", pageNo);
 						// that.pagination(data.body.countMyTask, "myTaskPagination", 1);
-						that.pagination(data.draftCount, "draftedTaskPagination", 1);
+						that.pagination(data.draftCount, "draftedTaskPagination", pageNo);
 					} else {
 						sap.m.MessageBox.information(data.message, {
 							styleClass: "sapUiSizeCompact",
@@ -318,6 +318,7 @@ sap.ui.define([
 						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
+						
 
 					}
 

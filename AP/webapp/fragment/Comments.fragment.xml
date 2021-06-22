@@ -1,9 +1,9 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons">
-	<TextArea value="{nonPOInvoiceModel>/commments}" maxLength="100" cols="150" placeholder="Enter your comments"></TextArea>
+	<TextArea value="{oPOModel>/commments}" maxLength="100" cols="150" placeholder="Enter your comments"></TextArea>
 	<Button text="POST" press="onPostComment"></Button>
 	<comm:Timeline growingThreshold="20" showFilterBar="false" sortOldestFirst="false"
-		content="{oPOModel>/comments}">
-		<comm:TimelineItem id="idTemplateItem" dateTime="{nonPOInvoiceModel>createdAt}" title="{nonPOInvoiceModel>user}" userNameClickable="false"
-			text="{nonPOInvoiceModel>comment}" userName="{nonPOInvoiceModel>createdBy}" icon="sap-icon://comment"></comm:TimelineItem>
+		content="{oPOModel>/comment}">
+		<comm:TimelineItem id="idTemplateItem" dateTime="{oPOModel>createdAt}" title="{oPOModel>user}" userNameClickable="false"
+			text="{oPOModel>comment}" userName="{oPOModel>createdBy}" icon="sap-icon://comment"></comm:TimelineItem>
 	</comm:Timeline>
 </core:FragmentDefinition>
