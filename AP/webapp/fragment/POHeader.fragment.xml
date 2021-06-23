@@ -5,8 +5,8 @@
 				<Label text="{i18n>TRANSACTION}" required="true"></Label>
 				<Select forceSelection="false" width="80%" items="{StaticDataModel>/transactionType}" selectedKey="{oPOModel>/transactionType}"
 					valueStateText=" " valueState="{oMandatoryModel>/NonPO/transactionTypeState}" change="onTransactionChange"
-					 enabled="{oVisibilityModel>/NonPOInvoice/editable}">
-					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}" />
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 				</Select>
 			</VBox>
 			<VBox>
@@ -61,11 +61,14 @@
 					value="{ path:'oPOModel>/baseLineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/baseLineDateState}" change="onBaseLineDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
-			<VBox >
+			<VBox>
 				<Label text="{i18n>PostingDate}" required="true"/>
 				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
 					value="{ path:'oPOModel>/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/postingDateState}" change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
 			</VBox>
 			<VBox >
 				<Label text="{i18n>DueDate}"/>
@@ -92,9 +95,6 @@
 						<core:ListItem key="{oDropDownModel>PmntMeth}" text="{oDropDownModel>PmntMethName}"/>
 					</items>
 				</Select>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>PaymentBlock}"/>
@@ -105,6 +105,9 @@
 						<core:ListItem key="{oDropDownModel>PmntBlk}" text="{oDropDownModel>PmntBlkDesc}"/>
 					</items>
 				</Select>
+				<layoutData>
+					<l:GridData linebreak="true"/>
+				</layoutData>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>TaxCode}" required="true"/>
@@ -130,13 +133,10 @@
 						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 					</items>
 				</Select>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
 			</VBox>
-			<VBox>
+			<VBox visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}">
 				<Label text="{i18n>BatchId}"/>
-				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{parts:['oVisibilityModel>/NonPOInvoice/editable','oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}" valueStateText=" "
+				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
 				<layoutData>
 					<l:GridData linebreak="true"/>

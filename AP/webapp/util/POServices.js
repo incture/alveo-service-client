@@ -296,7 +296,7 @@ com.menabev.AP.util.POServices = {
 			"vendorID": oPOModel.getProperty("/vendorId"),
 			"companyCode": oPOModel.getProperty("/compCode"),
 			"invoiceReference": oPOModel.getProperty("/extInvNum"),
-			"invoiceTotal": oPOModel.getProperty("/invoiceTotal"),
+			"invoiceAmount": oPOModel.getProperty("/invoiceTotal"),
 			"grossAmount": oPOModel.getProperty("/grossAmount"),
 			"taxAmount": oPOModel.getProperty("/taxAmount"),
 			"balanceAmount": oPOModel.getProperty("/balanceAmount"),
@@ -328,7 +328,7 @@ com.menabev.AP.util.POServices = {
 			oPOModel.setProperty("/vendorId", oData.vendorID);
 			oPOModel.setProperty("/compCode", oData.companyCode);
 			oPOModel.setProperty("/extInvNum", oData.invoiceReference);
-			oPOModel.setProperty("/invoiceTotal", oData.invoiceTotal);
+			oPOModel.setProperty("/invoiceTotal", oData.invoiceAmount);
 			oPOModel.setProperty("/grossAmount", oData.grossAmount);
 			oPOModel.setProperty("/taxAmount", oData.taxAmount);
 			oPOModel.setProperty("/balanceAmount", oData.balanceAmount);
@@ -457,6 +457,9 @@ com.menabev.AP.util.POServices = {
 		var oHeader = {
 			"Content-Type": "application/scim+json"
 		};
+		if (!oData.invoiceTotal) {
+			oData.invoiceTotal = 0;
+		}
 		var oPayload = {
 			"invoiceHeaderDto": oData
 		};
@@ -477,7 +480,7 @@ com.menabev.AP.util.POServices = {
 					actions: [sap.m.MessageBox.Action.OK],
 					onClose: function (sAction) {
 						if (!save) {
-							oController.router.navTo("Inbox");
+							oController.oRouter.navTo("Inbox");
 						}
 					}
 				});

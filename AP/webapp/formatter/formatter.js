@@ -265,8 +265,8 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return val;
 	},
-	batchIDVisible: function (editable, invType) {
-		if (editable && invType === "PO") {
+	batchIDVisible: function (invType) {
+		if (invType === "PO") {
 			return true;
 		} else {
 			return false;

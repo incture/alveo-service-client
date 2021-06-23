@@ -20,8 +20,8 @@ sap.ui.define([
 			this.oUserDetailModel = oUserDetailModel;
 
 			var oComponent = this.getOwnerComponent();
-			this.router = oComponent.getRouter();
-			this.router.getRoute("TemplateManagement").attachPatternMatched(this.onRouteMatched, this);
+			this.oRouter = oComponent.getRouter();
+			this.oRouter.getRoute("TemplateManagement").attachPatternMatched(this.onRouteMatched, this);
 			this.clicks = 0;
 		},
 
@@ -464,7 +464,7 @@ sap.ui.define([
 		},
 
 		onNavBack: function () {
-			this.router.navTo("NonPOInvoice");
+			this.oRouter.navTo("NonPOInvoice");
 		},
 
 		onClickSearchTemplate: function () {

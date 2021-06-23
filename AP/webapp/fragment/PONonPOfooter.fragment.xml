@@ -10,5 +10,5 @@
 	<Button text="{i18n>Reject}" type="Reject" tooltip="{i18n>Reject}" press="onNonPoReject" class="sapUiTinyMarginEnd" enabled="false"
 		visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}"/>
 		<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Reject}" press="onCancelChanges" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}"/>
+		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
 </core:FragmentDefinition>

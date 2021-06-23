@@ -34,7 +34,10 @@ sap.ui.define([
 			this.oDataAPIModel = oDataAPIModel;
 			var ZP2P_API_EC_GL_SRV = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
 			this.ZP2P_API_EC_GL_SRV = ZP2P_API_EC_GL_SRV;
-			oMandatoryModel.setProperty("/NonPO",{});
+
+			var getResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+			this.getResourceBundle = getResourceBundle;
+			oMandatoryModel.setProperty("/NonPO", {});
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			oPOModel.loadData("model/UIDataModel.json");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);

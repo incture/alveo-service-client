@@ -5,7 +5,7 @@
 			<fb:FilterBar id="filterBarId" search="onSearch" clear="clearFilter" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
 				visible="{baseModel>/SearchVisiblity}">
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>Vendor Id}">
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>VendorId}">
 						<fb:control>
 							<Input filterSuggests="false" value="{oTaskInboxModel>/filterParams/vendorId}" showSuggestion="true" suggest="VendorIdSuggest"
 								suggestionItemSelected="vendorIdSelected" change="onVendorIdChange" suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10">
@@ -115,10 +115,10 @@
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvoiceNo}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>Invoice Date}" design="Bold"/>
+									<Label text="{i18n>InvoiceDate}" design="Bold"/>
 								</Column>
 								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvoiceType}" design="Bold"/>

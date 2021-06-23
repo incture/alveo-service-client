@@ -44,12 +44,20 @@ sap.ui.define([
 			this.oDPODetailsModel = oDPODetailsModel;
 			var oDataAPIModel = this.getOwnerComponent().getModel("oDataAPIModel");
 			this.oDataAPIModel = oDataAPIModel;
+			var oDPODetailsModel = this.getOwnerComponent().getModel("oDPODetailsModel");
+			this.oDPODetailsModel = oDPODetailsModel;
+			var oDataAPIModel = this.getOwnerComponent().getModel("oDataAPIModel");
+			this.oDataAPIModel = oDataAPIModel;
+			var ZP2P_API_EC_GL_SRV = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
+			this.ZP2P_API_EC_GL_SRV = ZP2P_API_EC_GL_SRV;
+			var getResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+			this.getResourceBundle = getResourceBundle;
 
 			this.setModel(new JSONModel(), "templateModel");
 
 			this.getBtnVisibility();
-			this.router = this.getOwnerComponent().getRouter();
-			this.router.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
+			this.oRouter = this.getOwnerComponent().getRouter();
+			this.oRouter.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
 			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 			oMandatoryModel.setProperty("/NonPO", {});
 			var oHeader = {
@@ -82,7 +90,7 @@ sap.ui.define([
 					"invoice_ref_number": "",
 					"vendorName": "",
 					"ocrBatchId": "",
-					"compCode": "",
+					"compCode": "1010",
 					"extInvNum": "",
 					"invoiceTotal": 0,
 					"sapInvoiceNumber": 0,
@@ -334,7 +342,7 @@ sap.ui.define([
 
 		//This function will route to TemplateManagement view
 		onClickManageTemplate: function () {
-			this.router.navTo("TemplateManagement");
+			this.oRouter.navTo("TemplateManagement");
 		},
 
 		//function onSelectTemplate is triggered on click of Select template
@@ -843,7 +851,7 @@ sap.ui.define([
 		// 					actions: [sap.m.MessageBox.Action.OK],
 		// 					onClose: function (sAction) {
 		// 						if (!save) {
-		// 							that.router.navTo("Inbox");
+		// 							that.oRouter.navTo("Inbox");
 		// 						}
 		// 					}
 		// 				});
@@ -1085,7 +1093,7 @@ sap.ui.define([
 							sap.m.MessageBox.success(message, {
 								actions: [sap.m.MessageBox.Action.OK],
 								onClose: function (sAction) {
-									that.router.navTo("Inbox");
+									that.oRouter.navTo("Inbox");
 								}
 							});
 						} else {
@@ -1137,7 +1145,8 @@ sap.ui.define([
 				nonPOInvoiceModelData = oPOModel.getData(),
 				bError = false,
 				mandatoryFeildsForCC = ["invoiceTotal", "taxCode", "taxValue"],
-				manLength = mandatoryFeildsForCC.length, data;
+				manLength = mandatoryFeildsForCC.length,
+				data;
 
 			var key;
 			for (var i = 0; i < manLength; i++) {
@@ -1153,7 +1162,7 @@ sap.ui.define([
 		},
 
 		onNavBack: function () {
-			this.router.navTo("Inbox");
+			this.oRouter.navTo("Inbox");
 		},
 
 		onChangeUserInputTaxAmount: function (oEvent) {

@@ -706,7 +706,7 @@ sap.ui.define([
 							sap.m.MessageBox.success(message, {
 								actions: [sap.m.MessageBox.Action.OK],
 								onClose: function (sAction) {
-									that.router.navTo("Inbox");
+									that.oRouter.navTo("Inbox");
 								}
 							});
 						} else {
