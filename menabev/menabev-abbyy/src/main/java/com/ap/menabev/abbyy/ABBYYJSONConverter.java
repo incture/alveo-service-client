@@ -59,9 +59,9 @@ public class ABBYYJSONConverter {
 								else if ("TotalPriceNetto".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
 									itemDto.setGrossPrice(invoiceItem.getDouble("Value"));
 								else if ("VATPercentage".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setTaxPercentage(invoiceItem.getInt("Value"));
+									itemDto.setTaxPercentage(invoiceItem.getDouble("Value"));
 								else if ("VATValue".equalsIgnoreCase(itemName) && invoiceItem.has("Value") && !ServiceUtil.isEmpty(invoiceItem.get("Value")))
-									itemDto.setTaxValue(invoiceItem.getInt("Value"));
+									itemDto.setTaxValue(invoiceItem.getDouble("Value"));
 
 							}
 
@@ -92,7 +92,7 @@ public class ABBYYJSONConverter {
 					}
 
 					else if ("TotalNetAmount".equalsIgnoreCase(name)) {
-						headerDto.setAmountBeforeTax(headerObj.getInt("Value"));
+						headerDto.setAmountBeforeTax(headerObj.getDouble("Value"));
 					}
 
 				}

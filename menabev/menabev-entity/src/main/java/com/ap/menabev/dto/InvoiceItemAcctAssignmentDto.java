@@ -3,21 +3,27 @@ package com.ap.menabev.dto;
 import lombok.Data;
 
 public @Data class InvoiceItemAcctAssignmentDto {
+	
+	
 	private String accountAssgnGuid;
 	private String requestId;
-	private String itemId;
+	private String itemId; // invoiceItemId
 	private String serialNo;
 	private Boolean isDeleted;
-	private Boolean isUnplanned;
-	private String qty;
+	private Boolean  isPlanned;
+	private Double qty;
 	private String qtyUnit;
-	private double distPerc;
-	private String netValue;
+	private Double distPerc;
+	private Double netValue;
 	private String glAccount;
 	private String costCenter;
-	private String debitOrCredit;
-	private String text;
-	private String taxValue;
-	private String taxPercentage;
+	private String costCenterText;
+	private String  taxValue;
+     private String taxPercentage;
+	private String subNumber;
+	private String orderId;
+	private String profitCtr;
+    private String wbsElement;
+    private String crDbIndicator;
 
 }

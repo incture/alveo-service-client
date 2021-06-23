@@ -7,5 +7,6 @@ public class CreateInvoiceHeaderDto {
 	
 	private InvoiceHeaderDto invoiceHeaderDto;
 	private String responseStatus;
+	private int status;
 
 }

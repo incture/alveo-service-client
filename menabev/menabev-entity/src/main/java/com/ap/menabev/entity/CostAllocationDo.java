@@ -35,25 +35,27 @@ public @Data class CostAllocationDo implements Serializable {
 	@Id
 	@Column(name = "ITEM_ID", nullable = false)
 	private String itemId; 
+	@Column(name = "ITEM_TEXT",length = 50)
+	private String itemText;
 	@Column(name = "SUB_NUM" ,length = 10)
 	private String subNum;
 	@Column(name = "DELETE_IND")
 	private Boolean deleteInd;
 	@Column(name = "QUANTITY")
-	private double quantity;
+	private Double quantity;
 	@Column(name = "QUANTITY_UNIT", length = 5)
 	private String quantityUnit;
 	@Column(name = "DISTR_PERC")
-	private double distrPerc;
+	private Double distrPerc;
 	@Column(name = "ORDER_ID",length = 5)
 	private String orderId;
 	@Column(name = "NET_VALUE")
-	private double netValue;
+	private Double netValue;
 	@Column(name = "GL_ACCOUNT",length = 10)
 	private String glAccount;
 	@Column(name = "GL_ACCOUNT_TEXT",length = 10)
 	private String glAccountText;
-	@Column(name = "COST_CENTER",length = 4)
+	@Column(name = "COST_CENTER",length = 50)
 	private String costCenter;
 	@Column(name = "COST_CENTER_TEXT",length = 50)
 	private String costCenterText;

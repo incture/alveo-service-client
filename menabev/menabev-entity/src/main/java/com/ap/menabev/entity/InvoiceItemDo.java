@@ -53,11 +53,11 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "UPC_CODE", length = 50)
 	private String upcCode;
 	@Column(name = "INV_QTY")
-	private double invQty;
+	private Double invQty;
 	@Column(name = "UOM", length = 5)
 	private String uom;
 	@Column(name = "UNIT_PRICE")
-	private double unitPrice;
+	private Double unitPrice;
 	@Column(name = "CURRENCY", length = 5)
 	private String currency;
 	@Column(name = "PRICING_UNIT", length = 5)
@@ -65,19 +65,19 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "ORDER_PRICE_UNIT", length = 5)
 	private String orderPriceUnit;
 	@Column(name = "GROSS_PRICE")
-	private double grossPrice;
+	private Double grossPrice;
 	@Column(name = "DISCOUNT_VALUE")
-	private double discountValue;
+	private Double discountValue;
 	@Column(name = "DISCOUNT_PERCENTAGE")
-	private double disPerentage;
+	private Double disPerentage;
 	@Column(name = "TAX_CODE", length = 5)
 	private String taxCode;
 	@Column(name = "TAX_VALUE")
-	private double taxValue;
+	private Double taxValue;
 	@Column(name = "TAX_PERCENTAGE")
-	private double taxPercentage;
+	private Double taxPercentage;
 	@Column(name = "NET_WORTH")
-	private double netWorth;
+	private Double netWorth;
 	@Column(name = "IS_TWOWAY_MATCHED")
 	private Boolean isTwowayMatched;
 	@Column(name = "IS_THREEWAY_MATCHED")
@@ -97,13 +97,13 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "UPDATED_BY", length = 100)
 	private String updatedBy;
 	@Column(name = "UPDATED_AT")
-	private long updatedAt;
+	private Long updatedAt;
 	@Column(name = "isSelected")
 	private Boolean isSelected;
 	@Column(name = "MATCHED_By")
 	private String matchedBy;
 	@Column(name = "IS_ACC_ASSIGNED")
-	private boolean isAccAssigned;
+	private Boolean isAccAssigned;
 	@Column(name = "ITEM_REQUISATION_NUM", length = 10)
 	private String itemRequisationNum;
 	@Column(name = "REQUISATION_NUM", length = 10)
@@ -113,7 +113,7 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "CONTRACT_ITEM", length = 10)
 	private String contractItem;
 	@Column(name = "IS_DELETED")
-	private boolean isDeleted;
+	private Boolean isDeleted;
 
 	// Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by
 	// Prashant Kumar

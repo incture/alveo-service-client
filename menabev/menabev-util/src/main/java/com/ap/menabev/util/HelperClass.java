@@ -23,6 +23,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
@@ -252,5 +253,44 @@ public class HelperClass {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	public ResponseEntity<?>  taskCompleteWorkflowApi(String payload,String taskid) {
+		try {
+			
+			System.err.println("Input payload"+ payload);
+			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+			HttpClient client = HttpClientBuilder.create().build();
+			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances/" + taskid;
+				// if user is not empty and not null task will be claimed.
+				//payload = "{\"processor\":\"" + dto.getUserId() + "\"}";
+				System.err.println("payload=" + payload);
+			HttpPatch httpPatch = new HttpPatch(url);
+			httpPatch.addHeader("Authorization", "Bearer " + token);
+			httpPatch.addHeader("Content-Type", "application/json");
+			try {
+				StringEntity entity = new StringEntity(payload);
+				System.err.println("inputEntity " + entity);
+				entity.setContentType("application/json");
+				httpPatch.setEntity(entity);
+				HttpResponse response = client.execute(httpPatch);
+				if (response.getStatusLine().getStatusCode() == HttpStatus.NO_CONTENT.value()) {
+					
+						return new ResponseEntity<String>( getDataFromStream(response.getEntity().getContent()),HttpStatus.CREATED);
+					} 
+				 else {
+					return new ResponseEntity<String>(
+							"Failed due " + getDataFromStream(response.getEntity().getContent()),
+							HttpStatus.BAD_REQUEST);
+				}
+			} catch (IOException e) {
+				System.err.println("Exception "+e.getMessage());
+				return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		} catch (Exception e) {
+			System.err.println("Exception "+e.getMessage());
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

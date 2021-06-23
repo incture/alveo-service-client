@@ -1,7 +1,5 @@
 package com.ap.menabev.dto;
 
-import javax.persistence.Column;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,5 +33,8 @@ public class CostAllocationDto {
 	private String taxPer;
 	private String baseRate;
 	private String materialDesc;
+	private String subNum;
+	private String glAccountText;
+	private String costCenterText;
 	
 }

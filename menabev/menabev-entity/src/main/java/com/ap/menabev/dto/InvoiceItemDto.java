@@ -1,14 +1,7 @@
 package com.ap.menabev.dto;
 
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Id;
-
-import com.ap.menabev.entity.InvoiceItemAcctAssignmentDo;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,19 +22,19 @@ public class InvoiceItemDto {
 	private String articleNum;
 	private Integer customerItemId;
 	private String upcCode;
-	private double invQty;
+	private Double invQty;
 	private String uom;
-	private double unitPrice;
+	private Double unitPrice;
 	private String currency;
 	private Integer pricingUnit;
 	private String orderPriceUnit;
-	private double grossPrice;
-	private double discountValue;
-	private double disPerentage;
+	private Double grossPrice;
+	private Double discountValue;
+	private Double disPerentage;
 	private String taxCode;
-	private double taxValue;
-	private double taxPercentage;
-	private double netWorth;
+	private Double taxValue;
+	private Double taxPercentage;
+	private Double netWorth;
 	private Boolean isTwowayMatched;
 	private Boolean isThreewayMatched;
 	private Long matchDocNum;
@@ -51,22 +44,20 @@ public class InvoiceItemDto {
 	private String matchpackageNumber;
 	private String matchType;// manuall or Auto posting
 	private String updatedBy;
-	private long updatedAt;
+	private Long updatedAt;
 	private Boolean isSelected;
 	private String matchedBy;
-    private boolean isAccAssigned;
+    private Boolean isAccAssigned;
     private String itemRequisationNum;
     private String requisationNum;
     private String contractNum;
     private String contractItem;
-    private boolean isDeleted;
+    private Boolean isDeleted;
     private String setPoMaterialNum;
 	private List<InvoiceItemAcctAssignmentDto> invItemAcctDtoList;
 	private List<ItemMessageDto> invoiceItemMessages;
-	
-	
-	//Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by Prashant Kumar
-	
+	// Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by
+	// Prashant Kumar
 	private String accAssignmentCat;
 	private String itemStatusCode;
 	private String itemStatusText;
@@ -77,7 +68,6 @@ public class InvoiceItemDto {
 	private Double poUnitPriceOPU;
 	private Double poUnitPriceOU;
 	private String orderUnit;
-//	private String orderPriceUnit;
 	private String orderUnitISO;
 	private String orderPriceUnitISO;
 	private String itemCategory;
@@ -85,8 +75,8 @@ public class InvoiceItemDto {
 	private String productType;
 	private String poMatNum;
 	private String poItemText;
-	private Double poQtyOU; 
-	private Double poQtyOPU; 
+	private Double poQtyOU;
+	private Double poQtyOPU;
 	private String poTaxCode;
 	private Boolean grFlag;
 	private Boolean grBsdIv;

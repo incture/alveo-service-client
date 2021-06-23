@@ -36,17 +36,17 @@ public @Data class InvoiceItemAcctAssignmentDo implements Serializable{
 	@Column(name="SERIAL_NO",nullable=false)
 	private String serialNo;
 	@Column(name="IS_DELETED")
-	private boolean isDeleted;
+	private Boolean isDeleted;
 	@Column(name = "IS_PLANNED")
-	private boolean  isPlanned;
+	private Boolean  isPlanned;
 	@Column(name = "QUANTITY")
-	private double qty;
+	private Double qty;
 	@Column(name = "QUANTITY_UNIT",length = 10)
 	private String qtyUnit;
 	@Column(name="DIST_PERC")
-	private double distPerc;
+	private Double distPerc;
 	@Column(name = "NET_VALUE")
-	private double netValue;
+	private Double netValue;
 	@Column(name = "GL_ACCOUNT",length = 10)
 	private String glAccount;
 	@Column(name = "COST_CENTER")

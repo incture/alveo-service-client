@@ -37,11 +37,11 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "REQUEST_ID", nullable = false)
 	private String requestId; //0
 	@Column(name = "REQUEST_CREATED_AT",length = 50 )
-	private long request_created_at;
+	private Long request_created_at;
 	@Column(name = "REQUEST_CREATED_BY")
 	private String request_created_by;
 	@Column(name = "REQUEST_UPDATED_AT" , length = 50)
-	private long request_updated_at;
+	private Long request_updated_at;
 	@Column(name = "REQUEST_UPDATED_BY")
 	private String request_updated_by;
 	@Column(name = "INVOICE_REF_NUMBER",length = 16)
@@ -55,7 +55,7 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "EXT_INV_NUM",length = 20)
 	private String extInvNum;//  Invoice Number for NON po, Invoice Reference Number
 	@Column(name = "INVOICE_TOTAL")
-	private double invoiceTotal;//2
+	private Double invoiceTotal;//2
 	@Column(name = "SAP_INVOICE_NUMBER",length = 15)
 	private String sapInvoiceNumber;//13
 	@Column(name = "INVOICE_PDF_ID",length = 64)
@@ -69,11 +69,11 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "COUNTRY_CODE",length = 40)
 	private String countryCode;
 	@Column(name = "DOCUMENT_DATE")
-	private long documentDate;
+	private Long documentDate;
 	@Column(name = "DUE_DATE")
-	private long dueDate;//22
+	private Long dueDate;//22
 	@Column(name = "INVOICE_DATE" )
-	private long invoiceDate;// added for the tag in xml _InvoiceDate as discussed.
+	private Long invoiceDate;// added for the tag in xml _InvoiceDate as discussed.
 	@Column(name = "VENDOR_ID",length = 10)
 	private String vendorId;//4
 	@Column(name = "CHANNEL_TYPE",length = 10)
@@ -85,7 +85,7 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "INVOICE_TYPE" ,length = 10)
 	private String invoiceType;//12
 	@Column(name = "INVOICE_AMOUNT")
-	private double invoiceAmount;//2
+	private Double invoiceAmount;//2
 	@Column(name = "FISCAL_YEAR",length = 8)
 	private String fiscalYear;//14
 	@Column(name = "CURRENCY" , length = 6)
@@ -95,29 +95,29 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "PAYMENT_METHOD" ,length = 20)
 	private String paymentMethod;//16
 	@Column(name = "TAX_AMOUNT")
-	private double taxAmount;//17
+	private Double taxAmount;//17
 	@Column(name = "SYS_SUGGESRTED_TAX_AMOUNT")
-	private double sysSusgestedTaxAmount;
+	private Double sysSusgestedTaxAmount;
 	@Column(name = "SHIPPING_COST")
-	private double shippingCost;//18
+	private Double shippingCost;//18
 	@Column(name = "TASK_STATUS",length = 20)
 	private String taskStatus;//5
 	@Column(name = "VERSION",length = 10)
 	private Integer version;//21
 	@Column(name = "GROSS_AMOUNT")
-	private double grossAmount;
+	private Double grossAmount;
 	@Column(name = "BALANCE_AMOUNT")
-	private double balanceAmount;
+	private Double balanceAmount;
 	@Column(name = "REASON_FOR_REJECTION" , length = 10)
 	private String reasonForRejection;
 	@Column(name = "UPDATED_BY")
-	private long updatedBy;
+	private Long updatedBy;
 	@Column(name = "UPDATED_AT")
-	private long updatedAt;
+	private Long updatedAt;
 	@Column(name = "ACCOUNT_NUMBER" ,length = 15)
 	private String accountNumber;
 	@Column(name = "POSTING_DATE")
-	private long postingDate;
+	private Long postingDate;
 	@Column(name="PAYMENT_BLOCK",length = 10)
 	private String paymentBlock;
 	@Column(name="PAYMENT_BLOCK_DESC",length = 20)
@@ -131,35 +131,39 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "TASK_GROUP",length = 50)
 	private String taskGroup;
 	@Column(name = "IS_NON-PO_OR_PO")
-	private boolean isnonPoOrPo;
+	private Boolean isnonPoOrPo;
 	@Column(name="TRANSACTION_TYPE" ,length = 8)
 	private String transactionType;
 	@Column(name="DELIVERY_NOTE",length = 50)
 	private String deliveryNote;
 	@Column(name = "AMOUNT_BEFORE_TAX")
-	private double amountBeforeTax;
+	private Double amountBeforeTax;
 	@Column(name = "TAX_CODE" ,length = 4)
 	private String taxCode;
 	@Column(name = "TAX_RATE",length = 10)
 	private String taxRate;
 	@Column(name = "TAX_PERCENTAGE")
-	private double taxPercentage;
+	private Double taxPercentage;
+	@Column(name = "TAX_VALUE",length = 20)
+	private String  taxValue;
 	@Column(name="SURCHARGE")
-	private double surcharge;
+	private Double surcharge;
 	@Column(name = "DISCOUNT")
-	private double discount;
+	private Double discount;
 	@Column(name = "INVOCIE_GROSS")
-	private double invoiceGross;
+	private Double invoiceGross;
 	@Column(name = "VAT_REG_NUM",length = 20)
 	private String vatRegNum;
 	@Column(name = "UNPLANNED_COST")
-	private double unplannedCost;
+	private Double unplannedCost;
 	@Column(name = "PLANNED_COST")
-	private double plannedCost;
+	private Double plannedCost;
 	@Column(name = "BASE_LINE_DATE")
-	private long baseLineDate;
+	private Long baseLineDate;
+	@Column(name = "TOTAL_BASE_RATE",length = 20)
+	private String totalBaseRate;
 	@Column(name = "IS_REJECTED")
-	private boolean isRejected;
+	private Boolean isRejected;
 	@Column(name = "INVOICE_STATUS",length = 5)
 	private String invoiceStatus;
 	@Column(name = "INVOICE_STATUS_TEXT",length = 30)
