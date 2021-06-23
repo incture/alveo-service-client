@@ -79,7 +79,8 @@ public class PurchaseDocumentItemServiceImpl implements PurchaseDocumentItemServ
 	@Override
 	public List<PurchaseDocumentItemDo> getPurchaseDocumentItem(String refDocNum) {
 		// TODO Auto-generated method stub
-		return  repository.getPurchaseDocumentItem(refDocNum);
+//		return  repository.getPurchaseDocumentItem(refDocNum);
+		return null;
 	}
 
 }
