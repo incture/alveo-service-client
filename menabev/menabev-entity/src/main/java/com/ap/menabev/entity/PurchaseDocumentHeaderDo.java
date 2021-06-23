@@ -2,6 +2,7 @@ package com.ap.menabev.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,79 +13,68 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="PURCHASE_DOCUMENT_HEADER")
+@Table(name = "PO_HEADER")
 @Getter
 @Setter
 public class PurchaseDocumentHeaderDo {
-	
-	
 	@Id
-	@Column(name="DOCUMENT_NUMBER")
-	private String documentNumber;//Po NUMBER
-	
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PurchaseDocHeader")
-//	@GenericGenerator(name = "PurchaseDocHeader", strategy = "com.incture.ap.sequences.PurchaseDocumentHeaderSequenceGenerator", parameters = {
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value = "1"), @Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER, value = "PDH-"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER, value = "%06d"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM,value="PURCHASE_DOCUMENT_HEADER_SEQ")})
-	@Column(name="PURCHASE_DOCUMENT_HEADER_ID")
-	private String purchaseDocumentHeaderId;
-	
-	@Column(name="CONFIRMATION_TEXT")
-	private String confirmationText;	
-	
-	@Column(name="DOCUMENT_CAT")
-	private String documentCat;
-	@Column(name="DOCUMENT_TYPE")
-	private String documentType;
-	@Column(name="COMPANY_CODE")
-	private String companyCode;
-	@Column(name="STATUS")
-	private String status;
-	@Column(name="VENDOR")
-	private String vendor;
-	@Column(name="PAYMENT_TERMS")
-	private String paymentTerms;
-	@Column(name="PURCHASE_ORG")
-	private String purchaseOrg;
-	@Column(name="PURCHASE_GROUP")
-	private String purchaseGroup;
-	@Column(name="CURRENCY")
+	@Column(name = "UUID")
+	private String uuid = UUID.randomUUID().toString();
+	@Column(name = "DOCUMENT_NUMBER",length=10)
+	private String documentNumber;
+	@Column(name = "COMPANY_CODE",length=4)
+	private String compCode;
+	@Column(name = "PURCHASE_ORGANISATION",length=4)
+	private String purOrg;
+	@Column(name = "PURCHASE_GROUP",length=3)
+	private String purchGroup;
+	@Column(name = "CURRENCY",length=5)
 	private String currency;
-	@Column(name="EXCHANGE_RATE")
-	private BigDecimal exchangeRate;
-	@Column(name="DOCUMENT_NET_VALUE")
-	private BigDecimal documentNetValue;
-	
-	@Column(name="HAS_DELIVERY_COST")
-	private Boolean hasDeliveryCost;
-	@Column(name="DELIVERY_VENDOR")
-	private String deliveryVendor;
-	
-	@Column(name="PO_DATE")
-	private Date poDate;
-	
-	@Column(name="PO_STATUS")
-	private String poStatus;
-	
-	@Column(name="PO_CREATED_BY")
-	private String poCreatedBy;
-	
-	@Column(name="CREATED_BY")
+	@Column(name = "CURRENCY_ISO",length=3)
+	private String currencyISO;
+	@Column(name = "DOCUMENT_DATE",length=8)
+	private Long documentDate;
+	@Column(name = "SUPPL_VEND",length=10)
+	private String supplVend;
+	@Column(name = "SUPPL_PLANT",length=4)
+	private String supplPlant;
+	@Column(name = "DIFF_INV",length=10)
+	private String diffInv;
+	@Column(name = "PO_RELEASE_INDICATOR",length=1)
+	private String poRelIndicator;
+	@Column(name = "PO_RELEASE_STATUS",length=8)
+	private String poRelStatus;
+	@Column(name = "VAT_COUNTRY",length=3)
+	private String vatCountry;
+	@Column(name = "LAST_CHANGED_AT",length=21)
+	private Long lasChangedAt;
+	@Column(name = "VENDOR_ID",length=10)
+	private String vendorId;
+	@Column(name = "DOC_TYPE",length=4)
+	private String doctType;
+	@Column(name = "DOC_CAT",length=1)
+	private String docCat;
+	@Column(name = "DELETION_INDICATOR",length=1)
+	private String detetetionInd;
+	@Column(name = "STATUS",length=1)
+	private String status;
+	@Column(name = "CREATE_DATE",length=8)
+	private Long createDate;
+	@Column(name = "CREATE_BY",length=12)
 	private String createdBy;
-	
-	@Column(name="PO_CREATED_DATE")
-	private Date poCreatedDate;
-	
-	@Column(name="PO_NET_PRICE")
-	private String poNetPrice;
-	//PO date
-	
-	@Column(name="COMMENT")
-	private String comment;
-	
-	
-	
-	
-	
+	@Column(name = "ITM_INVL",length=5)
+	private String itmInvl;
+	@Column(name = "PAYMENT_TERMS",length=4)
+	private String paymentTerms;
+	@Column(name = "DISCOUNT1_TO",length=3)
+	private Double dscnt1To;
+	@Column(name = "DISCOUNT2_TO",length=3)
+	private Double dscnt2To;
+	@Column(name = "DISCOUNT3_TO",length=3)
+	private Double dscnt3To;
+	@Column(name = "DISCTPCT1",length=5)
+	private Double dsctPct1;
+	@Column(name = "DSCTPCT2",length=5)
+	private Double dsctPct2;
+
 }

@@ -4,42 +4,48 @@ package com.ap.menabev.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 @Getter
 @Setter
+@ToString
 public class PurchaseDocumentHeaderDto {
 
-	private String purchaseDocumentHeaderId = UUID.randomUUID().toString();
-	//private String confirmationText; in ConfirmationItem
+	private String uuid;
 	private String documentNumber;
-	private String documentCat;
-	private String documentType;
-	private String companyCode;
-	private String status;
-	private String vendor;
-	private String paymentTerms;
-	private String purchaseOrg;
-	private String purchaseGroup;
+	private String compCode;
+	private String purOrg;
+	private String purchGroup;
 	private String currency;
-	private BigDecimal exchangeRate;
-	private BigDecimal documentNetValue;
-	private Boolean hasDeliveryCost;
-	private String deliveryVendor;
-	private String poStatus;
-	private String poCreatedBy;
+	private String currencyISO;
+	private Long documentDate;
+	private String supplVend;
+	private String supplPlant;
+	private String diffInv;
+	private String poRelIndicator;
+	private String poRelStatus;
+	private String vatCountry;
+	private Long lasChangedAt;
+	private String vendorId;
+	private String doctType;
+	private String docCat;
+	private String detetetionInd;
+	private String status;
+	private Long createDate;
 	private String createdBy;
-	private Date poCreatedDate;	
-	private String poNetPrice;
-	private String confirmationText;
-	private String comment;
-	//Po Net Price
-	//po Stauts
-	//Po_Created By
-	//Po created Date 
-
-
-	
+	private String itmInvl;
+	private String paymentTerms;
+	private Double dscnt1To;
+	private Double dscnt2To;
+	private Double dscnt3To;
+	private Double dsctPct1;
+	private Double dsctPct2;
+	private List<PurchaseDocumentItemDto> poItem;
+	private List<PoHistoryDto> poHistory;
+	private List<PoHistoryTotalsDto> poHistoryTotals;
+	private List<PoDeliveryCostHistoryDto> poDeliveryCostHistory;
 }
