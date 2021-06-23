@@ -14,6 +14,7 @@ import com.ap.menabev.entity.PurchaseDocumentItemDo;
 @Repository
 public interface PurchaseDocumentItemRespository extends JpaRepository<PurchaseDocumentItemDo, String> {
 
+	
 	@Transactional
 	@Modifying(clearAutomatically=true)
 	@Query("Delete from PurchaseDocumentItemDo ph where ph.documentNumber= ?1")
