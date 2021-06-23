@@ -23,6 +23,7 @@ import com.ap.menabev.dto.DeleteDraftInputDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
+import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 
 import com.ap.menabev.dto.ResponseDto;
@@ -144,21 +145,21 @@ public class InvoiceHeaderController {
 	}
 
 	@PostMapping("/remediationBuyer/Users")
-	public ResponseEntity<?> remediationBuyer(@RequestBody List<PurchaseOrderRemediationInput> create)
+	public ResponseEntity<?> remediationBuyer(@RequestBody List<PurchaseDocumentHeaderDto> create)
 			throws URISyntaxException, IOException {
 		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create, "BUYER",
 				"/PurchOrdDetailsSet?", "PurchaseOrderCreator");
 	}
 
 	@PostMapping("/remediationGRNWithNoPR/Users")
-	public ResponseEntity<?> remediationGrnWithPurchGrp(@RequestBody List<PurchaseOrderRemediationInput> create)
+	public ResponseEntity<?> remediationGrnWithPurchGrp(@RequestBody List<PurchaseDocumentHeaderDto> create)
 			throws URISyntaxException, IOException {
 		return headerService.odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create, "GRN",
 				"/PurchGrpDetailsSet?", "PurchasingGroup");
 	}
 
 	@PostMapping("/remediation/Users")
-	public ResponseEntity<?> remediationBuyerWithPrNumandPrItem(@RequestBody List<PurchaseOrderRemediationInput> create)
+	public ResponseEntity<?> remediationBuyerWithPrNumandPrItem(@RequestBody List<PurchaseDocumentHeaderDto> create)
 			throws URISyntaxException, IOException {
 		return headerService.getRemediationUserDetails(create, "ALL");
 	}

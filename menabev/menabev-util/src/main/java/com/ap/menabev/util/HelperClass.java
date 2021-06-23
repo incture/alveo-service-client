@@ -34,7 +34,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class HelperClass {
 	
 	
@@ -255,42 +258,44 @@ public class HelperClass {
 		return false;
 	}
 	
-	
-	public ResponseEntity<?>  taskCompleteWorkflowApi(String payload,String taskid) {
+	public static ResponseEntity<?> completeTask(String taskId) {
+
 		try {
-			
-			System.err.println("Input payload"+ payload);
-			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+
 			HttpClient client = HttpClientBuilder.create().build();
-			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances/" + taskid;
-				// if user is not empty and not null task will be claimed.
-				//payload = "{\"processor\":\"" + dto.getUserId() + "\"}";
-				System.err.println("payload=" + payload);
+
+			String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances/" + taskId;
+			String payload = "{\"context\": {},\"status\":\"COMPLETED\",\"priority\": \"MEDIUM\"}";
+
 			HttpPatch httpPatch = new HttpPatch(url);
-			httpPatch.addHeader("Authorization", "Bearer " + token);
+			httpPatch.addHeader("Authorization", "Bearer " + jwToken);
 			httpPatch.addHeader("Content-Type", "application/json");
+
 			try {
 				StringEntity entity = new StringEntity(payload);
-				System.err.println("inputEntity " + entity);
 				entity.setContentType("application/json");
 				httpPatch.setEntity(entity);
 				HttpResponse response = client.execute(httpPatch);
+
 				if (response.getStatusLine().getStatusCode() == HttpStatus.NO_CONTENT.value()) {
-					
-						return new ResponseEntity<String>( getDataFromStream(response.getEntity().getContent()),HttpStatus.CREATED);
-					} 
-				 else {
-					return new ResponseEntity<String>(
-							"Failed due " + getDataFromStream(response.getEntity().getContent()),
+					return new ResponseEntity<String>("Task completed", HttpStatus.NO_CONTENT);
+				} else {
+					return new ResponseEntity<String>(getDataFromStream(response.getEntity().getContent()),
 							HttpStatus.BAD_REQUEST);
 				}
+
 			} catch (IOException e) {
-				System.err.println("Exception "+e.getMessage());
-				return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+				System.err.println("ExceptionIO "+e.getMessage());
+				return new ResponseEntity<String>("Exception failed " + e.getCause().getCause().getLocalizedMessage(),
+						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+
 		} catch (Exception e) {
 			System.err.println("Exception "+e.getMessage());
-			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>("Exception due to " + e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 	}
+
 }

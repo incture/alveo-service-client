@@ -68,6 +68,8 @@ import com.ap.menabev.dto.OdataOutPutPayload;
 import com.ap.menabev.dto.OdataResponseDto;
 import com.ap.menabev.dto.OdataResultObject;
 import com.ap.menabev.dto.PoDocumentItem;
+import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
+import com.ap.menabev.dto.PurchaseDocumentItemDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 import com.ap.menabev.dto.RemediationUser;
 import com.ap.menabev.dto.RemediationUserDto;
@@ -718,7 +720,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (responseRules.getStatusCodeValue() == 200) {
 				@SuppressWarnings("unchecked")
 				List<ApproverDataOutputDto> lists = (List<ApproverDataOutputDto>) responseRules.getBody();
-
+                    if(!ServiceUtil.isEmpty(lists))  {     
+				
 				// Generate Request Id
 				if (invoiceDto.getInvoiceHeaderDto().getRequestId() != null
 						&& !invoiceDto.getInvoiceHeaderDto().getRequestId().isEmpty()) {
@@ -866,8 +869,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceDto.setStatus(200);
 				return new ResponseEntity<CreateInvoiceHeaderDto>(invoiceDto, HttpStatus.OK);
 			} else {
+				return new ResponseEntity<>("Please check the rule file no reccord maintained for process lead determination.", HttpStatus.OK);
+				
+			}
+			} else {
 				return new ResponseEntity<>(responseRules, HttpStatus.OK);
 			}
+
 
 		} catch (Exception e) {
 
@@ -988,6 +996,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				System.err.println("filteredrequestIds ="+filteredrequestIds);
 				if(filteredrequestIds !=null && !filteredrequestIds.isEmpty()){
 				List<String>   requestIds = filteredrequestIds.stream().map(InvoiceHeaderDo::getRequestId).collect(Collectors.toList());
+				
 				if( requestIds!=null && !requestIds.isEmpty()){
 			// call the worklfow Api 
 			ResponseEntity<?> responseFromSapApi = fetchWorkflowUserTaksListByRequestId(filterDto,requestIds);			
@@ -1076,28 +1085,30 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								draftList.add(inbox);
 							}
 							// top and skip for draft 
-							if(draftDtoList.size()>=(int)filterDto.getTop()){
-							int startIndex = (int)filterDto.getSkip();
-							System.err.println("startIndex "+startIndex);
-							int endIndex = (int)(filterDto.getSkip()+filterDto.getTop());
-							System.err.println("endIndex "+endIndex);
-						     paginatedDraftLists = draftList.subList(startIndex,endIndex);
+							//if(draftDtoList.size()>=(int)filterDto.getTop()){
+							int skip = (int)filterDto.getSkip();
+							System.err.println("skip "+skip);
+							int top = (int)(filterDto.getSkip()+filterDto.getTop());
+							System.err.println("top "+top);
+						    paginatedDraftLists = draftList.stream().skip(skip).limit(top).collect(Collectors.toList());
 							response.setDraftList(paginatedDraftLists);
-							}else {
-								int startIndex = (int)filterDto.getSkip();
-								System.err.println("startIndex "+startIndex);
-								int endIndex = draftDtoList.size();
-								System.err.println("endIndex "+endIndex);
-							     paginatedDraftLists = draftList.subList(startIndex,endIndex);
-								response.setDraftList(paginatedDraftLists);	
-								}}
+							//}else {
+								//int startIndex = (int)filterDto.getSkip();
+								//System.err.println("startIndex "+startIndex);
+								//int endIndex = draftDtoList.size()-1;
+								//System.err.println("endIndex "+endIndex);
+							    // paginatedDraftLists = draftList.subList(startIndex,endIndex);
+								//response.setDraftList(paginatedDraftLists);	
+								//}
+							}
 							}
 							response.setDraftCount(draftDtoList.size());
 							response.setSkip(filterDto.getSkip());
 							response.setTop(filterDto.getTop());
 							response.setSkip(filterDto.getSkip());
 							response.setTaskList(inboxOutputList);
-							response.setTotalCount(readyAndReservedInvoiceList.size());
+							//response.setTotalCount(readyAndReservedInvoiceList.size());
+							response.setTotalCount(listOfWorkflowTasks.get(0).getTotalCount());
 							response.setMessage("SUCCESS");
 							response.setStatusCodeValue(200);
 							System.err.println("response of outPut" + response);
@@ -1342,7 +1353,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					String userID =  formIdValue(filter.getAssignedTo());
 						appendParamInUrl(url, WorkflowConstants.RECIPIENT_USER_KEY, userID);
 						             String requetId =  formIdValue(requesIds);
-					if (filter.getRequestId() != null && !filter.getRequestId().isEmpty()) {
+					if (!ServiceUtil.isEmpty(requesIds)) {
 						appendParamInUrl(url, WorkflowConstants.SUBJECT, requetId);
 					}
 					appendParamInUrl(url, WorkflowConstants.FIND_COUNT_OF_TASKS_KEY,
@@ -1528,22 +1539,21 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							draftList.add(inbox);
 						}
 						// top and skip for draft 
-						if(draftDtoList.size()>=(int)filterDto.getTop()){
-							int startIndex = (int)filterDto.getSkip();
-							System.err.println("startIndex "+startIndex);
-							int endIndex = (int)(filterDto.getSkip()+filterDto.getTop());
-							System.err.println("endIndex "+endIndex);
-						     paginatedDraftLists = draftList.subList(startIndex,endIndex);
-							response.setDraftList(paginatedDraftLists);
-							}else {
-								int startIndex = (int)filterDto.getSkip();
-							System.err.println("startIndex "+startIndex);
-							int endIndex = draftDtoList.size();
-							System.err.println("endIndex "+endIndex);
-						     paginatedDraftLists = draftList.subList(startIndex,endIndex);
-							response.setDraftList(paginatedDraftLists);	
-								response.setDraftList(paginatedDraftLists);	
-								}
+						//if(draftDtoList.size()>=(int)filterDto.getTop()){
+						int skip = (int)filterDto.getSkip();
+						System.err.println("skip "+skip);
+						int top = (int)(filterDto.getSkip()+filterDto.getTop());
+						System.err.println("top "+top);
+					    paginatedDraftLists = draftList.stream().skip(skip).limit(top).collect(Collectors.toList());
+						response.setDraftList(paginatedDraftLists);
+						//}else {
+							//int startIndex = (int)filterDto.getSkip();
+							//System.err.println("startIndex "+startIndex);
+							//int endIndex = draftDtoList.size()-1;
+							//System.err.println("endIndex "+endIndex);
+						    // paginatedDraftLists = draftList.subList(startIndex,endIndex);
+							//response.setDraftList(paginatedDraftLists);	
+							//}
 						}
 						}
 					response.setDraftCount(draftList.size());
@@ -2570,8 +2580,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 	}
 	// get Remediation user details 
-		@Override
-		public ResponseEntity<?> getRemediationUserDetails(List<PurchaseOrderRemediationInput> dtoList,String userListNeeded) throws URISyntaxException, IOException{
+	    @Override
+		public ResponseEntity<?> getRemediationUserDetails(List<PurchaseDocumentHeaderDto> dtoList,String userListNeeded) throws URISyntaxException, IOException{
 			
 			List<RemediationUser> remediationUserOutput = new ArrayList<RemediationUser>();
 			if(userListNeeded.equals("BUYER")){
@@ -2581,7 +2591,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	            	 remediationUserOutput.add(grnUsers);
 			}else if(userListNeeded.equals("GRN")){
 				// check if purchaseReq  is empty , than call purchaseGroup.
-				List<PoDocumentItem> itemList = dtoList.stream().flatMap(e -> e.getPoDocumentItem().stream()).collect(Collectors.toList());
+				List<PurchaseDocumentItemDto> itemList = dtoList.stream().flatMap(e -> e.getPoItem().stream()).collect(Collectors.toList());
 			  if(!itemList.isEmpty() && itemList!=null){
 				  List<List<String>>   listOfprNumAndprItem = checkPurReqNumAndPurReqItem(dtoList);
                   List<String>   prNumList = listOfprNumAndprItem.get(0);
@@ -2657,10 +2667,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		 
 		
 	    @Override
-		public ResponseEntity<?> odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(List<PurchaseOrderRemediationInput> dtoList,String userListNeeded,String entitySet,String param) throws URISyntaxException, IOException {
+		public ResponseEntity<?> odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(List<PurchaseDocumentHeaderDto> dtoList,String userListNeeded,String entitySet,String param) throws URISyntaxException, IOException {
 			if(!dtoList.isEmpty()&& dtoList!=null){
-				List<String>   createdBy = dtoList.stream().filter(c->!c.getCreatedBy().isEmpty()).map(PurchaseOrderRemediationInput::getCreatedBy).collect(Collectors.toList());
-				List<String>     purchasingGroup = dtoList.stream().filter(c->!c.getCreatedBy().isEmpty()).map(PurchaseOrderRemediationInput::getPurchGroup).collect(Collectors.toList());
+				List<String>   createdBy = dtoList.stream().filter(c->!c.getCreatedBy().isEmpty()).map(PurchaseDocumentHeaderDto::getCreatedBy).collect(Collectors.toList());
+				List<String>     purchasingGroup = dtoList.stream().filter(c->!c.getCreatedBy().isEmpty()).map(PurchaseDocumentHeaderDto::getPurchGroup).collect(Collectors.toList());
 				String endPointurl = null;
 				// form url
 				if((!createdBy.isEmpty() && createdBy!=null)||(!purchasingGroup.isEmpty() && purchasingGroup!=null)){
@@ -2775,6 +2785,25 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
                      remediation.setUsers(remediList); 
                      return remediation;
 		}
+		
+		public RemediationUser formOutPutSuccessResponseForRule(List<ApproverDataOutputDto> approverList,String type)
+		{
+			 RemediationUser remediation = new RemediationUser();
+             remediation.setType(type);
+             remediation.setMessage("Success");
+             List<RemediationUserDto> remediList = new ArrayList<RemediationUserDto>();
+             if(!ServiceUtil.isEmpty(approverList)){
+             approverList.stream().forEach(r->{
+                  	   RemediationUserDto reme = new RemediationUserDto();
+                  	   reme.setUser(r.getUserOrGroup());
+                  	   remediList.add(reme);
+                     });}
+             else {
+            	 remediation.setMessage("Please check Default reccord in Bussiness rules , no process lead user found.");
+             }
+                     remediation.setUsers(remediList); 
+                     return remediation;
+		}
 		//Faiure
 		public RemediationUser formOutPutFailureResponse(String jsonOutputString,String type)
 		{
@@ -2785,11 +2814,22 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
     	  errorMessage.setUsers(Collections.emptyList());
 		        return errorMessage;
 		}
-		public List<List<String>> checkPurReqNumAndPurReqItem(List<PurchaseOrderRemediationInput> dtoList){
+		public RemediationUser formOutPutFailureResponseForRule(String jsonOutputString,String type)
+		{
+		  RemediationUser  errorMessage = new RemediationUser();
+    	  OdataErrorResponseDto response =  convertStringToJsonForOdataFailure(jsonOutputString);
+    	  errorMessage.setType(type);
+    	  errorMessage.setMessage(response.getError().getMessage().getValue());
+    	  errorMessage.setUsers(Collections.emptyList());
+		        return errorMessage;
+		}
+		
+		
+		public List<List<String>> checkPurReqNumAndPurReqItem(List<PurchaseDocumentHeaderDto> dtoList){
 			      
 			List<List<String>>    listOutput = new ArrayList<List<String>>();
-			List<PoDocumentItem> itemList = dtoList.stream().flatMap(e -> e.getPoDocumentItem().stream()).collect(Collectors.toList());
-  			List<PoDocumentItem>	 itemUnqiueList = itemList .stream().filter(distinctByKeys(PoDocumentItem::getPreqNum, PoDocumentItem::getPreqItem)).collect(Collectors.toList());
+			List<PurchaseDocumentItemDto> itemList = dtoList.stream().flatMap(e -> e.getPoItem().stream()).collect(Collectors.toList());
+  			List<PurchaseDocumentItemDto>	 itemUnqiueList = itemList .stream().filter(distinctByKeys(PurchaseDocumentItemDto::getPreqNum, PurchaseDocumentItemDto::getPreqItem)).collect(Collectors.toList());
   			List<String> prNumList = new ArrayList<String>();
   			List<String> prItemList = new ArrayList<String>();
    			itemUnqiueList.stream().forEach(prNum->{
@@ -2804,77 +2844,221 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		
 		
 		// AccountantSubmitApi 
+		@SuppressWarnings("unchecked")
 		@Override
-		public ResponseEntity<?>  accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit){
+		public ResponseEntity<?>  accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit) throws URISyntaxException, IOException{
 		// save api for invoice 
-		/*	
+			
+			List<RemediationUser> userList = new ArrayList<RemediationUser>();
 			// check for action Code
-			if(!ServiceUtil.isEmpty(invoiceSubmit.getPurchaseOrders()){
+			if(!ServiceUtil.isEmpty(invoiceSubmit.getPurchaseOrders())){
 			// if Accountant Submit For Remediation 
 			if(invoiceSubmit.getActionCode().equals(ApplicationConstants.ACCOUNTANT_SUBMIT_FOR_REMEDIATION)){
 				
-				if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.PO_MISSING_OR_INVALID )){
+				if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.PO_MISSING_OR_INVALID)){
 	         //If invoiceStatusCode=PO Missing-01 or ItemMismatch, Price Mismatch, price/qty mismatch then call getRemediationUsersAPI with buyer flag
 					// call remediation for BUYER
-				ResponseEntity<?>	 responseBuyer    = odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create, "BUYER",
+				ResponseEntity<?>	 responseBuyer    = odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(invoiceSubmit.getPurchaseOrders(), "BUYER",
 							"/PurchOrdDetailsSet?", "PurchaseOrderCreator");
 				//  get data of the remediation user with the success check 
-				
+						RemediationUser usersBuyer = (RemediationUser) responseBuyer.getBody();
+						userList.add(usersBuyer);
 				}
-				if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.NO_GRN )){
+				if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.NO_GRN)){
 					// call remediation for GRN by group 
-					 List<List<String>>   listOfprNumAndprItem = checkPurReqNumAndPurReqItem(dtoList);
+					 List<List<String>>   listOfprNumAndprItem = checkPurReqNumAndPurReqItem(invoiceSubmit.getPurchaseOrders());
 	                  List<String>   prNumList = listOfprNumAndprItem.get(0);
 	                  List<String>   prItemList = listOfprNumAndprItem.get(1);
-					if((prNumList.isEmpty() || prNumList==null)&& (prItemList.isEmpty()||prItemList==null)){
-					
-			    ResponseEntity<?> responsePurchGrp	= odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(create, "GRN",
+					if(ServiceUtil.isEmpty(prNumList) && ServiceUtil.isEmpty(prItemList)){
+			    ResponseEntity<?> responsePurchGrp	= odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(invoiceSubmit.getPurchaseOrders(), "GRN",
 								"/PurchGrpDetailsSet?", "PurchasingGroup");
 			    // get data of the remediation GRN user by purchase Group  with success Check 
-			
+			            RemediationUser usersGrnPurchGrp = (RemediationUser) responsePurchGrp.getBody();
+				        userList.add(usersGrnPurchGrp);
 					}else {
 						// get data of the remediation GRN user by request Id and Request Num 
 						ResponseEntity<?>  responseOfGrnPurReqAndItem =	odataGetRemediationDetailsForGrnByPurchReqAndPurchReqItem(prNumList,prItemList,"GRN","/PurchReqDetailsSet?");
 						 System.err.println("responseOfGrnPurReqAndItem "+responseOfGrnPurReqAndItem);
 						// get data for remediation GRN user by purReqNum and purReqItem
-						 
-						 
+						  RemediationUser userOfGrnPurReqAndItem = (RemediationUser) responseOfGrnPurReqAndItem.getBody();
+					        userList.add(userOfGrnPurReqAndItem);
 					}
-					
 				   }
+				// get overal respons e
+				invoiceSubmit.setUserList(userList);
+				System.err.println("Remediation User Response "+invoiceSubmit);
+				return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);
 				}
-				// update the remediation user list in invoice Object 
-			   return null;
-			}
-			// Accountant Submit For Approval
+			              // Accountant Submit For Approval
 			else if(invoiceSubmit.getActionCode().equals(ApplicationConstants.ACCOUNTANT_SUBMIT_FOR_APPROVAL)){
-				
 			        if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.READY_TO_POST)){
-					
+			        	List<ApproverDataOutputDto> lists = Collections.EMPTY_LIST;
+
 			        	// get process lead user 
+			        	AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
+						determination.setCompCode("1010");
+						determination.setProcessLeadCheck("Process Lead");
+						determination.setVednorId(invoiceSubmit.getInvoice().getVendorId());
+						ResponseEntity<?> responseRules = triggerRuleService(determination);
+						if(responseRules.getStatusCodeValue()==200){
+					                     lists = (List<ApproverDataOutputDto>) responseRules.getBody();
+					                     RemediationUser   processLeadUser = formOutPutSuccessResponseForRule(lists,"ProcessLead");
+					                    userList.add(processLeadUser);          
+						}else {
+							RemediationUser processLeadUser = new RemediationUser();
+							processLeadUser.setType("ProcessLead");
+							processLeadUser.setMessage(responseRules.getBody().toString());
+							processLeadUser.setUsers(Collections.emptyList());
+				               userList.add(processLeadUser);
+						}
 			        	
 				}
-				
 			    // update the Process lead user list in Invoice Object 
-				return null;
-			}
+			        invoiceSubmit.setUserList(userList);
+			        System.err.println("ProcessLead User Response "+invoiceSubmit);
+					return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);			}
 			else {
-				
 				// Accountant Submit For Reject
-				
 		            // get process lead user for reject 
-				
+				List<ApproverDataOutputDto> lists = Collections.EMPTY_LIST;
+				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
+				determination.setCompCode("1010");
+				determination.setProcessLeadCheck("Process Lead");
+				determination.setVednorId(invoiceSubmit.getInvoice().getVendorId());
+				ResponseEntity<?> responseRules = triggerRuleService(determination);
 				// update the process lead user list in invocieObject 
-				
-				return null;
-			}
-			
+				if(responseRules.getStatusCodeValue()==200){
+			                     lists = (List<ApproverDataOutputDto>) responseRules.getBody();
+			                     RemediationUser   processLeadUser = formOutPutSuccessResponseForRule(lists,"ProcessLead");
+			                    userList.add(processLeadUser);          
+				}else {
+					RemediationUser processLeadUser = new RemediationUser();
+					processLeadUser.setType("ProcessLead");
+					processLeadUser.setMessage(responseRules.getBody().toString());
+					processLeadUser.setUsers(Collections.emptyList());
+		               userList.add(processLeadUser);
+				}
+		}
+	    // update the Process lead user list in Invoice Object 
+	        invoiceSubmit.setUserList(userList);
+	        System.err.println("ProcessLead User Response "+invoiceSubmit);
+			return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);	
 		} 
-		else {
-			invoiceSubmit.set
-			return ResponseEntity<invoiceSubmit>()
-		}*/
-			return null;
-         }
-			
+       else {
+    	   invoiceSubmit.setMessage("Po Object List IS MISSING");
+    	   invoiceSubmit.setStatus(400);
+    	   return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit,HttpStatus.BAD_REQUEST);
+		}
+}
+		
+		
+		@Override
+		public ResponseEntity<?>  accountantSubmitOkApi(InvoiceSubmitDto invoiceSubmitOk){
+			if(!ServiceUtil.isEmpty(invoiceSubmitOk.getPurchaseOrders())){
+				
+				if(invoiceSubmitOk.getActionCode().equals(ApplicationConstants.ACCOUNTANT_SUBMIT_FOR_APPROVAL)){
+					// Accountant Submit For Approval
+					// close task 
+				ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmitOk.getTaskId());
+					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+						  // success 
+						    List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmitOk,invoiceSubmitOk.getActionCode(),"ACCOUNTTANT_SUBMIT_APPROVAL");
+						    invoiceSubmitOk.getInvoice().setActivityLog(activity);
+						    // save all the things - activity log and comments
+						  invoiceSubmitOk.setMessage("Task Completed.");
+					  }else {
+						  // failed 
+						  invoiceSubmitOk.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+					  }
+					return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmitOk,HttpStatus.OK);
+				} else if(invoiceSubmitOk.getActionCode().equals(ApplicationConstants.ACCOUNTANT_SUBMIT_FOR_REMEDIATION)){
+					// if Accountant Submit For Remediation 
+					ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmitOk.getTaskId());
+					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+						  // success 
+						      List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmitOk,invoiceSubmitOk.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+						      invoiceSubmitOk.getInvoice().setActivityLog(activity);
+						      // save all the things - activity log and comments
+						      invoiceSubmitOk.setMessage("Task Completed.");
+				
+					  }else {
+						  // failed 
+						  invoiceSubmitOk.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+					  }
+						return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmitOk,HttpStatus.OK);			
+				   }else {
+					   ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmitOk.getTaskId());
+						  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+							  // success 
+							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmitOk,invoiceSubmitOk.getActionCode(),"ACCOUNTTANT_SUBMIT_REJECT");
+							  invoiceSubmitOk.getInvoice().setActivityLog(activity);
+							  // save all things - activity log and comments
+							  invoiceSubmitOk.setMessage("Task Completed.");
+						  }else {
+							  // failed 
+							  invoiceSubmitOk.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+						  }
+					   // Account Submit For Reject    
+				return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmitOk,HttpStatus.OK);	
+			          } 
+		     }else {
+	    	   invoiceSubmitOk.setMessage("Po Object List IS MISSING");
+	    	   invoiceSubmitOk.setStatus(400);
+	    	   return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmitOk,HttpStatus.BAD_REQUEST);
+			}
+		}
+		
+		@Override
+		public List<ActivityLogDto> createActivityLogForSubmit(InvoiceSubmitDto invoiceSubmitOk,String actionCode,String actionCodeText){
+			     List<ActivityLogDto>   activitLogs     = invoiceSubmitOk.getInvoice().getActivityLog();
+			if(!activitLogs.isEmpty()){
+				//update activity log of the previous values
+				activitLogs.stream().forEach(activity->{
+					activity.setActionCode(actionCode);
+					activity.setActionCodeText(actionCodeText);
+					activity.setCreatedAt(ServiceUtil.getEpocTime());
+					activity.setCreatedBy(invoiceSubmitOk.getInvoice().getTaskOwner());
+					activity.setInvoiceStatusCode(invoiceSubmitOk.getInvoice().getInvoiceStatus());
+					activity.setInvoiceStatusText(invoiceSubmitOk.getInvoice().getInvoiceStatusText());
+					activity.setProcessor(invoiceSubmitOk.getInvoice().getProcessor());
+					activity.setRequestId(invoiceSubmitOk.getInvoice().getRequestId());
+					activity.setTaskCreatedAt(invoiceSubmitOk.getInvoice().getRequest_created_at());
+					activity.setTaskId(invoiceSubmitOk.getTaskId());
+					activity.setTaskOwner(invoiceSubmitOk.getInvoice().getTaskOwner());
+					activity.setTaskStatus("COMPLETED");
+					activity.setWorkflowCreateBy(invoiceSubmitOk.getInvoice().getRequest_created_by());
+					activity.setWorkflowCreatedAt(invoiceSubmitOk.getInvoice().getRequest_created_at());
+					activity.setWorkflowId(invoiceSubmitOk.getInvoice().getWorkflowId());
+					activity.setWorkflowStatus("IN-PROGRESS");
+				});	
+			}
+			ActivityLogDto activity = createActivityLogForPoOrNonPo(invoiceSubmitOk.getInvoice());
+			activitLogs.add(activity);
+		return activitLogs;
+		}
+		
+		// create activity for po and nonPo 
+		@Override
+		public ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader){
+			ActivityLogDto activity = new ActivityLogDto();
+			activity.setGuid(UUID.randomUUID().toString());
+			activity.setActionCode("CREATED");// set the action code
+			activity.setActionCodeText("CREATED");
+			activity.setCreatedAt(ServiceUtil.getEpocTime());
+			activity.setCreatedBy(invoiceHeader.getTaskOwner());
+			activity.setInvoiceStatusCode(invoiceHeader.getInvoiceStatus());
+			activity.setInvoiceStatusText(invoiceHeader.getInvoiceStatusText());
+			activity.setProcessor(invoiceHeader.getProcessor());
+			activity.setRequestId(invoiceHeader.getRequestId());
+			activity.setTaskCreatedAt(invoiceHeader.getRequest_created_at());
+			activity.setTaskId(invoiceHeader.getTaskId());
+			activity.setTaskOwner(invoiceHeader.getTaskOwner());
+			activity.setTaskStatus("IN-PROGRESS");
+			activity.setWorkflowCreateBy(invoiceHeader.getRequest_created_by());
+			activity.setWorkflowCreatedAt(invoiceHeader.getRequest_created_at());
+			activity.setWorkflowId(invoiceHeader.getWorkflowId());
+			activity.setWorkflowStatus("IN-PROGRESS");
+		    return activity;
+		}
+
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
+import com.ap.menabev.dto.ActivityLogDto;
 import com.ap.menabev.dto.ClaimAndReleaseDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.HeaderCheckDto;
@@ -15,6 +16,7 @@ import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceSubmitDto;
+import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
@@ -44,17 +46,20 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> deleteDraft(List<String> requestId);
     ResponseEntity<?> claimTaskOfUser(ClaimAndReleaseDto dto);
 	ResponseEntity<?>  getInboxTaskWithMultipleSearch(FilterMultipleHeaderSearchDto filterDto);
+    ResponseEntity<?> getRemediationUserDetails(List<PurchaseDocumentHeaderDto> dtoList,String userListNeeded) throws URISyntaxException, IOException;
+	ResponseEntity<?> getInboxUserTask(FilterMultipleHeaderSearchDto filterDto);
+	ResponseEntity<?> getInvoiceDetail(String requestId);
+	ResponseEntity<?> accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit) throws URISyntaxException, IOException;
+	InvoiceHeaderDto saveAPI(InvoiceHeaderDto dto);
+	ResponseEntity<?> odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(
+			List<PurchaseDocumentHeaderDto> dtoList, String userListNeeded, String entitySet, String param)
+			throws URISyntaxException, IOException;
 	ResponseEntity<?> odataGetRemediationDetailsForGrnByPurchReqAndPurchReqItem(List<String> purchaseReqList,
 			List<String> purchaseReqItemList, String userListNeeded, String entitySet)
 			throws URISyntaxException, IOException;
-	ResponseEntity<?> odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(
-			List<PurchaseOrderRemediationInput> dtoList, String userListNeeded, String entitySet, String param)
-			throws URISyntaxException, IOException;
-	ResponseEntity<?> getRemediationUserDetails(List<PurchaseOrderRemediationInput> dtoList, String userListNeeded)
-			throws URISyntaxException, IOException;
-	public ResponseEntity<?> getInboxUserTask(FilterMultipleHeaderSearchDto filterDto);
-	ResponseEntity<?> getInvoiceDetail(String requestId);
-	ResponseEntity<?> accountantInvoiceSubmit(InvoiceSubmitDto invoiceSubmit);
-	InvoiceHeaderDto saveAPI(InvoiceHeaderDto dto);	
+	ResponseEntity<?> accountantSubmitOkApi(InvoiceSubmitDto invoiceSubmitOk);
+	ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader);
+	List<ActivityLogDto> createActivityLogForSubmit(InvoiceSubmitDto invoiceSubmitOk, String actionCode,
+			String actionCodeText);	
 
 }
