@@ -1,118 +1,123 @@
 package com.ap.menabev.entity;
 
 
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
-import com.ap.menabev.dto.PurchaseDocumentItemPkDto;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "Purchase_Document_Item")
-@IdClass(PurchaseDocumentItemPkDto.class)
+@Table(name = "PO_ITEM")
 @Getter
 @Setter
 @ToString
-public class PurchaseDocumentItemDo implements Serializable{
-
-	private static final long serialVersionUID = 3875994822103092792L;
-	
-	@Id
-	@Column(name = "DOCUMENT_NUMBER")
+public class PurchaseDocumentItemDo{
+    @Id
+	@Column(name="ITEM_UUID")
+	private String itemUuid = UUID.randomUUID().toString();
+    @Column(name="DOCUMENT_NUMBER",length=10)
 	private String documentNumber;
-	
-	@Id
-	@Column(name = "DOCUMENT_ITEM")
-	private String documentItem;//Item_Id
-	
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PurchaseDocItem")
-//	@GenericGenerator(name = "PurchaseDocItem", strategy = "com.incture.ap.sequences.PurchaseDocumentItemSequenceGenerator", parameters = {
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.INCREMENT_PARAM, value = "1"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.VALUE_PREFIX_PARAMETER, value = "PDI"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.NUMBER_FORMAT_PARAMETER, value = "%06d"),
-//			@Parameter(name = InvoiceHeaderSequenceGenerator.SEQUENCE_PARAM, value = "PURCHASE_DOCUMENT_ITEM_SEQ") })
-	@Column(name = "PURCHASE_DOCUMENT_ITEM_ID")
-	private String purchaseDocumentItemId;
-
-	@Column(name = "DELETION_IND")
-	private Boolean deletionInd;
-	
-	@Column(name = "SHORT_TEXT")
-	private String shortText;//Description
-	
-	@Column(name = "MATERIAL_NUM")
-	private String materialNum;
-	@Column(name = "VEND_MAT")
-	private String vendMat;
-	@Column(name = "PLANT")
+	@Column(name="DOCUMENT_ITEM",length=5)
+	private String documentItem;
+	@Column(name="DELETE_IND",length=1)
+	private String deleteInd;
+	@Column(name="SHORT_TEXT",length=40)
+	private String shortText;
+	@Column(name="MATERIAL",length=18)
+	private String material;
+	@Column(name="MATERIAL_EXT",length=40)
+	private String materialExt;
+	@Column(name="E_MATERIAL",length=18)
+	private String eMaterial;
+	@Column(name="PLANT",length=4)
 	private String plant;
-	@Column(name = "STG_LOC")
-	private String stgLoc;
-	@Column(name = "PO_QTY")
-	private BigDecimal poQty;
-	@Column(name = "ORDER_UNIT")
-	private String orderUnit;
-	@Column(name = "ORDER_PRICE_UNIT")
-	private String orderPriceUnit;//UOM
-	@Column(name = "CONV_NUM1")
-	private BigDecimal convNum1;
-	@Column(name = "CONV_DEN1")
-	private BigDecimal convDen1;
-	@Column(name = "NET_PRICE")
-	private BigDecimal netPrice;
-	@Column(name = "PRICE_UNIT")
-	private String priceUnit;
-	@Column(name = "TAX_CODE")
+	@Column(name="STORAGE_LOCATION",length=4)
+	private String storageLoc;
+	@Column(name="TRAKING_NO",length=10)
+	private String trackingNo;
+	@Column(name="MATERIAL_GROUP",length=9)
+	private String materialGrp;
+	@Column(name="INFO_RECORD",length=10)
+	private String infoRecord;
+	@Column(name="VENDOR_MATERIAL",length=35)
+	private String vendMat;
+	@Column(name="QUANTITY",length=13)
+	private Double quantity;
+	@Column(name="PO_UNIT",length=3)
+	private String poUnit;
+	@Column(name="PO_UNIT_ISO",length=3)
+	private String poUnitISO;
+	@Column(name="ORDER_PRICE_UNIT",length=3)
+	private String orderPriceUnit;
+	@Column(name="ORDER_PRICE_UNIT_ISO",length=3)
+	private String orderPriceUnitISO;
+	@Column(name="CONV_NUM1",length=5)
+	private Double convNum1;
+	@Column(name="CONV_DEN1",length=5)
+	private Double convDen1;
+	@Column(name="NET_PRICE",length=11)
+	private Double netPrice;
+	@Column(name="PRICE_UNIT",length=5)
+	private Double priceUnit;
+	@Column(name="GR_PR_TIME",length=3)
+	private Double grPrTime;
+	@Column(name="TAX_CODE",length=2)
 	private String taxCode;
-	@Column(name = "NO_MORE_GR")
-	private Boolean noMoreGr;
-	@Column(name = "ITEM_CAT")
-	private String itemCat;
-	@Column(name = "ACCTASSCAT")
-	private String acctasscat;
-	@Column(name = "GR_IND")
-	private Boolean grInd;
-	@Column(name = "IR_IND")
-	private Boolean irInd;
-	@Column(name = "GR_BASEDIV")
-	private Boolean grBasediv;
-	@Column(name = "NET_WEIGHT")
-	private BigDecimal netWeight;
-	@Column(name = "NET_VOLUME")
-	private BigDecimal netVolume;
-	@Column(name = "BASE_UNIT")
-	private Integer baseUnit;
-	
-	@Column(name="UPC_CODE")
-	private String upcCode;
-	
-	@Column(name="DELIVERED_QTY")
-	private String deliveredQty;
-	
-	@Column(name="INVOICE_QTY")
-    private String invoiceQty;
-	
-	@Column(name="TAX_PERCENTAGE")
-    private String taxPercentage;
-	
-	@Column(name="TOTAL_PRICE")
-    private String totalPrice;//net Price
-	
-	@Column(name="TAX_AMOUNT")
-    private String taxAmount;
-	
-	@Column(name="DELIVERY_DATE")
-    private Date deliveryDate;
-	
-	
+	@Column(name="NO_MORE_GR",length=1)
+	private String noMoreGr;
+	@Column(name="FINAL_INV_IND",length=1)
+	private String finalInvInd;
+	@Column(name="ITEM_CATEGORY",length=1)
+	private String itemCategory;
+	@Column(name="ACCOUNT_ASS_CAT",length=1)
+	private String accountAssCat;
+	@Column(name="DISTRIBUTION",length=1)
+	private String distribution;
+	@Column(name="PART_INV",length=1)
+	private String partInv;
+	@Column(name="GR_IND",length=1)
+	private String grInd;
+	@Column(name="GR_NON_VAL",length=1)
+	private String gr_non_val;
+	@Column(name="IR_IND",length=1)
+	private String irInd;
+	@Column(name="GR_BSD-IV-IND",length=1)
+	private String grBsdIVInd;
+	@Column(name="SRV_BSD_IV_IND",length=1)
+	private String srvBsdIVInd;
+	@Column(name="AGREEMENT",length=10)
+	private String agreement;
+	@Column(name="AGREEMENT_ITM",length=5)
+	private String agreeemntItm;
+	@Column(name="TAX_JUR_CODE",length=15)
+	private String taxJurCode;
+	@Column(name="SUPPL_VENDOR",length=10)
+	private String supplVendor;
+	@Column(name="PREQ_NUM",length=10)
+	private String preqNum;
+	@Column(name="PREQ_ITEM",length=5)
+	private String preqItem;
+	@Column(name="CONTRACT_NUM",length=10)
+	private String contractNum;
+	@Column(name="CONTRACT_ITM",length=10)
+	private String contractItm;
+	@Column(name="REF_DOC_NUM",length=10)
+	private String refDocNum;
+	@Column(name="REF_DOC_ITEM",length=5)
+	private String refDocItem;
+	@Column(name="DELI_COMPLETE",length=1)
+	private String delivComplete;
+	@Column(name="PART_DELV",length=1)
+	private String partDelv;
+	@Column(name="ITEM_CHANGED_AT",length=8)
+	private Long itemChangedAt;
+	@Column(name="PRODUCT_TYPE", length=2)
+	private String productType;
+
 }
