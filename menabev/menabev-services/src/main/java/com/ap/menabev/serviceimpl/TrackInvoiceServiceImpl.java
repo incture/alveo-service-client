@@ -199,7 +199,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			 * requestId.get(i) + "'" + ","); } else { rqstId.append("'" +
 			 * requestId.get(i) + "'"); } }
 			 */
-			filterQueryMap.put(" RR.REQUEST_ID IN", "(" + dto.getRequestId() + ")");
+			filterQueryMap.put(" RR.REQUEST_ID IN", "('"  + dto.getRequestId() + "')");
 		}
 		if (dto.getCompanyCode() != null && !dto.getCompanyCode().isEmpty()) {
 			StringBuffer rqstId = new StringBuffer();
@@ -209,7 +209,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			 * requestId.get(i) + "'" + ","); } else { rqstId.append("'" +
 			 * requestId.get(i) + "'"); } }
 			 */
-			filterQueryMap.put(" RR.COMPANY_CODE IN", "(" + dto.getCompanyCode() + ")");
+			filterQueryMap.put(" RR.COMPANY_CODE IN", "('" + dto.getCompanyCode() + "')");
 		}
 		if (dto.getVendorId() != null && !dto.getVendorId().isEmpty()) {
 			StringBuffer rqstId = new StringBuffer();
@@ -244,12 +244,14 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		}
 
 		if (dto.getRequestCreatedOnFrom() != 0) {
-			filterQueryMap.put(" RR.REQUEST_CREATED_AT =", dto.getRequestCreatedOnTo() + "");
+			filterQueryMap.put(" RR.REQUEST_ID IN", "('"  + dto.getRequestId() + "')");
+
+			filterQueryMap.put(" RR.REQUEST_CREATED_AT =", "('" +dto.getRequestCreatedOnTo() +"')");
 			// correct
 		}
 
 		if (dto.getInvoiceRefNum() != null && !dto.getInvoiceRefNum().isEmpty()) {
-			filterQueryMap.put(" RR.INVOICE_REF_NUMBER =", dto.getInvoiceRefNum() + "");
+			filterQueryMap.put(" RR.EXT_INV_NUM =", dto.getInvoiceRefNum() + "");
 			// correct
 		}
 
