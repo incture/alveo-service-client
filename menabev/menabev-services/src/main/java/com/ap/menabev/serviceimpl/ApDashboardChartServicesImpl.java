@@ -21,6 +21,8 @@ import com.ap.menabev.dto.ApChartUIDto;
 import com.ap.menabev.dto.ApChartValues;
 import com.ap.menabev.dto.ApCharts;
 import com.ap.menabev.dto.ApDashboardCharts;
+import com.ap.menabev.dto.ApDashboardKPIDto;
+import com.ap.menabev.dto.ApDashboardKPIValuesDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.ApDashboardChartRepository;
 import com.ap.menabev.service.ApDashboardChartServices;
@@ -82,7 +84,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 					"PARTIAL GRN", "UOM MISMATCH", "ITEM MISMATCH", "QTY MISMATCH", "PRICE MISMATCH", "PRICE/QTY",
 					"BALANCE MISMATCH", "SAP POSTED", "PAID", "UNPAID" };
 			String agingArr[] = { "1", "+1", "+7", "+14", "+21", "+28" };
-			
+
 			HashMap<String, Integer> exceptionMap = new HashMap<String, Integer>();
 
 			HashMap<String, Integer> aigingMap = new HashMap<String, Integer>();
@@ -110,7 +112,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 					}
 
 				}
-				
+
 				if (!ServiceUtil.isEmpty(list.getDueDate())) {
 
 					long currentTimestamp = System.currentTimeMillis();
@@ -143,7 +145,8 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 						} else {
 							aigingMap.put(today, 1);
 						}
-					} else {aigingMap.put(today, 0);
+					} else {
+						aigingMap.put(today, 0);
 					}
 					if (dayCount >= 8 && dayCount <= 14) {
 						if (aigingMap.containsKey(date7)) {
@@ -151,7 +154,8 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 						} else {
 							aigingMap.put(date7, 1);
 						}
-					} else {aigingMap.put(date7, 0);
+					} else {
+						aigingMap.put(date7, 0);
 					}
 					if (dayCount >= 15 && dayCount <= 21) {
 						if (aigingMap.containsKey(date14)) {
@@ -159,7 +163,8 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 						} else {
 							aigingMap.put(date14, 1);
 						}
-					} else {aigingMap.put(date14, 0);
+					} else {
+						aigingMap.put(date14, 0);
 					}
 					if (dayCount >= 22 && dayCount <= 28) {
 						if (aigingMap.containsKey(date21)) {
@@ -167,7 +172,8 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 						} else {
 							aigingMap.put(date21, 1);
 						}
-					} else {aigingMap.put(date21, 0);
+					} else {
+						aigingMap.put(date21, 0);
 					}
 					if (dayCount > 28) {
 						if (aigingMap.containsKey(date28)) {
@@ -175,7 +181,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 						} else {
 							aigingMap.put(date28, 1);
 						}
-					}else{
+					} else {
 						aigingMap.put(date28, 0);
 					}
 
@@ -183,24 +189,22 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			}
 
 			// for Exception payloas
-				for(String s:arr)
-				{
-					if (exceptionMap.containsKey(s)) {
-						
-					} else {
-						exceptionMap.put(s, 0);
-					}
-					
+			for (String s : arr) {
+				if (exceptionMap.containsKey(s)) {
+
+				} else {
+					exceptionMap.put(s, 0);
 				}
-				for(String s:agingArr)
-				{
-					if (aigingMap.containsKey(s)) {
-						
-					} else {
-						aigingMap.put(s, 0);
-					}
-					
+
+			}
+			for (String s : agingArr) {
+				if (aigingMap.containsKey(s)) {
+
+				} else {
+					aigingMap.put(s, 0);
 				}
+
+			}
 
 			logger.error("exceptionMap = " + exceptionMap);
 			logger.error("aigingMap = " + aigingMap);
@@ -281,5 +285,95 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			return new Long("-1");
 		}
 	}
+
+	@Override
+	public ResponseEntity<?> getKPIDetails(ApChartUIDto dto) {
+		try {
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+			String rcvdOnFrom = dto.getRcvdOnFrom();
+			String rcvdOnTo = dto.getRcvdOnTo();
+			Date date = new Date();
+			Date date1 = new Date();
+			try {
+				date = dateFormat.parse(rcvdOnFrom);
+				date1 = dateFormat.parse(rcvdOnTo);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			long fromDate = date.getTime();
+			long toDate = date1.getTime();
+
+			String companyCode = dto.getCompanyCode();
+			String currency = dto.getCurrency();
+			List<String> vendorId = dto.getVendorId();
+
+			ApDashboardKPIDto kpiDto = new ApDashboardKPIDto();
+			
+//			 List<ApDashboardKPIValuesDto> kpiValuesDto=  getKPIValueList(fromDate, toDate, companyCode, currency, vendorId);
+			List<ApDashboardKPIValuesDto> kpiValuesDto = new ArrayList<ApDashboardKPIValuesDto>();
+
+			List<InvoiceHeaderDo> todaykpiValuesDto = new ArrayList<InvoiceHeaderDo>();
+			List<InvoiceHeaderDo> patodaykpiValuesDto = new ArrayList<InvoiceHeaderDo>();
+			List<InvoiceHeaderDo> poBasedkpiValuesDto = new ArrayList<InvoiceHeaderDo>();
+			List<InvoiceHeaderDo> npoBkpiValuesDto = new ArrayList<InvoiceHeaderDo>();
+			List<InvoiceHeaderDo> OverDuekpiValuesDto = new ArrayList<InvoiceHeaderDo>();
+
+			todaykpiValuesDto = repo.getTodayKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+
+			ApDashboardKPIValuesDto values0 = new ApDashboardKPIValuesDto();
+			values0.setLabel("Today");
+			values0.setIcon("");
+			values0.setCount(todaykpiValuesDto.size());
+			kpiValuesDto.add(values0);
+
+			ApDashboardKPIValuesDto values1 = new ApDashboardKPIValuesDto();
+			values1.setLabel("Pending Approval");
+			values1.setIcon("");
+			values1.setCount(patodaykpiValuesDto.size());
+			kpiValuesDto.add(values1);
+
+			ApDashboardKPIValuesDto values2 = new ApDashboardKPIValuesDto();
+			values2.setLabel("PO Based");
+			values2.setIcon("");
+			values2.setCount(poBasedkpiValuesDto.size());
+			kpiValuesDto.add(values2);
+
+			ApDashboardKPIValuesDto values3 = new ApDashboardKPIValuesDto();
+			values3.setLabel("Non-PO Based");
+			values3.setIcon("");
+			values3.setCount(npoBkpiValuesDto.size());
+			kpiValuesDto.add(values3);
+
+			ApDashboardKPIValuesDto values4 = new ApDashboardKPIValuesDto();
+			values4.setLabel("Over Due");
+			values4.setIcon("");
+			values4.setCount(OverDuekpiValuesDto.size());
+			kpiValuesDto.add(values4);
+			
+			
+			kpiDto.setRcvdOnFrom(rcvdOnFrom);
+			kpiDto.setRcvdOnTo(rcvdOnTo);
+			kpiDto.setChartName("KPI's"); 
+			kpiDto.setTotal(0);
+			kpiDto.setCharts(kpiValuesDto);
+			return new ResponseEntity<ApDashboardKPIDto>(kpiDto, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Failed due to " + e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+//	public static List<ApDashboardKPIValuesDto> getKPIValueList(long fromDate, long toDate, String companyCode, String currency,List<String> vendorId) throws ParseException {
+
+	//		return kpiValuesDto;
+//	}
 
 }

@@ -26,8 +26,13 @@ public class ApDashboardChartController {
 	
 //	@GetMapping("/getDashboardChartDetails")
 	@PostMapping("/getDashboardChartDetails")
-	public ResponseEntity<?> getByDates(@RequestBody ApChartUIDto dto){
+	public ResponseEntity<?> getDashboardChartDetailsBetween(@RequestBody ApChartUIDto dto){
 		return services.getDashboardChartDetailsBetween(dto);
 	}
 
+	
+	@PostMapping("/getKPIDetails")
+	public ResponseEntity<?> getKPIDetails(@RequestBody ApChartUIDto dto){
+		return services.getKPIDetails(dto);
+	}
 }
