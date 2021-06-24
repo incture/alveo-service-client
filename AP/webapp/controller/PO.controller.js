@@ -189,6 +189,55 @@ sap.ui.define([
 			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			POServices.onDueDateChange(oEvent, this);
 		},
+		
+		onClickInvoiceAccAssignment: function (oEvent) {
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var oPOModel = this.getView().getModel("oPOModel");
+			var invoiceItemAccAssgn = oPOModel.getProperty(sPath + "/invoiceItemAccAssgn");
+			oPOModel.setProperty("/invoiceItemAccAssgn", invoiceItemAccAssgn);
+			this.GLCodingDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.GLCoding", this);
+			this.getView().addDependent(this.GLCodingDialog);
+			this.GLCodingDialog.open();
+		},
+
+		onCancelGLCoding: function () {
+			this.GLCodingDialog.close();
+		},
+
+		addGLCodingRow: function (oEvent) {
+			var oPOModel = this.getView().getModel("oPOModel"),
+				oPOModelData = oPOModel.getData();
+			if (!oPOModelData.invoiceItemAccAssgn) {
+				oPOModelData.invoiceItemAccAssgn = [];
+			}
+			oPOModelData.invoiceItemAccAssgn.unshift({
+				"accountAssgnGuid": "",
+				"requestId": "",
+				"itemId": "",
+				"serialNo": "",
+				"isDeleted": "",
+				"isUnplanned": "",
+				"qty": 0,
+				"qtyUnit": "",
+				"distPerc": "",
+				"netValue": "",
+				"glAccount": "",
+				"costCenter": "",
+				"debitOrCredit": "",
+				"text": "",
+				"taxValue": "",
+				"taxPercentage": "",
+				"taxCode": ""
+			});
+			oPOModel.refresh();
+		},
+		
+		deleteNonPoItemData: function (oEvent) {
+			var oPOModel = this.getView().getModel("oPOModel");
+			var index = oEvent.getSource().getParent().getBindingContextPath().split("/")[2];
+			oPOModel.getData().invoiceItemAccAssgn.splice(index, 1);
+			oPOModel.refresh();
+		},
 
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered

@@ -1,0 +1,71 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<Dialog class="sapUiSizeCompact" contentWidth="75%">
+		<customHeader>
+			<OverflowToolbar>
+				<Title text="{i18n>GLCoding}"/>
+				<ToolbarSpacer/>
+				<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" icon="sap-icon://add" class="SecondaryBtn" press="addGLCodingRow"/>
+			</OverflowToolbar>
+		</customHeader>
+		<content>
+			<VBox class="sapUiSmallMargin">
+				<Table items="{oPOModel>/invoiceItemAccAssgn}" sticky="ColumnHeaders">
+					<columns>
+						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>Description}" design="Bold"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>DCINdicator}" design="Bold"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+							<Label text="{i18n>CostCentre}" design="Bold" required="true"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+							<Label text="{i18n>Quantity}" design="Bold"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+							<Label text="{i18n>Amount}" design="Bold" required="true"/>
+						</Column>
+						<Column hAlign="Center" minScreenWidth="Desktop" demandPopin="true"></Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Input value="{oPOModel>glAccount}" filterSuggests="false" showSuggestion="true" class="glaccount"
+									suggestionItems="{oDropDownModel>/GLAccountResult}" suggestionItemSelected="AAGlAccountSelected" suggest="glAccountSuggest"
+									change="errorHandler" valueState="{oPOModel>glError}">
+									<suggestionItems>
+										<core:ListItem text="{oDropDownModel>GlAccnt}" additionalText="{oDropDownModel>GlAccountName}"/>
+									</suggestionItems>
+								</Input>
+								<Text class="sapUiTinyMarginEnd" text="{oPOModel>materialDescription}"/>
+								<Select selectedKey="{oPOModel>debitOrCredit}" change="onInvoiceDetailsChangeCrDr">
+									<core:Item text="Debit" key="H"/>
+									<core:Item text="Credit" key="S"/>
+								</Select>
+								<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
+									valueState="{oPOModel>costCenterError}" change="onChangeCostCenter">
+									<items>
+										<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
+									</items>
+								</Select>
+								<Input value="{oPOModel>qty}" type="Number"/>
+								<Input value="{oPOModel>amount}"/>
+								<Button type="Reject" icon="sap-icon://delete" tooltip="{i18n>Delete}" press="deleteNonPoItemData" class="sapUiTinyMarginEnd"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</content>
+		<beginButton>
+			<Button text="{i18n>Cancel}" press="onCancelGLCoding"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>Done}" press="onClickDoneGLCoding" enabled="false"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

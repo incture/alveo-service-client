@@ -48,7 +48,7 @@
 						</Column>
 					</columns>
 					<items>
-						<ColumnListItem>
+						<ColumnListItem highlight="{path: 'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}">
 							<cells>
 								<Input value="{oPOModel>itemText}" change="onChangeInvoiceItemText"/>
 								<Input value="{oPOModel>invQty}" change="onChangeInvoiceInvQty"/>
@@ -57,7 +57,7 @@
 								<Input value="{oPOModel>netWorth}" change="onChangeInvoiceNetWorth"/>
 								<Text text="{oPOModel>avlQtyUoM}"/>
 								<Text text="{oPOModel>taxCode}"/>
-								<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment"/>
+								<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment" visible="{oPOModel>accountAssignmentCat}"/>
 							</cells>
 						</ColumnListItem>
 					</items>
