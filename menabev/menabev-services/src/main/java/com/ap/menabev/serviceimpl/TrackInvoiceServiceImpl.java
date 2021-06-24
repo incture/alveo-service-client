@@ -1,6 +1,7 @@
 package com.ap.menabev.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.ap.menabev.dto.OdataOutPutPayload;
+import com.ap.menabev.dto.OdataResponseDto;
+import com.ap.menabev.dto.OdataResultObject;
+import com.ap.menabev.dto.OdataTrackInvoiceObject;
+import com.ap.menabev.dto.OdataTrackInvoiceOutputPayload;
+import com.ap.menabev.dto.OdataTrackInvoiceResponseDto;
+import com.ap.menabev.dto.RemediationUser;
+import com.ap.menabev.dto.RemediationUserDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.TrackInvoiceInputDto;
+import com.ap.menabev.dto.TrackInvoiceOdataOutputResponse;
 import com.ap.menabev.dto.TrackInvoiceOutputDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
@@ -23,6 +33,7 @@ import com.ap.menabev.service.PoSearchApiService;
 import com.ap.menabev.service.TrackInvoiceService;
 import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
+import com.google.gson.Gson;
  
 @Service
 public class TrackInvoiceServiceImpl implements TrackInvoiceService {
@@ -64,7 +75,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			}
 		 }
 		for(InvoiceHeaderDo headerDo:sapPostedList ){
-				invoiceReferenceNumberList.add(headerDo.getInvoice_ref_number());
+				invoiceReferenceNumberList.add(headerDo.getExtInvNum());
+		logger.info("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
 		}
 				//ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet", invoiceReferenceNumberList.toString(), "GET", odataHelperClass.getDestination("SD4_DEST"));
 		}
@@ -72,16 +84,74 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
 		String endPointurl = formInputUrl(invoiceReferenceNumberList);
 		ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataService(endPointurl,null, "GET", map);
-		//List<TrackInvoiceInputDto> oDataBody=(List<TrackInvoiceInputDto>) odataResponse.getBody();
-		//oDataBody 
-		
-		return odataResponse;
+		 if(odataResponse.getStatusCodeValue()==200){
+             String jsonOutputString = (String) odataResponse.getBody();
+             System.err.println("ECCResponse "+jsonOutputString);
+          // convert OuputResponse  
+             TrackInvoiceOdataOutputResponse  trackInvoiceOdataOutputResponse =  formOutPutSuccessResponse(jsonOutputString);
+	             System.err.println("convertedResponse "+trackInvoiceOdataOutputResponse);
+	           if(!ServiceUtil.isEmpty( trackInvoiceOdataOutputResponse.getUsers())){
+	        	   for(OdataTrackInvoiceObject odataTrackInvoiceObject:trackInvoiceOdataOutputResponse.getUsers())
+	        	   {
+	        		   if(!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate())){
+	        			   
+	        		   }
+	        	   }
+	           }
+	             
+	             return new ResponseEntity<TrackInvoiceOdataOutputResponse>(trackInvoiceOdataOutputResponse,HttpStatus.OK);
+          }else {
+           	  String jsonOutputString = (String) odataResponse.getBody();
+           	TrackInvoiceOdataOutputResponse  errorMessage =  formOutPutFailureResponse(jsonOutputString);	  
+           	  System.err.println("convertedRrrorResponse "+odataResponse);
+  		return new ResponseEntity<TrackInvoiceOdataOutputResponse>(errorMessage,HttpStatus.BAD_REQUEST);
+       }
 		}
 		catch(Exception e){
 			logger.info(e.toString());
 			return null;
 		}
 	}
+	public TrackInvoiceOdataOutputResponse formOutPutSuccessResponse(String jsonOutputString)
+	{
+		TrackInvoiceOdataOutputResponse trackInvoiceOdataOutputResponse = new TrackInvoiceOdataOutputResponse();
+		trackInvoiceOdataOutputResponse.setType("TEST_SUCCESS");
+		trackInvoiceOdataOutputResponse.setMessage("Success");
+         List<OdataTrackInvoiceObject> trackInvoiceOutputDtoList = new ArrayList<OdataTrackInvoiceObject>();
+         OdataTrackInvoiceResponseDto  taskDto =     convertStringToJsonForOdataSuccess(jsonOutputString);
+        OdataTrackInvoiceOutputPayload    outResp =  taskDto.getD();
+                 List<OdataTrackInvoiceObject> resultList = outResp.getResults();
+                 resultList.stream().forEach(r->{
+              	 trackInvoiceOutputDtoList.add(r);
+                 });
+                 trackInvoiceOdataOutputResponse.setUsers(trackInvoiceOutputDtoList); 
+                 return trackInvoiceOdataOutputResponse;
+	}
+	//Faiure
+			public TrackInvoiceOdataOutputResponse formOutPutFailureResponse(String jsonOutputString)
+			{
+				TrackInvoiceOdataOutputResponse errorMessage = new TrackInvoiceOdataOutputResponse();
+		    	  OdataErrorResponseDto response =  convertStringToJsonForOdataFailure(jsonOutputString);
+				errorMessage.setType("TEST_ERROR");
+		    	  errorMessage.setMessage(response.getError().getMessage().getValue());
+		        
+		                 errorMessage.setUsers(Collections.emptyList()); 
+		                 return errorMessage;
+			  
+			}
+			
+			// get odata success body
+			public OdataTrackInvoiceResponseDto convertStringToJsonForOdataSuccess(String json){
+				OdataTrackInvoiceResponseDto  taskDto = new Gson().fromJson(json.toString(),
+						OdataTrackInvoiceResponseDto.class);
+				return taskDto;
+			}
+			// get odata Failure  body 
+			public OdataErrorResponseDto convertStringToJsonForOdataFailure(String json){
+				OdataErrorResponseDto response = new Gson().fromJson(json.toString(),
+						OdataErrorResponseDto.class);
+				return response;
+			}
 	public String formInputUrl(List<String> invoiceReferenceNumberList){
 		StringBuilder urlForm = new StringBuilder();
 		appendParamInOdataUrl(urlForm, "&$format","json" );
