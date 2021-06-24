@@ -8,5 +8,5 @@ import com.ap.menabev.dto.TrackInvoiceInputDto;
 public interface TrackInvoiceService {
 
 	public ResponseEntity<?> fetchTrackInvoice(TrackInvoiceInputDto trackInvoiceInputDto);
-
+ 
 }
