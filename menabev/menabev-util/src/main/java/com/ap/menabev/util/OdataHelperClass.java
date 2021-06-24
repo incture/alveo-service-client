@@ -33,7 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.stereotype.Component;
+@Component
 public class OdataHelperClass {
 
 	private static final Logger logger = LoggerFactory.getLogger(OdataHelperClass.class);
