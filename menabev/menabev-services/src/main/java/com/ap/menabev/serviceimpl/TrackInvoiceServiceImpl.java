@@ -72,6 +72,9 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
 		String endPointurl = formInputUrl(invoiceReferenceNumberList);
 		ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataService(endPointurl,null, "GET", map);
+		//List<TrackInvoiceInputDto> oDataBody=(List<TrackInvoiceInputDto>) odataResponse.getBody();
+		//oDataBody 
+		
 		return odataResponse;
 		}
 		catch(Exception e){
@@ -83,7 +86,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		StringBuilder urlForm = new StringBuilder();
 		appendParamInOdataUrl(urlForm, "&$format","json" );
 		appendParamInOdataUrl(urlForm, "&$filter","" );
-		appendValuesInOdataUrl(urlForm,"invoiceReferenceNumber",invoiceReferenceNumberList);
+		appendValuesInOdataUrl(urlForm,"ReferenceInvoiceNumber",invoiceReferenceNumberList);
 		//appendInOdataUrl(urlForm, ")and","(" );
 		urlForm.insert(0, ("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet?"));
 		System.err.println("url"+urlForm.toString());
