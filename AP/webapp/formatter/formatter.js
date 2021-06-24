@@ -272,5 +272,12 @@ com.menabev.AP.formatter.formatter = {
 			return false;
 		}
 	},
+	
+	ThreeWayMatchHighlight: function(isThreewayMatched){
+		if(isThreewayMatched){
+			return "Success";
+		}
+		return "None";
+	}
 
 };
