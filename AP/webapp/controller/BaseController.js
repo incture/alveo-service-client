@@ -932,8 +932,9 @@ sap.ui.define([
 			var oDataAPIModel = this.oDataAPIModel;
 			var oDropDownModel = this.oDropDownModel;
 			var value = oEvent.getParameter("suggestValue");
+				oDropDownModel.setProperty("/VendorIdSuggest", {});
 			if (value && value.length > 2) {
-				var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true";
+				var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true or substringof('" + value + "',SupplierName) eq true";
 				oDataAPIModel.read(url, {
 					success: function (oData, header) {
 						var data = oData.results;
@@ -963,7 +964,7 @@ sap.ui.define([
 			var that = this;
 			var message = this.getResourceBundle.getText("CancelChanges");
 			sap.m.MessageBox.success(message, {
-				actions: [sap.m.MessageBox.Action.OK],
+				actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 				onClose: function (e) {
 					if (e === "OK") {
 						that.oRouter.navTo("Inbox");

@@ -190,7 +190,6 @@
     /*background-color: yellow;*/
     /*height: 90vh; old*/
     height: 93vh;
-    margin: 9px;
     width: calc(100% - 10px) !important;
 }
 

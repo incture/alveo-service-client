@@ -231,42 +231,6 @@ com.menabev.AP.util.POServices = {
 		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
 	},
 
-	hdrInvAmtCalu: function (oEvent, oController) {
-		var oPOModel = oController.oPOModel,
-			oMandatoryModel = oController.oMandatoryModel,
-			invoiceAmt = oEvent.getParameter("value");
-		if (!invoiceAmt) {
-			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "Error");
-		} else {
-			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "None");
-			invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
-			oPOModel.setProperty("/invoiceTotal", invoiceAmt);
-		}
-		this.calculateBalance(oEvent, oController);
-	},
-
-	calculateBalance: function (oEvent, oController) {
-		var oPOModel = oController.oPOModel,
-			that = this,
-			invAmt = oPOModel.getProperty("/invoiceTotal"),
-			grossAmount = oPOModel.getProperty("/grossAmount");
-		var balanceAmount = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
-		balanceAmount = that.nanValCheck(balanceAmount).toFixed(2);
-		oPOModel.setProperty("/balanceAmount", balanceAmount);
-		oPOModel.refresh();
-		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
-	},
-	nanValCheck: function (value) {
-		if (!value || isNaN(value)) {
-			return 0;
-		} else if (Number(value) === 0 || parseFloat(value) === -0) {
-			return 0;
-		} else if (!isNaN(value)) {
-			return parseFloat(value);
-		}
-		return value;
-	},
-
 	onHeaderChange: function (oEvent, oController, transaction) {
 		var oPOModel = oController.oPOModel;
 		var changeIndicator = oPOModel.getProperty("/changeIndicator");
@@ -568,6 +532,42 @@ com.menabev.AP.util.POServices = {
 		}
 	},
 
+	hdrInvAmtCalu: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel,
+			oMandatoryModel = oController.oMandatoryModel,
+			invoiceAmt = oEvent.getParameter("value");
+		if (!invoiceAmt) {
+			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "Error");
+		} else {
+			oMandatoryModel.setProperty("/NonPO/invoiceAmountState", "None");
+			invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
+			oPOModel.setProperty("/invoiceTotal", invoiceAmt);
+		}
+		this.calculateBalance(oEvent, oController);
+	},
+
+	calculateBalance: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel,
+			that = this,
+			invAmt = oPOModel.getProperty("/invoiceTotal"),
+			grossAmount = oPOModel.getProperty("/grossAmount");
+		var balanceAmount = that.nanValCheck(invAmt) - that.nanValCheck(grossAmount);
+		balanceAmount = that.nanValCheck(balanceAmount).toFixed(2);
+		oPOModel.setProperty("/balanceAmount", balanceAmount);
+		oPOModel.refresh();
+		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
+	},
+	nanValCheck: function (value) {
+		if (!value || isNaN(value)) {
+			return 0;
+		} else if (Number(value) === 0 || parseFloat(value) === -0) {
+			return 0;
+		} else if (!isNaN(value)) {
+			return parseFloat(value);
+		}
+		return value;
+	},
+
 	calculateGrossAmount: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel,
 			that = this,
@@ -578,5 +578,57 @@ com.menabev.AP.util.POServices = {
 		oPOModel.setProperty("/grossAmount", grossAmount);
 		oPOModel.refresh();
 	},
+
+	calSysSuggTaxAmt: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel;
+		var itemDetails = oPOModel.getProperty("/invoiceItems");
+		var length = itemDetails.length;
+		var sysSuggestTax = 0,
+			taxPercentage, basePrice, lineTax;
+		for (var i = 0; i < length; i++) {
+			basePrice = itemDetails[i].basePrice;
+			taxPercentage = itemDetails[i].taxPercentage;
+			lineTax = this.nanValCheck(basePrice) * (this.nanValCheck(taxPercentage) / 100);
+			sysSuggestTax += lineTax;
+		}
+		oPOModel.setProperty("/taxAmount", sysSuggestTax);
+	},
+	calculateLineItemNet: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel;
+		var itemDetails = oPOModel.getProperty("/invoiceItems");
+		var length = itemDetails.length,
+			grossPrice;
+		var sysSuggestTax = 0,
+			taxPer, basePrice, lineTax;
+		for (var i = 0; i < length; i++) {
+			var grossPrice = itemDetails[i].grossPrice;
+			lineTax = this.nanValCheck(grossPrice) * (this.nanValCheck(taxPer) / 100);
+			sysSuggestTax += lineTax;
+		}
+		oPOModel.setProperty("/taxAmount", sysSuggestTax);
+	},
+
+	onItemTaxCodeChange: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel;
+		var selectedItem = oEvent.getParameters().selectedItem.getBindingContext("oDropDownModel").getObject();
+		var oContextObj = oEvent.getSource().getBindingContext("oDropDownModel").getObject();
+		var taxCode = selectedItem.TxCode;
+		var taxPercentage = selectedItem.TaxRate;
+		var sPath = oEvent.getSource().getBindingContext("oDropDownModel").getPath();
+		oPOModel.setProperty(sPath + "/taxCode", taxCode);
+		oPOModel.setProperty(sPath + "/taxPercentage", taxPercentage);
+	},
+
+	// Item level calculation
+	onInvQtyChange: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel;
+		var oContextObj = oEvent.getSource().getBindingContext("oUserDetailModel").getObject();
+		var Quantity = oContextObj.invQty,
+			unitPrice = oContextObj.unitPrice,
+			taxPer = oContextObj.taxPercentage;
+		this.calSysSuggTaxAmt();
+		this.calculateBalance();
+		this.calculateGrossAmount();
+	}
 
 };

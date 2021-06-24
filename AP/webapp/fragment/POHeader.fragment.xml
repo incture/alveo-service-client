@@ -128,7 +128,7 @@
 				<Label text="{i18n>INVOICETYPE}" required="true"/>
 				<Select forceSelection="false" showSecondaryValues="true" valueState="{oMandatoryModel>/NonPO/invoiceTypeState}" valueStateText=" "
 					selectedKey="{oPOModel>/invoiceType}" items="{StaticDataModel>/invoiceType}" width="80%" change="onChangeInvoiceType"
-					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}        ">
 					<items>
 						<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 					</items>

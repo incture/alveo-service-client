@@ -18,7 +18,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="B" label="{i18n>inboxRequestID}">
 						<fb:control>
-							<MaskInput mask="CCC-CCCCCCCC-CCCCCCCC" placeholderSymbol="_" placeholder="Enter task number"
+							<MaskInput mask="CCC-CCCCCCCC-CCCCCCCC" placeholderSymbol=" " placeholder="Enter Request ID"
 								value="{oTaskInboxModel>/filterParams/requestId}">
 								<rules>
 									<MaskInputRule maskFormatSymbol="C" regex="[A-Z0-9]"/>
@@ -234,7 +234,7 @@
 					<!--</IconTabFilter>-->
 					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}"
 						visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}">
-						<Table items="{oTaskInboxModel>/draftTask}" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">
+						<Table items="{oTaskInboxModel>/draftTask}" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" id="DRAFTTABLE">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>

@@ -246,12 +246,23 @@ sap.ui.define([
 			},
 
 			getInboxData: function (pageNo) {
+				var table = this.getView().byId("DRAFTTABLE");
+				table.removeSelections();
 				var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup"),
 					oVisibilityModel = this.oVisibilityModel;
+				var oPaginationModel = this.oPaginationModel;
 				oVisibilityModel.setProperty("/Inbox", {});
 				var oTaskInboxModel = this.oTaskInboxModel,
 					sUrl = "/menabevdev/invoiceHeader/inbox/tasks",
 					that = this;
+				oPaginationModel.setProperty("/openTaskPagination", {});
+				oPaginationModel.setProperty("/myTaskPagination", {});
+				oPaginationModel.setProperty("/draftedTaskPagination", {});
+				oPaginationModel.setProperty("/pagination", {});
+				oPaginationModel.setProperty("/openTaskPagination/paginationVisible", false);
+				oPaginationModel.setProperty("/myTaskPagination/paginationVisible", false);
+				oPaginationModel.setProperty("/draftedTaskPagination/paginationVisible", false);
+				oPaginationModel.setProperty("/pagination/paginationVisible", false);
 				var oPayload = jQuery.extend(true, {}, oTaskInboxModel.getProperty("/filterParams"));
 				if (oPayload.invoiceDateFrom) {
 					oPayload.invoiceDateFrom = new Date(oPayload.invoiceDateFrom).getTime();
@@ -278,6 +289,7 @@ sap.ui.define([
 				}
 				oPayload.assignedTo = assignedTo;
 				oPayload.skip = skip;
+				oPayload.vendorId = vendorId;
 				oPayload.top = 2;
 				oPayload.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 				var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -524,10 +536,14 @@ sap.ui.define([
 				var oTaskInboxModel = this.oTaskInboxModel;
 				var requestId = [],
 					req;
+				if (!selectedItems.length) {
+					sap.m.MessageToast.show("Please select items to delete");
+				}
 				for (var i = 0; i < selectedItems.length; i++) {
 					req = oTaskInboxModel.getProperty(selectedItems[i] + "/requestId");
 					requestId.push(req);
 				}
+
 				table.removeSelections();
 				sap.m.MessageBox.confirm("Are you sure you want to delete selected Items?", {
 					styleClass: "sapUiSizeCompact",

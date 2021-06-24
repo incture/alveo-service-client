@@ -282,7 +282,7 @@ sap.ui.define([
 			if (startDate && endDate && startDate > endDate) {
 				odatePicker.setValueState("Error");
 				odatePicker.setValue("");
-				odatePicker.setValueStateText("Start Date should be lesser than End Date");
+				odatePicker.setValueStateText("From date should be lesser that To date");
 			} else {
 				odatePicker.setValueState("None");
 			}
