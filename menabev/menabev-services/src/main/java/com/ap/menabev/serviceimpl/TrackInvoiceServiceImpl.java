@@ -98,19 +98,21 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				System.err.println("headerList pendingApprovalDto:"+invoiceHeaderDo.getInvoiceStatus());
 
 				InvoiceHeaderDto sapPendingApprovaldDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-				invoiceHeaderDo.setInvoiceStatus("16");
-				invoiceHeaderDo.setInvoiceStatusText("Pending Approval");
-				System.err.println("headerList pendingApprovalDto:"+invoiceHeaderDo);
+				sapPendingApprovaldDto.setInvoiceStatus("16");
+				sapPendingApprovaldDto.setInvoiceStatusText("Pending Approval");
+				System.err.println("headerList pendingApprovalDto:"+sapPendingApprovaldDto);
 
 				pendingApprovalList.add(sapPendingApprovaldDto);
 			}
 		 }
+		if(!ServiceUtil.isEmpty(sapPostedList)){
 		for(InvoiceHeaderDto headerDo:sapPostedList ){
 				invoiceReferenceNumberList.add(headerDo.getExtInvNum());
 				System.err.println("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
 		}
 				//ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet", invoiceReferenceNumberList.toString(), "GET", odataHelperClass.getDestination("SD4_DEST"));
 		}
+	
 		if(!ServiceUtil.isEmpty(invoiceReferenceNumberList)){
 		try{
 		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
@@ -137,20 +139,12 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	        			   }
 	        	   }
 	           }
-	        	   List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
-                           .collect(Collectors.toList());  
-	        	   System.err.println("newList:"+newList);
-	        	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
-	        	   trackInvoiceOutputPayload.setUsers(newList);
-	        	   trackInvoiceOutputPayload.setType("Success");
-	        	   trackInvoiceOutputPayload.setMessage("Success");
-	             return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
-          }else {
+	           }
+	           }else {
            	  String jsonOutputStr = (String) odataResponse.getBody();
-           	TrackInvoiceOutputPayload  errorMessage =  formOutPutFailureResponse(jsonOutputString);	  
+           	TrackInvoiceOutputPayload  errorMessage =  formOutPutFailureResponse(jsonOutputStr);	  
            	  System.err.println("convertedRrrorResponse "+odataResponse);
   		return new ResponseEntity<TrackInvoiceOutputPayload>(errorMessage,HttpStatus.BAD_REQUEST);
-          }
 		 }
 		}
 		 catch(Exception e)
@@ -160,15 +154,36 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		 }
 		}
 		else{
+			
 			TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
 			trackInvoiceOutputPayload.setMessage("Refrerence number is not found for the specipic vendor number");
 			trackInvoiceOutputPayload.setType("ERROR");
-			trackInvoiceOutputPayload.setUsers(Collections.emptyList());
+			trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
 			System.err.println("Refrerence number is not found for the specipic vendor number");
-	  		return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
+			//return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
 		}
-		return null;
-	}
+		 /*List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
+                 .collect(Collectors.toList());  
+  	   System.err.println("newList:"+newList);*/
+  	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
+  	   trackInvoiceOutputPayload.setRejectedList(rejectedList);
+  	   trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
+  	   trackInvoiceOutputPayload.setType("Success");
+  	   trackInvoiceOutputPayload.setMessage("Success");
+       return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
+		}
+		else{
+			TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
+			trackInvoiceOutputPayload.setMessage("filtered values not found in DB");
+			trackInvoiceOutputPayload.setType("ERROR");
+			trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
+			trackInvoiceOutputPayload.setRejectedList(rejectedList);
+		  	trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
+		  	  			System.err.println("filtered values not found in DB");
+	  		return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
+	
+		}
+		}
 	public TrackInvoiceOdataOutputResponse formOutPutSuccessResponse(String jsonOutputString)
 	{
 		TrackInvoiceOdataOutputResponse trackInvoiceOdataOutputResponse = new TrackInvoiceOdataOutputResponse();
@@ -189,10 +204,13 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			{
 				TrackInvoiceOutputPayload errorMessage = new TrackInvoiceOutputPayload();
 		    	  OdataErrorResponseDto response =  convertStringToJsonForOdataFailure(jsonOutputString);
-				errorMessage.setType("TEST_ERROR");
+				errorMessage.setType("Odata service failed");
 		    	  errorMessage.setMessage(response.getError().getMessage().getValue());
 		        
-		                 errorMessage.setUsers(Collections.emptyList()); 
+		                 errorMessage.setSapPostedList(Collections.emptyList()); 
+		                 errorMessage.setPendingApprovalList(Collections.emptyList()); 
+		                 errorMessage.setRejectedList(Collections.emptyList()); 
+
 		                 return errorMessage;
 			  
 			}

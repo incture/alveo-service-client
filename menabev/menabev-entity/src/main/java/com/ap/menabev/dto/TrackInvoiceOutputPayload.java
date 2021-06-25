@@ -7,7 +7,9 @@ import lombok.Data;
 @Data
 public class TrackInvoiceOutputPayload {
 	private String type;
-    private List<InvoiceHeaderDto> users;
+    private List<InvoiceHeaderDto> sapPostedList;
+    private List<InvoiceHeaderDto> rejectedList;
+    private List<InvoiceHeaderDto> pendingApprovalList;
     private String message;
 
 }
