@@ -63,7 +63,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	public ResponseEntity<?> fetchTrackInvoice(TrackInvoiceInputDto trackInvoiceInputDto) {
 		ResponseDto responseDto=new ResponseDto();
 		List<InvoiceHeaderDo> headerList= filterInvoicesMultiple(trackInvoiceInputDto);
-		logger.debug("headerList :"+headerList);
+		System.err.println("headerList :"+headerList);
 		ModelMapper modelMapper = new ModelMapper();
 		List<InvoiceHeaderDto> sapPostedList=new ArrayList<>();
 		List<InvoiceHeaderDto> pendingApprovalList=new ArrayList<>();
@@ -73,41 +73,41 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
 		if(!ServiceUtil.isEmpty(headerList))
 		{
-			logger.debug("headerList invoiceNumber:"+headerList.get(0).getInvoice_ref_number());
+			System.err.println("headerList invoiceNumber:"+headerList.get(0).getInvoice_ref_number());
 		for (InvoiceHeaderDo invoiceHeaderDo:headerList){
 			if(invoiceHeaderDo.getInvoiceStatus()=="13" && invoiceHeaderDo.getInvoiceStatus()=="14" )
 			{
-				logger.debug("headerList sapPostedDto:"+invoiceHeaderDo.getInvoiceStatus());
+				System.err.println("headerList sapPostedDto:"+invoiceHeaderDo.getInvoiceStatus());
 
 				InvoiceHeaderDto sapPostedDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-				logger.debug("headerList sapPostedDto:"+sapPostedDto);
+				System.err.println("headerList sapPostedDto:"+sapPostedDto);
 
 				sapPostedList.add(sapPostedDto);
 			}
 			else if(invoiceHeaderDo.getInvoiceStatus()=="15")
 			{
-				logger.debug("headerList rejectedDto:"+invoiceHeaderDo.getInvoiceStatus());
+				System.err.println("headerList rejectedDto:"+invoiceHeaderDo.getInvoiceStatus());
 
 				InvoiceHeaderDto sapRejectedDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-				logger.debug("headerList rejectedDto:"+sapRejectedDto);
+				System.err.println("headerList rejectedDto:"+sapRejectedDto);
 
 				rejectedList.add(sapRejectedDto);
 			}
 			else
 			{
-				logger.debug("headerList pendingApprovalDto:"+invoiceHeaderDo.getInvoiceStatus());
+				System.err.println("headerList pendingApprovalDto:"+invoiceHeaderDo.getInvoiceStatus());
 
 				InvoiceHeaderDto sapPendingApprovaldDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 				invoiceHeaderDo.setInvoiceStatus("16");
 				invoiceHeaderDo.setInvoiceStatusText("Pending Approval");
-				logger.debug("headerList pendingApprovalDto:"+invoiceHeaderDo);
+				System.err.println("headerList pendingApprovalDto:"+invoiceHeaderDo);
 
 				pendingApprovalList.add(sapPendingApprovaldDto);
 			}
 		 }
 		for(InvoiceHeaderDto headerDo:sapPostedList ){
 				invoiceReferenceNumberList.add(headerDo.getExtInvNum());
-		logger.debug("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
+				System.err.println("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
 		}
 				//ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet", invoiceReferenceNumberList.toString(), "GET", odataHelperClass.getDestination("SD4_DEST"));
 		}
@@ -115,7 +115,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		try{
 		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
 		String endPointurl = formInputUrl(invoiceReferenceNumberList);
-		logger.debug("endPointurl:"+endPointurl);
+		System.err.println("endPointurl:"+endPointurl);
 		ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataService(endPointurl,null, "GET", map);
 		 if(odataResponse.getStatusCodeValue()==200){
              String jsonOutputString = (String) odataResponse.getBody();
@@ -139,6 +139,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	           }
 	        	   List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
                            .collect(Collectors.toList());  
+	        	   System.err.println("newList:"+newList);
 	        	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
 	        	   trackInvoiceOutputPayload.setUsers(newList);
 	        	   trackInvoiceOutputPayload.setType("Success");
@@ -163,6 +164,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			trackInvoiceOutputPayload.setMessage("Refrerence number is not found for the specipic vendor number");
 			trackInvoiceOutputPayload.setType("ERROR");
 			trackInvoiceOutputPayload.setUsers(Collections.emptyList());
+			System.err.println("Refrerence number is not found for the specipic vendor number");
 	  		return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
 		}
 		return null;
