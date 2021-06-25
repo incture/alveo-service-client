@@ -16,15 +16,15 @@ public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderD
 	Date date = new Date();
 	long today = date.getTime();
 	
-	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and  "
+	/*@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and  "
 			+ "i.compCode=:companyCode and i.currency=:currency and i.vendorId IN (:vendorId)")
 	List<InvoiceHeaderDo> getDashboardChartDetailsBetween(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
 			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
-	
+	*/
 	
 	//FOR KPI DETAILS
 	
-	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at =:toDate")
+	/*@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at =:toDate")
 	List<InvoiceHeaderDo> getTodayKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
 			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
 	
@@ -47,5 +47,5 @@ public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderD
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.dueDate > 'today' ")
 	List<InvoiceHeaderDo> getOverDueKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
 			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
-
+*/
 }

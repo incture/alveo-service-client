@@ -1,12 +1,17 @@
 package com.ap.menabev.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.collections4.ListUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.OdataOutPutPayload;
 import com.ap.menabev.dto.OdataResponseDto;
 import com.ap.menabev.dto.OdataResultObject;
@@ -26,6 +32,7 @@ import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.TrackInvoiceInputDto;
 import com.ap.menabev.dto.TrackInvoiceOdataOutputResponse;
 import com.ap.menabev.dto.TrackInvoiceOutputDto;
+import com.ap.menabev.dto.TrackInvoiceOutputPayload;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
@@ -56,25 +63,49 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	public ResponseEntity<?> fetchTrackInvoice(TrackInvoiceInputDto trackInvoiceInputDto) {
 		ResponseDto responseDto=new ResponseDto();
 		List<InvoiceHeaderDo> headerList= filterInvoicesMultiple(trackInvoiceInputDto);
-		List<InvoiceHeaderDo> sapPostedList=new ArrayList<>();
-		List<InvoiceHeaderDo> pendingApprovalList=new ArrayList<>();
+		logger.debug("headerList :"+headerList);
+		ModelMapper modelMapper = new ModelMapper();
+		List<InvoiceHeaderDto> sapPostedList=new ArrayList<>();
+		List<InvoiceHeaderDto> pendingApprovalList=new ArrayList<>();
+		List<InvoiceHeaderDto> rejectedList=new ArrayList<>();
 		List<String> invoiceReferenceNumberList=new ArrayList<>();
+		List<InvoiceHeaderDto> finalpayload=new ArrayList<>();
 
 		if(!ServiceUtil.isEmpty(headerList))
 		{
+			logger.debug("headerList invoiceNumber:"+headerList.get(0).getInvoice_ref_number());
 		for (InvoiceHeaderDo invoiceHeaderDo:headerList){
-			if(invoiceHeaderDo.getInvoiceStatus()=="13" && invoiceHeaderDo.getInvoiceStatusText()=="APPROVED")
+			if(invoiceHeaderDo.getInvoiceStatus()=="13" && invoiceHeaderDo.getInvoiceStatus()=="14" )
 			{
-				sapPostedList.add(invoiceHeaderDo);
+				logger.debug("headerList sapPostedDto:"+invoiceHeaderDo.getInvoiceStatus());
+
+				InvoiceHeaderDto sapPostedDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+				logger.debug("headerList sapPostedDto:"+sapPostedDto);
+
+				sapPostedList.add(sapPostedDto);
+			}
+			else if(invoiceHeaderDo.getInvoiceStatus()=="15")
+			{
+				logger.debug("headerList rejectedDto:"+invoiceHeaderDo.getInvoiceStatus());
+
+				InvoiceHeaderDto sapRejectedDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+				logger.debug("headerList rejectedDto:"+sapRejectedDto);
+
+				rejectedList.add(sapRejectedDto);
 			}
 			else
 			{
+				logger.debug("headerList pendingApprovalDto:"+invoiceHeaderDo.getInvoiceStatus());
+
+				InvoiceHeaderDto sapPendingApprovaldDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 				invoiceHeaderDo.setInvoiceStatus("16");
 				invoiceHeaderDo.setInvoiceStatusText("Pending Approval");
-				pendingApprovalList.add(invoiceHeaderDo);
+				logger.debug("headerList pendingApprovalDto:"+invoiceHeaderDo);
+
+				pendingApprovalList.add(sapPendingApprovaldDto);
 			}
 		 }
-		for(InvoiceHeaderDo headerDo:sapPostedList ){
+		for(InvoiceHeaderDto headerDo:sapPostedList ){
 				invoiceReferenceNumberList.add(headerDo.getExtInvNum());
 		logger.info("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
 		}
@@ -95,22 +126,37 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	        	   {
 	        		   if(!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate())){
 	        			   
-	        		   }
+	        			   for(InvoiceHeaderDto invoiceHeaderDto:sapPostedList){
+	        				   invoiceHeaderDto.setInvoiceStatus("16");
+	        				   invoiceHeaderDto.setInvoiceStatusText("Paid");
+	        				   invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
+	        				   invoiceHeaderDto.setPaymentReference(odataTrackInvoiceObject.getPaymentStatus());
+	        				   sapPostedList.add(invoiceHeaderDto);
+	        			   }
 	        	   }
 	           }
-	             
-	             return new ResponseEntity<TrackInvoiceOdataOutputResponse>(trackInvoiceOdataOutputResponse,HttpStatus.OK);
+	        	   List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
+                           .collect(Collectors.toList());  
+	        	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
+	        	   trackInvoiceOutputPayload.setUsers(newList);
+	        	   trackInvoiceOutputPayload.setType("Success");
+	        	   trackInvoiceOutputPayload.setMessage("Success");
+	             return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
           }else {
-           	  String jsonOutputString = (String) odataResponse.getBody();
-           	TrackInvoiceOdataOutputResponse  errorMessage =  formOutPutFailureResponse(jsonOutputString);	  
+           	  String jsonOutputStr = (String) odataResponse.getBody();
+           	TrackInvoiceOutputPayload  errorMessage =  formOutPutFailureResponse(jsonOutputString);	  
            	  System.err.println("convertedRrrorResponse "+odataResponse);
-  		return new ResponseEntity<TrackInvoiceOdataOutputResponse>(errorMessage,HttpStatus.BAD_REQUEST);
-       }
+  		return new ResponseEntity<TrackInvoiceOutputPayload>(errorMessage,HttpStatus.BAD_REQUEST);
+          }
+		 }
 		}
-		catch(Exception e){
-			logger.info(e.toString());
-			return null;
-		}
+		 catch(Exception e)
+		 {
+			 e.printStackTrace();
+			 return null;
+		 }
+		return null;
+		
 	}
 	public TrackInvoiceOdataOutputResponse formOutPutSuccessResponse(String jsonOutputString)
 	{
@@ -128,9 +174,9 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
                  return trackInvoiceOdataOutputResponse;
 	}
 	//Faiure
-			public TrackInvoiceOdataOutputResponse formOutPutFailureResponse(String jsonOutputString)
+			public TrackInvoiceOutputPayload formOutPutFailureResponse(String jsonOutputString)
 			{
-				TrackInvoiceOdataOutputResponse errorMessage = new TrackInvoiceOdataOutputResponse();
+				TrackInvoiceOutputPayload errorMessage = new TrackInvoiceOutputPayload();
 		    	  OdataErrorResponseDto response =  convertStringToJsonForOdataFailure(jsonOutputString);
 				errorMessage.setType("TEST_ERROR");
 		    	  errorMessage.setMessage(response.getError().getMessage().getValue());

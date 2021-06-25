@@ -78,6 +78,7 @@ public class InvoiceHeaderDto {
 	private String invoiceStatusText;
 	private String approvalStatus;
 	private String sapInvocieNumber;
+	
 	// not in DB
 	private String processor;
 	private Long emailReceivedAt;
@@ -91,6 +92,9 @@ public class InvoiceHeaderDto {
 	private List<HeaderMessageDto>  headerMessages;
 	//Added by Dipanjan on 21/06/2021 from Menabev AP DB Tables sheet shared by Prashant Kumar
 	private InvoiceChangeIndicator changeIndicators;
+	// added for track invoice by laxmi 
+	private String paymentReference;
+	private long clearingDate;
 	
 
 	  
