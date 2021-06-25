@@ -45,7 +45,7 @@ import com.google.gson.Gson;
 @Service
 public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
-	private static final Logger logger = LoggerFactory.getLogger(PurchaseDocumentItemServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(TrackInvoiceServiceImpl.class);
 
 	@Autowired
 	InvoiceHeaderRepository invoiceHeaderRepository;
@@ -111,6 +111,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		}
 				//ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet", invoiceReferenceNumberList.toString(), "GET", odataHelperClass.getDestination("SD4_DEST"));
 		}
+		if(!ServiceUtil.isEmpty(invoiceReferenceNumberList)){
 		try{
 		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
 		String endPointurl = formInputUrl(invoiceReferenceNumberList);
@@ -155,8 +156,15 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			 e.printStackTrace();
 			 return null;
 		 }
+		}
+		else{
+			TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
+			trackInvoiceOutputPayload.setMessage("Refrerence number is not found for the specipic vendor number");
+			trackInvoiceOutputPayload.setType("ERROR");
+			trackInvoiceOutputPayload.setUsers(Collections.emptyList());
+	  		return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
+		}
 		return null;
-		
 	}
 	public TrackInvoiceOdataOutputResponse formOutPutSuccessResponse(String jsonOutputString)
 	{
