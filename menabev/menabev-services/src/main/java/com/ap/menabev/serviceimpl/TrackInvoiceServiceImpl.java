@@ -107,7 +107,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		 }
 		for(InvoiceHeaderDto headerDo:sapPostedList ){
 				invoiceReferenceNumberList.add(headerDo.getExtInvNum());
-		logger.info("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
+		logger.debug("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
 		}
 				//ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet", invoiceReferenceNumberList.toString(), "GET", odataHelperClass.getDestination("SD4_DEST"));
 		}
@@ -115,6 +115,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		try{
 		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
 		String endPointurl = formInputUrl(invoiceReferenceNumberList);
+		logger.debug("endPointurl:"+endPointurl);
 		ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataService(endPointurl,null, "GET", map);
 		 if(odataResponse.getStatusCodeValue()==200){
              String jsonOutputString = (String) odataResponse.getBody();
