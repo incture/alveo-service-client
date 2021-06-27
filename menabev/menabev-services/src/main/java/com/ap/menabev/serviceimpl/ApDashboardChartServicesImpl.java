@@ -23,8 +23,10 @@ import com.ap.menabev.dto.ApCharts;
 import com.ap.menabev.dto.ApDashboardCharts;
 import com.ap.menabev.dto.ApDashboardKPIDto;
 import com.ap.menabev.dto.ApDashboardKPIValuesDto;
+import com.ap.menabev.entity.CodesAndTextsDo;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.ApDashboardChartRepository;
+import com.ap.menabev.invoice.CodesAndTextsRepository;
 import com.ap.menabev.service.ApDashboardChartServices;
 import com.ap.menabev.util.ServiceUtil;
 
@@ -34,11 +36,23 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 	private static final Logger logger = LoggerFactory.getLogger(ApDashboardChartServicesImpl.class);
 	@Autowired
 	ApDashboardChartRepository repo;
+	
+	@Autowired
+	CodesAndTextsRepository codesAndTextsRepo;
 
 	@Override
 	public ResponseEntity<?> getDashboardChartDetailsBetween(ApChartUIDto dto) {
 		// TODO Auto-generated method stub
 		try {
+			
+			List<CodesAndTextsDo> codesAndTextsList=codesAndTextsRepo.findAll();
+			logger.error("codesAndTextsList date = " + codesAndTextsList);
+			HashMap<String, String> codesAndTextsmap = new HashMap<String, String>();
+			for(CodesAndTextsDo data:codesAndTextsList)
+			{
+				codesAndTextsmap.put(data.getStatusCode(), data.getShortText());
+			}
+			logger.error("codesAndTextsmap date = " + codesAndTextsmap);
 			List<InvoiceHeaderDo> lists = new ArrayList<InvoiceHeaderDo>();
 			ApDashboardCharts apDashboardCharts = new ApDashboardCharts();
 			List<ApCharts> apChartsList = new ArrayList<ApCharts>();
@@ -80,9 +94,10 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			logger.error("list data = " + lists);
 			total = lists.size();
 			logger.error("total size = " + total);
-			String arr[] = { "NEW", "DRAFT", "OPEN", "DUPLICATE INVOICE", "PO MISSING OR INVALID", "NO-GRN",
-					"PARTIAL GRN", "UOM MISMATCH", "ITEM MISMATCH", "QTY MISMATCH", "PRICE MISMATCH", "PRICE/QTY",
-					"BALANCE MISMATCH", "SAP POSTED", "PAID", "UNPAID" };
+//			String arr[] = { "NEW", "DRAFT", "OPEN", "DUPLICATE INVOICE", "PO MISSING OR INVALID", "NO-GRN",
+//					"PARTIAL GRN", "UOM MISMATCH", "ITEM MISMATCH", "QTY MISMATCH", "PRICE MISMATCH", "PRICE/QTY",
+//					"BALANCE MISMATCH", "SAP POSTED", "PAID", "UNPAID" };
+//			String arr[] = {"1", "2", "3", "4", "5", "6","7", "8", "9", "10", "11", "12","13", "14", "15"};
 			String agingArr[] = { "1", "+1", "+7", "+14", "+21", "+28" };
 
 			HashMap<String, Integer> exceptionMap = new HashMap<String, Integer>();
@@ -138,7 +153,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 						aigingMap.put(CountToday, 0);
 						logger.error("aigingMap = " + aigingMap);
 					}
-					if (dayCount <= 0 && dayCount <= 7) {
+					if (dayCount > 0 && dayCount <= 7) {
 
 						if (aigingMap.containsKey(today)) {
 							aigingMap.put(today, aigingMap.get(today) + 1);
@@ -189,13 +204,22 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			}
 
 			// for Exception payloas
-			for (String s : arr) {
-				if (exceptionMap.containsKey(s)) {
-
+//			for (String s : arr) {
+//				if (exceptionMap.containsKey(s)) {
+//
+//				} else {
+//					exceptionMap.put(s, 0);
+//				}
+//
+//			}
+			for (Map.Entry<String, String> entry : codesAndTextsmap.entrySet()) {
+				String key=codesAndTextsmap.get(entry.getKey());
+				if (exceptionMap.containsKey(key)) {
+					
 				} else {
-					exceptionMap.put(s, 0);
+					exceptionMap.put(key, 0);
 				}
-
+				
 			}
 			for (String s : agingArr) {
 				if (aigingMap.containsKey(s)) {
@@ -211,9 +235,12 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 
 			for (Map.Entry<String, Integer> entry : exceptionMap.entrySet()) {
 				ApChartValues value = new ApChartValues();
-				value.setLabel(entry.getKey());
-				value.setStatusCode(Integer.toString(indexOf(arr, entry.getKey())));
-				value.setStatusText(entry.getKey());
+				
+				String text=codesAndTextsmap.get(entry.getKey());
+				
+				value.setLabel(text);
+				value.setStatusCode(entry.getKey());
+				value.setStatusText(text);
 				value.setCount(entry.getValue());
 				apChartValues1List.add(value);
 			}
@@ -322,12 +349,17 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			List<InvoiceHeaderDo> npoBkpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 			List<InvoiceHeaderDo> OverDuekpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 
-			//todaykpiValuesDto = repo.getTodayKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			//patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			//poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			//npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			//OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-
+			todaykpiValuesDto = repo.getTodayKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			logger.error("todaykpiValuesDto List = " + todaykpiValuesDto);
+			logger.error("patodaykpiValuesDto List = " + patodaykpiValuesDto);
+			logger.error("poBasedkpiValuesDto List = " + poBasedkpiValuesDto);
+			logger.error("npoBkpiValuesDto List = " + npoBkpiValuesDto);
+			logger.error("OverDuekpiValuesDto List = " + OverDuekpiValuesDto);
+			
 			ApDashboardKPIValuesDto values0 = new ApDashboardKPIValuesDto();
 			values0.setLabel("Today");
 			values0.setIcon("");
