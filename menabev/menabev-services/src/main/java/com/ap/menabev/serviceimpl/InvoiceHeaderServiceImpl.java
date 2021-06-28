@@ -411,22 +411,26 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		ResponseDto response = new ResponseDto();
 		StringBuilder messageBuilder = new StringBuilder();
+		
+		InvoiceHeaderDo invoiceSavedDo = null;
 		try {
 			String requestId = null;
 			if (!ServiceUtil.isEmpty(dto.getRequestId())) {
 				requestId = dto.getRequestId();
 				InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
 				invoiceHeaderDo.setUpdatedAt(ServiceUtil.getEpocTime());
-				InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+				invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
 			} else {
 				requestId = seqService.getSequenceNoByMappingId(MenabevApplicationConstant.INVOICE_SEQUENCE, "INV");
 				InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
 				invoiceHeaderDo.setRequestId(requestId);
 				invoiceHeaderDo.setGuid(UUID.randomUUID().toString());
 				if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-					invoiceHeaderDo.setInvoiceStatus("OPEN");
+					invoiceHeaderDo.setInvoiceStatus(ApplicationConstants.NEW_INVOICE);
+					invoiceHeaderDo.setInvoiceStatusText("NEW");
+					invoiceHeaderDo.setInvoiceType("PO");
 				}
-				InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+				invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
 			}
 
 			// save invoice header.
@@ -535,6 +539,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setMessage("Success");
+			response.setObject(invoiceSavedDo);
 			return response;
 
 		} catch (Exception e) {
@@ -737,12 +742,19 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				// Trigger worklfow , which will direct to process lead
 				TriggerWorkflowContext context = new TriggerWorkflowContext();
 				context.setRequestId(requestId);
-				context.setInvoiceReferenceNumber(invoiceDto.getInvoiceHeaderDto().getExtInvNum());
+				context.setExtInvNumb(invoiceDto.getInvoiceHeaderDto().getExtInvNum());
 				context.setNonPo(true);
 				context.setManualNonPo(true);
 				context.setAccountantUser(invoiceDto.getInvoiceHeaderDto().getTaskOwner());
 				context.setAccountantGroup(invoiceDto.getInvoiceHeaderDto().getTaskGroup());
 				context.setProcessLead(lists.get(0).getUserOrGroup());
+				context.setAccountantAction("");
+				context.setInvoiceStatus(invoiceDto.getInvoiceHeaderDto().getInvoiceStatus());
+				context.setInvoiceStatusText(invoiceDto.getInvoiceHeaderDto().getInvoiceStatusText());
+				context.setInvoiceType(invoiceDto.getInvoiceHeaderDto().getInvoiceType());
+				context.setProcessLeadAction("");
+				context.setRemediationUser("");
+				context.setRemediationUserAction("");
 
 				ResponseEntity<?> response = triggerWorkflow((WorkflowContextDto) context,
 						"triggerresolutionworkflow.triggerresolutionworkflow");
@@ -2332,6 +2344,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			return Double.valueOf(0.0);
 		}
 	}
+	@Override
 	public ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination)
 			throws ClientProtocolException, IOException, URISyntaxException {
 		List<ApproverDataOutputDto> lists = null;
@@ -2476,6 +2489,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	// Trigger Workflow
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
 	public ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId) {
 		try {
 			String token = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();

@@ -109,7 +109,7 @@ public interface ApplicationConstants {
 	String NO_GRN = "05";
 	String PARTIAL_GRN = "06";
 	String UOM_MISMATCH = "07";
-	String ITEM_MISMATCH = "08";
+	String ITEM_MISMATCH = "3";
 	String QTY_MISMATCH = "09";
 	String PRICE_MISMATCH = "10";
 	String PRICE_OR_QTY_MISMATCH  = "11";

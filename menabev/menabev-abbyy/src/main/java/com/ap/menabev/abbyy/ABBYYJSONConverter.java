@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemDto;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ItemDto;
 import com.ap.menabev.util.ServiceUtil;
 
@@ -109,7 +110,7 @@ public class ABBYYJSONConverter {
 
 						// default value
 						itemDto.setItemStatusText("Item Mismatch");
-						itemDto.setItemStatusCode("08");
+						itemDto.setItemStatusCode(ApplicationConstants.ITEM_MISMATCH);
 						itemDto.setIsDeleted(Boolean.FALSE);
 						itemDto.setIsAccAssigned(Boolean.FALSE);
 						itemDto.setIsThreewayMatched(Boolean.FALSE);
@@ -162,7 +163,7 @@ public class ABBYYJSONConverter {
 			}
 
 			else if ("AmountBeforeTax".equalsIgnoreCase(name)) {
-				if (!ServiceUtil.isEmpty(headerObj.getDouble("Value")))
+				if (!ServiceUtil.isEmpty(headerObj.getString("Value")))
 					headerDto.setAmountBeforeTax(Double.valueOf(headerObj.getString("Value").replace(",", "")));
 				else
 					headerDto.setAmountBeforeTax(new Double(0.0));
@@ -198,9 +199,9 @@ public class ABBYYJSONConverter {
 					headerDto.setSurcharge(new Double(0.0));
 			} else if ("BUId".equalsIgnoreCase(name)) {
 				if (!ServiceUtil.isEmpty(headerObj.getString("Value")))
-					headerDto.setCompanyCode(headerObj.getString("Value"));
+					headerDto.setCompCode(headerObj.getString("Value"));
 				else
-					headerDto.setCompanyCode("1010");
+					headerDto.setCompCode("1010");
 			}
 
 			headerDto.setIsRejected(Boolean.FALSE);
@@ -210,8 +211,8 @@ public class ABBYYJSONConverter {
 			headerDto.setInvoiceGross(0.0);
 			headerDto.setUnplannedCost(0.0);
 			headerDto.setPlannedCost(0.0);
-			headerDto.setInvoiceStatus("0");
-			headerDto.setInvoiceStatusText("New");
+			headerDto.setInvoiceStatus(ApplicationConstants.NEW_INVOICE);
+			headerDto.setInvoiceStatusText("NEW");
 		}
 		headerDto.setInvoiceItems(itemsDtoList);
 		return headerDto;

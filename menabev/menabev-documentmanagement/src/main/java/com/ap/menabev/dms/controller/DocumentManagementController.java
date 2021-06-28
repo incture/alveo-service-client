@@ -37,7 +37,7 @@ public class DocumentManagementController {
 				return documentManagementService.uploadDocument(file, requestId);
 			} else {
 				ResponseDto response = new ResponseDto(ApplicationConstants.FAILURE, ApplicationConstants.CODE_FAILURE,
-						"File Not found");
+						"File Not found",null);
 				DmsResponseDto dmsResponse = new DmsResponseDto();
 				dmsResponse.setResponse(response);
 				return dmsResponse;

@@ -12,5 +12,6 @@ public @Data class ResponseDto {
 	private String status;
 	private String code;
 	private String message;
+	private Object object;
 
 }

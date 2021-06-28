@@ -10,11 +10,19 @@ public class TriggerWorkflowContext implements WorkflowContextDto{
 	private String requestId;
 	private boolean manualNonPo;
 	private boolean isNonPo;
-	private String invoiceReferenceNumber;
 	private String accountantUser;
 	private String accountantGroup;
 	private String processLead;
 	private String processLeadGroup;
+	private String accountantAction;
+	private String processLeadAction;
+	private String remediationUser;
+	private String remediationUserAction;
+	private String invoiceType;
+	private String invoiceStatus;
+	private String invoiceStatusText;
+	private String extInvNumb;
+	
 	
 	
 	@Override
@@ -22,8 +30,16 @@ public class TriggerWorkflowContext implements WorkflowContextDto{
 		
 		return  "{\"definitionId\":\"triggerresolutionworkflow.triggerresolutionworkflow\",\"context\":{\"requestId\":\"" + this.getRequestId()
 				+ "\",\"manualNonPo\":\"" + this.isManualNonPo() + "\",\"isNonPo\":\"" + this.isNonPo()
-				+ "\",\"invoiceReferenceNumber\":\"" + this.getInvoiceReferenceNumber() + "\",\"accountantUser\":\"" + this.getAccountantUser() + "\",\"accountantGroup\":\""
+				+ "\",\"accountantUser\":\"" + this.getAccountantUser() + "\",\"accountantGroup\":\""
 				+ this.getAccountantGroup() + "\",\"processLead\":\"" + this.getProcessLead() + "\",\"processLeadGroup\":\"" + this.getProcessLeadGroup()
+				+ "\",\"accountantAction\":\"" + this.getAccountantAction()
+				+ "\",\"processLeadAction\":\"" + this.getProcessLeadAction()
+				+ "\",\"remediationUser\":\"" + this.getRemediationUser()
+				+ "\",\"remediationUserAction\":\"" + this.getRemediationUserAction()
+				+ "\",\"invoiceType\":\"" + this.getInvoiceType()
+				+ "\",\"invoiceStatus\":\"" + this.getInvoiceStatus()
+				+ "\",\"invoiceStatusText\":\"" + this.getInvoiceStatusText()
+				+ "\",\"extInvNumb\":\"" + this.getExtInvNumb()
 				+ "\"}}";
 	}
 	

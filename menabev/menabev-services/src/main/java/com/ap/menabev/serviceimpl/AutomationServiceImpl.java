@@ -2,6 +2,7 @@ package com.ap.menabev.serviceimpl;
 
 import java.io.File;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,15 +17,21 @@ import javax.mail.Multipart;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ap.menabev.abbyy.ABBYYIntegration;
 import com.ap.menabev.abbyy.ABBYYJSONConverter;
+import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.SchedulerResponseDto;
+import com.ap.menabev.dto.TriggerWorkflowContext;
+import com.ap.menabev.dto.WorkflowContextDto;
+import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.email.Email;
+import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.entity.SchedulerConfigurationDo;
 import com.ap.menabev.entity.SchedulerCycleDo;
 import com.ap.menabev.entity.SchedulerCycleLogDo;
@@ -46,6 +53,7 @@ import com.ap.menabev.service.InvoiceItemService;
 import com.ap.menabev.service.SequenceGeneratorService;
 import com.ap.menabev.sftp.SFTPChannelUtil;
 import com.ap.menabev.util.ApplicationConstants;
+import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.ServiceUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.ChannelSftp;
@@ -94,6 +102,8 @@ public class AutomationServiceImpl implements AutomationService {
 
 	@Autowired
 	InvoiceHeaderService invoiceHeaderService;
+	
+	
 	@Autowired
 	ReasonForRejectionRepository rejectionRepository;
 
@@ -116,7 +126,7 @@ public class AutomationServiceImpl implements AutomationService {
 	public ResponseDto extractInvoiceFromEmail() {
 		ResponseDto response = null;
 		try {
-			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders");
+			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders",null);
 			// Step 1 : Get unread emails/messages from specific sender !
 			// input parameters email host,email id,password,email ids,flag,
 			Message[] emailMessages = email.readEmail(ApplicationConstants.OUTLOOK_HOST,
@@ -156,10 +166,10 @@ public class AutomationServiceImpl implements AutomationService {
 
 							}
 						} else {
-							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ");
+							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
 						}
 					} else {
-						response = new ResponseDto("Done", "200", "No Attacment found ");
+						response = new ResponseDto("Done", "200", "No Attacment found ",null);
 					}
 
 				}
@@ -186,10 +196,10 @@ public class AutomationServiceImpl implements AutomationService {
 
 							}
 						} else {
-							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ");
+							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
 						}
 					} else {
-						response = new ResponseDto("Done", "200", "No Attacment found ");
+						response = new ResponseDto("Done", "200", "No Attacment found ",null);
 					}
 
 				}
@@ -209,7 +219,7 @@ public class AutomationServiceImpl implements AutomationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("AutomationServiceImpl.extractInvoiceFromEmail():::" + e.getMessage());
-			response = new ResponseDto("Failed", "500", e.getMessage());
+			response = new ResponseDto("Failed", "500", e.getMessage(),null);
 		}
 		return response;
 	}
@@ -273,7 +283,6 @@ public class AutomationServiceImpl implements AutomationService {
 	}
 
 	private ResponseDto saveAllInvoiceDetails(List<InvoiceHeaderDto> headerList) {
-		// TODO Auto-generated method stub
 		ResponseDto response = null;
 		try {
 			for (InvoiceHeaderDto invoiceHeaderDto : headerList) {
@@ -285,13 +294,49 @@ public class AutomationServiceImpl implements AutomationService {
 					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
 				}
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
+				InvoiceHeaderDo invoiceHeaderDo  = (InvoiceHeaderDo) response.getObject();
+				// calling rule file and worklfow 
+				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
+				determination.setCompCode(invoiceHeaderDo.getCompCode());
+				determination.setProcessLeadCheck("Accountant");
+				determination.setVednorId(invoiceHeaderDo.getVendorId());
+				ResponseEntity<?> responseRules = invoiceHeaderService.triggerRuleService(determination);
+				System.err.println("responseRules Scheduler "+ responseRules);
+				@SuppressWarnings("unchecked")
+				List<ApproverDataOutputDto> lists = (List<ApproverDataOutputDto>) responseRules.getBody();
+				System.err.println("ApproverList scheduler"+lists);
+				// trigger workflow 
+				TriggerWorkflowContext context = new TriggerWorkflowContext();
+				context.setRequestId(invoiceHeaderDo.getRequestId());
+				context.setExtInvNumb(invoiceHeaderDo.getExtInvNum());
+				context.setNonPo(false);
+				context.setManualNonPo(false);
+				context.setAccountantUser(lists.get(0).getUserOrGroup());
+				context.setAccountantGroup(invoiceHeaderDo.getTaskGroup());
+				context.setProcessLead(lists.get(0).getUserOrGroup());
+				context.setAccountantAction("");
+				context.setInvoiceStatus(invoiceHeaderDo.getInvoiceStatus());
+				context.setInvoiceStatusText(invoiceHeaderDo.getInvoiceStatusText());
+				context.setInvoiceType(invoiceHeaderDo.getInvoiceType());
+				context.setProcessLeadAction("");
+				context.setRemediationUser("");
+				context.setRemediationUserAction("");
+				ResponseEntity<?> responseWorkflow = invoiceHeaderService.triggerWorkflow((WorkflowContextDto) context,
+						"triggerresolutionworkflow.triggerresolutionworkflow");
+				System.err.println("response of workflow Trigger scheduler" + response);
+				WorkflowTaskOutputDto taskOutputDto = (WorkflowTaskOutputDto) responseWorkflow.getBody();
+				// save invoice header
 				
+				invoiceHeaderDo.setWorkflowId(taskOutputDto.getId());
+				invoiceHeaderDo.setTaskStatus("READY");
+				InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+				System.err.println("invpoiceHeaderDo ="+invoiceSavedDo);
 			}
 			return response;
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			return new ResponseDto("500", "0", "Error " + e.getMessage());
+			return new ResponseDto("500", "0", "Error " + e.getMessage(),null);
 
 		}
 
@@ -308,7 +353,7 @@ public class AutomationServiceImpl implements AutomationService {
 					ApplicationConstants.UNSEEN_FLAGTERM, ApplicationConstants.EMAIL_FROM);
 
 			logger.error(emailMessages.length + "After reading email");
-			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders");
+			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders",null);
 			// Step 2 : Get the attachment pdf file from a message
 			List<File> files = new ArrayList<File>();
 			// map to move messages to processed/unprocessed folder
@@ -345,15 +390,15 @@ public class AutomationServiceImpl implements AutomationService {
 
 								}
 							} else {
-								response = new ResponseDto("Done", "200", "No PDF in the Attacment found ");
+								response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
 							}
 						} else {
-							response = new ResponseDto("Done", "200", "No Attacment found ");
+							response = new ResponseDto("Done", "200", "No Attacment found ",null);
 						}
 
 					}
 				} else {
-					response = new ResponseDto("Failed", "400", "Message is null or empty");
+					response = new ResponseDto("Failed", "400", "Message is null or empty",null);
 				}
 
 			} else {
@@ -378,10 +423,10 @@ public class AutomationServiceImpl implements AutomationService {
 
 							}
 						} else {
-							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ");
+							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
 						}
 					} else {
-						response = new ResponseDto("Done", "200", "No Attacment found ");
+						response = new ResponseDto("Done", "200", "No Attacment found ",null);
 					}
 
 				}
@@ -401,7 +446,7 @@ public class AutomationServiceImpl implements AutomationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("AutomationServiceImpl.extractInvoiceFromEmail():::" + e.getMessage());
-			response = new ResponseDto("Failed", "500", e.getMessage());
+			response = new ResponseDto("Failed", "500", e.getMessage(),null);
 		}
 		return response;
 	}

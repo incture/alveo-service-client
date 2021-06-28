@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.http.ResponseEntity;
 
+import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
 import com.ap.menabev.dto.ActivityLogDto;
 import com.ap.menabev.dto.ClaimAndReleaseDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
@@ -20,6 +22,7 @@ import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.StatusCountDto;
+import com.ap.menabev.dto.WorkflowContextDto;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.serviceimpl.FilterMultipleHeaderSearchDto;
 
@@ -61,6 +64,9 @@ public interface InvoiceHeaderService {
 	ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader);
 	List<ActivityLogDto> createActivityLogForSubmit(InvoiceSubmitDto invoiceSubmitOk, String actionCode,
 			String actionCodeText);
-	ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit);	
+	ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit);
+	ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination)
+			throws ClientProtocolException, IOException, URISyntaxException;
+	ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId);	
 
 }

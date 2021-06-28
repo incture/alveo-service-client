@@ -60,11 +60,11 @@ public class InvoiceHeaderDo implements Serializable {
 	private String sapInvoiceNumber;//13
 	@Column(name = "INVOICE_PDF_ID",length = 64)
 	private String invoicePdfId; // add the document id of the invoice pdf to show in oepn pdf .
-	@Column(name = "STREET" ,length = 10)
+	@Column(name = "STREET" ,length = 100)
 	private String street;
-	@Column(name = "ZIP_CODE", length = 10)
+	@Column(name = "ZIP_CODE", length = 50)
 	private String zipCode;
-	@Column(name = "CITY", length = 10)
+	@Column(name = "CITY", length = 50)
 	private String city;
 	@Column(name = "COUNTRY_CODE",length = 40)
 	private String countryCode;

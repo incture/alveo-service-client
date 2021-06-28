@@ -30,7 +30,7 @@ public class ABBYYController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO: handle exception
-			return new ResponseDto("Error", "500", e.getMessage());
+			return new ResponseDto("Error", "500", e.getMessage(),null);
 		}
 	}
 	@GetMapping("/shared")
