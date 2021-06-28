@@ -24,8 +24,8 @@ public class PoItemAccountAssignDo {
 	private String documentItem;
 	@Column(name="SERIAL_NO",length=2)
 	private String serialNo;
-	@Column(name="DELETE_IND",length=1)
-	private String deleteInd;
+	@Column(name="DELETE_IND")
+	private Boolean deleteInd;
 	@Column(name="CREATION_DATE",length=8)
 	private Long creatDate;
 	@Column(name="QUANTITY",length=13)
@@ -54,4 +54,8 @@ public class PoItemAccountAssignDo {
 	private String serviceDocItem;
 	@Column(name="SERVICE_DOC_TYPE",length=4)
 	private String serviceDocType;
+	@Column(name="CO_AREA",length = 4)
+	private String coArea;
+	@Column(name="PROFITCTR",length = 10)
+	private String profitCtr;
 }

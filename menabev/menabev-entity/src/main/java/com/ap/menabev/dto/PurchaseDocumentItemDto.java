@@ -41,17 +41,17 @@ public class PurchaseDocumentItemDto {
 	private Double priceUnit;
 	private Double grPrTime;
 	private String taxCode;
-	private String noMoreGr;
-	private String finalInvInd;
+	private Boolean noMoreGr;//
+	private Boolean finalInvInd;//
 	private String itemCategory;
 	private String accountAssCat;
 	private String distribution;
 	private String partInv;
 	private String grInd;
-	private String gr_non_val;
-	private String irInd;
-	private String grBsdIVInd;
-	private String srvBsdIVInd;
+	private Boolean gr_non_val;//
+	private Boolean irInd;//
+	private Boolean grBsdIVInd;//
+	private Boolean srvBsdIVInd;//
 	private String agreement;
 	private String agreeemntItm;
 	private String taxJurCode;
@@ -62,7 +62,7 @@ public class PurchaseDocumentItemDto {
 	private String contractItm;
 	private String refDocNum;
 	private String refDocItem;
-	private String delivComplete;
+	private Boolean delivComplete;//
 	private String partDelv;
 	private Long itemChangedAt;
 	private String productType;//TODO

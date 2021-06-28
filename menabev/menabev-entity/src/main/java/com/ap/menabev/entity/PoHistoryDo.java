@@ -59,8 +59,8 @@ public class PoHistoryDo {
 	private String debitCreditInd;
 	@Column(name="VALUATION_TYPE",length=10)
 	private String valuationType;
-	@Column(name="NO_MORE_GR",length=1)
-	private String noMoreGR;
+	@Column(name="NO_MORE_GR")
+	private Boolean noMoreGR;
 	@Column(name="REF_DOC_ID",length=16)
 	private String refDocId;
 	@Column(name="REF_DOC_NUM",length=10)

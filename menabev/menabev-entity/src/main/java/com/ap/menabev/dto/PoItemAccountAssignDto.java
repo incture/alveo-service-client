@@ -1,6 +1,8 @@
 package com.ap.menabev.dto;
 
 
+import javax.persistence.Column;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,7 +17,7 @@ public class PoItemAccountAssignDto {
 	private String documentNumber;
 	private String documentItem;
 	private String serialNo;
-	private String deleteInd;
+	private Boolean deleteInd;//
 	private Long creatDate;
 	private Double quantity;
 	private Double distPer;
@@ -30,4 +32,6 @@ public class PoItemAccountAssignDto {
 	private String serviceDoc;
 	private String serviceDocItem;
 	private String serviceDocType;
+	private String coArea;
+	private String profitCtr;
 }

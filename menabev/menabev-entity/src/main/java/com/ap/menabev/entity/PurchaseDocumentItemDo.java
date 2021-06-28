@@ -69,10 +69,10 @@ public class PurchaseDocumentItemDo{
 	private Double grPrTime;
 	@Column(name="TAX_CODE",length=2)
 	private String taxCode;
-	@Column(name="NO_MORE_GR",length=1)
-	private String noMoreGr;
-	@Column(name="FINAL_INV_IND",length=1)
-	private String finalInvInd;
+	@Column(name="NO_MORE_GR")
+	private Boolean noMoreGr;
+	@Column(name="FINAL_INV_IND")
+	private Boolean finalInvInd;
 	@Column(name="ITEM_CATEGORY",length=1)
 	private String itemCategory;
 	@Column(name="ACCOUNT_ASS_CAT",length=1)
@@ -83,14 +83,14 @@ public class PurchaseDocumentItemDo{
 	private String partInv;
 	@Column(name="GR_IND",length=1)
 	private String grInd;
-	@Column(name="GR_NON_VAL",length=1)
-	private String gr_non_val;
-	@Column(name="IR_IND",length=1)
-	private String irInd;
-	@Column(name="GR_BSD-IV-IND",length=1)
-	private String grBsdIVInd;
-	@Column(name="SRV_BSD_IV_IND",length=1)
-	private String srvBsdIVInd;
+	@Column(name="GR_NON_VAL")
+	private Boolean gr_non_val;
+	@Column(name="IR_IND")
+	private Boolean irInd;
+	@Column(name="GR_BSD-IV-IND")
+	private Boolean grBsdIVInd;
+	@Column(name="SRV_BSD_IV_IND")
+	private Boolean srvBsdIVInd;
 	@Column(name="AGREEMENT",length=10)
 	private String agreement;
 	@Column(name="AGREEMENT_ITM",length=5)
@@ -111,8 +111,8 @@ public class PurchaseDocumentItemDo{
 	private String refDocNum;
 	@Column(name="REF_DOC_ITEM",length=5)
 	private String refDocItem;
-	@Column(name="DELI_COMPLETE",length=1)
-	private String delivComplete;
+	@Column(name="DELIV_COMPLETE")
+	private Boolean delivComplete;
 	@Column(name="PART_DELV",length=1)
 	private String partDelv;
 	@Column(name="ITEM_CHANGED_AT",length=8)

@@ -31,7 +31,7 @@ public class PoHistoryDto {
 	private Double blockedQtyOPU;
 	private String debitCreditInd;
 	private String valuationType;
-	private String noMoreGR;
+	private Boolean noMoreGR;//
 	private String refDocId;
 	private String refDocNum;
 	private String refDocItem;
