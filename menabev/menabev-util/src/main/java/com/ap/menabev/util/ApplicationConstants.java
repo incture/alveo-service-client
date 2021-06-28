@@ -62,17 +62,17 @@ public interface ApplicationConstants {
 	// ----------------------------------------------------------//
 
 	// DEV DataBase Details
-	/*  String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver"; 
-	  String URL = "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
-	  String USERNAME = "MENABEVD"; 
-	  String PASSWORD = "menBHDev2021";*/
+	 String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver"; 
+     String URL = "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
+	 String USERNAME = "MENABEVD"; 
+	 String PASSWORD = "menBHDev2021";
 	 
 	// ----------------------------------------------------------//
 	// QA DataBase Details
-	String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
+	/*String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
 	String URL = "jdbc:sap://bfddd96c-4f38-4596-917d-fa62f7c56666.hana.prod-eu20.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true";
 	String USERNAME = "MENABEVQA";
-	String PASSWORD = "Dv4v.6nkTn6weJh6ZSNdL7-NTR8JqwL-AVzr_H-fJI1aj78QpqmGtFggsuSLuOC4e2qCkVurhiW12D9zyv6KRVyPJqPgmWR0tVffmyDZV5Aq7K2Zx_xm-C-esUhSiLC_";
+	String PASSWORD = "Dv4v.6nkTn6weJh6ZSNdL7-NTR8JqwL-AVzr_H-fJI1aj78QpqmGtFggsuSLuOC4e2qCkVurhiW12D9zyv6KRVyPJqPgmWR0tVffmyDZV5Aq7K2Zx_xm-C-esUhSiLC_";*/
 	// ------------------------------------------------------///
 
 	// Service Status
@@ -98,9 +98,12 @@ public interface ApplicationConstants {
 	String ACCOUNTANT_SUBMIT_FOR_REMEDIATION = "ASR";
 	String ACCOUNTANT_SUBMIT_FOR_APPROVAL = "ASA";
 	String ACCOUNTANT_REJECT = "AR";
+	String PROCESS_LEAD_APPROVAL = "PA";
+	String PROCESS_LEAD_REJECTION = "PR";
+	String PROCESS_LEAD_RESEND = "PRS";
 	String NEW_INVOICE = "00";
-	String DRAFT_INVOICE = "01";
-	String OPEN_INVOICE = "02";
+	String DRAFT_INVOICE = "9";
+	String OPEN_INVOICE = "10";
 	String DUPLICATE_INVOICE = "03";
 	String PO_MISSING_OR_INVALID ="04";  
 	String NO_GRN = "05";
@@ -156,24 +159,25 @@ public interface ApplicationConstants {
 	
 	
 	
-	
-	
+	//Connectivity Service Key Details For DEV
+		public static final String CONECTIVITY_CLIENT_ID = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
+		public static final String CONECTIVITY_CLIENT_SECRET = "d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=";
+		public static final String CONECTIVITY_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 	 
-	
+	//Connectivity Service Key Details For QA
+		
+//----------------------------------------------------------------------------------------->	
 	//Destination Service Key details for DEV
 		public static final String DESTINATION_CLIENT_ID = "sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2";
-		public static final String DESTINATION_CLIENT_SECRET = "5c9c9282-1cd3-4ab8-bacd-adb519a9d272$-wKP4BAeUCmyNNI1XsqNZ9NHnRLnj5xESx3wuVw5jRQ=";
+		public static final String DESTINATION_CLIENT_SECRET = "2af4f4c4-7265-4d95-b544-01e917937a1e$HlHDn__C2aLbv2PqTcyq251kX4P9QZmZDShfUEFw8NQ=";
 		public static final String DESTINATION_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 		public static final String DESTINATION_BASE_URL = "https://destination-configuration.cfapps.eu20.hana.ondemand.com/destination-configuration/v1/destinations/";
-
-
-
-		
 		//Destination Service Key details for QA
-		
-		
-		
-		
+	/*	public static final String DESTINATION_CLIENT_ID = "sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2";
+		public static final String DESTINATION_CLIENT_SECRET = "";
+		public static final String DESTINATION_TOKEN_URL = "/oauth/token?grant_type=client_credentials";
+		public static final String DESTINATION_BASE_URL = "https://destination-configuration.cfapps.eu20.hana.ondemand.com/destination-configuration/v1/destinations/";
+		*/
 		//Destination Service Key details for PROD
 	
 	

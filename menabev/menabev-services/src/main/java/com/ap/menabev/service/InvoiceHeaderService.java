@@ -60,6 +60,7 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> accountantSubmitOkApi(InvoiceSubmitDto invoiceSubmitOk);
 	ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader);
 	List<ActivityLogDto> createActivityLogForSubmit(InvoiceSubmitDto invoiceSubmitOk, String actionCode,
-			String actionCodeText);	
+			String actionCodeText);
+	ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit);	
 
 }

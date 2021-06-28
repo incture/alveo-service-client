@@ -1,5 +1,5 @@
 package com.ap.menabev.util;
- 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
 @Component
 public class OdataHelperClass {
 
@@ -115,6 +116,7 @@ public class OdataHelperClass {
 			Header[] json = null;
 			JSONObject obj = null;
 			String jwToken = getConectivityProxy();
+			System.err.println("jwToken ="+jwToken);
 			if (method.equalsIgnoreCase("GET")) {
 				httpRequestBase = new HttpGet(destinationInfo.get("URL") + url);
 			} else if (method.equalsIgnoreCase("POST")) {
@@ -195,11 +197,15 @@ public class OdataHelperClass {
 
 	public static String getConectivityProxy() throws URISyntaxException, IOException {
 		HttpClient client = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost(
+	/*	HttpPost httpPost = new HttpPost(
 				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
 		//use vcap or change when deploying in dev in dev space
 		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
-				"c1ac511d-74f8-4a64-a28b-c42bb41c2d2b$Md8ZvS__pg9I_Z_qPNhHrXR7p2zhCP9ByfhO3RYVCt8=");
+				"d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=");*/
+		HttpPost httpPost = new HttpPost(ApplicationConstants.CONECTIVITY_TOKEN_URL);
+		String auth = encodeUsernameAndPassword(ApplicationConstants.CONECTIVITY_CLIENT_ID,
+				ApplicationConstants.CONECTIVITY_CLIENT_SECRET);
+		
 		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
 		String data = getDataFromStream(res.getEntity().getContent());

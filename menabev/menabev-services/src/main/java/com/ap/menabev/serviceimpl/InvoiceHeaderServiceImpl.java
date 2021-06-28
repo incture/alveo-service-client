@@ -569,8 +569,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			// save header
 			 invoiceDto.getInvoiceHeaderDto().setRequestId(requestId);
 			 invoiceDto.getInvoiceHeaderDto().setGuid(guid);
+			 invoiceDto.getInvoiceHeaderDto().setRequest_created_at((ServiceUtil.getEpocTime()));
 			if (ServiceUtil.isEmpty(invoiceDto.getInvoiceHeaderDto().getInvoiceStatus())) {
-				invoiceDto.getInvoiceHeaderDto().setInvoiceStatus("DRAFT");
+				invoiceDto.getInvoiceHeaderDto().setInvoiceStatus(ApplicationConstants.DRAFT_INVOICE);
+				invoiceDto.getInvoiceHeaderDto().setInvoiceStatusText("DRAFT");
 				invoiceDto.getInvoiceHeaderDto().setTaskStatus("DRAFT");
 			}
 			DecimalFormat decim = new DecimalFormat("#.##");
@@ -750,7 +752,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				
 				invoiceDto.getInvoiceHeaderDto().setRequestId(requestId);
 				invoiceDto.getInvoiceHeaderDto().setGuid(guid);
-				invoiceDto.getInvoiceHeaderDto().setInvoiceStatus("OPEN");
+				invoiceDto.getInvoiceHeaderDto().setInvoiceStatus(ApplicationConstants.OPEN_INVOICE);
+				invoiceDto.getInvoiceHeaderDto().setInvoiceStatusText("OPEN");
 				invoiceDto.getInvoiceHeaderDto().setTaskStatus("READY");
 				invoiceDto.getInvoiceHeaderDto().setWorkflowId(taskOutputDto.getId());
 				invoiceDto.getInvoiceHeaderDto().setRequest_created_at((ServiceUtil.getEpocTime()));
@@ -1017,7 +1020,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 								WorkflowTaskOutputDto workflow = new WorkflowTaskOutputDto();
 								workflow.setSubject(draftLists.get(i).getRequestId());
-								workflow.setStatus("DRAFT");
+								workflow.setStatus(ApplicationConstants.DRAFT_INVOICE);
 								listOfWorkflowTasks.add(workflow);
 							}
 						}
@@ -1038,7 +1041,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						
 						if(filterDtoList!=null && !filterDtoList.isEmpty()){
 						List<InvoiceHeaderDto> readyAndReservedInvoiceList = filterDtoList.stream()
-								.filter(w -> !w.getInvoiceStatus().equals("DRAFT")).collect(Collectors.toList());
+								.filter(w -> !w.getInvoiceStatus().equals(ApplicationConstants.DRAFT_INVOICE)).collect(Collectors.toList());
 						System.err.println("readyAndReservedTaskList after filter"+readyAndReservedInvoiceList);
 							// formMapfor claim
 							Map<String, WorkflowTaskOutputDto> map = checkForClaim(listOfWorkflowTasks);
@@ -1057,6 +1060,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								inbox.setRequestId(readyAndReservedInvoiceList.get(i).getRequestId());
 								inbox.setSapInvoiceNumber(readyAndReservedInvoiceList.get(i).getSapInvoiceNumber());
 								inbox.setValidationStatus(readyAndReservedInvoiceList.get(i).getInvoiceStatus());
+								inbox.setValidationStatusCode(readyAndReservedInvoiceList.get(i).getInvoiceStatusText());
 								inbox.setVendorId(readyAndReservedInvoiceList.get(i).getVendorId());
 								inbox.setVendorName(readyAndReservedInvoiceList.get(i).getVendorName());
 								inboxOutputList.add(inbox);
@@ -1080,6 +1084,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								inbox.setRequestId(draftDtoList.get(i).getRequestId());
 								inbox.setSapInvoiceNumber(draftDtoList.get(i).getSapInvoiceNumber());
 								inbox.setValidationStatus(draftDtoList.get(i).getInvoiceStatus());
+								inbox.setValidationStatusCode(draftDtoList.get(i).getInvoiceStatusText());
 								inbox.setVendorId(draftDtoList.get(i).getVendorId());
 								inbox.setVendorName(draftDtoList.get(i).getVendorName());
 								draftList.add(inbox);
@@ -1088,7 +1093,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							//if(draftDtoList.size()>=(int)filterDto.getTop()){
 							int skip = (int)filterDto.getSkip();
 							System.err.println("skip "+skip);
-							int top = (int)(filterDto.getSkip()+filterDto.getTop());
+							int top = (int)filterDto.getTop();
 							System.err.println("top "+top);
 						    paginatedDraftLists = draftList.stream().skip(skip).limit(top).collect(Collectors.toList());
 							response.setDraftList(paginatedDraftLists);
@@ -1191,7 +1196,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 										WorkflowTaskOutputDto workflow = new WorkflowTaskOutputDto();
 										workflow.setSubject(lists.get(i).getRequestId());
-										workflow.setStatus("DRAFT");
+										workflow.setStatus("9");
 										listOfWorkflowTasks.add(workflow);
 									}
 								}
@@ -1494,7 +1499,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				// Draft List form 
 				// list of invocie ready reserved 
 				List<InvoiceHeaderDto> readyAndReservedInvoiceList = filterDtoList.stream()
-						.filter(w -> !w.getInvoiceStatus().equals("Draft")).collect(Collectors.toList());
+						.filter(w -> !w.getInvoiceStatus().equals(ApplicationConstants.DRAFT_INVOICE)).collect(Collectors.toList());
 				System.err.println("readyAndReservedTaskList withoutFilter "+readyAndReservedInvoiceList);
 					// formMapfor claim
 					Map<String, WorkflowTaskOutputDto> map = checkForClaim(invoiceWorkflowRequestIdList);
@@ -1514,11 +1519,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						inbox.setSapInvoiceNumber(readyAndReservedInvoiceList.get(i).getSapInvoiceNumber());
 						inbox.setVendorId(readyAndReservedInvoiceList.get(i).getVendorId());
 						inbox.setVendorName(readyAndReservedInvoiceList.get(i).getVendorName());
+						inbox.setValidationStatus(readyAndReservedInvoiceList.get(i).getInvoiceStatus());
+						inbox.setValidationStatusCode(readyAndReservedInvoiceList.get(i).getInvoiceStatusText());
 						inboxOutputList.add(inbox);
 					}
 					if (filterDto.getRoleOfUser().equals("Accountant")) {
 						List<InvoiceHeaderDto> draftDtoList = filterDtoList.stream()
-								.filter(w -> w.getInvoiceStatus().equals("DRAFT")).collect(Collectors.toList());
+								.filter(w -> w.getInvoiceStatus().equals(ApplicationConstants.DRAFT_INVOICE)).collect(Collectors.toList());
 						System.err.println("Draft list withoutFilter "+ draftDtoList);
 						if(!ServiceUtil.isEmpty(draftList)){
 						for (int i = 0; i < draftDtoList.size(); i++) {
@@ -1534,6 +1541,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							inbox.setRequestId(draftDtoList.get(i).getRequestId());
 							inbox.setSapInvoiceNumber(draftDtoList.get(i).getSapInvoiceNumber());
 							inbox.setValidationStatus(draftDtoList.get(i).getInvoiceStatus());
+							inbox.setValidationStatusCode(draftDtoList.get(i).getInvoiceStatusText());
 							inbox.setVendorId(draftDtoList.get(i).getVendorId());
 							inbox.setVendorName(draftDtoList.get(i).getVendorName());
 							draftList.add(inbox);
@@ -1542,7 +1550,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						//if(draftDtoList.size()>=(int)filterDto.getTop()){
 						int skip = (int)filterDto.getSkip();
 						System.err.println("skip "+skip);
-						int top = (int)(filterDto.getSkip()+filterDto.getTop());
+						int top = (int)filterDto.getTop();
 						System.err.println("top "+top);
 					    paginatedDraftLists = draftList.stream().skip(skip).limit(top).collect(Collectors.toList());
 						response.setDraftList(paginatedDraftLists);
@@ -1604,19 +1612,19 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.DUE_DATE BETWEEN ", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
 			// is empty
 		}
-		if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
+		/*if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
 			filterQueryMap.put(" RR.DUE_DATE =", "'"+dto.getDueDateFrom() + "'");
 			// correct
-		}
+		}*/
 		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != null && dto.getInvoiceDateTo() != 0
 				&& dto.getInvoiceDateTo() != 0) {
 			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
 			// correct
 		}
-		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != 0) {
+		/*if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != 0) {
 			filterQueryMap.put(" RR.INVOICE_DATE =", dto.getInvoiceDateFrom() + "");
 			// correct
-		}
+		}*/
 		if (dto.getInvoiceType() != null && !dto.getInvoiceType().isEmpty()) {
 			StringBuffer rqstId = new StringBuffer();
 			for (int i = 0; i < dto.getInvoiceType().size(); i++) {
@@ -1660,10 +1668,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.INVOICE_TOTAL BETWEEN ", dto.getInvoiceValueFrom() + " AND " + dto.getInvoiceValueTo());
 			// correct
 		}
-		if (!ServiceUtil.isEmpty(dto.getInvoiceValueFrom())) {
+		/*if (!ServiceUtil.isEmpty(dto.getInvoiceValueFrom())) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL =", dto.getInvoiceDateFrom() + "");
 			// correct
-		}
+		}*/
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
 		AtomicInteger count = new AtomicInteger(0);
 		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
@@ -1719,19 +1727,19 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.DUE_DATE BETWEEN ", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
 			// is empty
 		}
-		if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
+		/*if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
 			filterQueryMap.put(" RR.DUE_DATE =", "'"+dto.getDueDateFrom() + "'");
 			// correct
-		}
+		}*/
 		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != null && dto.getInvoiceDateTo() != 0
 				&& dto.getInvoiceDateTo() != 0) {
 			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
 			// correct
 		}
-		if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != 0) {
+		/*if (dto.getInvoiceDateFrom() != null && dto.getInvoiceDateFrom() != 0) {
 			filterQueryMap.put(" RR.INVOICE_DATE =", dto.getInvoiceDateFrom() + "");
 			// correct
-		}
+		}*/
 		
 			filterQueryMap.put(" RR.INVOICE_TYPE IN", "('" +"NON-PO"+ "')");
 			// checked
@@ -1750,7 +1758,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			// is EMpty
 		}
 		
-			filterQueryMap.put(" RR.INVOICE_STATUS IN", "('" +"DRAFT" + "')");// procss
+			filterQueryMap.put(" RR.INVOICE_STATUS IN", "('" +"9" + "')");// procss
 		
 		if (dto.getExtInvNum() != null && !dto.getExtInvNum().isEmpty()) {
 			filterQueryMap.put(" RR.EXT_INV_NUM =", "'" + dto.getExtInvNum() + "'");
@@ -1759,10 +1767,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.INVOICE_TOTAL BETWEEN ", dto.getInvoiceValueFrom() + " AND " + dto.getInvoiceValueTo());
 			// correct
 		}
-		if (!ServiceUtil.isEmpty(dto.getInvoiceValueFrom())) {
+	/*	if (!ServiceUtil.isEmpty(dto.getInvoiceValueFrom())) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL =", dto.getInvoiceDateFrom() + "");
 			// correct
-		}
+		}*/
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
 		AtomicInteger count = new AtomicInteger(0);
 		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
@@ -1827,18 +1835,18 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.DUE_DATE BETWEEN ", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
 			// is empty
 		}
-		if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
+		/*if (dto.getDueDateFrom() != null && dto.getDueDateFrom() != 0) {
 			filterQueryMap.put(" RR.DUE_DATE =", dto.getDueDateFrom() + "");
 			// correct
-		}
+		}*/
 		if (!(ServiceUtil.isEmpty(dto.getInvoiceDateFrom()) && ServiceUtil.isEmpty(dto.getInvoiceDateFrom()))) {
 			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
 			// correct
 		}
-		if (!ServiceUtil.isEmpty(dto.getInvoiceDateFrom())) {
+		/*if (!ServiceUtil.isEmpty(dto.getInvoiceDateFrom())) {
 			filterQueryMap.put(" RR.INVOICE_DATE =", dto.getInvoiceDateFrom() + "");
 			// correct
-		}
+		}*/
 		if (dto.getInvoiceType() != null && !dto.getInvoiceType().isEmpty()) {
 
 			StringBuffer rqstId = new StringBuffer();
@@ -1884,10 +1892,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			filterQueryMap.put(" RR.INVOICE_TOTAL BETWEEN ", dto.getInvoiceValueFrom() + " AND " + dto.getInvoiceValueTo());
 			// correct
 		}
-		if (!ServiceUtil.isEmpty(dto.getInvoiceValueFrom())) {
+		/*if (!ServiceUtil.isEmpty(dto.getInvoiceValueFrom())) {
 			filterQueryMap.put(" RR.INVOICE_TOTAL =", dto.getInvoiceDateFrom() + "");
 			// correct
-		}
+		}*/
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
 		AtomicInteger count = new AtomicInteger(0);
 		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
@@ -2856,6 +2864,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if(invoiceSubmit.getActionCode().equals(ApplicationConstants.ACCOUNTANT_SUBMIT_FOR_REMEDIATION)){
 				
 				if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.PO_MISSING_OR_INVALID)){
+			       InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+		              invoiceSubmit.setInvoice(invoiceHeader);
 	         //If invoiceStatusCode=PO Missing-01 or ItemMismatch, Price Mismatch, price/qty mismatch then call getRemediationUsersAPI with buyer flag
 					// call remediation for BUYER
 				ResponseEntity<?>	 responseBuyer    = odataGetRemediationDetailsForBuyerAndGrnWithCreatedByAndPurchGrp(invoiceSubmit.getPurchaseOrders(), "BUYER",
@@ -2864,8 +2874,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						RemediationUser usersBuyer = (RemediationUser) responseBuyer.getBody();
 						userList.add(usersBuyer);
 				}
-				if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.NO_GRN)){
+				else if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.NO_GRN)){
 					// call remediation for GRN by group 
+					
+					 InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+		              invoiceSubmit.setInvoice(invoiceHeader);
 					 List<List<String>>   listOfprNumAndprItem = checkPurReqNumAndPurReqItem(invoiceSubmit.getPurchaseOrders());
 	                  List<String>   prNumList = listOfprNumAndprItem.get(0);
 	                  List<String>   prItemList = listOfprNumAndprItem.get(1);
@@ -2894,6 +2907,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			        if(invoiceSubmit.getInvoice().getInvoiceStatus().equals(ApplicationConstants.READY_TO_POST)){
 			        	List<ApproverDataOutputDto> lists = Collections.EMPTY_LIST;
 
+			        	 InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+			              invoiceSubmit.setInvoice(invoiceHeader);
 			        	// get process lead user 
 			        	AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
 						determination.setCompCode("1010");
@@ -2919,6 +2934,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);			}
 			else {
 				// Accountant Submit For Reject
+				
+				 InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+	              invoiceSubmit.setInvoice(invoiceHeader);
 		            // get process lead user for reject 
 				List<ApproverDataOutputDto> lists = Collections.EMPTY_LIST;
 				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
@@ -2955,7 +2973,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		@Override
 		public ResponseEntity<?>  accountantSubmitOkApi(InvoiceSubmitDto invoiceSubmitOk){
 			if(!ServiceUtil.isEmpty(invoiceSubmitOk.getPurchaseOrders())){
-				
 				if(invoiceSubmitOk.getActionCode().equals(ApplicationConstants.ACCOUNTANT_SUBMIT_FOR_APPROVAL)){
 					// Accountant Submit For Approval
 					// close task 
@@ -2965,6 +2982,16 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						    List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmitOk,invoiceSubmitOk.getActionCode(),"ACCOUNTTANT_SUBMIT_APPROVAL");
 						    invoiceSubmitOk.getInvoice().setActivityLog(activity);
 						    // save all the things - activity log and comments
+						    if(invoiceSubmitOk.getInvoice().getChangeIndicators()!=null){
+								 InvoiceChangeIndicator changesIndicators = invoiceSubmitOk.getInvoice().getChangeIndicators();
+								 changesIndicators.setActivityLog(true);
+								 invoiceSubmitOk.getInvoice().setChangeIndicators(changesIndicators);
+							}else{
+							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+							  changesIndicators.setActivityLog(true);
+							  invoiceSubmitOk.getInvoice().setChangeIndicators(changesIndicators);}
+						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmitOk.getInvoice());
+				              invoiceSubmitOk.setInvoice(invoiceHeader); 
 						  invoiceSubmitOk.setMessage("Task Completed.");
 					  }else {
 						  // failed 
@@ -2979,6 +3006,16 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						      List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmitOk,invoiceSubmitOk.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
 						      invoiceSubmitOk.getInvoice().setActivityLog(activity);
 						      // save all the things - activity log and comments
+						      if(invoiceSubmitOk.getInvoice().getChangeIndicators()!=null){
+									 InvoiceChangeIndicator changesIndicators = invoiceSubmitOk.getInvoice().getChangeIndicators();
+									 changesIndicators.setActivityLog(true);
+									 invoiceSubmitOk.getInvoice().setChangeIndicators(changesIndicators);
+								}else{
+								 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+								  changesIndicators.setActivityLog(true);
+								  invoiceSubmitOk.getInvoice().setChangeIndicators(changesIndicators);}
+							    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmitOk.getInvoice());
+					              invoiceSubmitOk.setInvoice(invoiceHeader); 
 						      invoiceSubmitOk.setMessage("Task Completed.");
 				
 					  }else {
@@ -2993,6 +3030,16 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmitOk,invoiceSubmitOk.getActionCode(),"ACCOUNTTANT_SUBMIT_REJECT");
 							  invoiceSubmitOk.getInvoice().setActivityLog(activity);
 							  // save all things - activity log and comments
+							  if(invoiceSubmitOk.getInvoice().getChangeIndicators()!=null){
+									 InvoiceChangeIndicator changesIndicators = invoiceSubmitOk.getInvoice().getChangeIndicators();
+									 changesIndicators.setActivityLog(true);
+									 invoiceSubmitOk.getInvoice().setChangeIndicators(changesIndicators);
+								}else{
+								 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+								  changesIndicators.setActivityLog(true);
+								  invoiceSubmitOk.getInvoice().setChangeIndicators(changesIndicators);}
+							    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmitOk.getInvoice());
+					              invoiceSubmitOk.setInvoice(invoiceHeader); 
 							  invoiceSubmitOk.setMessage("Task Completed.");
 						  }else {
 							  // failed 
@@ -3016,7 +3063,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				activitLogs.stream().forEach(activity->{
 					activity.setActionCode(actionCode);
 					activity.setActionCodeText(actionCodeText);
-					activity.setCreatedAt(ServiceUtil.getEpocTime());
+					activity.setCompletedAt(ServiceUtil.getEpocTime());
 					activity.setCreatedBy(invoiceSubmitOk.getInvoice().getTaskOwner());
 					activity.setInvoiceStatusCode(invoiceSubmitOk.getInvoice().getInvoiceStatus());
 					activity.setInvoiceStatusText(invoiceSubmitOk.getInvoice().getInvoiceStatusText());
@@ -3061,4 +3108,99 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		    return activity;
 		}
 
+		
+	     //process Lead Action Submit 
+		@Override
+		public ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit){
+                    if(!ServiceUtil.isEmpty(invoiceSubmit.getPurchaseOrders())){
+                    	 // Process Lead Submit for Approval 				
+				if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_APPROVAL)){
+					// Post invoice to SAP API 
+					
+					
+					// complete task 
+					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+				      invoiceSubmit.getInvoice().setActivityLog(activity);
+				ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId());
+					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+						  // success 
+						    // save all the things - activity log and comments
+						  // set all change indiactos
+						  if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
+								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+								 changesIndicators.setActivityLog(true);
+								 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+							}else{
+							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+							  changesIndicators.setActivityLog(true);
+							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
+						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+				              invoiceSubmit.setInvoice(invoiceHeader); 
+						  invoiceSubmit.setMessage("Task Completed.");
+					  }else {
+						  // failed 
+						  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+					  }
+					return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);
+				} else if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)){
+					// Process lead submit for rejection 
+					ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId());
+					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+						  // success 
+						      // save all the things - activity log and comments
+						  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+					      invoiceSubmit.getInvoice().setActivityLog(activity);
+					      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
+								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+								 changesIndicators.setActivityLog(true);
+								 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+							}else{
+							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+							  changesIndicators.setActivityLog(true);
+							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
+						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+				              invoiceSubmit.setInvoice(invoiceHeader); 
+			              invoiceSubmit.setInvoice(invoiceHeader);
+						      invoiceSubmit.setMessage("Task Completed.");
+				
+					  }else {
+						  // failed 
+						  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+					  }
+						return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);			
+				   }else {
+					   // process Lead Resend 
+					   ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId());
+						  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+							  // success 
+							  // save all things - activity log and comments
+							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+						      invoiceSubmit.getInvoice().setActivityLog(activity);
+						      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
+									 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+									 changesIndicators.setActivityLog(true);
+									 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+								}else{
+								 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+								  changesIndicators.setActivityLog(true);
+								  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
+							    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+					              invoiceSubmit.setInvoice(invoiceHeader); 
+							  invoiceSubmit.setMessage("Task Completed.");
+						  }else {
+							  // failed 
+							  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+						  }
+					   // Account Submit For Reject    
+				return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);	
+			          } 
+		     }else {
+	    	   invoiceSubmit.setMessage("Po Object List IS MISSING");
+	    	   invoiceSubmit.setStatus(400);
+	    	   return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit,HttpStatus.BAD_REQUEST);
+			}
+			
+			
+			
+		}
 }
