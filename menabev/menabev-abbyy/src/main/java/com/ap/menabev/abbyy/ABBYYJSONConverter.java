@@ -65,7 +65,7 @@ public class ABBYYJSONConverter {
 							itemDto.setUom(invoiceItem.getString("Value"));
 						} else if ("UnitPrice".equalsIgnoreCase(itemName) && invoiceItem.has("Value")) {
 							if (!ServiceUtil.isEmpty(invoiceItem.get("Value")))
-								itemDto.setUnitPrice(Double.valueOf(invoiceItem.getInt("Value")));
+								itemDto.setUnitPrice(Double.valueOf(invoiceItem.getDouble("Value")));
 							else
 								itemDto.setUnitPrice(0.0);
 						} else if ("UnitPriceDenominator".equalsIgnoreCase(itemName) && invoiceItem.has("Value")) {
@@ -127,7 +127,7 @@ public class ABBYYJSONConverter {
 			} else if ("InvoiceDate".equalsIgnoreCase(name)) {
 				String invDateString = headerObj.getString("Value");//
 				headerDto.setInvoiceDate(ServiceUtil.getStringToEpoch(invDateString));
-			} else if ("Total".equalsIgnoreCase(name) || "InvoiceTotal".equalsIgnoreCase(name)) {
+			} else if ("InvoiceTotal".equalsIgnoreCase(name) || "InvoiceTotal".equalsIgnoreCase(name)) {
 				if (!ServiceUtil.isEmpty(headerObj.getString("Value")))
 					headerDto.setInvoiceTotal(new Double(headerObj.getString("Value").replace(",", "")));
 				else
@@ -161,9 +161,9 @@ public class ABBYYJSONConverter {
 				headerDto.setAccountNumber(headerObj.getString("Value"));
 			}
 
-			else if ("TotalNetAmount".equalsIgnoreCase(name)) {
+			else if ("AmountBeforeTax".equalsIgnoreCase(name)) {
 				if (!ServiceUtil.isEmpty(headerObj.getDouble("Value")))
-					headerDto.setAmountBeforeTax(headerObj.getDouble("Value"));
+					headerDto.setAmountBeforeTax(Double.valueOf(headerObj.getString("Value").replace(",", "")));
 				else
 					headerDto.setAmountBeforeTax(new Double(0.0));
 			} else if ("PurchaseOrder".equalsIgnoreCase(name)) {
