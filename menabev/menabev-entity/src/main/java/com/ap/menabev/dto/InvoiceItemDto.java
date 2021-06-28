@@ -20,7 +20,7 @@ public class InvoiceItemDto {
 	private Long refDocNum;//ref_purchase_num
 	private String extItemId;
 	private String articleNum;
-	private Integer customerItemId;
+	private String customerItemId;
 	private String upcCode;
 	private Double invQty;
 	private String uom;

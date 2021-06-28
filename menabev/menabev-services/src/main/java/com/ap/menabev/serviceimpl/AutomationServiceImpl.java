@@ -49,6 +49,7 @@ import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.Session;
 
 @Service
@@ -284,7 +285,7 @@ public class AutomationServiceImpl implements AutomationService {
 					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
 				}
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
-
+				
 			}
 			return response;
 		} catch (Exception e) {
@@ -671,5 +672,76 @@ public class AutomationServiceImpl implements AutomationService {
 		schedulerCycleLogRepository.saveAll(schedulerCycleLogDoList);
 		schedulerRun.setNoOfCycles((schedulerRun.getNoOfCycles()== null ? 0 : schedulerRun.getNoOfCycles())+1);
 		schedulerRunRepository.save(schedulerRun);
+	}
+
+	@Override
+	public List<String> getNames() {
+		List<String> ret = new ArrayList<String>();
+		try {
+			Session session = SFTPChannelUtil.getSession();
+			ChannelSftp channelSftp = null;
+			channelSftp = SFTPChannelUtil.getJschChannel(session);
+			channelSftp.connect();
+			logger.error("Errorrrrrrrrrrrr" + ServiceUtil.isEmpty(channelSftp));
+			channelSftp.cd("\\Output\\");
+			Vector<String> files = channelSftp.ls("*");
+			for (int i = 0; i < files.size(); i++)
+			{
+			    Object obj = files.elementAt(i);
+			    logger.error("Objet  "+obj.toString());
+			    if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry)
+			    {
+			        LsEntry entry = (LsEntry) obj;
+			        if (true && !entry.getAttrs().isDir())
+			        {
+			        	logger.error("line 1"+entry.getFilename());
+			            ret.add(entry.getFilename());
+			        }
+			        if (true && entry.getAttrs().isDir())
+			        {
+			        	
+			            if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
+			            {
+			            	logger.error("line 2"+entry.getFilename());
+			            	
+			            	if(entry.getFilename().contains("Batch")){
+			            		logger.error("INSIDE Batch" );
+//			            		channelSftp.cd(entry.getFilename()+"\\");
+//			            		channelSftp.
+			            		Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
+			            		for (ChannelSftp.LsEntry fileEntry : filelist) {
+			    					try {
+			    						logger.error("INSIDE JSON " + fileEntry.getFilename());
+			    						if (fileEntry.getFilename().contains(".json")) {
+			    							logger.error("INSIDE JSON ");
+			    							InputStream is = channelSftp.get(fileEntry.getFilename());
+			    							ObjectMapper mapper = new ObjectMapper();
+			    							Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
+			    							JSONObject jsonObject = new JSONObject(jsonMap);
+			    							if (jsonObject.has("Documents")) {
+			    								InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
+			    								logger.error("InvoiceHeaderDto  :"+output);
+			    							}
+			    							is.close();
+			    						}
+			    					} catch (Exception e) {
+			    						e.printStackTrace();
+			    						
+
+			    					}
+			    				}
+			            	}
+			                ret.add(entry.getFilename());
+			            }
+			        }
+			    }
+			}
+			return ret;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			logger.error("Error in "+e.getMessage());
+			return null;
+		}
 	}
 }

@@ -846,6 +846,17 @@ public class ServiceUtil {
 		return file;
 	}
 
+	public static Long getStringToEpoch(String invDateString) {
+		// TODO Auto-generated method stub
+		try {
+			Long epoch =  new SimpleDateFormat("yyyy-MM-dd").parse(invDateString).getTime();
+			Long epochLong = epoch/1000;
+			return epochLong;
+		} catch (Exception e) {
+			return 0L;
+		}
+	}
+
 	// delay execution code.
 
 	/*

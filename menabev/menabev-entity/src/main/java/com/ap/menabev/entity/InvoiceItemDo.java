@@ -49,7 +49,7 @@ public class InvoiceItemDo implements Serializable {
 	@Column(name = "ARTICLE_NUM", length = 20)
 	private String articleNum;
 	@Column(name = "CUSTOMER_ITEM_ID", length = 20)
-	private Integer customerItemId;
+	private String customerItemId;
 	@Column(name = "UPC_CODE", length = 50)
 	private String upcCode;
 	@Column(name = "INV_QTY")
