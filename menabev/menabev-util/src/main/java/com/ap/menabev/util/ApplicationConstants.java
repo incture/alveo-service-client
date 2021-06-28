@@ -101,7 +101,7 @@ public interface ApplicationConstants {
 	String PROCESS_LEAD_APPROVAL = "PA";
 	String PROCESS_LEAD_REJECTION = "PR";
 	String PROCESS_LEAD_RESEND = "PRS";
-	String NEW_INVOICE = "00";
+	String NEW_INVOICE = "8";
 	String DRAFT_INVOICE = "9";
 	String OPEN_INVOICE = "10";
 	String DUPLICATE_INVOICE = "03";
