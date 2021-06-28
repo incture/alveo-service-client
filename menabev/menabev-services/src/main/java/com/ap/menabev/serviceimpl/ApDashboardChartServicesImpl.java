@@ -216,10 +216,10 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			for (Map.Entry<String, String> entry : codesAndTextsmap.entrySet()) {
 				String key=codesAndTextsmap.get(entry.getKey());
 				logger.error("code&value = " + key);
-				if (exceptionMap.containsKey(key)) {
+				if (exceptionMap.containsKey(entry.getKey())) {
 					
 				} else {
-					exceptionMap.put(key, 0);
+					exceptionMap.put(entry.getKey(), 0);
 				}
 				
 			}
