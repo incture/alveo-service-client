@@ -34,6 +34,7 @@ import com.ap.menabev.util.ServiceUtil;
 public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApDashboardChartServicesImpl.class);
+	
 	@Autowired
 	ApDashboardChartRepository repo;
 	
@@ -90,7 +91,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			logger.error("from date = " + companyCode);
 			logger.error("to date = " + vendorId);
 
-			//lists = repo.getDashboardChartDetailsBetween(fromDate, toDate, companyCode, currency, vendorId);
+			lists = repo.getDashboardChartDetailsBetween(fromDate, toDate, companyCode, currency, vendorId);
 			logger.error("list data = " + lists);
 			total = lists.size();
 			logger.error("total size = " + total);
@@ -349,11 +350,11 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			List<InvoiceHeaderDo> npoBkpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 			List<InvoiceHeaderDo> OverDuekpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 
-			todaykpiValuesDto = repo.getTodayKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate, companyCode, currency, vendorId);
-			OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate, companyCode, currency, vendorId);
+			todaykpiValuesDto = repo.getTodayKPIValues(fromDate, toDate);
+			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate);
+			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate);
+			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate);
+			OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate);
 			logger.error("todaykpiValuesDto List = " + todaykpiValuesDto);
 			logger.error("patodaykpiValuesDto List = " + patodaykpiValuesDto);
 			logger.error("poBasedkpiValuesDto List = " + poBasedkpiValuesDto);

@@ -25,27 +25,24 @@ public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderD
 	//FOR KPI DETAILS
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at =:toDate")
-	List<InvoiceHeaderDo> getTodayKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
-			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
+	List<InvoiceHeaderDo> getTodayKPIValues(@Param("toDate") long toDate);
 	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.invoiceStatus NOT IN ('13','15')")
-	List<InvoiceHeaderDo> getPOKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
-			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
+	List<InvoiceHeaderDo> getPOKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
 	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.invoiceType = 'PO' ")
-	List<InvoiceHeaderDo> getPOBKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
-			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
+//	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate")
+	List<InvoiceHeaderDo> getPOBKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
 	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.invoiceType = 'NON-PO' ")
-	List<InvoiceHeaderDo> getNPOKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
-			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
+//	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate ")
+	List<InvoiceHeaderDo> getNPOKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
 	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.dueDate > 'today' ")
-	List<InvoiceHeaderDo> getOverDueKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate,
-			@Param("companyCode") String companyCode,@Param("currency") String currency,@Param("vendorId") List<String> vendorId);
+	List<InvoiceHeaderDo> getOverDueKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
 
 }
