@@ -215,6 +215,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 //			}
 			for (Map.Entry<String, String> entry : codesAndTextsmap.entrySet()) {
 				String key=codesAndTextsmap.get(entry.getKey());
+				logger.error("code&value = " + key);
 				if (exceptionMap.containsKey(key)) {
 					
 				} else {
@@ -222,6 +223,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 				}
 				
 			}
+			logger.error("map = " + exceptionMap);
 			for (String s : agingArr) {
 				if (aigingMap.containsKey(s)) {
 
@@ -350,15 +352,19 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			List<InvoiceHeaderDo> npoBkpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 			List<InvoiceHeaderDo> OverDuekpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 
+			Date dateToday = new Date();
+			long today = dateToday.getTime();
+			
 			todaykpiValuesDto = repo.getTodayKPIValues(fromDate);
-			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate);
-			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate);
-			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate);
-			OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate);
 			logger.error("todaykpiValuesDto List = " + todaykpiValuesDto);
+			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate);
 			logger.error("patodaykpiValuesDto List = " + patodaykpiValuesDto);
+			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate);
 			logger.error("poBasedkpiValuesDto List = " + poBasedkpiValuesDto);
+			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate);
 			logger.error("npoBkpiValuesDto List = " + npoBkpiValuesDto);
+			OverDuekpiValuesDto = repo.getOverDueKPIValues(fromDate, toDate, today);
+			
 			logger.error("OverDuekpiValuesDto List = " + OverDuekpiValuesDto);
 			
 			ApDashboardKPIValuesDto values0 = new ApDashboardKPIValuesDto();

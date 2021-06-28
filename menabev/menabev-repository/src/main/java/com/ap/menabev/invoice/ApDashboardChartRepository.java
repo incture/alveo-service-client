@@ -13,8 +13,7 @@ import com.ap.menabev.entity.InvoiceHeaderPk;
 @Repository
 public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderDo,InvoiceHeaderPk> {
 	
-	Date date = new Date();
-	long today = date.getTime();
+	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and  "
 			+ "i.compCode=:companyCode and i.currency=:currency and i.vendorId IN (:vendorId)")
@@ -42,7 +41,7 @@ public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderD
 	List<InvoiceHeaderDo> getNPOKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
 	
 	
-	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.dueDate > 'today' ")
-	List<InvoiceHeaderDo> getOverDueKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
+	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.dueDate > :today ")
+	List<InvoiceHeaderDo> getOverDueKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate, @Param("today")  long today);
 
 }
