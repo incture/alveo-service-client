@@ -1,7 +1,13 @@
 package com.ap.menabev.service;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
+import com.ap.menabev.dto.AddPoInputDto;
+import com.ap.menabev.dto.AddPoOutputDto;
 import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.ResponseDto;
 public interface PurchaseDocumentHeaderService {
@@ -13,4 +19,7 @@ public interface PurchaseDocumentHeaderService {
 //	POHeaderItemDetailsDto getAllPurchaseDetailsByRequestId(String requestId);
 //	DeletePoResponseDto deletePoDetails(String requestId, Long poNum);
 //	AddPOResponseDto addPO(DashBoardDetailsDto dashBoardDetailsDto);
+	List<ResponseDto> saveOrUpdate(List<PurchaseDocumentHeaderDto> dto);
+	AddPoOutputDto savePo(AddPoInputDto poNumbers) throws URISyntaxException, IOException, ParseException;
+	List<PurchaseDocumentHeaderDto> referencePoApi(AddPoInputDto dto);
 }

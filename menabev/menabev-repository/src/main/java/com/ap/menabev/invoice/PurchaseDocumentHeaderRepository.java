@@ -48,4 +48,9 @@ public interface PurchaseDocumentHeaderRepository extends JpaRepository<Purchase
 	@Modifying(clearAutomatically=true)
 	@Query("Delete from PurchaseDocumentHeaderDo ph where ph.documentNumber= ?1")
 	public Integer deleteByDocumentNumber(String documentNumber);
+
+	@Query("select th from PurchaseDocumentHeaderDo th where th.documentNumber in ?1")
+	public List<PurchaseDocumentHeaderDo> getPo(List<String> purchaseOrder);
+
+	
 }
