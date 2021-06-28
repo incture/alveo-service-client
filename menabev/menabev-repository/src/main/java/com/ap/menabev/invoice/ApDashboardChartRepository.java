@@ -24,8 +24,8 @@ public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderD
 	
 	//FOR KPI DETAILS
 	
-	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at =:toDate")
-	List<InvoiceHeaderDo> getTodayKPIValues(@Param("toDate") long toDate);
+	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at =:fromDate")
+	List<InvoiceHeaderDo> getTodayKPIValues(@Param("fromDate") long fromDate);
 	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.invoiceStatus NOT IN ('13','15')")
@@ -33,7 +33,7 @@ public interface ApDashboardChartRepository extends JpaRepository<InvoiceHeaderD
 	
 	
 	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate and i.invoiceType = 'PO' ")
-//	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate")
+///	@Query(value = "select i from InvoiceHeaderDo i where  i.request_created_at BETWEEN :fromDate AND :toDate")
 	List<InvoiceHeaderDo> getPOBKPIValues(@Param("fromDate") long fromDate,@Param("toDate") long toDate);
 	
 	

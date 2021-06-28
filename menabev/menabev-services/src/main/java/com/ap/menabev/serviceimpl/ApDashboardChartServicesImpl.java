@@ -350,7 +350,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 			List<InvoiceHeaderDo> npoBkpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 			List<InvoiceHeaderDo> OverDuekpiValuesDto = new ArrayList<InvoiceHeaderDo>();
 
-			todaykpiValuesDto = repo.getTodayKPIValues(fromDate, toDate);
+			todaykpiValuesDto = repo.getTodayKPIValues(fromDate);
 			patodaykpiValuesDto = repo.getPOKPIValues(fromDate, toDate);
 			poBasedkpiValuesDto = repo.getPOBKPIValues(fromDate, toDate);
 			npoBkpiValuesDto = repo.getNPOKPIValues(fromDate, toDate);
