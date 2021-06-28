@@ -291,17 +291,17 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			filterQueryMap.put(" RR.VENDOR_ID IN", "(" + rqstId + ")");
 		}
 		if (dto.getDueDateFrom() != 0 && dto.getDueDateTo() != 0) {
-			filterQueryMap.put(" RR.DUE_DATE BETWEEN", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
+			filterQueryMap.put(" RR.DUE_DATE BETWEEN ", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
 			// is empty
 		}
 		
 		if (dto.getInvoiceDateFrom() != 0 && dto.getInvoiceDateTo()!=0) {
-			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN", +dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
+			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", +dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
 			// correct
 		}
 		
 		if (dto.getRequestCreatedOnTo() != 0 && dto.getRequestCreatedOnFrom() != 0) {
-			filterQueryMap.put(" RR.REQUEST_CREATED_AT BETWEEN", +dto.getRequestCreatedOnFrom() + "AND" +dto.getRequestCreatedOnTo());
+			filterQueryMap.put(" RR.REQUEST_CREATED_AT BETWEEN ", +dto.getRequestCreatedOnFrom() + "AND" +dto.getRequestCreatedOnTo());
 			// correct
 		}
 
