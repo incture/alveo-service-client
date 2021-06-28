@@ -99,7 +99,7 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 		// Encoding username and password
 		String auth = encodeUsernameAndPassword(
 				"sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2",
-				"5c9c9282-1cd3-4ab8-bacd-adb519a9d272$-wKP4BAeUCmyNNI1XsqNZ9NHnRLnj5xESx3wuVw5jRQ=");
+				"1d4df295-7d6b-4cdd-ad8c-bf1b94f5ae09$r4vVahsKKyH3ETxG28kj-KjYqPdBCHTY6A2gfVihpHg=");
 
 		httpPost.addHeader("Authorization", auth);
 
@@ -210,7 +210,7 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 		HttpPost httpPost = new HttpPost(
 				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
 		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
-				"c1ac511d-74f8-4a64-a28b-c42bb41c2d2b$Md8ZvS__pg9I_Z_qPNhHrXR7p2zhCP9ByfhO3RYVCt8=");
+				"b4b6cdb7-7b57-413b-a410-eee1637b25b5$fuDJiD5ckbeSAa2Jnt84tAlv8ZZEjPuQTz6868-GV8I=");
 		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
 		String data = getDataFromStream(res.getEntity().getContent());

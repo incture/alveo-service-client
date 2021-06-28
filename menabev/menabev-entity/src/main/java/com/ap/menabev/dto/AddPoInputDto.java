@@ -28,12 +28,12 @@ public class AddPoInputDto {
 	@Getter
 	@Setter
 	@ToString
-	public class purchaseOrder{
+	public static class PurchaseOrder{
 		String documentNumber;
 		String documentCategory;
 	}
 	private String requestId;
-	private InvoiceHeaderDto invoiceItem;
-	List<purchaseOrder> purchaseOrder;
+	private InvoiceHeaderDto invoiceHeader;
+	List<PurchaseOrder> purchaseOrder;
 	
 }
