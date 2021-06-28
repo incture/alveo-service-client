@@ -272,24 +272,12 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
 		query.append("SELECT * FROM INVOICE_HEADER RR WHERE");
 		if (dto.getRequestId() != null && !dto.getRequestId().isEmpty()) {
-			StringBuffer rqstId = new StringBuffer();
-			/*
-			 * for (int i = 0; i < requestId.size(); i++) { if (i <
-			 * dto.getRequestId().size() - 1) { rqstId.append("'" +
-			 * requestId.get(i) + "'" + ","); } else { rqstId.append("'" +
-			 * requestId.get(i) + "'"); } }
-			 */
-			filterQueryMap.put(" RR.REQUEST_ID IN", "('"  + dto.getRequestId() + "')");
+			
+			filterQueryMap.put(" RR.REQUEST_ID =", "('"  + dto.getRequestId() + "')");
 		}
 		if (dto.getCompanyCode() != null && !dto.getCompanyCode().isEmpty()) {
-			StringBuffer rqstId = new StringBuffer();
-			/*
-			 * for (int i = 0; i < requestId.size(); i++) { if (i <
-			 * dto.getRequestId().size() - 1) { rqstId.append("'" +
-			 * requestId.get(i) + "'" + ","); } else { rqstId.append("'" +
-			 * requestId.get(i) + "'"); } }
-			 */
-			filterQueryMap.put(" RR.COMPANY_CODE IN", "('" + dto.getCompanyCode() + "')");
+			
+			filterQueryMap.put(" RR.COMPANY_CODE =", "('" + dto.getCompanyCode() + "')");
 		}
 		if (dto.getVendorId() != null && !dto.getVendorId().isEmpty()) {
 			StringBuffer rqstId = new StringBuffer();
@@ -303,33 +291,21 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			filterQueryMap.put(" RR.VENDOR_ID IN", "(" + rqstId + ")");
 		}
 		if (dto.getDueDateFrom() != 0 && dto.getDueDateTo() != 0) {
-			filterQueryMap.put(" RR.DUE_DATE BETWEEN ", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
+			filterQueryMap.put(" RR.DUE_DATE BETWEEN", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
 			// is empty
 		}
-		if (dto.getDueDateFrom() != 0) {
-			filterQueryMap.put(" RR.DUE_DATE =", dto.getDueDateFrom() + "");
+		
+		if (dto.getInvoiceDateFrom() != 0 && dto.getInvoiceDateTo()!=0) {
+			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN", +dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
 			// correct
 		}
-		if (dto.getInvoiceDateFrom() != 0) {
-			filterQueryMap.put(" RR.INVOICE_DATE ", dto.getInvoiceDateTo() + " AND " + dto.getInvoiceDateTo());
-			// correct
-		}
-		if (dto.getInvoiceDateTo() != 0 && dto.getInvoiceDateFrom() != 0) {
-			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN =", dto.getInvoiceDateFrom() + "");
-			// correct
-		}
+		
 		if (dto.getRequestCreatedOnTo() != 0 && dto.getRequestCreatedOnFrom() != 0) {
-			filterQueryMap.put(" RR.REQUEST_UPDATED_AT =", dto.getRequestCreatedOnFrom() + "");
+			filterQueryMap.put(" RR.REQUEST_CREATED_AT BETWEEN", +dto.getRequestCreatedOnFrom() + "AND" +dto.getRequestCreatedOnTo());
 			// correct
 		}
 
-		if (dto.getRequestCreatedOnFrom() != 0) {
-			filterQueryMap.put(" RR.REQUEST_ID IN", "('"  + dto.getRequestId() + "')");
-
-			filterQueryMap.put(" RR.REQUEST_CREATED_AT =", "('" +dto.getRequestCreatedOnTo() +"')");
-			// correct
-		}
-
+		
 		if (dto.getInvoiceRefNum() != null && !dto.getInvoiceRefNum().isEmpty()) {
 			filterQueryMap.put(" RR.EXT_INV_NUM =", dto.getInvoiceRefNum() + "");
 			// correct
