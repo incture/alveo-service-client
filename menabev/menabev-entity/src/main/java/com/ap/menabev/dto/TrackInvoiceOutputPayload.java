@@ -10,6 +10,7 @@ public class TrackInvoiceOutputPayload {
     private List<InvoiceHeaderDto> sapPostedList;
     private List<InvoiceHeaderDto> rejectedList;
     private List<InvoiceHeaderDto> pendingApprovalList;
+    private List<InvoiceHeaderDto> payload;
     private String message;
 
 }

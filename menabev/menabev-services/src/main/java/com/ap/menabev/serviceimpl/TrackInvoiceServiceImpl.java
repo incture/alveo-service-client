@@ -69,7 +69,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		List<InvoiceHeaderDto> pendingApprovalList=new ArrayList<>();
 		List<InvoiceHeaderDto> rejectedList=new ArrayList<>();
 		List<String> invoiceReferenceNumberList=new ArrayList<>();
-		List<InvoiceHeaderDto> finalpayload=new ArrayList<>();
+		List<InvoiceHeaderDto> finalPayload=new ArrayList<>();
 
 		if(!ServiceUtil.isEmpty(headerList))
 		{
@@ -162,11 +162,13 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			System.err.println("Refrerence number is not found for the specipic vendor number");
 			//return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
 		}
-		 /*List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
+		 List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
                  .collect(Collectors.toList());  
-  	   System.err.println("newList:"+newList);*/
+  	   System.err.println("newList:"+newList);
   	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
-		trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
+		trackInvoiceOutputPayload.setPayload(newList);
+
+  	   trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
   	   trackInvoiceOutputPayload.setRejectedList(rejectedList);
   	   trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
   	   trackInvoiceOutputPayload.setType("Success");
@@ -177,6 +179,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
 			trackInvoiceOutputPayload.setMessage("filtered values not found in DB");
 			trackInvoiceOutputPayload.setType("ERROR");
+			trackInvoiceOutputPayload.setPayload(Collections.EMPTY_LIST);
+
 			trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
 			trackInvoiceOutputPayload.setRejectedList(rejectedList);
 		  	trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
