@@ -23,6 +23,7 @@ import com.ap.menabev.dto.DeleteDraftInputDto;
 import com.ap.menabev.dto.HeaderCheckDto;
 import com.ap.menabev.dto.InvoiceHeaderDashBoardDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
+import com.ap.menabev.dto.InvoiceSubmitDto;
 import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.PurchaseOrderRemediationInput;
 
@@ -163,5 +164,21 @@ public class InvoiceHeaderController {
 			throws URISyntaxException, IOException {
 		return headerService.getRemediationUserDetails(create, "ALL");
 	}
+	
+
+	@PostMapping("/accountant/invoiceSubmit")
+	public ResponseEntity<?> remediationInvoiceSubmit(@RequestBody InvoiceSubmitDto invoiceSubmit)
+			throws URISyntaxException, IOException {
+		return headerService.accountantInvoiceSubmit(invoiceSubmit);
+	}
+	
+	@PostMapping("/accountant/invoiceSubmitOk")
+	public ResponseEntity<?> accountInvoiceSubmitOk(@RequestBody InvoiceSubmitDto invoiceSubmit)
+			throws URISyntaxException, IOException {
+		return headerService.accountantSubmitOkApi(invoiceSubmit);
+	}
+	
+	
+	
 
 }

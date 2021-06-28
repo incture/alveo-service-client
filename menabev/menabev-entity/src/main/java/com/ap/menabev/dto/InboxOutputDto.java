@@ -15,6 +15,7 @@ public class InboxOutputDto {
 	private String invoiceType;
 	private Long sapInvoiceNumber;
 	private  String validationStatus; 
+	private String validationStatusCode;
 	private String invoiceTotal;
 	private String taskId;
 	private String processor;

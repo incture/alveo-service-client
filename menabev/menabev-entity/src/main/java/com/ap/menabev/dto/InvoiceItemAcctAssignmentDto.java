@@ -25,5 +25,10 @@ public @Data class InvoiceItemAcctAssignmentDto {
 	private String profitCtr;
     private String wbsElement;
     private String crDbIndicator;
+    //TODO add to DO after confirmation from PK
+    private Double alvQtyOPU;
+    private Double avlQtyOU;
+    private Double poUnitPriceOPU;
+    private Double poUnitPriceOU;
 
 }

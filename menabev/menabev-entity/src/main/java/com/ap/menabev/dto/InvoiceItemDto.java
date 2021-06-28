@@ -84,6 +84,8 @@ public class InvoiceItemDto {
 	private Boolean ivFlag;
 	private Integer convNum1;
 	private Integer convDen1;
+	//Add it after confirming with PK
+    private Double sysSuggTax;
 	
 	
 

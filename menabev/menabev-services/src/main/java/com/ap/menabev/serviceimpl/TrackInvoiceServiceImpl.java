@@ -75,7 +75,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		{
 			System.err.println("headerList invoiceNumber:"+headerList.get(0).getInvoice_ref_number());
 		for (InvoiceHeaderDo invoiceHeaderDo:headerList){
-			if(invoiceHeaderDo.getInvoiceStatus()=="13" && invoiceHeaderDo.getInvoiceStatus()=="14" )
+			if(invoiceHeaderDo.getInvoiceStatus().equals("13") && invoiceHeaderDo.getInvoiceStatus().equals("14"))
 			{
 				System.err.println("headerList sapPostedDto:"+invoiceHeaderDo.getInvoiceStatus());
 
@@ -84,7 +84,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
 				sapPostedList.add(sapPostedDto);
 			}
-			else if(invoiceHeaderDo.getInvoiceStatus()=="15")
+			else if(invoiceHeaderDo.getInvoiceStatus().equals("15"))
 			{
 				System.err.println("headerList rejectedDto:"+invoiceHeaderDo.getInvoiceStatus());
 
@@ -131,7 +131,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	        		   if(!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate())){
 	        			   
 	        			   for(InvoiceHeaderDto invoiceHeaderDto:sapPostedList){
-	        				   invoiceHeaderDto.setInvoiceStatus("16");
+	        				   invoiceHeaderDto.setInvoiceStatus("14");
 	        				   invoiceHeaderDto.setInvoiceStatusText("Paid");
 	        				   invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
 	        				   invoiceHeaderDto.setPaymentReference(odataTrackInvoiceObject.getPaymentStatus());
@@ -144,13 +144,13 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
            	  String jsonOutputStr = (String) odataResponse.getBody();
            	TrackInvoiceOutputPayload  errorMessage =  formOutPutFailureResponse(jsonOutputStr);	  
            	  System.err.println("convertedRrrorResponse "+odataResponse);
-  		return new ResponseEntity<TrackInvoiceOutputPayload>(errorMessage,HttpStatus.BAD_REQUEST);
+  		//return new ResponseEntity<TrackInvoiceOutputPayload>(errorMessage,HttpStatus.BAD_REQUEST);
 		 }
 		}
 		 catch(Exception e)
 		 {
 			 e.printStackTrace();
-			 return null;
+			// return null;
 		 }
 		}
 		else{
@@ -166,6 +166,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
                  .collect(Collectors.toList());  
   	   System.err.println("newList:"+newList);*/
   	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
+		trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
   	   trackInvoiceOutputPayload.setRejectedList(rejectedList);
   	   trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
   	   trackInvoiceOutputPayload.setType("Success");

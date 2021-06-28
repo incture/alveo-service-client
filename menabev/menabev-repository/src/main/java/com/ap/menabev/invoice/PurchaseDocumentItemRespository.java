@@ -20,6 +20,9 @@ public interface PurchaseDocumentItemRespository extends JpaRepository<PurchaseD
 	@Query("Delete from PurchaseDocumentItemDo ph where ph.documentNumber= ?1")
 	public Integer deleteByDocumentNumber(String documentNumber);
 
+	@Query("select pd from PurchaseDocumentItemDo pd where pd.documentNumber = ?1")
+	public List<PurchaseDocumentItemDo> getItems(String documentNumber);
+
 //	@Query("select pd from PurchaseDocumentItemDo pd where pd.documentNumber=:refDocNum")
 //	public List<PurchaseDocumentItemDo> getPurchaseDocumentItem(@Param("refDocNum") String refDocNum);
 //

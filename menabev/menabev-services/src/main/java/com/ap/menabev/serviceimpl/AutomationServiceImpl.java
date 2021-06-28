@@ -327,6 +327,7 @@ public class AutomationServiceImpl implements AutomationService {
 						String contentType = message.getContentType();
 						if (contentType.contains("multipart")) {
 							files = email.getAttachmentFromEmail(message);
+							System.err.println("330 files count= "+files.size());
 							if (!ServiceUtil.isEmpty(files)) {
 								// Step 3 : Put the files into abbyy.
 								try {
@@ -334,7 +335,7 @@ public class AutomationServiceImpl implements AutomationService {
 											ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
 									messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
 								} catch (Exception e) {
-									System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
+									System.err.println("AutomationServiceImpl.extractInvoiceFromEmail()");
 									logger.error(
 											"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
 													+ e.getMessage());

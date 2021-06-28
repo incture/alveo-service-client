@@ -98,9 +98,10 @@ public class ABBYYIntegration {
 		try {
 			for (File file : files) {
 				String inputFilePath = file.getAbsolutePath();
+				System.err.println("inputFilePath "+file.getAbsolutePath());
 				channelSftp.cd("\\Input\\");
 				channelSftp.put(inputFilePath,file.getName());
-
+                 System.err.println("fileName putInvoiceInAbby= "+file.getName());
 			}
 			message = "File uploaded";
 

@@ -99,7 +99,8 @@ public class Email {
 			// search for all "unseen" messages
 			Flags seen = new Flags(Flags.Flag.SEEN);
 			FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
-			String EMAIL_FROM = "Dipanjan Baidya <dipanjan.baidya@incture.com>";
+			//String EMAIL_FROM = "Dipanjan Baidya <dipanjan.baidya@incture.com>";
+			String EMAIL_FROM = "Naveen Kumar Arumugam <naveen.a@incture.com>";
 			// creates a search criterion
 			SearchTerm searchCondition = new SearchTerm() {
 

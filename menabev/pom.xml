@@ -206,37 +206,37 @@
 			<version>3.17</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.core4j/core4j -->
-<dependency>
-    <groupId>org.core4j</groupId>
-    <artifactId>core4j</artifactId>
-    <version>0.5</version>
-</dependency>
+		<dependency>
+			<groupId>org.core4j</groupId>
+			<artifactId>core4j</artifactId>
+			<version>0.5</version>
+		</dependency>
 
 
 
- <!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-kernel -->
-<dependency>
-    <groupId>org.apache.axis2</groupId>
-    <artifactId>axis2-kernel</artifactId>
-    <version>1.7.9</version>
-</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-kernel -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-kernel</artifactId>
+			<version>1.7.9</version>
+		</dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-adb -->
-<dependency>
-    <groupId>org.apache.axis2</groupId>
-    <artifactId>axis2-adb</artifactId>
-    <version>1.7.9</version>
-</dependency>
-    
-    <!-- https://mvnrepository.com/artifact/org.apache.axiom/com.springsource.org.apache.axiom -->
+		<!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-adb -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-adb</artifactId>
+			<version>1.7.9</version>
+		</dependency>
 
-    
-<dependency>
-    <groupId>com.fasterxml.jackson.dataformat</groupId>
-    <artifactId>jackson-dataformat-xml</artifactId>
-    <version>2.11.1</version>
-</dependency>
-		
+		<!-- https://mvnrepository.com/artifact/org.apache.axiom/com.springsource.org.apache.axiom -->
+
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.11.1</version>
+		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
 		<dependency>
@@ -244,54 +244,27 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.17</version>
 		</dependency>
+		<dependency>
+			<groupId>me.xdrop</groupId>
+			<artifactId>fuzzywuzzy</artifactId>
+			<version>1.2.0</version>
+		</dependency>
 	</dependencies>
-	<!-- <build>
-		<plugins>
-			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.13.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration> <generatePackage>com.ap.menabev.soap.journalcreatebinding</generatePackage> 
-					<generateDirectory>${project.basedir}/menabev-soap/src/main/java</generateDirectory> 
-					<schemaDirectory>${project.basedir}/menabev-soap/src/main/resources/wsdl</schemaDirectory> 
-					<schemaIncludes> <include>*.wsdl</include> </schemaIncludes> </configuration>
-			</plugin>
-		</plugins>
-	</build>
- -->
- 
-<!-- <build>
-    non-related stuff omitted
-    <plugins>
-        non-related stuff omitted
-        <plugin>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-wsdl2code-maven-plugin</artifactId>
-             <version>1.7.8</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>wsdl2code</goal>
-                    </goals>
-                    <phase>generate-sources</phase>
-                    <configuration>
-                        <packageName>com.ap.menabev.soap.journalcreatebinding</packageName>
-                        <wsdlFile>C:\Users\Arun.Gauda\git\MenabevDev\menabev\menabev-soap\src\main\resources\wsdl\journalcreatebinding.wsdl</wsdlFile>
-                        <databindingName>adb</databindingName>
-                        <syncMode>sync</syncMode>
-                        <unpackClasses>true</unpackClasses>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
-</build> -->
+	<!-- <build> <plugins> <plugin> <groupId>org.jvnet.jaxb2.maven2</groupId> 
+		<artifactId>maven-jaxb2-plugin</artifactId> <version>0.13.2</version> <executions> 
+		<execution> <goals> <goal>generate</goal> </goals> </execution> </executions> 
+		<configuration> <generatePackage>com.ap.menabev.soap.journalcreatebinding</generatePackage> 
+		<generateDirectory>${project.basedir}/menabev-soap/src/main/java</generateDirectory> 
+		<schemaDirectory>${project.basedir}/menabev-soap/src/main/resources/wsdl</schemaDirectory> 
+		<schemaIncludes> <include>*.wsdl</include> </schemaIncludes> </configuration> 
+		</plugin> </plugins> </build> -->
+
+	<!-- <build> non-related stuff omitted <plugins> non-related stuff omitted 
+		<plugin> <groupId>org.apache.axis2</groupId> <artifactId>axis2-wsdl2code-maven-plugin</artifactId> 
+		<version>1.7.8</version> <executions> <execution> <goals> <goal>wsdl2code</goal> 
+		</goals> <phase>generate-sources</phase> <configuration> <packageName>com.ap.menabev.soap.journalcreatebinding</packageName> 
+		<wsdlFile>C:\Users\Arun.Gauda\git\MenabevDev\menabev\menabev-soap\src\main\resources\wsdl\journalcreatebinding.wsdl</wsdlFile> 
+		<databindingName>adb</databindingName> <syncMode>sync</syncMode> <unpackClasses>true</unpackClasses> 
+		</configuration> </execution> </executions> </plugin> </plugins> </build> -->
 
 </project>
