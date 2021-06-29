@@ -82,7 +82,7 @@ public class PurchaseDocumentItemDo{
 	@Column(name="PART_INV",length=1)
 	private String partInv;
 	@Column(name="GR_IND",length=1)
-	private String grInd;
+	private Boolean grInd;
 	@Column(name="GR_NON_VAL")
 	private Boolean gr_non_val;
 	@Column(name="IR_IND")
