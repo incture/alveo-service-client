@@ -313,6 +313,10 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			filterQueryMap.put(" RR.EXT_INV_NUM =", "('" +dto.getInvoiceRefNum() + "')");
 			// correct 
 		}
+		if (dto.getInvoiceStatus() != null && !dto.getInvoiceStatus().isEmpty()) {
+			filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +dto.getInvoiceStatus() + "')");
+			// correct 
+		}
 
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
 		AtomicInteger count = new AtomicInteger(0);

@@ -19,6 +19,7 @@ public class TrackInvoiceInputDto {
 	private String invoiceRefNum;
 	private long dueDateFrom;
 	private long dueDateTo;
+	private String invoiceStatus;
 	private String top;
 	private String skip;
 		
