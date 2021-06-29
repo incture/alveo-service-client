@@ -98,7 +98,7 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 //			String arr[] = { "NEW", "DRAFT", "OPEN", "DUPLICATE INVOICE", "PO MISSING OR INVALID", "NO-GRN",
 //					"PARTIAL GRN", "UOM MISMATCH", "ITEM MISMATCH", "QTY MISMATCH", "PRICE MISMATCH", "PRICE/QTY",
 //					"BALANCE MISMATCH", "SAP POSTED", "PAID", "UNPAID" };
-//			String arr[] = {"1", "2", "3", "4", "5", "6","7", "8", "9", "10", "11", "12","13", "14", "15"};
+			String arr[] = {"1", "2", "3", "4", "5", "6","7", "8", "9", "10", "11", "12","13", "14", "15"};
 			String agingArr[] = { "1", "+1", "+7", "+14", "+21", "+28" };
 
 			HashMap<String, Integer> exceptionMap = new HashMap<String, Integer>();
@@ -204,25 +204,25 @@ public class ApDashboardChartServicesImpl implements ApDashboardChartServices {
 				}
 			}
 
-			// for Exception payloas
-//			for (String s : arr) {
-//				if (exceptionMap.containsKey(s)) {
-//
-//				} else {
-//					exceptionMap.put(s, 0);
-//				}
-//
-//			}
-			for (Map.Entry<String, String> entry : codesAndTextsmap.entrySet()) {
-				String key=codesAndTextsmap.get(entry.getKey());
-				logger.error("code&value = " + key);
-				if (exceptionMap.containsKey(entry.getKey())) {
-					
+			/// for Exception payloas
+			for (String s : arr) {
+				if (exceptionMap.containsKey(s)) {
+
 				} else {
-					exceptionMap.put(entry.getKey(), 0);
+					exceptionMap.put(s, 0);
 				}
-				
+
 			}
+//			for (Map.Entry<String, String> entry : codesAndTextsmap.entrySet()) {
+//				String key=codesAndTextsmap.get(entry.getKey());
+//				logger.error("code&value = " + key);
+//				if (exceptionMap.containsKey(entry.getKey())) {
+//					
+//				} else {
+//					exceptionMap.put(entry.getKey(), 0);
+//				}
+//				
+//			}
 			logger.error("map = " + exceptionMap);
 			for (String s : agingArr) {
 				if (aigingMap.containsKey(s)) {
