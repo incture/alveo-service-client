@@ -258,97 +258,97 @@
 					<ToolbarSpacer/>
 					<Button text="{i18n>AddPO}" press="onClickAddPO" class="sapUiSizeCompact SecondaryBtn"/>
 				</OverflowToolbar>
-				<Panel expandable="true" width="auto">
-					<headerToolbar>
-						<OverflowToolbar>
-							<Title text="Purchase Order - {oPOModel>purOrg}"/>
-							<ToolbarSpacer/>
-							<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"/>
-						</OverflowToolbar>
-					</headerToolbar>
-					<content>
-						<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
-							<l:content>
-								<VBox>
-									<Label text="{i18n>VendorId}:"/>
-									<Text text="{oPOModel>vendorId}"/>
-								</VBox>
-								<VBox>
-									<Label text="{i18n>Company}:"/>
-									<Text text=" {oPOModel>compCode}"/>
-								</VBox>
-								<VBox>
-									<Label text="{i18n>ExchangeRate}:"/>
-									<Text text="{oPOModel>exchangeRate}"/>
-								</VBox>
-								<VBox>
-									<Label text="{i18n>Currency}:"/>
-									<Text text="{oPOModel>currency}"/>
-								</VBox>
-								<VBox>
-									<Label text="{i18n>PaymentTerms}:"/>
-									<Text text="{oPOModel>paymentTerms}"/>
-								</VBox>
-							</l:content>
-						</l:Grid>
-						<Table items="{oPOModel>/poItem}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20">
-							<headerToolbar>
-								<OverflowToolbar>
-									<Button text="{i18n>Copy}" press="copyPOToInvoiceTabRow" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}"/>
-									<ToolbarSpacer/>
-								</OverflowToolbar>
-							</headerToolbar>
-							<columns>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>Item}" tooltip="{i18n>Item}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>ShortText}" tooltip="{i18n>ShortText}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>Quantity}" tooltip="{i18n>Quantity}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>ProfitCenter}" tooltip="{i18n>ProfitCenter}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>OrderUnitSKU}" tooltip="{i18n>OrderUnitSKU}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>OrderUnit}" tooltip="{i18n>OrderUnit}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>VendorMaterial}" tooltip="{i18n>VendorMaterial}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>TaxCode}" tooltip="{i18n>TaxCode}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>UPC}" tooltip="{i18n>UPC}"/>
-								</Column>
-								<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-									<Label design="Bold" text="{i18n>UnitPrice}" tooltip="{i18n>UnitPrice}"/>
-								</Column>
-							</columns>
-							<items>
-								<ColumnListItem>
-									<cells>
-										<Text text="{oPOModel>documentItem}"/>
-										<Text text="{oPOModel>shortText}"/>
-										<Text text="{oPOModel>quantity}"/>
-										<Text text="{oPOModel>ProfitCenter}"/>
-										<Text text="{oPOModel>orderPriceUnit}"/>
-										<Text text="{oPOModel>orderPriceUnitISO}"/>
-										<Text text="{oPOModel>vendMat}"/>
-										<Text text="{oPOModel>taxCode}"/>
-										<Text text="{oPOModel>upc}"/>
-										<Text text="{oPOModel>priceUnit}"/>
-									</cells>
-								</ColumnListItem>
-							</items>
-						</Table>
-					</content>
-				</Panel>
+				<VBox items="{oPOModel>/getReferencedByPO}">
+					<Panel expandable="true" width="auto">
+						<headerToolbar>
+							<OverflowToolbar>
+								<Title text="Purchase Order - {oPOModel>purOrg}"/>
+								<ToolbarSpacer/>
+								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"/>
+							</OverflowToolbar>
+						</headerToolbar>
+						<content>
+							<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
+								<l:content>
+									<VBox>
+										<Label text="{i18n>VendorId}:"/>
+										<Text text="{oPOModel>vendorId}"/>
+									</VBox>
+									<VBox>
+										<Label text="{i18n>Company}:"/>
+										<Text text=" {oPOModel>compCode}"/>
+									</VBox>
+									<VBox>
+										<Label text="{i18n>ExchangeRate}:"/>
+										<Text text="{oPOModel>exchangeRate}"/>
+									</VBox>
+									<VBox>
+										<Label text="{i18n>Currency}:"/>
+										<Text text="{oPOModel>currency}"/>
+									</VBox>
+									<VBox>
+										<Label text="{i18n>PaymentTerms}:"/>
+										<Text text="{oPOModel>paymentTerms}"/>
+									</VBox>
+								</l:content>
+							</l:Grid>
+							<Table items="{oPOModel>poItem}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20">
+								<headerToolbar>
+									<OverflowToolbar>
+										<Button text="{i18n>Copy}" press="copyPOToInvoiceTabRow" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}"
+												enabled="false"/>
+										<ToolbarSpacer/>
+									</OverflowToolbar>
+								</headerToolbar>
+								<columns>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>Item}" tooltip="{i18n>Item}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>ShortText}" tooltip="{i18n>ShortText}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>Quantity}" tooltip="{i18n>Quantity}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>OrderUnitSKU}" tooltip="{i18n>OrderUnitSKU}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>OrderUnit}" tooltip="{i18n>OrderUnit}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>VendorMaterial}" tooltip="{i18n>VendorMaterial}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>TaxCode}" tooltip="{i18n>TaxCode}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text="{i18n>StorageLoc}" tooltip="{i18n>UnitPrice}"/>
+									</Column>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label/>
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem>
+										<cells>
+											<Text text="{oPOModel>documentItem}"/>
+											<Text text="{oPOModel>shortText}"/>
+											<Text text="{oPOModel>quantity}"/>
+											<Text text="{oPOModel>quantity}"/>
+											<Text text="{oPOModel>netPrice}"/>
+											<Text text="{oPOModel>orderPriceUnit}"/>
+											<Text text="{oPOModel>plant}"/>
+											<Text text="{oPOModel>taxCode}"/>
+											<Text text="{oPOModel>storageloc}"/>
+											<core:Icon src="sap-icon://detail-view" press="onClickPODetailView"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</content>
+					</Panel>
+				</VBox>
 			</IconTabFilter>
 		</items>
 	</IconTabBar>

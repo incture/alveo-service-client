@@ -45,7 +45,8 @@ sap.ui.define([
 				}
 			};
 			var url = "/menabevdev/NonPoTemplate/getAll";
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			jQuery.ajax({
 				type: "POST",
 				contentType: "application/json",
@@ -54,7 +55,7 @@ sap.ui.define([
 				data: JSON.stringify(payload),
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					if (data.length) {
 						this.getModel("templateModel").setProperty("/aNonPoTemplate", data);
 						var count = data[0].count;
@@ -69,7 +70,7 @@ sap.ui.define([
 					}
 				}.bind(this),
 				error: function (result, xhr, data) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = "";
 					if (result.status === 504) {
 						errorMsg = "Request timed-out. Please refresh page";
@@ -143,7 +144,7 @@ sap.ui.define([
 				data: JSON.stringify(payload),
 				async: true,
 				success: function (result, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					var message = result.message;
 					if (result.status === "Success") {
 						sap.m.MessageBox.success(message, {
@@ -160,7 +161,7 @@ sap.ui.define([
 
 				}.bind(this),
 				error: function (result, xhr, data) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = "";
 					if (result.status === 504) {
 						errorMsg = "Request timed-out. Please refresh page";
@@ -522,7 +523,8 @@ sap.ui.define([
 				var oFormData = new FormData();
 				oFormData.set("file", excelFile);
 				var url = "/menabevdev/NonPoTemplate/uploadExcel";
-				this.busyDialog.open();
+				var busy = new sap.m.BusyDialog();
+				busy.open();
 				var that = this;
 				jQuery.ajax({
 					url: url,
@@ -553,7 +555,7 @@ sap.ui.define([
 						}
 					}.bind(this),
 					error: function (result, xhr, data) {
-						this.busyDialog.close();
+						busy.close();
 						var errorMsg = "";
 						if (result.status === 504) {
 							errorMsg = "Request timed-out. Please refresh your page";

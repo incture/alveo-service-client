@@ -313,6 +313,34 @@ com.menabev.AP.formatter.formatter = {
 			value = 0.00;
 		}
 		return value;
+	},
+
+	getInvoiceItems: function (isTwoWayMatched, isDeleted) {
+		if (!isTwoWayMatched && !isDeleted) {
+			return true;
+		}
+		return false;
+	},
+
+	getPurchaseOrders: function (isTwoWayMatched, isDeleted) {
+		if (isTwoWayMatched && isDeleted) {
+			return true;
+		}
+		return false;
+	},
+
+	getMatchedItems: function (isTwoWayMatched, isDeleted) {
+		if (isTwoWayMatched && !isDeleted) {
+			return true;
+		}
+		return false;
+	},
+
+	getMatchedBtnVisible: function (itemCategory) {
+		if (itemCategory === "D") {
+			return false;
+		}
+		return true;
 	}
 
 };

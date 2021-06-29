@@ -226,7 +226,13 @@
 				"target": [
 					"PO"
 				]
-			}],
+			},{
+					"name": "ItemMatch",
+					"pattern": "ItemMatch",
+					"target": [
+						"ItemMatch"
+					]
+				}],
 			"targets": {
 				"UploadInvoice": {
 					"viewType": "XML",
@@ -267,6 +273,10 @@
 				"PO": {
 					"viewType": "XML",
 					"viewName": "PO"
+				},
+				"ItemMatch": {
+					"viewType": "XML",
+					"viewName": "ItemMatch"
 				}
 			}
 		}
