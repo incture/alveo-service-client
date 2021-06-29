@@ -47,7 +47,7 @@ public class PurchaseDocumentItemDto {
 	private String accountAssCat;
 	private String distribution;
 	private String partInv;
-	private String grInd;
+	private Boolean grInd;//
 	private Boolean gr_non_val;//
 	private Boolean irInd;//
 	private Boolean grBsdIVInd;//
