@@ -41,7 +41,7 @@ import com.ap.menabev.service.TrackInvoiceService;
 import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
 import com.google.gson.Gson;
- 
+
 @Service
 public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
@@ -55,216 +55,218 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
 	@Autowired
 	InvoiceHeaderRepoFilter invoiceHeaderRepoFilter;
-	
+
 	@Autowired
 	PoSearchApiServiceImpl poSearchApiServiceImpl;
 
 	@SuppressWarnings("static-access")
 	public ResponseEntity<?> fetchTrackInvoice(TrackInvoiceInputDto trackInvoiceInputDto) {
-		ResponseDto responseDto=new ResponseDto();
-		List<InvoiceHeaderDo> headerList= filterInvoicesMultiple(trackInvoiceInputDto);
-		System.err.println("headerList :"+headerList);
+		List<InvoiceHeaderDo> headerList = filterInvoicesMultiple(trackInvoiceInputDto);
+		System.err.println("headerList :" + headerList);
 		ModelMapper modelMapper = new ModelMapper();
-		List<InvoiceHeaderDto> sapPostedList=new ArrayList<>();
-		List<InvoiceHeaderDto> pendingApprovalList=new ArrayList<>();
-		List<InvoiceHeaderDto> rejectedList=new ArrayList<>();
-		List<String> invoiceReferenceNumberList=new ArrayList<>();
-		List<InvoiceHeaderDto> finalPayload=new ArrayList<>();
+		List<InvoiceHeaderDto> sapPostedList = new ArrayList<>();
+		List<InvoiceHeaderDto> pendingApprovalList = new ArrayList<>();
+		List<InvoiceHeaderDto> rejectedList = new ArrayList<>();
+		List<String> invoiceReferenceNumberList = new ArrayList<>();
+		List<InvoiceHeaderDto> finalPayload = new ArrayList<>();
 
-		if(!ServiceUtil.isEmpty(headerList))
-		{
-			System.err.println("headerList invoiceNumber:"+headerList.get(0).getInvoice_ref_number());
-		for (InvoiceHeaderDo invoiceHeaderDo:headerList){
-			if(invoiceHeaderDo.getInvoiceStatus().equals("13") && invoiceHeaderDo.getInvoiceStatus().equals("14"))
-			{
-				System.err.println("headerList sapPostedDto:"+invoiceHeaderDo.getInvoiceStatus());
+		if (!ServiceUtil.isEmpty(headerList)) {
+			System.err.println("headerList invoiceNumber:" + headerList.get(0).getInvoice_ref_number());
+			for (InvoiceHeaderDo invoiceHeaderDo : headerList) {
+				if (invoiceHeaderDo.getInvoiceStatus().equals("13")
+						&& invoiceHeaderDo.getInvoiceStatus().equals("14")) {
+					System.err.println("headerList sapPostedDto:" + invoiceHeaderDo.getInvoiceStatus());
+					double total=0;
+					if(!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount()) && !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())){
+					 total=invoiceHeaderDo.getGrossAmount()+invoiceHeaderDo.getTaxAmount();
+					}
+					InvoiceHeaderDto sapPostedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+					sapPostedDto.setInvoiceTotal(total);
+					System.err.println("headerList sapPostedDto:" + sapPostedDto);
 
-				InvoiceHeaderDto sapPostedDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-				System.err.println("headerList sapPostedDto:"+sapPostedDto);
+					sapPostedList.add(sapPostedDto);
+				} else if (invoiceHeaderDo.getInvoiceStatus().equals("15")) {
+					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
+					double total=0;
+					if(!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount()) && !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount()))
+						{
+					 total=invoiceHeaderDo.getGrossAmount()+invoiceHeaderDo.getTaxAmount();
+						}
+					InvoiceHeaderDto sapRejectedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+					System.err.println("headerList rejectedDto:" + sapRejectedDto);
+					sapRejectedDto.setInvoiceTotal(total);
+					rejectedList.add(sapRejectedDto);
+				} else {
+					System.err.println("headerList pendingApprovalDto:" + invoiceHeaderDo.getInvoiceStatus());
+					double total=0;
+					if(!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount()) && !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount()))
+						{
+							total=invoiceHeaderDo.getGrossAmount()+invoiceHeaderDo.getTaxAmount();
+						}
+					InvoiceHeaderDto sapPendingApprovaldDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+					sapPendingApprovaldDto.setInvoiceTotal(total);
+					sapPendingApprovaldDto.setInvoiceStatus("16");
+					sapPendingApprovaldDto.setInvoiceStatusText("Pending Approval");
+					System.err.println("headerList pendingApprovalDto:" + sapPendingApprovaldDto);
 
-				sapPostedList.add(sapPostedDto);
+					pendingApprovalList.add(sapPendingApprovaldDto);
+				}
 			}
-			else if(invoiceHeaderDo.getInvoiceStatus().equals("15"))
-			{
-				System.err.println("headerList rejectedDto:"+invoiceHeaderDo.getInvoiceStatus());
-
-				InvoiceHeaderDto sapRejectedDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-				System.err.println("headerList rejectedDto:"+sapRejectedDto);
-
-				rejectedList.add(sapRejectedDto);
+			if (!ServiceUtil.isEmpty(sapPostedList)) {
+				for (InvoiceHeaderDto headerDo : sapPostedList) {
+					invoiceReferenceNumberList.add(headerDo.getExtInvNum());
+					System.err.println("invoiceReferenceNumberList:" + invoiceReferenceNumberList);
+				}
+				// ResponseEntity<?>
+				// odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet",
+				// invoiceReferenceNumberList.toString(), "GET",
+				// odataHelperClass.getDestination("SD4_DEST"));
 			}
-			else
-			{
-				System.err.println("headerList pendingApprovalDto:"+invoiceHeaderDo.getInvoiceStatus());
 
-				InvoiceHeaderDto sapPendingApprovaldDto=modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-				sapPendingApprovaldDto.setInvoiceStatus("16");
-				sapPendingApprovaldDto.setInvoiceStatusText("Pending Approval");
-				System.err.println("headerList pendingApprovalDto:"+sapPendingApprovaldDto);
+			if (!ServiceUtil.isEmpty(invoiceReferenceNumberList)) {
+				try {
+					Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
+					String endPointurl = formInputUrl(invoiceReferenceNumberList);
+					System.err.println("endPointurl:" + endPointurl);
+					ResponseEntity<?> odataResponse = odataHelperClass.consumingOdataService(endPointurl, null, "GET",
+							map);
+					if (odataResponse.getStatusCodeValue() == 200) {
+						String jsonOutputString = (String) odataResponse.getBody();
+						System.err.println("ECCResponse " + jsonOutputString);
+						// convert OuputResponse
+						TrackInvoiceOdataOutputResponse trackInvoiceOdataOutputResponse = formOutPutSuccessResponse(
+								jsonOutputString);
+						System.err.println("convertedResponse " + trackInvoiceOdataOutputResponse);
+						if (!ServiceUtil.isEmpty(trackInvoiceOdataOutputResponse.getUsers())) {
+							for (OdataTrackInvoiceObject odataTrackInvoiceObject : trackInvoiceOdataOutputResponse
+									.getUsers()) {
+								if (!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate())) {
 
-				pendingApprovalList.add(sapPendingApprovaldDto);
+									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
+										invoiceHeaderDto.setInvoiceStatus("14");
+										invoiceHeaderDto.setInvoiceStatusText("Paid");
+										invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
+										invoiceHeaderDto
+												.setPaymentReference(odataTrackInvoiceObject.getPaymentStatus());
+										sapPostedList.add(invoiceHeaderDto);
+									}
+								}
+							}
+						}
+					} else {
+						String jsonOutputStr = (String) odataResponse.getBody();
+						TrackInvoiceOutputPayload errorMessage = formOutPutFailureResponse(jsonOutputStr);
+						System.err.println("convertedRrrorResponse " + odataResponse);
+						// return new
+						// ResponseEntity<TrackInvoiceOutputPayload>(errorMessage,HttpStatus.BAD_REQUEST);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					// return null;
+				}
+			} else {
+
+				TrackInvoiceOutputPayload trackInvoiceOutputPayload = new TrackInvoiceOutputPayload();
+				trackInvoiceOutputPayload.setMessage("Record not found");
+				trackInvoiceOutputPayload.setType("200");
+				trackInvoiceOutputPayload.setPayload(Collections.EMPTY_LIST);
+				System.err.println("Refrerence number is not found for the specipic vendor number");
+				// return new
+				// ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
 			}
-		 }
-		if(!ServiceUtil.isEmpty(sapPostedList)){
-		for(InvoiceHeaderDto headerDo:sapPostedList ){
-				invoiceReferenceNumberList.add(headerDo.getExtInvNum());
-				System.err.println("invoiceReferenceNumberList:"+invoiceReferenceNumberList);
-		}
-				//ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet", invoiceReferenceNumberList.toString(), "GET", odataHelperClass.getDestination("SD4_DEST"));
-		}
-	
-		if(!ServiceUtil.isEmpty(invoiceReferenceNumberList)){
-		try{
-		Map<String, Object> map = odataHelperClass.getDestination("SD4_DEST");
-		String endPointurl = formInputUrl(invoiceReferenceNumberList);
-		System.err.println("endPointurl:"+endPointurl);
-		ResponseEntity<?> odataResponse=odataHelperClass.consumingOdataService(endPointurl,null, "GET", map);
-		 if(odataResponse.getStatusCodeValue()==200){
-             String jsonOutputString = (String) odataResponse.getBody();
-             System.err.println("ECCResponse "+jsonOutputString);
-          // convert OuputResponse  
-             TrackInvoiceOdataOutputResponse  trackInvoiceOdataOutputResponse =  formOutPutSuccessResponse(jsonOutputString);
-	             System.err.println("convertedResponse "+trackInvoiceOdataOutputResponse);
-	           if(!ServiceUtil.isEmpty( trackInvoiceOdataOutputResponse.getUsers())){
-	        	   for(OdataTrackInvoiceObject odataTrackInvoiceObject:trackInvoiceOdataOutputResponse.getUsers())
-	        	   {
-	        		   if(!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate())){
-	        			   
-	        			   for(InvoiceHeaderDto invoiceHeaderDto:sapPostedList){
-	        				   invoiceHeaderDto.setInvoiceStatus("14");
-	        				   invoiceHeaderDto.setInvoiceStatusText("Paid");
-	        				   invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
-	        				   invoiceHeaderDto.setPaymentReference(odataTrackInvoiceObject.getPaymentStatus());
-	        				   sapPostedList.add(invoiceHeaderDto);
-	        			   }
-	        	   }
-	           }
-	           }
-	           }else {
-           	  String jsonOutputStr = (String) odataResponse.getBody();
-           	TrackInvoiceOutputPayload  errorMessage =  formOutPutFailureResponse(jsonOutputStr);	  
-           	  System.err.println("convertedRrrorResponse "+odataResponse);
-  		//return new ResponseEntity<TrackInvoiceOutputPayload>(errorMessage,HttpStatus.BAD_REQUEST);
-		 }
-		}
-		 catch(Exception e)
-		 {
-			 e.printStackTrace();
-			// return null;
-		 }
-		}
-		else{
-			
-			TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
-			trackInvoiceOutputPayload.setMessage("Refrerence number is not found for the specipic vendor number");
-			trackInvoiceOutputPayload.setType("ERROR");
-			trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
-			System.err.println("Refrerence number is not found for the specipic vendor number");
-			//return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
-		}
-		 List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)                          .flatMap(Collection::stream)
-                 .collect(Collectors.toList());  
-  	   System.err.println("newList:"+newList);
-  	   TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
-		trackInvoiceOutputPayload.setPayload(newList);
-
-  	   trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
-  	   trackInvoiceOutputPayload.setRejectedList(rejectedList);
-  	   trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
-  	   trackInvoiceOutputPayload.setType("Success");
-  	   trackInvoiceOutputPayload.setMessage("Success");
-       return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
-		}
-		else{
-			TrackInvoiceOutputPayload trackInvoiceOutputPayload=new TrackInvoiceOutputPayload();
-			trackInvoiceOutputPayload.setMessage("filtered values not found in DB");
-			trackInvoiceOutputPayload.setType("ERROR");
+			List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)
+					.flatMap(Collection::stream).collect(Collectors.toList());
+			System.err.println("newList:" + newList);
+			TrackInvoiceOutputPayload trackInvoiceOutputPayload = new TrackInvoiceOutputPayload();
+			trackInvoiceOutputPayload.setPayload(newList);
+			trackInvoiceOutputPayload.setType("200");
+			trackInvoiceOutputPayload.setMessage("Success");
+			return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload, HttpStatus.OK);
+		} else {
+			TrackInvoiceOutputPayload trackInvoiceOutputPayload = new TrackInvoiceOutputPayload();
+			trackInvoiceOutputPayload.setMessage("Record not found");
+			trackInvoiceOutputPayload.setType("200");
 			trackInvoiceOutputPayload.setPayload(Collections.EMPTY_LIST);
+			System.err.println("filtered values not found in DB");
+			return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload, HttpStatus.OK);
 
-			trackInvoiceOutputPayload.setSapPostedList(sapPostedList);
-			trackInvoiceOutputPayload.setRejectedList(rejectedList);
-		  	trackInvoiceOutputPayload.setPendingApprovalList(pendingApprovalList);
-		  	  			System.err.println("filtered values not found in DB");
-	  		return new ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.BAD_REQUEST);
-	
 		}
-		}
-	public TrackInvoiceOdataOutputResponse formOutPutSuccessResponse(String jsonOutputString)
-	{
+	}
+
+	public TrackInvoiceOdataOutputResponse formOutPutSuccessResponse(String jsonOutputString) {
 		TrackInvoiceOdataOutputResponse trackInvoiceOdataOutputResponse = new TrackInvoiceOdataOutputResponse();
 		trackInvoiceOdataOutputResponse.setType("TEST_SUCCESS");
 		trackInvoiceOdataOutputResponse.setMessage("Success");
-         List<OdataTrackInvoiceObject> trackInvoiceOutputDtoList = new ArrayList<OdataTrackInvoiceObject>();
-         OdataTrackInvoiceResponseDto  taskDto =     convertStringToJsonForOdataSuccess(jsonOutputString);
-        OdataTrackInvoiceOutputPayload    outResp =  taskDto.getD();
-                 List<OdataTrackInvoiceObject> resultList = outResp.getResults();
-                 resultList.stream().forEach(r->{
-              	 trackInvoiceOutputDtoList.add(r);
-                 });
-                 trackInvoiceOdataOutputResponse.setUsers(trackInvoiceOutputDtoList); 
-                 return trackInvoiceOdataOutputResponse;
+		List<OdataTrackInvoiceObject> trackInvoiceOutputDtoList = new ArrayList<OdataTrackInvoiceObject>();
+		OdataTrackInvoiceResponseDto taskDto = convertStringToJsonForOdataSuccess(jsonOutputString);
+		OdataTrackInvoiceOutputPayload outResp = taskDto.getD();
+		List<OdataTrackInvoiceObject> resultList = outResp.getResults();
+		resultList.stream().forEach(r -> {
+			trackInvoiceOutputDtoList.add(r);
+		});
+		trackInvoiceOdataOutputResponse.setUsers(trackInvoiceOutputDtoList);
+		return trackInvoiceOdataOutputResponse;
 	}
-	//Faiure
-			public TrackInvoiceOutputPayload formOutPutFailureResponse(String jsonOutputString)
-			{
-				TrackInvoiceOutputPayload errorMessage = new TrackInvoiceOutputPayload();
-		    	  OdataErrorResponseDto response =  convertStringToJsonForOdataFailure(jsonOutputString);
-				errorMessage.setType("Odata service failed");
-		    	  errorMessage.setMessage(response.getError().getMessage().getValue());
-		        
-		                 errorMessage.setSapPostedList(Collections.emptyList()); 
-		                 errorMessage.setPendingApprovalList(Collections.emptyList()); 
-		                 errorMessage.setRejectedList(Collections.emptyList()); 
 
-		                 return errorMessage;
-			  
-			}
-			
-			// get odata success body
-			public OdataTrackInvoiceResponseDto convertStringToJsonForOdataSuccess(String json){
-				OdataTrackInvoiceResponseDto  taskDto = new Gson().fromJson(json.toString(),
-						OdataTrackInvoiceResponseDto.class);
-				return taskDto;
-			}
-			// get odata Failure  body 
-			public OdataErrorResponseDto convertStringToJsonForOdataFailure(String json){
-				OdataErrorResponseDto response = new Gson().fromJson(json.toString(),
-						OdataErrorResponseDto.class);
-				return response;
-			}
-	public String formInputUrl(List<String> invoiceReferenceNumberList){
+	// Faiure
+	public TrackInvoiceOutputPayload formOutPutFailureResponse(String jsonOutputString) {
+		TrackInvoiceOutputPayload errorMessage = new TrackInvoiceOutputPayload();
+		OdataErrorResponseDto response = convertStringToJsonForOdataFailure(jsonOutputString);
+		errorMessage.setType("Odata service failed");
+		errorMessage.setMessage(response.getError().getMessage().getValue());
+		errorMessage.setPayload(Collections.emptyList());
+
+		return errorMessage;
+
+	}
+
+	// get odata success body
+	public OdataTrackInvoiceResponseDto convertStringToJsonForOdataSuccess(String json) {
+		OdataTrackInvoiceResponseDto taskDto = new Gson().fromJson(json.toString(), OdataTrackInvoiceResponseDto.class);
+		return taskDto;
+	}
+
+	// get odata Failure body
+	public OdataErrorResponseDto convertStringToJsonForOdataFailure(String json) {
+		OdataErrorResponseDto response = new Gson().fromJson(json.toString(), OdataErrorResponseDto.class);
+		return response;
+	}
+
+	public String formInputUrl(List<String> invoiceReferenceNumberList) {
 		StringBuilder urlForm = new StringBuilder();
-		appendParamInOdataUrl(urlForm, "&$format","json" );
-		appendParamInOdataUrl(urlForm, "&$filter","" );
-		appendValuesInOdataUrl(urlForm,"ReferenceInvoiceNumber",invoiceReferenceNumberList);
-		//appendInOdataUrl(urlForm, ")and","(" );
+		appendParamInOdataUrl(urlForm, "&$format", "json");
+		appendParamInOdataUrl(urlForm, "&$filter", "");
+		appendValuesInOdataUrl(urlForm, "ReferenceInvoiceNumber", invoiceReferenceNumberList);
+		// appendInOdataUrl(urlForm, ")and","(" );
 		urlForm.insert(0, ("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet?"));
-		System.err.println("url"+urlForm.toString());
+		System.err.println("url" + urlForm.toString());
 		return urlForm.toString();
-		}
-	public static void appendValuesInOdataUrl(StringBuilder url,String key, List<String> value){
-		for(int i = 0; i<value.size();i++){
-			if(value.size()==1){
-			url.append(key+"%20eq%20"+"%27"+value.get(i)+"%27");
-			System.out.println("26 ");
-			}
-			else if(i==value.size()-1){
-				url.append(key+"%20eq%20"+"%27"+value.get(i)+"%27");
+	}
+
+	public static void appendValuesInOdataUrl(StringBuilder url, String key, List<String> value) {
+		for (int i = 0; i < value.size(); i++) {
+			if (value.size() == 1) {
+				url.append(key + "%20eq%20" + "%27" + value.get(i) + "%27");
+				System.out.println("26 ");
+			} else if (i == value.size() - 1) {
+				url.append(key + "%20eq%20" + "%27" + value.get(i) + "%27");
 				System.out.println("30 ");
-			}else{
-				url.append(key+"%20eq%20"+"%27"+value.get(i)+"%27"+"%20or%20");
+			} else {
+				url.append(key + "%20eq%20" + "%27" + value.get(i) + "%27" + "%20or%20");
 				System.out.println("29 ");
-				
+
 			}
 		}
 	}
+
 	public static void appendParamInOdataUrl(StringBuilder url, String key, String value) {
-		url.append( key + "=" + value);
-		}
-		public static void appendInOdataUrl(StringBuilder url, String key, String value) {
-		url.append( key + "" + value);
-		}
-		
+		url.append(key + "=" + value);
+	}
+
+	public static void appendInOdataUrl(StringBuilder url, String key, String value) {
+		url.append(key + "" + value);
+	}
+
 	private List<InvoiceHeaderDo> filterInvoicesMultiple(TrackInvoiceInputDto dto) {
 		List<InvoiceHeaderDo> invoiceOrderList = null;
 		StringBuffer query = new StringBuffer();
@@ -272,11 +274,11 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
 		query.append("SELECT * FROM INVOICE_HEADER RR WHERE");
 		if (dto.getRequestId() != null && !dto.getRequestId().isEmpty()) {
-			
-			filterQueryMap.put(" RR.REQUEST_ID =", "('"  + dto.getRequestId() + "')");
+
+			filterQueryMap.put(" RR.REQUEST_ID =", "('" + dto.getRequestId() + "')");
 		}
 		if (dto.getCompanyCode() != null && !dto.getCompanyCode().isEmpty()) {
-			
+
 			filterQueryMap.put(" RR.COMPANY_CODE =", "('" + dto.getCompanyCode() + "')");
 		}
 		if (dto.getVendorId() != null && !dto.getVendorId().isEmpty()) {
@@ -294,21 +296,22 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			filterQueryMap.put(" RR.DUE_DATE BETWEEN ", +dto.getDueDateFrom() + " AND " + dto.getDueDateTo());
 			// is empty
 		}
-		
-		if (dto.getInvoiceDateFrom() != 0 && dto.getInvoiceDateTo()!=0) {
-			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ", +dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
-			// correct
-		}
-		
-		if (dto.getRequestCreatedOnTo() != 0 && dto.getRequestCreatedOnFrom() != 0) {
-			filterQueryMap.put(" RR.REQUEST_CREATED_AT BETWEEN ", +dto.getRequestCreatedOnFrom() + "AND" +dto.getRequestCreatedOnTo());
+
+		if (dto.getInvoiceDateFrom() != 0 && dto.getInvoiceDateTo() != 0) {
+			filterQueryMap.put(" RR.INVOICE_DATE BETWEEN ",
+					+dto.getInvoiceDateFrom() + " AND " + dto.getInvoiceDateTo());
 			// correct
 		}
 
-		
-		if (dto.getInvoiceRefNum() != null && !dto.getInvoiceRefNum().isEmpty()) {
-			filterQueryMap.put(" RR.EXT_INV_NUM =", dto.getInvoiceRefNum() + "");
+		if (dto.getRequestCreatedOnTo() != 0 && dto.getRequestCreatedOnFrom() != 0) {
+			filterQueryMap.put(" RR.REQUEST_CREATED_AT BETWEEN ",
+					+dto.getRequestCreatedOnFrom() + " AND " + dto.getRequestCreatedOnTo());
 			// correct
+		}
+
+		if (dto.getInvoiceRefNum() != null && !dto.getInvoiceRefNum().isEmpty()) {
+			filterQueryMap.put(" RR.EXT_INV_NUM =", "('" +dto.getInvoiceRefNum() + "')");
+			// correct 
 		}
 
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
