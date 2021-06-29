@@ -1,0 +1,71 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" xmlns:l="sap.ui.layout">
+	<Dialog title="{oPOModel>/submitTypeTitle}" class="sapUiSizeCompact" contentWidth="50%">
+		<content>
+			<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L6 M6 S12">
+				<l:content>
+					<VBox class="sapUiTinyMargin">
+						<HBox>
+							<Label text="{i18n>InvoiceNumber}" design="Bold" class="sapUiTinyMarginEnd"/>
+							<Text text="{oPOModel>/invoiceNumber}"/>
+						</HBox>
+						<HBox>
+							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
+							<Text text="{oPOModel>/invoiceStatus}"/>
+						</HBox>
+						<layoutData>
+							<l:GridData span="XL8 L8 M8 S6"/>
+						</layoutData>
+					</VBox>
+					<HBox class="sapUiTinyMargin">
+						<Label text="{i18n>TotalValue}" design="Bold" class="sapUiTinyMarginEnd"/>
+						<Text text="{oPOModel>/totalValue}"/>
+						<layoutData>
+							<l:GridData span="XL4 L4 M4 S6"/>
+						</layoutData>
+					</HBox>
+				</l:content>
+			</l:Grid>
+			<tnt:InfoLabel text="{i18n>submitInfoLabelMsg}" colorScheme="7" displayOnly="true"/>
+			<Table alternateRowColors="true" items="{oPOModel>/userList/users}">
+				<!--<headerToolbar>-->
+				<!--	<OverflowToolbar>-->
+				<!--		<ToolbarSpacer/>-->
+				<!--		<Button icon="sap-icon://sys-add"/>-->
+				<!--		<Button icon="sap-icon://sys-minus"/>-->
+				<!--	</OverflowToolbar>-->
+				<!--</headerToolbar>-->
+				<columns>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
+						<Label design="Bold" text="{i18n>BuyerUserId}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
+						<Label design="Bold" text="{i18n>Group}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
+						<Label design="Bold" text="{i18n>Actions}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{oPOModel>buyerUserId}"/>
+							<Text text="{oPOModel>group}"/>
+							<Text text="{oPOModel>action}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+			<l:Grid hSpacing="1" vSpacing="0" defaultSpan="XL12 L12 M12 S12" class="sapUiSmallMarginTopBottom">
+                <Label design="Bold" text="{i18n>COMMENTS}" required="true"/>
+                <TextArea value="{oPOModel>/sComments}" placeholder="{i18n>PleaseEnterComments}" showExceededText="true" maxLength="40" width="100%" liveChange="onCommentsLiveChange"
+                    valueState="{oPOModel>/sCommentValueState}" valueLiveUpdate="true"/>
+            </l:Grid>
+		</content>
+		<beginButton>
+			<Button text="{i18n>Submit}" press="oSubmit" type="Emphasized" enabled="false"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>Cancel}" press="onCancelSubmitDialog"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

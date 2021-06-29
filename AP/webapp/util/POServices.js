@@ -322,7 +322,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	//Called on click of Submit Button.
-	onNonPoSubmit: function (oEvent, oController, MandatoryFileds) {
+	onNonPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode) {
 		var oPOModel = oController.oPOModel;
 		var oMandatoryModel = oController.oMandatoryModel;
 		var oSubmitData = oPOModel.getData();
@@ -403,10 +403,16 @@ com.menabev.AP.util.POServices = {
 					sap.m.MessageBox.error("Tax MisMatched");
 					return;
 				}
+				if (oSubmitData.invoiceType == "PO") {
+					var sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit",
+						sMethod = "POST";
+					this.onAccSubmit(oController, oSubmitData, sMethod, sUrl, actionCode, "openFrag");
+				} else {
+					var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
+						sMethod = "POST";
+					this.saveSubmitServiceCall(oController, oSubmitData, sMethod, sUrl);
+				}
 
-				var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
-					sMethod = "POST";
-				this.saveSubmitServiceCall(oController, oSubmitData, sMethod, sUrl);
 			}
 		}
 
@@ -631,7 +637,7 @@ com.menabev.AP.util.POServices = {
 		this.calculateGrossAmount();
 	},
 
-	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode) {
+	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, method) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -646,7 +652,7 @@ com.menabev.AP.util.POServices = {
 			"invoice": oData,
 			"requestId": oData.requestId,
 			"taskId": oData.taskId,
-			"actionCode":oData.taskId
+			"actionCode": actionCode
 		};
 		busy.open();
 		oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, sMethod, false, false, oHeader);
@@ -657,17 +663,18 @@ com.menabev.AP.util.POServices = {
 			if (oData.status === 200) {
 				var ReqId = oData.invoiceHeaderDto.requestId;
 				oPOModel.setProperty("/", oData.invoiceHeaderDto);
-				sap.m.MessageBox.success(message, {
-					actions: [sap.m.MessageBox.Action.OK],
-					onClose: function (sAction) {
-						oController.oRouter.navTo("Inbox");
-					}
-				});
-			} else {
-				sap.m.MessageBox.information(message, {
-					actions: [sap.m.MessageBox.Action.OK]
-				});
-			}
+				if (actionCode === "ASR") {
+					oController.onSubmitForRemediationFrag();
+				} else if (actionCode === "ASA") {
+					oController.onSubmitForApprovalFrag();
+				}
+				// sap.m.MessageBox.success(message, {
+				// 	actions: [sap.m.MessageBox.Action.OK],
+				// 	onClose: function (sAction) {
+				// 		oController.oRouter.navTo("Inbox");
+				// 	}
+				// });
+			} 
 		});
 		oServiceModel.attachRequestFailed(function (oEvent) {
 			busy.close();
