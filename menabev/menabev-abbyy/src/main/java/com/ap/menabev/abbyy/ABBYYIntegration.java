@@ -11,11 +11,13 @@ import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.ap.menabev.sftp.SFTPChannelUtil;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.jcraft.jsch.Session;
 
 @Service
 public class ABBYYIntegration {
@@ -93,7 +95,7 @@ public class ABBYYIntegration {
 //		return message;
 //	}
 
-	public String putInvoiceInAbbyy(List<File> files, String abbyyRemoteInputDirectory, ChannelSftp channelSftp) {
+	/*public String putInvoiceInAbbyy(List<File> files, String abbyyRemoteInputDirectory, ChannelSftp channelSftp) {
 		String message = null;
 		try {
 			for (File file : files) {
@@ -108,10 +110,45 @@ public class ABBYYIntegration {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("Error in ABBYYIntegration.uploadFileUsingJsch()");
+			
 			message = "Error While Getting ChannelSftp :: " + e.getMessage();
 		}
 		return message;
-	}
+	}*/
+	
+	public String putInvoiceInAbbyy(List<File> files, String abbyyRemoteInputDirectory, ChannelSftp channelSftp) {
+		String message = null;
+		try {
+			channelSftp.cd("\\Input\\");
+		for (File file : files) {
+		String inputFilePath = file.getAbsolutePath();
+		System.err.println("inputFilePath "+file.getAbsolutePath());
+		//channelSftp.cd("\\Input\\");
+		try {
+		channelSftp.put(inputFilePath,file.getName());
+		} catch (Exception e) {
+
+		logger.error("inside for loop catch block");
+
+		Session session = SFTPChannelUtil.getSession();
+		channelSftp = SFTPChannelUtil.getJschChannel(session);
+		channelSftp.connect();
+		channelSftp.put(inputFilePath,file.getName());
+		logger.error("after put in catch inside for loop");
+		}
+		System.err.println("fileName putInvoiceInAbby= "+file.getName());
+		}
+		message = "File uploaded";
+
+
+
+		} catch (Exception e) {
+		e.printStackTrace();
+		logger.error("Error in ABBYYIntegration.uploadFileUsingJsch()");
+		message = "Error While Getting ChannelSftp :: " + e.getMessage();
+		}
+		return message;
+		}
 
 	public List<JSONObject> getJsonOutputFromSFTP(ChannelSftp channelSftp) {
 		List<JSONObject> jsonList = new ArrayList<JSONObject>();

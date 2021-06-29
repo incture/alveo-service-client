@@ -873,7 +873,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						}
 				}
 				// Update the Activity Log table
-				//createActivityLog(requestId);
+		ActivityLogDo		 responseActvity   = createActivityLog(requestId,invoiceSavedDo,invoiceDto.getInvoiceHeaderDto().getActivityLog());
+				
+		        System.err.println("responseActivity "+responseActvity);
+		
 				if (lists.get(0).getUserType().equals("Default")) {
 					invoiceDto.setResponseStatus("Invoice " + invoiceSavedDo.getRequestId()
 							+ " has been created & task is available to Default User " + lists.get(0).getUserOrGroup());
@@ -898,18 +901,39 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		}
 	}
 
-	/*public ResponseEntity<?> createActivityLog(String requestId,InvoiceHeaderDto invoice) {
-		
+	public  ActivityLogDo createActivityLog(String requestId,InvoiceHeaderDo invoiceHeader,List<ActivityLogDto> activityLogs) {
+		try{
+			if(activityLogs==null){
+				activityLogs = Collections.emptyList();
+			}
 		ActivityLogDto activity = new ActivityLogDto();
-		activity.setActionCode("S");
+		activity.setGuid(UUID.randomUUID().toString());
+		activity.setActionCode("CREATED");// set the action code
 		activity.setActionCodeText("CREATED");
-		activity.setActivityId(UUID.randomUUID().toString());
-		activity.setCreatedAt(invoice.getRequest_created_at());
-		activity.setCreatedBy(invoice.getRequest_created_by());
-		activity.setInvoiceStatusCode("");
+		activity.setCreatedAt(ServiceUtil.getEpocTime());
+		activity.setCreatedBy(invoiceHeader.getTaskOwner());
+		activity.setInvoiceStatusCode(invoiceHeader.getInvoiceStatus());
+		activity.setInvoiceStatusText(invoiceHeader.getInvoiceStatusText());
+	//	activity.setProcessor(invoiceHeader.getProcessor());
+		activity.setRequestId(invoiceHeader.getRequestId());
+		activity.setTaskCreatedAt(invoiceHeader.getRequest_created_at());
+		activity.setTaskId(invoiceHeader.getTaskId());
+		activity.setTaskOwner(invoiceHeader.getTaskOwner());
+		activity.setTaskStatus("IN-PROGRESS");
+		activity.setWorkflowCreateBy(invoiceHeader.getRequest_created_by());
+		activity.setWorkflowCreatedAt(invoiceHeader.getRequest_created_at());
+		activity.setWorkflowId(invoiceHeader.getWorkflowId());
+		activity.setWorkflowStatus("IN-PROGRESS");
+	   activityLogs.add(activity);
+	   List<ActivityLogDo>   activityLogsdo = ObjectMapperUtils.mapAll(activityLogs, ActivityLogDo.class);
+	    ActivityLogDo activityResponse =  activityLogRepo.saveAll(activityLogsdo).get(0);
+	    return activityResponse;
 		
-		return null;
-	}*/
+		}catch (Exception e){
+			
+			return null;
+		}
+	}
 
 
 	@Override
