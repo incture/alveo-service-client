@@ -97,14 +97,14 @@ sap.ui.define([
 					oPaginationModel.setProperty("/" + objectName + "/totalTaskCount", 0);
 				} else {
 					oPaginationModel.setProperty("/" + objectName + "/totalTaskCount", count);
-					var pages = parseInt(count / 2);
+					var pages = parseInt(count / 10);
 					if (pages < 1) {
 						oPaginationModel.setProperty("/" + objectName + "/paginationVisible", false);
 						return;
 					} else {
 						oPaginationModel.setProperty("/" + objectName + "/paginationVisible", true);
 					}
-					var remainder = count % 2;
+					var remainder = count % 10;
 					if (remainder) {
 						pages = pages + 1;
 					}
@@ -276,7 +276,7 @@ sap.ui.define([
 				if (oPayload.dueDateTo) {
 					oPayload.dueDateTo = new Date(oPayload.dueDateTo).getTime();
 				}
-				var skip = (pageNo - 1) * 2;
+				var skip = (pageNo - 1) * 10;
 				var assignedTo = oTaskInboxModel.getProperty("/filterParams/assignedTo");
 				if (!assignedTo) {
 					assignedTo = [];
@@ -290,7 +290,7 @@ sap.ui.define([
 				oPayload.assignedTo = assignedTo;
 				oPayload.skip = skip;
 				oPayload.vendorId = vendorId;
-				oPayload.top = 2;
+				oPayload.top = 10;
 				oPayload.roleOfUser = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 				var oServiceModel = new sap.ui.model.json.JSONModel();
 				var oHeader = {
@@ -303,29 +303,55 @@ sap.ui.define([
 					busy.close();
 					var data = oEvent.getSource().getData();
 					var arr = [];
-					if (data.message == "SUCCESS") {
-						if (!data.totalCount) {
-							data.totalCount = 0;
+					if (oEvent.getParameters().success) {
+						if (data.message == "SUCCESS") {
+							if (!data.totalCount) {
+								data.totalCount = 0;
+							}
+							if (!data.draftCount) {
+								data.draftCount = 0;
+							}
+							oTaskInboxModel.setProperty("/openTaskCount", data.totalCount);
+							// oTaskInboxModel.setProperty("/myTaskCount", data.body.countMyTask);
+							oTaskInboxModel.setProperty("/draftCount", data.draftCount);
+							oTaskInboxModel.setProperty("/openTask", {});
+							oTaskInboxModel.setProperty("/draftTask", {});
+							if (data.taskList) {
+								oTaskInboxModel.setProperty("/openTask", data.taskList);
+							}
+							if (data.draftList) {
+								oTaskInboxModel.setProperty("/draftTask", data.draftList);
+							}
+							that.pagination(data.totalCount, "openTaskPagination", pageNo);
+							// that.pagination(data.body.countMyTask, "myTaskPagination", 1);
+							that.pagination(data.draftCount, "draftedTaskPagination", pageNo);
+						} else {
+							sap.m.MessageBox.information(data.message, {
+								styleClass: "sapUiSizeCompact",
+								actions: [sap.m.MessageBox.Action.OK]
+							});
+							oTaskInboxModel.setProperty("/openTaskCount", 0);
+							oTaskInboxModel.setProperty("/draftCount", 0);
+							oTaskInboxModel.setProperty("/openTask", {});
+							oTaskInboxModel.setProperty("/draftTask", {});
+
 						}
-						if (!data.draftCount) {
-							data.draftCount = 0;
-						}
-						oTaskInboxModel.setProperty("/openTaskCount", data.totalCount);
-						// oTaskInboxModel.setProperty("/myTaskCount", data.body.countMyTask);
-						oTaskInboxModel.setProperty("/draftCount", data.draftCount);
+					} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+						var message = "Session Lost. Press OK to refresh the page";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK],
+							onClose: function (sAction) {
+								location.reload(true);
+							}
+						});
+						oTaskInboxModel.setProperty("/openTaskCount", 0);
+						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
-						if (data.taskList) {
-							oTaskInboxModel.setProperty("/openTask", data.taskList);
-						}
-						if (data.draftList) {
-							oTaskInboxModel.setProperty("/draftTask", data.draftList);
-						}
-						that.pagination(data.totalCount, "openTaskPagination", pageNo);
-						// that.pagination(data.body.countMyTask, "myTaskPagination", 1);
-						that.pagination(data.draftCount, "draftedTaskPagination", pageNo);
-					} else {
-						sap.m.MessageBox.information(data.message, {
+					} else if (oEvent.getParameters().errorobject.statusCode == 400) {
+						var message = "Service Unavailable. Please try after sometime";
+						sap.m.MessageBox.information(message, {
 							styleClass: "sapUiSizeCompact",
 							actions: [sap.m.MessageBox.Action.OK]
 						});
@@ -333,7 +359,6 @@ sap.ui.define([
 						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
-
 					}
 
 				});
@@ -416,8 +441,8 @@ sap.ui.define([
 				oTaskInboxModel.setProperty("/filterParams", {});
 				oTaskInboxModel.setProperty("/filterParams/validationStatus", []);
 				oTaskInboxModel.setProperty("/filterParams/assignedTo", assignedTo);
-				oTaskInboxModel.setProperty("/filterParams/vendorId", []);
-				oTaskInboxModel.setProperty("/filterParams/invoiceType", ["PO"]);
+				oTaskInboxModel.setProperty("/filterParams/vendorId", "");
+				oTaskInboxModel.setProperty("/filterParams/invoiceType", ["PO", "NON-PO"]);
 				oTaskInboxModel.setProperty("/filterParams/taskStatus", ["READY", "RESERVED"]);
 				this.getInboxData(1);
 			},
@@ -538,6 +563,7 @@ sap.ui.define([
 					req;
 				if (!selectedItems.length) {
 					sap.m.MessageToast.show("Please select items to delete");
+					return;
 				}
 				for (var i = 0; i < selectedItems.length; i++) {
 					req = oTaskInboxModel.getProperty(selectedItems[i] + "/requestId");

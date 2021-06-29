@@ -1,6 +1,6 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.App"
 	xmlns:vc="com.menabev.AP.customControl" xmlns:html="http://www.w3.org/1999/xhtml">
-	<App>
+	<App class="sapUiSizeCompact">
 		<Page>
 			<customHeader>
 				<OverflowToolbar>

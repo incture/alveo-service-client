@@ -13,7 +13,6 @@
 									<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
 								</suggestionItems>
 							</Input>
-							<!--<Input value="{oTaskInboxModel>/filterParams/vendorId}" maxLength="10"/>-->
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="B" label="{i18n>inboxRequestID}">
@@ -62,12 +61,12 @@
 								tooltip="Due To Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="I" label="{i18n>InvoiceValueFrom}">
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="false" name="I" label="{i18n>InvoiceValueFrom}">
 						<fb:control>
 							<Input value="{oTaskInboxModel>/filterParams/invoiceValueFrom}" type="Number" change="onChangeInvoiceValue"/>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="J" label="{i18n>InvoiceValueTo}">
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="false" name="J" label="{i18n>InvoiceValueTo}">
 						<fb:control>
 							<Input value="{oTaskInboxModel>/filterParams/invoiceValueTo}" type="Number" change="onChangeInvoiceValue"/>
 						</fb:control>
@@ -97,7 +96,7 @@
 			</fb:FilterBar>
 			<IconTabBar expanded="true" headerMode="Inline" select="onTabSelectPagination" selectedKey="{oTaskInboxModel>/selectedFilterTab}">
 				<items>
-					<IconTabFilter text="{i18n>OPENTASK}" key="openTask" count="{oTaskInboxModel>/openTaskCount}">
+					<IconTabFilter text="{i18n>TASK}" key="openTask" count="{oTaskInboxModel>/openTaskCount}">
 						<Table items="{oTaskInboxModel>/openTask}" mode="None" class="labelwrapTable" sticky="ColumnHeaders">
 							<headerToolbar>
 								<OverflowToolbar>
@@ -108,40 +107,43 @@
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
-								<Column hAlign="Center">
+								<Column width="10%">
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column hAlign="Center">
+								<Column width="10%">
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvoiceNo}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvoiceDate}" design="Bold"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvoiceType}" design="Bold"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>Value}" design="Bold" wrapping="true"/>
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>InvoiceValue}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>DueDate}" design="Bold"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" visible="false">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
+									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true"/>
+								</Column>
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
 								</Column>
 							</columns>
@@ -152,86 +154,25 @@
 									<Label text="{oTaskInboxModel>extInvNum}" wrapping="true"/>
 									<Label text="{path:'oTaskInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}" wrapping="true"/>
 									<Label text="{oTaskInboxModel>invoiceType}" wrapping="true"/>
-									<Label text="{oTaskInboxModel>invoiceTotal}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>invoiceTotal',formatter:'com.menabev.AP.formatter.formatter.formatPrice'}" wrapping="true"/>
 									<Label text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} " wrapping="true"/>
-									<Label text="{oTaskInboxModel>validationStatus}" wrapping="true"/>
+									<Label text="{oTaskInboxModel>validationStatusCode}" wrapping="true"/>
 									<Label text="{oTaskInboxModel>status}" wrapping="true"/>
-									<Label text="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}"
-										tooltip="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
 									<Label text="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}"
 										tooltip="{path:'oTaskInboxModel>recipientGroups', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
+									<Label text="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.formatRecipient'}"
+										tooltip="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
+									<Label text="{oTaskInboxModel>status}" wrapping="true"/>
 									<HBox>
-										<core:Icon src="sap-icon://locked" tooltip="claim" press="onClaimRelease"
+										<Button text="{i18n>Claim}" type="Emphasized" tooltip="claim" press="onClaimRelease"
 											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setClaimVisible'}"/>
-										<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease"
+										<Button text="{i18n>Release}" type="Emphasized" tooltip="release" press="onClaimRelease"
 											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setReleaseVisible'}"/>
 									</HBox>
 								</ColumnListItem>
 							</items>
 						</Table>
 					</IconTabFilter>
-					<!--<IconTabFilter text="{i18n>MYTASK}" key="myTask" count="{oTaskInboxModel>/myTaskCount}">-->
-					<!--	<Table items="{oTaskInboxModel>/myTask}" mode="None" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders">-->
-					<!--		<headerToolbar>-->
-					<!--			<OverflowToolbar>-->
-					<!--				<ToolbarSpacer></ToolbarSpacer>-->
-					<!--				<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"-->
-					<!--					visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>-->
-					<!--				<Button icon="sap-icon://action-settings" type="Emphasized"/>-->
-					<!--			</OverflowToolbar>-->
-					<!--		</headerToolbar>-->
-					<!--		<columns>-->
-					<!--			<Column hAlign="Center">-->
-					<!--				<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--			<Column hAlign="Center">-->
-					<!--				<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">-->
-					<!--				<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">-->
-					<!--				<Label text="{i18n>Invoice Date}" design="Bold"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">-->
-					<!--				<Label text="{i18n>InvoiceType}" design="Bold"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
-					<!--				<Label text="{i18n>Value}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
-					<!--				<Label text="{i18n>DueDate}" design="Bold"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
-					<!--				<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
-					<!--				<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--			<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">-->
-					<!--				<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>-->
-					<!--			</Column>-->
-					<!--		</columns>-->
-					<!--		<items>-->
-					<!--			<ColumnListItem>-->
-					<!--				<Link text="{oTaskInboxModel>requestId}" press="onReqIdClaimSelect" wrapping="true"/>-->
-					<!--				<Text text="{oTaskInboxModel>vendorId}-{oTaskInboxModel>vendorName}"/>-->
-					<!--				<Text text="{oTaskInboxModel>extInvNum}"/>-->
-					<!--				<Text text="{path:'oTaskInboxModel>invoiceDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>-->
-					<!--				<Text text="{oTaskInboxModel>invoiceType}"/>-->
-					<!--				<Text text="{oTaskInboxModel>invoiceTotal}"/>-->
-					<!--				<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>-->
-					<!--				<Text text="{oTaskInboxModel>validationStatus}"/>-->
-					<!--				<Text text="{oTaskInboxModel>status}"/>-->
-					<!--				<core:Icon src="sap-icon://unlocked" tooltip="release" press="onClaimRelease">-->
-					<!--					<core:layoutData>-->
-					<!--						<FlexItemData growFactor="1"/>-->
-					<!--					</core:layoutData>-->
-					<!--				</core:Icon>-->
-					<!--			</ColumnListItem>-->
-					<!--		</items>-->
-					<!--	</Table>-->
-					<!--</IconTabFilter>-->
 					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}"
 						visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}">
 						<Table items="{oTaskInboxModel>/draftTask}" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" id="DRAFTTABLE">
@@ -245,34 +186,34 @@
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
-								<Column hAlign="Center">
+								<Column>
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column hAlign="Center">
+								<Column>
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>Invoice No.}" design="Bold" wrapping="true"/>
+								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
+									<Label text="{i18n>InvoiceNo}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>Invoice Date}" design="Bold"/>
+								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
+									<Label text="{i18n>InvoiceDate}" design="Bold"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvoiceType}" design="Bold"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>Value}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>DueDate}" design="Bold"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" hAlign="Center" minScreenWidth="Desktop" demandPopin="true" visible="false">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
 								</Column>
 							</columns>
@@ -285,7 +226,7 @@
 									<Text text="{oTaskInboxModel>invoiceType}"/>
 									<Text text="{oTaskInboxModel>invoiceTotal}"/>
 									<Text text="{path:'oTaskInboxModel>dueDate', formatter:'com.menabev.AP.formatter.formatter.formatDate'} "/>
-									<Text text="{oTaskInboxModel>validationStatus}"/>
+									<Text text="{oTaskInboxModel>validationStatusCode}"/>
 									<Text text="{oTaskInboxModel>status}"/>
 									<Button icon="sap-icon://delete" press="onDeleteDraft"></Button>
 								</ColumnListItem>

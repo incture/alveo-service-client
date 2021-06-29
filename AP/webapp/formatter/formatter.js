@@ -272,12 +272,47 @@ com.menabev.AP.formatter.formatter = {
 			return false;
 		}
 	},
-	
-	ThreeWayMatchHighlight: function(isThreewayMatched){
-		if(isThreewayMatched){
+
+	ThreeWayMatchHighlight: function (isThreewayMatched) {
+		if (isThreewayMatched) {
 			return "Success";
 		}
 		return "None";
+	},
+
+	formatPOVisible: function (POState) {
+		if (POState === true) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	formatPOItemCatVisible: function (POState, itemCat) {
+		if (POState === true && itemCat == "D") {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	formatPrice: function (value) {
+		if (value) {
+			value = parseFloat(value);
+			value = value.toFixed(2);
+		} else {
+			value = 0.00;
+		}
+		return value;
+	},
+	formatQuantity: function (value) {
+		if (value) {
+			value = parseFloat(value);
+			value = value.toFixed(3);
+		} else {
+			value = 0.00;
+		}
+		return value;
 	}
 
 };

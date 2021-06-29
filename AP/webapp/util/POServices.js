@@ -629,6 +629,58 @@ com.menabev.AP.util.POServices = {
 		this.calSysSuggTaxAmt();
 		this.calculateBalance();
 		this.calculateGrossAmount();
+	},
+
+	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode) {
+		var that = this;
+		var oPOModel = oController.oPOModel;
+		var oServiceModel = new sap.ui.model.json.JSONModel();
+		var busy = new sap.m.BusyDialog();
+		var oHeader = {
+			"Content-Type": "application/scim+json"
+		};
+		if (!oData.invoiceTotal) {
+			oData.invoiceTotal = 0;
+		}
+		var oPayload = {
+			"invoice": oData,
+			"requestId": oData.requestId,
+			"taskId": oData.taskId,
+			"actionCode":oData.taskId
+		};
+		busy.open();
+		oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, sMethod, false, false, oHeader);
+		oServiceModel.attachRequestCompleted(function (oEvent) {
+			busy.close();
+			var oData = oEvent.getSource().getData();
+			var message = oData.responseStatus;
+			if (oData.status === 200) {
+				var ReqId = oData.invoiceHeaderDto.requestId;
+				oPOModel.setProperty("/", oData.invoiceHeaderDto);
+				sap.m.MessageBox.success(message, {
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (sAction) {
+						oController.oRouter.navTo("Inbox");
+					}
+				});
+			} else {
+				sap.m.MessageBox.information(message, {
+					actions: [sap.m.MessageBox.Action.OK]
+				});
+			}
+		});
+		oServiceModel.attachRequestFailed(function (oEvent) {
+			busy.close();
+			var oData = oEvent.getSource().getData();
+			var errorMsg = "";
+			if (oData.status === 504) {
+				errorMsg = "Request timed-out. Please refresh your page";
+				// this.errorMsg(errorMsg);
+			} else {
+				// errorMsg = data;
+				// this.errorMsg(errorMsg);
+			}
+		});
 	}
 
 };

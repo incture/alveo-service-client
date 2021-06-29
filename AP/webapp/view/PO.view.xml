@@ -1,6 +1,6 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.PO"
 	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified">
-	<Page class="sapUiSizeCompact">
+	<Page class="sapUiSizeCompact TaskPage">
 		<customHeader>
 			<OverflowToolbar>
 				<core:Fragment fragmentName="com.menabev.AP.fragment.POHeaderToolbar" type="XML"/>

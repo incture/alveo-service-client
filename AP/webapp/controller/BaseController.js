@@ -4,8 +4,9 @@ sap.ui.define([
 	"sap/m/MessageBox",
 	"sap/m/MessageToast",
 	'sap/ui/model/Filter',
-	'sap/ui/model/FilterOperator'
-], function (Controller, JSONModel, MessageBox, MessageToast, Filter, FilterOperator) {
+	'sap/ui/model/FilterOperator',
+	"com/menabev/AP/util/POServices"
+], function (Controller, JSONModel, MessageBox, MessageToast, Filter, FilterOperator, POServices) {
 	"use strict";
 	return Controller.extend("com.menabev.AP.controller.BaseController", {
 
@@ -931,10 +932,15 @@ sap.ui.define([
 		VendorIdSuggest: function (oEvent, oController) {
 			var oDataAPIModel = this.oDataAPIModel;
 			var oDropDownModel = this.oDropDownModel;
+			var oPOModel = this.oPOModel;
+			if (oEvent.getSource().getCustomData()[0]) {
+				oPOModel.setProperty("/vendorName", "");
+			}
 			var value = oEvent.getParameter("suggestValue");
-				oDropDownModel.setProperty("/VendorIdSuggest", {});
+			oDropDownModel.setProperty("/VendorIdSuggest", {});
 			if (value && value.length > 2) {
-				var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true or substringof('" + value + "',SupplierName) eq true";
+				var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true or substringof('" + value +
+					"',SupplierName) eq true";
 				oDataAPIModel.read(url, {
 					success: function (oData, header) {
 						var data = oData.results;
@@ -946,18 +952,11 @@ sap.ui.define([
 			}
 		},
 
-		// vendorIdSelected: function (oEvent, oController) {
-		// 	var oPOModel = this.oPOModel;
-		// 	var sVendorId = oEvent.getParameter("selectedItem").getProperty("text"),
-		// 		sVendorName = oEvent.getParameter("selectedItem").getProperty("additionalText");
-		// 	oPOModel.setProperty("/vendorName", sVendorName);
-		// 	oPOModel.setProperty("/vendorId", sVendorId);
-		// 	oPOModel.refresh();
-		// 	// this.onHeaderChange(oEvent, oController, "isVendoIdChanged");
-		// },
-
 		onVendorIdChange: function (oEvent) {
 			var a = oEvent.getSource().getValue();
+			if (a) {
+				return true;
+			}
 		},
 
 		onCancelChanges: function () {
@@ -971,7 +970,9 @@ sap.ui.define([
 					}
 				}
 			});
-		}
+		},
+
+		// SubmitForRemidiation:
 
 	});
 

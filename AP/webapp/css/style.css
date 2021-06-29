@@ -1,3 +1,63 @@
+/*App page classes*/
+.sapMIBar-CTX .sapMLabel {
+    color: #fff;
+}
+
+/* PO Non PO classes*/
+
+.TaskPage.sapMPage .sapMPageHeader {
+    background-color: #d5e0ea !important;
+}
+
+.TaskPage .sapMIBar-CTX .sapMTitle {
+    color: #000000;
+}
+
+.TaskPage .sapMIBar-CTX .sapMLabel {
+    color: #000000;
+}
+
+.gridMargin .sapUiRespGrid.sapUiRespGridVSpace1>div {
+    margin-bottom: 0.5rem;
+}
+
+/*Inbox classes*/
+.sapUiSizeCompact .sapMBtn {
+    height: 2.000rem;
+    padding: 0.1875rem 0.2rem;
+}
+
+.sapMITBContent {
+    border-bottom: 0.0625rem solid #d9d9d9;
+}
+
+.sapMITBContent {
+    padding: 0.2rem;
+    position: relative;
+    background-color: #f7f7f7;
+}
+
+.sapUiSizeCompact .sapMTB.sapMTBHeader-CTX {
+    height: 1.75rem;
+}
+
+.Messageboxtitle .sapMDialog>header.sapMDialogTitle .sapMTitle {
+    color: #fff;
+    margin: 0;
+    vertical-align: middle;
+}
+
+/*Comments*/
+
+.sapSuiteUiCommonsTimeline {
+    max-width: 100vw !important;
+    margin-left: unset !important;
+    margin-right: unset !important;
+    position: relative;
+}
+
+
+/**/
 .simpleForm1 {
     padding-right: 8%;
     padding-top: 0rem;
@@ -69,19 +129,6 @@
 
 }
 
-.TaskPage.sapMPage .sapMPageHeader {
-    background-color: #0053A7 !important;
-}
-
-.TaskPage .sapMIBar-CTX .sapMTitle {
-    color: #fff;
-    font-size: larger;
-}
-
-.sapUiSizeCompact .sapMBtn {
-    height: 2.000rem;
-    padding: 0.1875rem 0.2rem;
-}
 
 /*FD*/
 
@@ -195,9 +242,9 @@
 
 
 
-.navContainer.sapMNav {
-    border-radius: 8px;
-}
+/*.navContainer.sapMNav {*/
+/*    border-radius: 8px;*/
+/*}*/
 
 .sapMITB {
     position: relative;
@@ -223,15 +270,6 @@
     box-shadow: none !important;
     background-color: #0053a7 !important;
     ;
-}
-
-.sapMIBar-CTX .sapMLabel {
-    color: #ffffff;
-}
-
-.sapMIBar-CTX .sapMTitle {
-    color: #ffffff;
-    text-shadow: none;
 }
 
 .sapMTBStandard {
@@ -525,6 +563,7 @@
 }
 
 /*to adjust the width of popover suggestions*/
-.glaccount, .sapMPopoverCont {
+.glaccount,
+.sapMPopoverCont {
     width: auto !important;
 }
