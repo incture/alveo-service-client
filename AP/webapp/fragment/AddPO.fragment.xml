@@ -22,7 +22,7 @@
 							<Input value="{addPOModel>/documentNumber}" maxLength="10" liveChange="inputLiveChange"/>
 						</fb:control>
 					</fb:FilterItem>
-					<fb:FilterItem name="B" label="{i18n>DocCategory}" visible="{addPOModel>/POFilterVisible}" visible="false">
+					<fb:FilterItem name="B" label="{i18n>DocCategory}" visible="false">
 						<fb:control>
 							<Select forceSelection="false" selectedKey="{addPOModel>/documentCategory}" width="100%" enabled="false">
 								<items>
@@ -32,17 +32,17 @@
 							</Select>
 						</fb:control>
 					</fb:FilterItem>
-					<fb:FilterItem name="C" label="{i18n>VendorId}" visible="{addPOModel>/POFilterVisible}" visible="false">
+					<fb:FilterItem name="C" label="{i18n>VendorId}" visible="false">
 						<fb:control>
 							<Input value="{addPOModel>/vendorId}" enabled="false"/>
 						</fb:control>
 					</fb:FilterItem>
-					<fb:FilterItem name="D" label="{i18n>CompanyCode}" visible="{addPOModel>/POFilterVisible}" visible="false">
+					<fb:FilterItem name="D" label="{i18n>CompanyCode}" visible="false">
 						<fb:control>
 							<Input value="{addPOModel>/companyCode}" enabled="false"/>
 						</fb:control>
 					</fb:FilterItem>
-					<fb:FilterItem name="E" label="{i18n>DateRange}" visible="{addPOModel>/POFilterVisible}" visible="false">
+					<fb:FilterItem name="E" label="{i18n>DateRange}" visible="false">
 						<fb:control>
 							<DateRangeSelection delimiter="{path:'/delimiterDRS1'}" dateValue="{path:'/dateValueDRS1'}" secondDateValue="{path:'/secondDateValueDRS1'}"
 								displayFormat="MM/dd/yyyy" enabled="false"/>
@@ -56,7 +56,7 @@
 				</fb:filterItems>
 			</fb:FilterBar>
 			<Table items="{addPOModel>/result}" class="sapUiSizeCompact" growing="true" growingThreshold="100"
-				sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" alternateRowColors="true" mode="MultiSelect">
+				sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" alternateRowColors="true" mode="MultiSelect" select="onSelectAddPO">
 				<columns>
 					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 						<Label text="{i18n>DocNumber}" design="Bold"/>
@@ -91,7 +91,7 @@
 			<Button text="{i18n>Cancel}" type="Reject" press="onCancelAddPO"/>
 		</beginButton>
 		<endButton>
-			<Button text="{i18n>Add}" press="onClickAdd" enabled="false"/>
+			<Button text="{i18n>Add}" press="onClickAddPOOk" enabled="{oVisibilityModel>/PO/enabled}"/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

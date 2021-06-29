@@ -38,6 +38,7 @@ sap.ui.define([
 			var getResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 			this.getResourceBundle = getResourceBundle;
 			oMandatoryModel.setProperty("/NonPO", {});
+			this.oVisibilityModel.setProperty("/PO", {});
 			var userGroup = oUserDetailModel.getProperty("/loggedinUserGroup");
 			oPOModel.loadData("model/UIDataModel.json");
 			this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
@@ -48,6 +49,9 @@ sap.ui.define([
 						requestId = oArgs.id,
 						status = oArgs.status;
 					POServices.getPONonPOData("", that, requestId);
+					var invoiceItems = oPOModel.getProperty("/invoiceItems");
+					var arrUniqueInvoiceItems = this.fnFindUniqueInvoiceItems(invoiceItems);
+					this.getReferencePo(arrUniqueInvoiceItems);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -192,7 +196,7 @@ sap.ui.define([
 		
 		onClickInvoiceAccAssignment: function (oEvent) {
 			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
-			var oPOModel = this.getView().getModel("oPOModel");
+			var oPOModel = this.oPOModel;
 			var invoiceItemAccAssgn = oPOModel.getProperty(sPath + "/invoiceItemAccAssgn");
 			oPOModel.setProperty("/invoiceItemAccAssgn", invoiceItemAccAssgn);
 			this.GLCodingDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.GLCoding", this);
@@ -238,32 +242,93 @@ sap.ui.define([
 			oPOModel.getData().invoiceItemAccAssgn.splice(index, 1);
 			oPOModel.refresh();
 		},
+		
+		onClickItemMatch: function () {
+			this.oRouter.navTo("ItemMatch");
+		},
 
-		/**
-		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
-		 * (NOT before the first rendering! onInit() is used for that one!).
-		 * @memberOf com.menabev.AP.view.PO
-		 */
-		//	onBeforeRendering: function() {
-		//
-		//	},
+		fnFindUniqueInvoiceItems: function (arr) {
+			var newArray = [];
+			var uniqueObject = {};
+			for (var i in arr) {
+				var refDocNum = arr[i]['refDocNum'];
+				uniqueObject[refDocNum] = arr[i];
+			}
+			for (i in uniqueObject) {
+				var obj = {
+					"documentCategory": uniqueObject[i].refDocCategory,
+					"documentNumber": uniqueObject[i].refDocNum
+				};
+				newArray.push(obj);
+			}
+			return newArray;
+		},
+		
+		getReferencePo: function (arrUniqueInvoiceItems) {
+			var payload = {
+				"requestId": "",
+				"purchaseOrder": arrUniqueInvoiceItems
+			};
+			//Test Payload
+			// payload = {
+			// 	"requestId": null,
+			// 	"purchaseOrder": [{
+			// 		"documentCategory": "",
+			// 		"documentNumber": "1000000002"
+			// 	}]
+			// };
+			var url = "/menabevdev/purchaseDocumentHeader/getReferencePoApi";
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					this.oPOModel.setProperty("/getReferencedByPO", data);
+				}.bind(this),
+				error: function (err) {
+					sap.m.MessageToast.show(err.statusText);
+				}.bind(this)
+			});
+		},
+		
+		onClickPODetailView: function (oEvent) {
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+				oPOModel = this.oPOModel,
+				selectedItem = oPOModel.getProperty(sPath),
+				sDocumentItem = selectedItem.documentItem,
+				sDocumentNumber = selectedItem.documentNumber;
+			var poHistoryPath = this.getPathForPOHistory(sPath);
+			var poHistory = oPOModel.getProperty(poHistoryPath + "/poHistory");
+			var aPOItemDetails = this.findPOItemDetails(sDocumentItem, sDocumentNumber, poHistory);
+			oPOModel.setProperty("/aPOItemDetails", aPOItemDetails);
+			oPOModel.setProperty("/aPOItemDocumentItem", sDocumentItem);
+			this.POItemDetails = sap.ui.xmlfragment("com.menabev.AP.fragment.POItemDetails", this);
+			this.getView().addDependent(this.POItemDetails);
+			this.POItemDetails.setModel(oPOModel, "oPOModel");
+			this.POItemDetails.open();
+		},
 
-		/**
-		 * Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
-		 * This hook is the same one that SAPUI5 controls get after being rendered.
-		 * @memberOf com.menabev.AP.view.PO
-		 */
-		//	onAfterRendering: function() {
-		//
-		//	},
+		getPathForPOHistory: function (sPath) {
+			var newPath = sPath.split("/").slice(0, 3).join("/");
+			return newPath;
+		},
+		
+		onClosePODetailsDialog: function () {
+			this.POItemDetails.close();
+		},
 
-		/**
-		 * Called when the Controller is destroyed. Use this one to free resources and finalize activities.
-		 * @memberOf com.menabev.AP.view.PO
-		 */
-		//	onExit: function() {
-		//
-		//	}
+		findPOItemDetails: function (sDocumentItem, sDocumentNumber, poHistory) {
+			var newArray = [];
+			for (var i = 0; i < poHistory.length; i++) {
+				if (poHistory[i]["documentItem"] === sDocumentItem && poHistory[i]["documentNumber"] === sDocumentNumber) {
+					newArray.push(poHistory[i]);
+				}
+			}
+			return newArray;
+		},
 
 	});
 

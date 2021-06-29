@@ -169,58 +169,6 @@ sap.ui.define([
 			}
 		},
 
-		//Service call to load Non PO data
-		//Parameter: requestId
-		// getNonPOData: function (requestId) {
-		// 	var sUrl = "/menabevdev/invoiceHeader/getInvoiceByRequestId/" + requestId;
-		// 	jQuery.ajax({
-		// 		method: "GET",
-		// 		contentType: "application/json",
-		// 		url: sUrl,
-		// 		dataType: "json",
-		// 		async: true,
-		// 		success: function (oData, textStatus, jqXHR) {
-		// 			this.busyDialog.close();
-		// 			if (oData.responseStatus === "Success") {
-		// 				this.oPOModel.setProperty("/invoiceDetailUIDto", {
-		// 					invoiceHeader: oData.invoiceHeaderDto,
-		// 					vstate: {}
-		// 				});
-		// 				var invoicePdfId = this.oPOModel.getProperty("/invoicePdfId");
-		// 				if (invoicePdfId) {
-		// 					this.oPOModel.setProperty("/openPdfBtnVisible", true);
-		// 				}
-		// 			}
-		// 			this.oPOModel.refresh();
-		// 		}.bind(this),
-		// 		error: function (result, xhr, data) {
-		// 			this.busyDialog.close();
-		// 			var errorMsg = "";
-		// 			if (result.status === 504) {
-		// 				errorMsg = "Request timed-out. Please refresh your page";
-		// 				this.errorMsg(errorMsg);
-		// 			} else {
-		// 				errorMsg = data;
-		// 				this.errorMsg(errorMsg);
-		// 			}
-		// 		}.bind(this)
-		// 	});
-		// },
-
-		//function hdrInvAmtCalu is triggered on change of Invoice Amount in the header field
-		// hdrInvAmtCalu: function (oEvent) {
-		// 	var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-		// 		invoiceAmt = oEvent.getParameter("value");
-		// 	if (!invoiceAmt) {
-		// 		oPOModel.setProperty("/vstate/invoiceTotal", "Error");
-		// 	} else {
-		// 		oPOModel.setProperty("/vstate/invoiceTotal", "None");
-		// 		invoiceAmt = (parseFloat(invoiceAmt)).toFixed(2);
-		// 		oPOModel.setProperty("/invoiceHeader/invoiceTotal", invoiceAmt);
-		// 	}
-		// 	this.calculateBalance();
-		// },
-
 		//function getGLaccountValue is triggered on change of GL Account in the Cost Center table
 		//Frag:NonPOCostCenter---- //Updated
 		getGLaccountValue: function (oEvent) {
@@ -371,7 +319,8 @@ sap.ui.define([
 			var templateModel = this.getModel("templateModel");
 			templateModel.setProperty("/allocateTempBtnEnabled", false);
 			var url = "/menabevdev/NonPoTemplate/selectNonPoTemplate";
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			jQuery.ajax({
 				type: "GET",
 				contentType: "application/json",
@@ -379,12 +328,12 @@ sap.ui.define([
 				dataType: "json",
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					templateModel.setProperty("/aNonPoTemplate", data);
 					this.selectTemplateFragment.open();
 				}.bind(this),
 				error: function (result, xhr, data) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = "";
 					if (result.status === 504) {
 						errorMsg = "Request timed-out. Please refresh your page";
@@ -480,7 +429,8 @@ sap.ui.define([
 			}
 
 			//service call to preview the cost allocation
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			var sUrl = "/menabevdev/costAllocation/getCostAllocationForTemplate";
 			jQuery.ajax({
 				method: "POST",
@@ -490,7 +440,7 @@ sap.ui.define([
 				data: JSON.stringify(payload),
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					this.oPOModel.setProperty("/previewListNonPoItem", data);
 					if (!this.previewTemplateDialog) {
 						this.previewTemplateDialog = sap.ui.xmlfragment("previewTemplate", "com.menabev.AP.fragment.PreviewTemplate", this);
@@ -500,7 +450,7 @@ sap.ui.define([
 
 				}.bind(this),
 				error: function (result, xhr, data) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = "";
 					if (result.status === 504) {
 						errorMsg = "Request timed-out. Please refresh your page";
@@ -749,290 +699,10 @@ sap.ui.define([
 			POServices.onNonPoSave(oEvent, this);
 		},
 
-		//Called on click of Submit Button.
-		// onNonPoSubmit: function () {
-		// 	var oSubmitData = this.fnCreatePayloadSaveSubmit();
-		// 	var bCostAllocation = false;
-		// 	//Header Mandatory feilds validation
-		// 	var validateMandatoryFields = this.validateMandatoryFields(oSubmitData.invoiceHeaderDto);
-		// 	if (!validateMandatoryFields) {
-		// 		sap.m.MessageBox.error("Please fill all mandatory fields!");
-		// 	}
-		// 	if (validateMandatoryFields) {
-		// 		if (oSubmitData.invoiceHeaderDto.costAllocation.length > 0) {
-		// 			bCostAllocation = true;
-		// 		} else {
-		// 			bCostAllocation = false;
-		// 			sap.m.MessageBox.error("Please Enter Cost Allocation Details!");
-		// 		}
-		// 	}
-
-		// 	if (validateMandatoryFields && bCostAllocation) {
-		// 		//COST ALLOCATION VALIDATION START 
-		// 		var oPOModel = this.getOwnerComponent().getModel("oPOModel");
-		// 		var costAllocation = $.extend(true, [], oPOModel.getProperty("/costAllocation"));
-		// 		var bflag = true;
-		// 		for (var i = 0; i < costAllocation.length; i++) {
-		// 			var bValidate = false;
-		// 			if (!costAllocation[i].glAccount || costAllocation[i].glError === "Error") {
-		// 				bValidate = true;
-		// 				costAllocation[i].glError = "Error";
-		// 			}
-		// 			if (!costAllocation[i].netValue || costAllocation[i].amountError === "Error") {
-		// 				bValidate = true;
-		// 				costAllocation[i].amountError = "Error";
-		// 			}
-		// 			if (!costAllocation[i].costCenter || costAllocation[i].costCenterError === "Error") {
-		// 				bValidate = true;
-		// 				costAllocation[i].costCenterError = "Error";
-		// 			}
-		// 			if (!costAllocation[i].itemText || costAllocation[i].itemTextError === "Error") {
-		// 				bValidate = true;
-		// 				costAllocation[i].itemTextError = "Error";
-		// 			}
-		// 			if (bValidate) {
-		// 				bflag = false;
-		// 				continue;
-		// 			}
-		// 		}
-		// 		if (!bflag) {
-		// 			oPOModel.setProperty("/costAllocation", costAllocation);
-		// 			var sMsg = "Please Enter Required Fields G/L Account,Amount,Cost Center & Text!";
-		// 			sap.m.MessageBox.error(sMsg);
-		// 			return;
-		// 		} else {
-		// 			//COST ALLOCATION VALIDATION END
-		// 			oSubmitData.invoiceHeaderDto.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
-		// 			oSubmitData.invoiceHeaderDto.docStatus = "Created";
-		// 			var balance = oSubmitData.invoiceHeaderDto.balance;
-		// 			if (this.nanValCheck(balance) !== 0) {
-		// 				sap.m.MessageBox.error("Balance is not 0");
-		// 				return;
-		// 			}
-		// 			var totalTax = oPOModel.getProperty("/taxAmount");
-		// 			var userInputTaxAmount = oPOModel.getProperty("/taxValue");
-		// 			var taxDifference = this.nanValCheck(userInputTaxAmount) - this.nanValCheck(totalTax);
-		// 			if (this.nanValCheck(taxDifference) !== 0) {
-		// 				sap.m.MessageBox.error("Tax MisMatched");
-		// 				return;
-		// 			}
-
-		// 			var sUrl = "/menabevdev/invoiceHeader/accountantSubmit",
-		// 				sMethod = "POST";
-		// 			this.saveSubmitServiceCall(oSubmitData, sMethod, sUrl);
-		// 		}
-		// 	}
-
-		// },
 		onNonPoSubmit: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/NonPo");
 			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds);
 		},
-
-		//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
-		// saveSubmitServiceCall: function (oData, sMethod, sUrl, save) {
-		// 	var that = this;
-		// 	var oPOModel = this.getOwnerComponent().getModel("oPOModel");
-		// 	this.busyDialog.open();
-		// 	$.ajax({
-		// 		url: sUrl,
-		// 		method: sMethod,
-		// 		async: false,
-		// 		contentType: "application/json",
-		// 		dataType: "json",
-		// 		data: JSON.stringify(oData),
-		// 		success: function (data, xhr, result) {
-		// 			this.busyDialog.close();
-		// 			var message = data.responseStatus;
-		// 			var ReqId = data.invoiceHeaderDto.requestId;
-		// 			oPOModel.setProperty("/requestId", ReqId);
-		// 			if (result.status === 200) {
-		// 				sap.m.MessageBox.success(message, {
-		// 					actions: [sap.m.MessageBox.Action.OK],
-		// 					onClose: function (sAction) {
-		// 						if (!save) {
-		// 							that.oRouter.navTo("Inbox");
-		// 						}
-		// 					}
-		// 				});
-		// 			} else {
-		// 				sap.m.MessageBox.information(message, {
-		// 					actions: [sap.m.MessageBox.Action.OK]
-		// 				});
-		// 			}
-		// 		}.bind(this),
-		// 		error: function (result, xhr, data) {
-		// 			this.busyDialog.close();
-		// 			var errorMsg = "";
-		// 			if (result.status === 504) {
-		// 				errorMsg = "Request timed-out. Please refresh your page";
-		// 				this.errorMsg(errorMsg);
-		// 			} else {
-		// 				errorMsg = data;
-		// 				this.errorMsg(errorMsg);
-		// 			}
-		// 		}.bind(this)
-		// 	});
-		// },
-
-		//this function used to form payload for SUBMIT and SAVE
-		// fnCreatePayloadSaveSubmit: function (oEvent) {
-		// 	var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
-		// 		nonPOInvoiceModelData = oPOModel.getData();
-
-		// 	var objectIsNew = jQuery.extend({}, nonPOInvoiceModelData);
-		// 	objectIsNew.costAllocation = [];
-		// 	var reqId = objectIsNew.invoiceHeader.requestId ? objectIsNew.invoiceHeader.requestId : null;
-		// 	if (nonPOInvoiceModelData.costAllocation) {
-		// 		for (var i = 0; i < nonPOInvoiceModelData.costAllocation.length; i++) {
-		// 			var itemId = nonPOInvoiceModelData.costAllocation[i].itemId ? nonPOInvoiceModelData.costAllocation[i].itemId : null;
-		// 			var costAllocationId = nonPOInvoiceModelData.costAllocation[i].costAllocationId ? nonPOInvoiceModelData.costAllocation[i].costAllocationId :
-		// 				null;
-		// 			objectIsNew.costAllocation.push({
-		// 				"accountNum": nonPOInvoiceModelData.costAllocation[i].accountNum,
-		// 				"assetNo": null,
-		// 				"baseRate": nonPOInvoiceModelData.costAllocation[i].baseRate,
-		// 				"costAllocationId": costAllocationId,
-		// 				"costCenter": nonPOInvoiceModelData.costAllocation[i].costCenter,
-		// 				"crDbIndicator": nonPOInvoiceModelData.costAllocation[i].crDbIndicator,
-		// 				"deleteInd": null,
-		// 				"distrPerc": nonPOInvoiceModelData.costAllocation[i].distrPerc,
-		// 				"glAccount": nonPOInvoiceModelData.costAllocation[i].glAccount,
-		// 				"internalOrderId": nonPOInvoiceModelData.costAllocation[i].internalOrderId,
-		// 				"itemId": itemId,
-		// 				"itemText": nonPOInvoiceModelData.costAllocation[i].itemText,
-		// 				"lineText": "",
-		// 				"materialDesc": nonPOInvoiceModelData.costAllocation[i].materialDesc,
-		// 				"netValue": nonPOInvoiceModelData.costAllocation[i].netValue,
-		// 				"orderId": "",
-		// 				"profitCenter": nonPOInvoiceModelData.costAllocation[i].profitCenter,
-		// 				"quantity": "0.00",
-		// 				"quantityUnit": "",
-		// 				"taxCode": nonPOInvoiceModelData.costAllocation[i].taxCode,
-		// 				"taxPer": nonPOInvoiceModelData.costAllocation[i].taxPer,
-		// 				"taxValue": nonPOInvoiceModelData.costAllocation[i].taxValue,
-		// 				"taxConditionType": nonPOInvoiceModelData.costAllocation[i].taxConditionType,
-		// 				"requestId": reqId,
-		// 				"serialNo": 0,
-		// 				"subNumber": null,
-		// 				"wbsElement": null
-		// 			});
-
-		// 		}
-		// 	}
-		// 	var obj = {};
-		// 	var invoiceHeaderDto = {
-		// 		"accountNumber": "",
-		// 		"accountingDoc": "",
-		// 		"amountBeforeTax": "",
-		// 		"assignedTo": "",
-		// 		"balance": objectIsNew.balance,
-		// 		"balanceCheck": true,
-		// 		"baseLine": "",
-		// 		"channelType": "",
-		// 		"claimed": "",
-		// 		"claimedUser": "",
-		// 		"clearingAccountingDocument": "",
-		// 		"clearingDate": "",
-		// 		"clerkEmail": "",
-		// 		"clerkId": 0,
-		// 		"compCode": objectIsNew.compCode,
-		// 		"createdAt": "",
-		// 		"createdAtFrom": "",
-		// 		"createdAtInDB": 0,
-		// 		"createdAtTo": "",
-		// 		"createdByInDb": "",
-		// 		"createdOn": 0,
-		// 		"currency": "",
-		// 		"deliveryNote": "",
-		// 		"deposit": "",
-		// 		"disAmt": "",
-		// 		"discount": "",
-		// 		"docStatus": "",
-		// 		"dueDate": objectIsNew.dueDate,
-		// 		"dueDateFrom": "",
-		// 		"dueDateTo": "",
-		// 		"emailFrom": "",
-		// 		"extInvNum": objectIsNew.extInvNum,
-		// 		"filterFor": "",
-		// 		"fiscalYear": "",
-		// 		"forwaredTaskOwner": "",
-		// 		"grossAmount": objectIsNew.grossAmount,
-		// 		"headerText": "",
-		// 		"invoiceDate": objectIsNew.invoiceDate,
-		// 		"invoiceDateFrom": "",
-		// 		"invoiceDateTo": "",
-		// 		"invoiceItems": [],
-		// 		"invoicePdfId": objectIsNew.invoicePdfId,
-		// 		"invoiceTotal": Number(objectIsNe.invoiceTotal),
-		// 		"invoiceTotalFrom": "",
-		// 		"invoiceTotalTo": "",
-		// 		"invoiceType": "NON-PO",
-		// 		"lifecycleStatus": "",
-		// 		"lifecycleStatusText": "",
-		// 		"manualpaymentBlock": "",
-		// 		"nonPoOrPo": true,
-		// 		"ocrBatchId": objectIsNe.ocrBatchId,
-		// 		"paymentBlock": objectIsNew.paymentBlock,
-		// 		"paymentBlockDesc": "",
-		// 		"paymentStatus": "",
-		// 		"paymentMethod": "",
-		// 		"paymentTerms": objectIsNew.paymentTerms,
-		// 		"plannedCost": "",
-		// 		"processor": "",
-		// 		"postingDate": objectIsNew.postingDate,
-		// 		"reasonForRejection": "",
-		// 		"refpurchaseDoc": "",
-		// 		"refpurchaseDocCat": "",
-		// 		"rejected": "",
-		// 		"request_created_at": 0,
-		// 		"request_created_by": "",
-		// 		"request_updated_at": 0,
-		// 		"request_updated_by": "",
-		// 		"requestId": reqId,
-		// 		"sapInvoiceNumber": 0,
-		// 		"shippingCost": 0,
-		// 		"subTotal": "",
-		// 		"street": "",
-		// 		"surcharge": "",
-		// 		"sysSusgestedTaxAmount": "",
-		// 		"taskGroup": "",
-		// 		"taskOwner": objectIsNew.taskOwner,
-		// 		"taskOwnerId": this.oUserDetailModel.getProperty("/loggedInUserMail"),
-		// 		"taskStatus": objectIsNew.taskStatus,
-		// 		"taxAmount": objectIsNew.taxAmount,
-		// 		"taxCode": objectIsNew.taxCode,
-		// 		"taxRate": objectIsNew.taxPer,
-		// 		"taxValue": objectIsNew.taxValue,
-		// 		"totalBaseRate": objectIsNew.totalBaseRate,
-		// 		"transactionType": "",
-		// 		"unplannedCost": "",
-		// 		"updatedAt": 0,
-		// 		"updatedBy": "",
-		// 		"vatRegNum": "",
-		// 		"vendorId": objectIsNew.vendorId,
-		// 		"vendorName": objectIsNew.vendorName,
-		// 		"version": 0,
-		// 		"zipCode": ""
-		// 	};
-		// 	obj.invoiceHeaderDto = invoiceHeaderDto;
-		// 	obj.invoiceHeaderDto.attachments = [];
-		// 	if (oPOModel.getData().docManagerDto && oPOModel.getData().docManagerDto.length > 0) {
-		// 		for (var n = 0; n < oPOModel.getData().docManagerDto.length; n++) {
-		// 			obj.invoiceHeaderDto.attachments.push(oPOModel.getData().docManagerDto[n]);
-		// 		}
-		// 	}
-		// 	obj.invoiceHeaderDto.comments = [];
-		// 	if (oPOModel.getData().invoiceDetailUIDto.commentDto && oPOModel.getData().invoiceDetailUIDto.commentDto.length >
-		// 		0) {
-		// 		for (var k = 0; k < oPOModel.getData().invoiceDetailUIDto.commentDto.length; k++) {
-		// 			obj.invoiceHeaderDto.comments.push(oPOModel.getData().invoiceDetailUIDto.commentDto[k]);
-		// 		}
-		// 	}
-		// 	obj.invoiceItemAcctAssignmentDto = objectIsNew.invoiceItems;
-		// 	obj.costAllocationDto = objectIsNew.costAllocation;
-		// 	return obj;
-		// },
 
 		//Called on click of Reject Button.
 		//Frag:RejectDialog will open  
@@ -1074,7 +744,8 @@ sap.ui.define([
 				var jsonData = objectIsNew.invoiceHeader;
 				var url = "InctureApDest/invoiceHeader/updateLifeCycleStatus";
 				var that = this;
-				this.busyDialog.open();
+				var busy = new sap.m.BusyDialog();
+				busy.open();
 				$.ajax({
 					url: url,
 					method: "PUT",
@@ -1086,7 +757,7 @@ sap.ui.define([
 					dataType: "json",
 					data: JSON.stringify(jsonData),
 					success: function (data, xhr, result) {
-						this.busyDialog.close();
+						busy.close();
 						var message = data.responseStatus;
 						if (result.status === 200) {
 							mRejectModel.setProperty("/selectedKey", "");
@@ -1103,7 +774,7 @@ sap.ui.define([
 						}
 					}.bind(this),
 					error: function (result, xhr, data) {
-						this.busyDialog.close();
+						busy.close();
 						var errorMsg = "";
 						if (result.status === 504) {
 							errorMsg = "Request timed-out. Please refresh your page";
@@ -1223,12 +894,13 @@ sap.ui.define([
 				oFilter.push(new sap.ui.model.Filter("VATRegistration", sap.ui.model.FilterOperator.EQ, VATRegistration));
 			}
 			var oDataModel = this.getOwnerComponent().getModel("API_BUSINESS_PARTNER");
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			oDataModel.read("/A_Supplier", {
 				filters: oFilter,
 				async: false,
 				success: function (oData, oResponse) {
-					this.busyDialog.close();
+					busy.close();
 					if (oData.results.length) {
 						vendorSearchModel.setProperty("/vendorResult", oData.results);
 						// sap.m.MessageToast.show("vendor search successfull");
@@ -1237,7 +909,7 @@ sap.ui.define([
 					}
 				}.bind(this),
 				error: function (error) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = "";
 					if (error.statusCode === 504) {
 						errorMsg = "Request timed-out. Please try again!";

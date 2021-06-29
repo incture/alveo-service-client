@@ -230,7 +230,8 @@ sap.ui.define([
 		fnOpenPDF: function (documentId, key) {
 			//service call to load the pdf document
 			// var documentId = this.getModel("nonPOInvoiceModel").getProperty("/invoiceDetailUIDto/invoiceHeader/invoicePdfId");
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			var sUrl = "/menabevdev/document/download/" + documentId;
 			jQuery.ajax({
 				type: "GET",
@@ -239,7 +240,7 @@ sap.ui.define([
 				dataType: "json",
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					this.pdfData = data;
 					if (data.fileAvailability) {
 						if (key === "PO") {
@@ -255,7 +256,7 @@ sap.ui.define([
 					}
 				}.bind(this),
 				error: function (result, xhr, data) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = "";
 					if (result.status === 504) {
 						errorMsg = "Request timed-out. Please refresh your page";
@@ -336,7 +337,8 @@ sap.ui.define([
 				"SD4_DEST/sap/opu/odata/sap/ZP2P_API_VENDORBALANCE_SRV/VenBalHeaderSet?$filter=Vendor eq '" + vendorId + "' and CompanyCode eq '" +
 				companyCode + "' and KeyDate eq '" +
 				currentDate + "'&$expand=ToVendorBalance&$format=json";
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			jQuery.ajax({
 				type: "GET",
 				contentType: "application/json",
@@ -344,12 +346,12 @@ sap.ui.define([
 				dataType: "json",
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					vendorBalanceModel.setProperty("/", data.d.results[0]);
 					this.vendorBalanceFragment.open();
 				}.bind(this),
 				error: function (error) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = JSON.parse(error.responseText);
 					errorMsg = errorMsg.error.message.value;
 					this.errorMsg(errorMsg);
@@ -553,9 +555,9 @@ sap.ui.define([
 		},
 
 		onClickAddPO: function () {
-			var nonPOInvoiceModel = this.getModel("nonPOInvoiceModel"),
-				vendorId = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/vendorId"),
-				companyCode = nonPOInvoiceModel.getProperty("/invoiceDetailUIDto/invoiceHeader/companyCode");
+			var oPOModel = this.oPOModel,
+				vendorId = oPOModel.getProperty("/vendorId"),
+				companyCode = oPOModel.getProperty("/companyCode");
 			var addPOModel = new JSONModel();
 			this.getView().setModel(addPOModel, "addPOModel");
 			var oFragmentName = "com.menabev.AP.fragment.AddPO";
@@ -598,7 +600,8 @@ sap.ui.define([
 				"vendorName": addPOModel.getProperty("/vendorName")
 			};
 			var url = "/menabevdev/po/search";
-			this.busyDialog.open();
+			var busy = new sap.m.BusyDialog();
+			busy.open();
 			jQuery.ajax({
 				type: "POST",
 				contentType: "application/json",
@@ -607,11 +610,11 @@ sap.ui.define([
 				data: JSON.stringify(payload),
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.busyDialog.close();
+					busy.close();
 					addPOModel.setProperty("/result", data);
 				}.bind(this),
 				error: function (error) {
-					this.busyDialog.close();
+					busy.close();
 					var errorMsg = JSON.parse(error.responseText);
 					errorMsg = errorMsg.error.message.value;
 					this.errorMsg(errorMsg);
@@ -628,6 +631,65 @@ sap.ui.define([
 
 		onCancelAddPO: function () {
 			this.addPOFragment.close();
+		},
+
+		onSelectAddPO: function (oEvent) {
+			var addPOModel = this.getModel("addPOModel"),
+				selectedFilters = oEvent.getSource().getSelectedContextPaths();
+			addPOModel.setProperty("/selectedFilters", selectedFilters);
+			if (selectedFilters.length) {
+				if (selectedFilters.length === 1) {
+					this.oVisibilityModel.setProperty("/PO/enabled", true);
+				}
+			} else {
+				this.oVisibilityModel.setProperty("/PO/enabled", false);
+			}
+		},
+
+		onClickAddPOOk: function () {
+			var addPOModel = this.getModel("addPOModel");
+			var selectedFilters = addPOModel.getProperty("/selectedFilters");
+
+			var purchaseOrder = [];
+			for (var i = 0; i < selectedFilters.length; i++) {
+				var sTemp = addPOModel.getProperty(selectedFilters[i]);
+				var obj = {
+					"documentCategory": sTemp.documentCategory,
+					"documentNumber": sTemp.documentNumber
+				};
+				purchaseOrder.push(obj);
+			}
+			var payload = {
+				"invoiceHeader": this.oPOModel.getData(),
+				"purchaseOrder": purchaseOrder,
+				"requestId": "string"
+			};
+			//service call to preview the Add PO
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			var sUrl = "/menabevdev/purchaseDocumentHeader/savePo";
+			jQuery.ajax({
+				method: "POST",
+				contentType: "application/json",
+				url: sUrl,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					busy.close();
+				}.bind(this),
+				error: function (result, xhr, data) {
+					busy.close();
+					var errorMsg = "";
+					if (result.status === 504) {
+						errorMsg = "Request timed-out. Please refresh your page";
+						this.errorMsg(errorMsg);
+					} else {
+						errorMsg = data;
+						this.errorMsg(errorMsg);
+					}
+				}.bind(this)
+			});
 		},
 		//End of Add PO
 
@@ -688,7 +750,8 @@ sap.ui.define([
 				var jsonData = objectIsNew.invoiceHeader;
 				var url = "InctureApDest/invoiceHeader/updateLifeCycleStatus";
 				var that = this;
-				this.busyDialog.open();
+				var busy = new sap.m.BusyDialog();
+				busy.open();
 				$.ajax({
 					url: url,
 					method: "PUT",
@@ -700,7 +763,7 @@ sap.ui.define([
 					dataType: "json",
 					data: JSON.stringify(jsonData),
 					success: function (data, xhr, result) {
-						this.busyDialog.close();
+						busy.close();
 						var message = data.responseStatus;
 						if (result.status === 200) {
 							mRejectModel.setProperty("/selectedKey", "");
@@ -717,7 +780,7 @@ sap.ui.define([
 						}
 					}.bind(this),
 					error: function (result, xhr, data) {
-						this.busyDialog.close();
+						busy.close();
 						var errorMsg = "";
 						if (result.status === 504) {
 							errorMsg = "Request timed-out. Please refresh your page";

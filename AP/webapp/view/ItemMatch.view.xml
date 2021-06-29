@@ -1,0 +1,137 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.ItemMatch"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout" xmlns:ui="sap.ui.table">
+	<Page title="{oPOModel>/requestId} - Item Match" showNavButton="true" navButtonPress="onNavback" class="sapUiSizeCompact">
+		<content>
+			<Toolbar>
+				<Title text="{i18n>UnmatchedItems}" level="H2"/>
+			</Toolbar>
+			<l:Grid defaultSpan="XL3 L6 M6 S12" class="sapUiSizeCompact">
+				<VBox>
+					<Table inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}" selectionChange="onSelectCustomerPO"
+						alternateRowColors="true">
+						<headerToolbar>
+							<OverflowToolbar>
+								<Title text="{i18n>Invoices}" level="H2"/>
+								<ToolbarSpacer/>
+								<SearchField width="30%"/>
+							</OverflowToolbar>
+						</headerToolbar>
+						<columns>
+							<Column minScreenWidth="Tablet" demandPopin="true">
+								<Label text="{i18n>Description}"/>
+							</Column>
+							<Column minScreenWidth="Tablet" demandPopin="true">
+								<Label text="{i18n>VendorMaterial}"/>
+							</Column>
+							<Column minScreenWidth="Tablet" demandPopin="true">
+								<Label text="{i18n>UPC}"/>
+							</Column>
+						</columns>
+						<items>
+							<ColumnListItem
+								visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getInvoiceItems'}">
+								<cells>
+									<Text text="{oPOModel>shortText}"/>
+									<Text text="{oPOModel>vendMat}"/>
+									<Text text="{oPOModel>poUnit}"/>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+				</VBox>
+				<VBox>
+					<ui:TreeTable rows="{path:'oPOModel>/aItemMatchPO', parameters: {arrayNames:['poItemServices']}}" selectionMode="None"
+						alternateRowColors="true" visibleRowCount="5">
+						<ui:extension>
+							<OverflowToolbar>
+								<Title text="{i18n>PurchaseOrders}" level="H2"/>
+								<ToolbarSpacer/>
+								<SearchField width="30%"/>
+							</OverflowToolbar>
+						</ui:extension>
+						<ui:columns>
+							<ui:Column>
+								<Label text="{i18n>Description}"/>
+								<ui:template>
+									<Text text="{oPOModel>shortText}"/>
+								</ui:template>
+							</ui:Column>
+							<ui:Column>
+								<Label text="{i18n>VendorMaterial}"/>
+								<ui:template>
+									<Text text="{oPOModel>vendMat}"/>
+								</ui:template>
+							</ui:Column>
+							<ui:Column>
+								<Label text="{i18n>UPC}"/>
+								<ui:template>
+									<Text text="{oPOModel>poUnit}"/>
+								</ui:template>
+							</ui:Column>
+							<ui:Column>
+								<Label text="{i18n>ItemNo}"/>
+								<ui:template>
+									<Text text="{oPOModel>itemNumber}"/>
+								</ui:template>
+							</ui:Column>
+							<ui:Column>
+								<Label text="{i18n>NetPrice}"/>
+								<ui:template>
+									<Text text="{oPOModel>netPrice}"/>
+								</ui:template>
+							</ui:Column>
+							<ui:Column>
+								<Label/>
+								<ui:template>
+									<Button text="{i18n>Match}" type="Emphasized"
+										visible="{path:'oPOModel>itemCategory', formatter: 'com.menabev.AP.formatter.formatter.getMatchedBtnVisible'}"/>
+								</ui:template>
+							</ui:Column>
+						</ui:columns>
+					</ui:TreeTable>
+				</VBox>
+			</l:Grid>
+			<VBox class="sapUiSmallMargin">
+				<Table inset="false" items="{oPOModel>/invoiceItems}" mode="MultiSelect" alternateRowColors="true">
+					<headerToolbar>
+						<OverflowToolbar>
+							<Title text="{i18n>MatchedItems}" level="H2"/>
+							<ToolbarSpacer/>
+							<Button text="Unmatch" class="sapUiTinyMarginEnd" type="Emphasized"/>
+							<SearchField width="30%"/>
+						</OverflowToolbar>
+					</headerToolbar>
+					<columns>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>Description}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>VendorMaterial}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>UPC}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>NetPrice}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>MatchedBy}"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem
+							visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getMatchedItems'}">
+							<cells>
+								<Text text="{oPOModel>shortText}"/>
+								<Text text="{oPOModel>vendMat}"/>
+								<Text text="{oPOModel>poUnit}"/>
+								<Text text="{oPOModel>netPrice}"/>
+								<Text text="{oPOModel>matchedBy}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</content>
+	</Page>
+</mvc:View>

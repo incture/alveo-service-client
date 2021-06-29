@@ -114,9 +114,9 @@ sap.ui.define([
 				oEvent.getSource().setValueState("None");
 			}
 		},
-		
+
 		//function will trim if the user input is alphabets and special characters on live change
-		inputLiveChange: function(oEvent){
+		inputLiveChange: function (oEvent) {
 			var oValue = oEvent.getSource().getValue();
 			if (isNaN(oValue)) {
 				oValue = oValue.replace(/[^\d]/g, '');
@@ -213,7 +213,8 @@ sap.ui.define([
 					// oFormData.set("file", jQuery.sap.domById(oFileUploader.getId() + "-fu").files[0]);
 					oFormData.set("file", this.file);
 					var url = "/menabevdev/uploadInvoice";
-					this.busyDialog.open();
+					var busy = new sap.m.BusyDialog();
+					busy.open();
 					jQuery.ajax({
 						url: url,
 						method: "POST",
@@ -228,7 +229,7 @@ sap.ui.define([
 						cache: false,
 						data: oFormData,
 						success: function (success) {
-							that.busyDialog.close();
+							busy.close();
 							var errorMsg = "";
 							if (success.status === "Error") {
 								errorMsg = "Request timed-out. Please contact your administrator";
@@ -247,7 +248,7 @@ sap.ui.define([
 
 						},
 						error: function (fail) {
-							that.busyDialog.close();
+							busy.close();
 							var errorMsg = "";
 							if (fail.status === 504) {
 								errorMsg = "Request timed-out. Please contact your administrator";

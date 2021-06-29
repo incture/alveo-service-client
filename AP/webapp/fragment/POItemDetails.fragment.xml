@@ -1,0 +1,63 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" xmlns:l="sap.ui.layout">
+	<Dialog title="{i18n>Rejection}" class="sapUiSizeCompact" draggable="true">
+		<customHeader>
+			<OverflowToolbar>
+				<Title text="Item - {oPOModel>/aPOItemDocumentItem}"/>
+				<ToolbarSpacer/>
+				<Button tooltip="{i18n>Close}" icon="sap-icon://decline" press="onClosePODetailsDialog"/>
+			</OverflowToolbar>
+		</customHeader>
+		<content>
+			<Table items="{oPOModel>/aPOItemDetails}" class="sapUiSizeCompact">
+				<columns>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>ShortText}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>MvT}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>MaterialDocument}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Item}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>PostingDate}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Quantity}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>AmountInLC}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>LCurr}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Amount}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>Currency}" design="Bold"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{oPOModel>historyCategory}" textAlign="Center"/>
+							<Text text="{oPOModel>goodsMvmtType}" textAlign="Center"/>
+							<Text text="{oPOModel>historyDocument}" textAlign="Center"/>
+							<Text text="{oPOModel>historyDocumentItem}" textAlign="Center"/>
+							<Text text="{oPOModel>postingDate}" textAlign="Center"/>
+							<Text text="{oPOModel>quantity}" textAlign="Center"/>
+							<Text text="{oPOModel>amountLocCurr}" textAlign="Center"/>
+							<Text text="{oPOModel>companyCodeCurr}" textAlign="Center"/>
+							<Text text="{oPOModel>amountForCurr}" textAlign="Center"/>
+							<Text text="{oPOModel>currency}" textAlign="Center"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Dialog>
+</core:FragmentDefinition>
