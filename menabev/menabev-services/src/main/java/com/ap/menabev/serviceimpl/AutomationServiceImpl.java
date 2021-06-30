@@ -50,6 +50,7 @@ import com.ap.menabev.invoice.StatusConfigRepository;
 import com.ap.menabev.service.AutomationService;
 import com.ap.menabev.service.InvoiceHeaderService;
 import com.ap.menabev.service.InvoiceItemService;
+import com.ap.menabev.service.PurchaseDocumentHeaderService;
 import com.ap.menabev.service.SequenceGeneratorService;
 import com.ap.menabev.sftp.SFTPChannelUtil;
 import com.ap.menabev.util.ApplicationConstants;
@@ -103,6 +104,8 @@ public class AutomationServiceImpl implements AutomationService {
 	@Autowired
 	InvoiceHeaderService invoiceHeaderService;
 	
+	@Autowired 
+	PurchaseDocumentHeaderService purchaseHeaderService;
 	
 	@Autowired
 	ReasonForRejectionRepository rejectionRepository;
@@ -284,6 +287,7 @@ public class AutomationServiceImpl implements AutomationService {
 
 	private ResponseDto saveAllInvoiceDetails(List<InvoiceHeaderDto> headerList) {
 		ResponseDto response = null;
+		ResponseDto responseAutoPosting  = null;
 		try {
 			for (InvoiceHeaderDto invoiceHeaderDto : headerList) {
 				invoiceHeaderDto.setChannelType(ApplicationConstants.CHANEL_TYPE_EMAIL);
@@ -294,12 +298,15 @@ public class AutomationServiceImpl implements AutomationService {
 					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
 				}
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
-				InvoiceHeaderDo invoiceHeaderDo  = (InvoiceHeaderDo) response.getObject();
+				System.err.println("InvoiceHeader "+response );
+				
+				// call autoposting method 
+				InvoiceHeaderDto    invoiceHeaderAutoPost =  purchaseHeaderService.autoPostApi(invoiceHeaderDto);
 				// calling rule file and worklfow 
 				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
-				determination.setCompCode(invoiceHeaderDo.getCompCode());
+				determination.setCompCode(invoiceHeaderAutoPost.getCompCode());
 				determination.setProcessLeadCheck("Accountant");
-				determination.setVednorId(invoiceHeaderDo.getVendorId());
+				determination.setVednorId(invoiceHeaderAutoPost.getVendorId());
 				ResponseEntity<?> responseRules = invoiceHeaderService.triggerRuleService(determination);
 				System.err.println("responseRules Scheduler "+ responseRules);
 				@SuppressWarnings("unchecked")
@@ -307,17 +314,17 @@ public class AutomationServiceImpl implements AutomationService {
 				System.err.println("ApproverList scheduler"+lists);
 				// trigger workflow 
 				TriggerWorkflowContext context = new TriggerWorkflowContext();
-				context.setRequestId(invoiceHeaderDo.getRequestId());
-				context.setExtInvNumb(invoiceHeaderDo.getExtInvNum());
+				context.setRequestId(invoiceHeaderAutoPost.getRequestId());
+				context.setExtInvNumb(invoiceHeaderAutoPost.getInvoice_ref_number());
 				context.setNonPo(false);
 				context.setManualNonPo(false);
 				context.setAccountantUser(lists.get(0).getUserOrGroup());
-				context.setAccountantGroup(invoiceHeaderDo.getTaskGroup());
+				context.setAccountantGroup(invoiceHeaderAutoPost.getTaskGroup());
 				context.setProcessLead(lists.get(0).getUserOrGroup());
 				context.setAccountantAction("");
-				context.setInvoiceStatus(invoiceHeaderDo.getInvoiceStatus());
-				context.setInvoiceStatusText(invoiceHeaderDo.getInvoiceStatusText());
-				context.setInvoiceType(invoiceHeaderDo.getInvoiceType());
+				context.setInvoiceStatus(invoiceHeaderAutoPost.getInvoiceStatus());
+				context.setInvoiceStatusText(invoiceHeaderAutoPost.getInvoiceStatusText());
+				context.setInvoiceType(invoiceHeaderAutoPost.getInvoiceType());
 				context.setProcessLeadAction("");
 				context.setRemediationUser("");
 				context.setRemediationUserAction("");
@@ -326,11 +333,11 @@ public class AutomationServiceImpl implements AutomationService {
 				System.err.println("response of workflow Trigger scheduler" + response);
 				WorkflowTaskOutputDto taskOutputDto = (WorkflowTaskOutputDto) responseWorkflow.getBody();
 				// save invoice header
-				
-				invoiceHeaderDo.setWorkflowId(taskOutputDto.getId());
-				invoiceHeaderDo.setTaskStatus("READY");
-				InvoiceHeaderDo invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
-				System.err.println("invpoiceHeaderDo ="+invoiceSavedDo);
+				invoiceHeaderDto.setWorkflowId(taskOutputDto.getId());
+				invoiceHeaderDto.setTaskStatus("READY");
+				responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
+				System.err.println("invoiceHeaderAutoPost responseAutoPosting ="+responseAutoPosting);
+				response.setObject(invoiceHeaderDto);
 			}
 			return response;
 		} catch (Exception e) {
