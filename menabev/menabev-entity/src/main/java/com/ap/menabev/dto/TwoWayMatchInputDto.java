@@ -22,5 +22,6 @@ public class TwoWayMatchInputDto {
 	private String matchOrUnmatchFlag;
 	private String vendorId;
 	private InvoiceItemDto invoiceItem;
+	private PurchaseDocumentItemDto purchaseDocumentItem;
 	private List<PurchaseDocumentHeaderDto> purchaseDocumentHeader;
 }

@@ -23,5 +23,5 @@ public interface PurchaseDocumentHeaderService {
 	List<ResponseDto> saveOrUpdate(List<PurchaseDocumentHeaderDto> dto);
 	AddPoOutputDto savePo(AddPoInputDto poNumbers) throws URISyntaxException, IOException, ParseException;
 	List<PurchaseDocumentHeaderDto> referencePoApi(AddPoInputDto dto);
-	InvoiceHeaderDto autoPostApi(InvoiceHeaderDto dto) throws URISyntaxException, IOException;
+	InvoiceHeaderDto autoPostApi(InvoiceHeaderDto dto) throws URISyntaxException, IOException, ParseException;
 }

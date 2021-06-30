@@ -59,7 +59,7 @@ public class PurchaseDocumentHeaderController {
 	}
 	
 	@PostMapping("/autoPostApi")
-	public InvoiceHeaderDto autoPostApi(@RequestBody InvoiceHeaderDto dto) throws URISyntaxException, IOException{
+	public InvoiceHeaderDto autoPostApi(@RequestBody InvoiceHeaderDto dto) throws URISyntaxException, IOException, ParseException{
 		return documentHeaderService.autoPostApi(dto);
 	}
 	

@@ -259,7 +259,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			if (!ServiceUtil.isEmpty(dto.getManualVsAuto())) {
 				if ("MAN".equals(dto.getManualVsAuto())) {
 					InvoiceItemDto invItemPoManual = matchPoToInvItem(dto, dto.getInvoiceItem(),
-							dto.getPurchaseDocumentHeader().get(0).getPoItem().get(0), "MAN");
+							dto.getPurchaseDocumentItem(), "MAN");
 					return invItemPoManual;
 
 				}
