@@ -104,7 +104,7 @@ public class ABBYYJSONConverter {
 								itemDto.setTaxValue(0.0);
 						}
 
-						else if ("TotalPriceBruTo".equalsIgnoreCase(itemName) && invoiceItem.has("Value")
+						else if ("TotalPriceBrutto".equalsIgnoreCase(itemName) && invoiceItem.has("Value")
 								&& !ServiceUtil.isEmpty(invoiceItem.get("Value")))
 							itemDto.setNetWorth(invoiceItem.getDouble("Value"));
 
@@ -167,7 +167,7 @@ public class ABBYYJSONConverter {
 					headerDto.setAmountBeforeTax(Double.valueOf(headerObj.getString("Value").replace(",", "")));
 				else
 					headerDto.setAmountBeforeTax(new Double(0.0));
-			} else if ("PurchaseOrder".equalsIgnoreCase(name)) {
+			} else if ("Purchase_Order".equalsIgnoreCase(name)) {
 				headerDto.setRefpurchaseDoc(headerObj.getString("Value"));
 			} else if ("TransactionType".equalsIgnoreCase(name)) {
 				headerDto.setTransactionType(headerObj.getString("Value"));
