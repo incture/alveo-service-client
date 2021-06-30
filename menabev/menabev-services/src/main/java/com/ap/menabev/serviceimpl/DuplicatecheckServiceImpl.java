@@ -97,7 +97,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			query = query + "vendorId like '" + dto.getVendorId() + "' and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-			query = query + "lifecycleStatus like '" + dto.getInvoiceStatus() + "' and ";
+			query = query + "invoiceStatus like '" + dto.getInvoiceStatus() + "' and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceReference())) {
 			query = query + "extInvNum like '" + dto.getInvoiceReference() + "' and ";
