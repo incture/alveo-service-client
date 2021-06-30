@@ -314,7 +314,15 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			// correct 
 		}
 		if (dto.getInvoiceStatus() != null && !dto.getInvoiceStatus().isEmpty()) {
-			filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +dto.getInvoiceStatus() + "')");
+			StringBuffer rqstId = new StringBuffer();
+			for (int i = 0; i < dto.getInvoiceStatus().size(); i++) {
+				if (i < dto.getInvoiceStatus().size() - 1) {
+					rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'" + ",");
+				} else {
+					rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'");
+				}
+			}
+			filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
 			// correct 
 		}
 
