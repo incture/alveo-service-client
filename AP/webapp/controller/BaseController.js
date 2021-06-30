@@ -677,6 +677,11 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					busy.close();
+					var oPOModel = this.oPOModel();
+					oPOModel.setProperty("/", data.invoiceObject);
+					oPOModel.setProperty("/getReferencedByPO", data.referencePo);
+					oPOModel.refresh();
+					this.addPOFragment.close();
 				}.bind(this),
 				error: function (result, xhr, data) {
 					busy.close();
