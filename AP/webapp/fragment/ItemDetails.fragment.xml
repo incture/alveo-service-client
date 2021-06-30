@@ -2,7 +2,7 @@
 	<IconTabBar>
 		<items>
 			<IconTabFilter text="{i18n>Invoice}" key="Invoice">
-				<ScrollContainer width="100rem" focusable="true" horizontal="true">
+				<ScrollContainer width="100%" focusable="true" horizontal="true">
 					<Table items="{oPOModel>/invoiceItems}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20" id="itemdetails">
 						<headerToolbar>
 							<OverflowToolbar>
@@ -52,7 +52,7 @@
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>TAXVALUE}" tooltip="{i18n>TAXVALUE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
 								<Label design="Bold" text="{i18n>NETPRICE}" tooltip="{i18n>NETPRICE}"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
@@ -64,7 +64,7 @@
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
 								<Label design="Bold" text="{i18n>ACCASSGN}" tooltip="{i18n>ACCASSGN}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>MATCHDOCNUM}" tooltip="{i18n>MATCHDOCNUM}"/>
 							</Column>
@@ -80,7 +80,7 @@
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>REQITM}" tooltip="{i18n>REQITM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>CONTRACTNUM}" tooltip="{i18n>CONTRACTNUM}"/>
 							</Column>
@@ -96,27 +96,23 @@
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>PRODUCTTYPE}" tooltip="{i18n>PRODUCTTYPE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%" visible="false"
-								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>POMATNUM}" tooltip="{i18n>POITEMTEXT}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false"
-								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>POITEMTEXT}" tooltip="{i18n>POITEMTEXT}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false"
-								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>POQTYOU}" tooltip="{i18n>POQTYOU}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false"
-								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>POTAXCODE}" tooltip="{i18n>POTAXCODE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle','oPOModel>itemCategory'],formatter:'com.menabev.AP.formatter.formatter.formatPOItemCatVisible'}">
 								<Label design="Bold" text="{i18n>MATCHSERVICENUM}" tooltip="{i18n>MATCHSERVICENUM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle','oPOModel>itemCategory'],formatter:'com.menabev.AP.formatter.formatter.formatPOItemCatVisible'}">
 								<Label design="Bold" text="{i18n>MATCHPACKAGENUMBER}" tooltip="{i18n>MATCHPACKAGENUMBER}"/>
 							</Column>
@@ -295,8 +291,7 @@
 							<Table items="{oPOModel>poItem}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20">
 								<headerToolbar>
 									<OverflowToolbar>
-										<Button text="{i18n>Copy}" press="copyPOToInvoiceTabRow" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}"
-												enabled="false"/>
+										<Button text="{i18n>Copy}" press="copyPOToInvoiceTabRow" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}" enabled="false"/>
 										<ToolbarSpacer/>
 									</OverflowToolbar>
 								</headerToolbar>

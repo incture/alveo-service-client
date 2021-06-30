@@ -637,7 +637,7 @@ com.menabev.AP.util.POServices = {
 		this.calculateGrossAmount();
 	},
 
-	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, method) {
+	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, method,ok) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -663,17 +663,11 @@ com.menabev.AP.util.POServices = {
 			if (oData.status === 200) {
 				var ReqId = oData.invoiceHeaderDto.requestId;
 				oPOModel.setProperty("/", oData.invoiceHeaderDto);
-				if (actionCode === "ASR") {
+				if (!ok && actionCode === "ASR") {
 					oController.onSubmitForRemediationFrag();
-				} else if (actionCode === "ASA") {
+				} else if (!ok && actionCode === "ASA") {
 					oController.onSubmitForApprovalFrag();
 				}
-				// sap.m.MessageBox.success(message, {
-				// 	actions: [sap.m.MessageBox.Action.OK],
-				// 	onClose: function (sAction) {
-				// 		oController.oRouter.navTo("Inbox");
-				// 	}
-				// });
 			} 
 		});
 		oServiceModel.attachRequestFailed(function (oEvent) {

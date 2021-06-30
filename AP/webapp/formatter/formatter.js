@@ -247,23 +247,32 @@ com.menabev.AP.formatter.formatter = {
 			return true;
 		} else {
 			return false;
+
 		}
 	},
 	formatRecipient: function (array) {
-		var len = array.length,
-			val = "";
-		if (len) {
-			val = array[0];
+		if (array) {
+			var len = array.length,
+				val = "";
+			if (len) {
+				val = array[0];
+			}
+			return val;
+		} else {
+			return "";
 		}
-		return val;
 	},
 	arraytoString: function (array) {
-		var len = array.length,
-			val = "";
-		for (var i = 0; i < len; i++) {
-			val += array[i] + "\n";
+		if (array) {
+			var len = array.length,
+				val = "";
+			for (var i = 0; i < len; i++) {
+				val += array[i] + "\n";
+			}
+			return val;
+		} else {
+			return "";
 		}
-		return val;
 	},
 	batchIDVisible: function (invType) {
 		if (invType === "PO") {

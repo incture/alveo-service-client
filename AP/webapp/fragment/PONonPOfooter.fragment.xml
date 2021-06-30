@@ -7,8 +7,8 @@
 		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
 	<Button text="{i18n>Submit}" type="Emphasized" tooltip="{i18n>Submit}" press="onNonPoSubmit" class="btnEmphasized sapUiTinyMarginEnd"
 		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
-	<Button text="{i18n>Submit}" type="Emphasized" tooltip="{i18n>SubmitForRemidiation}" press="SubmitForRemidiation" class="btnEmphasized sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
+	<!--<Button text="{i18n>SubmitForRemidiation}" type="Emphasized" tooltip="{i18n>SubmitForRemidiation}" press="SubmitForRemidiation" class="btnEmphasized sapUiTinyMarginEnd"-->
+	<!--	visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>-->
 	<Button text="{i18n>Reject}" type="Reject" tooltip="{i18n>Reject}" press="onNonPoReject" class="sapUiTinyMarginEnd" enabled="false"
 		visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}"/>
 	<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Reject}" press="onCancelChanges" class="sapUiTinyMarginEnd"

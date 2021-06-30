@@ -62,7 +62,7 @@
             </l:Grid>
 		</content>
 		<beginButton>
-			<Button text="{i18n>Submit}" press="oSubmit" type="Emphasized" enabled="false"/>
+			<Button text="{i18n>OK}" press="onClickOK" type="Emphasized" enabled="false"/>
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>Cancel}" press="onCancelSubmitDialog"/>

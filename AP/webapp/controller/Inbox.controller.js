@@ -25,25 +25,25 @@ sap.ui.define([
 				this.oUserDetailModel = oUserDetailModel;
 				var oDataAPIModel = this.getOwnerComponent().getModel("oDataAPIModel");
 				this.oDataAPIModel = oDataAPIModel;
+				oPaginationModel.setProperty("/openTaskPagination", {});
+				oPaginationModel.setProperty("/myTaskPagination", {});
+				oPaginationModel.setProperty("/draftedTaskPagination", {});
+				oPaginationModel.setProperty("/pagination", {});
+				oPaginationModel.setProperty("/openTaskPagination/paginationVisible", false);
+				oPaginationModel.setProperty("/myTaskPagination/paginationVisible", false);
+				oPaginationModel.setProperty("/draftedTaskPagination/paginationVisible", false);
+				oPaginationModel.setProperty("/pagination/paginationVisible", false);
+				oTaskInboxModel.setProperty("/filterParams", {});
+				oTaskInboxModel.setProperty("/selectedFilterTab", "openTask");
+				oTaskInboxModel.setProperty("/openTask", {});
+				oTaskInboxModel.setProperty("/myTask", {});
+				oTaskInboxModel.setProperty("/draftTask", {});
 				this.setFilterBar();
 				this.getProcessStatus();
 				this.clearFilter();
 				this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 				this.oRouter.attachRoutePatternMatched(function (oEvent) {
 					if (oEvent.getParameter("name") === "Inbox") {
-						oPaginationModel.setProperty("/openTaskPagination", {});
-						oPaginationModel.setProperty("/myTaskPagination", {});
-						oPaginationModel.setProperty("/draftedTaskPagination", {});
-						oPaginationModel.setProperty("/pagination", {});
-						oPaginationModel.setProperty("/openTaskPagination/paginationVisible", false);
-						oPaginationModel.setProperty("/myTaskPagination/paginationVisible", false);
-						oPaginationModel.setProperty("/draftedTaskPagination/paginationVisible", false);
-						oPaginationModel.setProperty("/pagination/paginationVisible", false);
-						oTaskInboxModel.setProperty("/filterParams", {});
-						oTaskInboxModel.setProperty("/selectedFilterTab", "openTask");
-						oTaskInboxModel.setProperty("/openTask", {});
-						oTaskInboxModel.setProperty("/myTask", {});
-						oTaskInboxModel.setProperty("/draftTask", {});
 						that.getInboxData(1);
 					}
 				});
