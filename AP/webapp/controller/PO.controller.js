@@ -50,8 +50,8 @@ sap.ui.define([
 						status = oArgs.status;
 					POServices.getPONonPOData("", that, requestId);
 					var invoiceItems = oPOModel.getProperty("/invoiceItems");
-					var arrUniqueInvoiceItems = this.fnFindUniqueInvoiceItems(invoiceItems);
-					this.getReferencePo(arrUniqueInvoiceItems);
+					var arrUniqueInvoiceItems = that.fnFindUniqueInvoiceItems(invoiceItems);
+					that.getReferencePo(arrUniqueInvoiceItems);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -152,7 +152,7 @@ sap.ui.define([
 			this.fnOpenPDF(documentId, oSelectedBtnKey);
 		},
 
-		onSubmitForRemediation: function () {
+		onSubmitForRemediationFrag: function () {
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog);
@@ -161,7 +161,7 @@ sap.ui.define([
 			this.SubmitDialog.open();
 		},
 
-		onSubmitForApproval: function () {
+		onSubmitForApprovalFrag: function () {
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog);
@@ -176,11 +176,23 @@ sap.ui.define([
 
 		onNonPoSubmit: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds);
+			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds, "ASA");
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+		},
+
+		SubmitForRemidiation: function (oEvent) {
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds, "ASR");
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+		},
+		
+		onPressOK: function (oEvent) {
+			var oPayload = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
 		onNonPoSave: function (oEvent) {
-			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			POServices.onNonPoSave(oEvent, this);
 		},
 
@@ -193,7 +205,12 @@ sap.ui.define([
 			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			POServices.onDueDateChange(oEvent, this);
 		},
-		
+
+		onClickOK: function (oEvent) {
+			var oPayload = this.oPOModel.getData();
+			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA","ok");
+		},
+
 		onClickInvoiceAccAssignment: function (oEvent) {
 			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
 			var oPOModel = this.oPOModel;
@@ -235,7 +252,7 @@ sap.ui.define([
 			});
 			oPOModel.refresh();
 		},
-		
+
 		deleteNonPoItemData: function (oEvent) {
 			var oPOModel = this.getView().getModel("oPOModel");
 			var index = oEvent.getSource().getParent().getBindingContextPath().split("/")[2];
