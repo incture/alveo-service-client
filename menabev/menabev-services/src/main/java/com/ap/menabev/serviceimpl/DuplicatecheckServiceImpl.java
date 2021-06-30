@@ -416,11 +416,11 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			itemReturn.setItemCategory(poItem.getItemCategory());
 			itemReturn.setProductType(poItem.getProductType());
 			itemReturn.setSetPoMaterialNum(poItem.getMaterial());
-			// vi. Set InvItem-poQtyOu = poItem-qty
 			itemReturn.setPoQtyOU(poItem.getQuantity());
 			// vii. Set InvItem-poQtuOpu = poItem-qtyOpu//TODO
-			// viii. Set InvItem-orderUnit = poItem-orderUnit??TODO
-			// itemReturn.setOrderUnit(poItem.getOr);TODO
+//			itemReturn.setPoQtyOPU(poItem.get);
+			// viii. Set InvItem-orderUnit = poItem-orderUnit??
+			itemReturn.setOrderUnit(poItem.getPoUnit());
 			itemReturn.setOrderPriceUnit(poItem.getOrderPriceUnit());
 			itemReturn.setPoUnitPriceOPU(poItem.getNetPrice());
 			itemReturn.setGrBsdIv(Boolean.valueOf(poItem.getGrBsdIVInd()));
@@ -430,7 +430,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 			// xvii. Calculate invItem-invTaxAmount
 			// 1. Based on invItem-grossAmount and invItem-taxCode(%)
-			// TODO
+			// Tax Calculation
+			Double sysSugTax = (itemReturn.getGrossPrice() * Double.valueOf(poItem.getTaxCode())) / 100;
+			itemReturn.setSysSuggTax(sysSugTax);
 			Double taxValue = (itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxCode())) / 100;
 			itemReturn.setTaxValue(taxValue);
 			itemReturn.setConvNum1(Integer.valueOf(poItem.getConvNum1().toString()));
@@ -455,7 +457,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 				itemReturn.setAlvQtyOPU(itemReturn.getAlvQtyUOM());
 				itemReturn.setPoUnitPriceUOM(poItem.getNetPrice());
 				itemReturn.setPoUnitPriceOPU(poItem.getNetPrice());
-				itemReturn.setPoUnitPriceOU(itemReturn.getAlvQtyUOM());
+				itemReturn.setPoUnitPriceOU(poItem.getNetPrice());
 				// Account Assignment
 				if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
 					if ("K".equals(poItem.getAccountAssCat())) {
@@ -475,7 +477,6 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 							// iv. InvItem-ItemAccountAssignment-netValueOu =
 							// fn(invItem-grossPrice)
-							// if
 							// (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()))
 							// {
 							// accountAssignment.setNetValue(itemReturn.getGrossPrice());
@@ -499,6 +500,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// fn(invItem-grossPrice)
 							// Only Net value is there TODO
 							// ix. InvItem-ItemAccountAssignment-OrderPriceUnit
+							accountAssignment.setPoUnitPriceOPU(Double.valueOf(poItem.getOrderPriceUnit()));
 							// TODO
 							// poItem-OrderPriceUnit
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCostCenter())) {
@@ -515,13 +517,20 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						else if ("2".equals(poItem.getDistribution())) {
 							int i = 0;
 							for (InvoiceItemAcctAssignmentDto accountAssignment : itemReturn.getInvItemAcctDtoList()) {
-								if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
-									accountAssignment.setNetValue(itemReturn.getGrossPrice());
+								if(!ServiceUtil.isEmpty(itemReturn.getInvItemAcctDtoList().get(i).getDistPerc()) && !ServiceUtil.isEmpty(itemReturn.getInvQty()) && !ServiceUtil.isEmpty(itemReturn.getGrossPrice())){
+									Double qty = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc() * itemReturn.getInvQty()) / 100;
+									Double netValue = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc() * itemReturn.getGrossPrice()) / 100;
+									accountAssignment.setNetValue(netValue);
+									accountAssignment.setQty(qty);
 								}
-								if (!ServiceUtil.isEmpty(itemReturn.getInvQty())) {
-									accountAssignment.setQty(itemReturn.getInvQty());
-								}
-								if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
+								
+//								if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
+//									accountAssignment.setNetValue(itemReturn.getGrossPrice());
+//								}
+//								if (!ServiceUtil.isEmpty(itemReturn.getInvQty())) {
+//									accountAssignment.setQty(itemReturn.getInvQty());
+//								}
+								if (!ServiceUtil.isEmpty(itemReturn.getUom())) {
 									accountAssignment.setQtyUnit(itemReturn.getUom());
 								}
 								// v. InvItem-ItemAccountAssignment-netValueOu =
@@ -534,9 +543,11 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									accountAssignment.setAvlQtyOU(qtyOpuToOu(itemReturn.getConvNum1(),
 											itemReturn.getConvDen1(), itemReturn.getAlvQtyOPU()));
 								}
-								// vii. InvItem-ItemAccountAssignment-OrderUnit
-								// =
-								// poItem-OrderUnit
+								// vii. InvItem-ItemAccountAssignment-OrderUnit/ =
+								// poItem-OrderUnit//TODO
+								if(!ServiceUtil.isEmpty(poItem.getPoUnit())){
+//									accountAssignment.setPoUnitPriceOU(poUnitPriceOU);
+								}
 								if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyOPU())) {
 									accountAssignment.setAlvQtyOPU((itemReturn.getAlvQtyOPU()));
 								} else if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyOPU())) {
@@ -618,7 +629,6 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 							// iv. InvItem-ItemAccountAssignment-netValueOu =
 							// fn(invItem-grossPrice)
-							// if
 							// (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()))
 							// {
 							// accountAssignment.setNetValue(itemReturn.getGrossPrice());
@@ -642,6 +652,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// fn(invItem-grossPrice)
 							// Only Net value is there TODO
 							// ix. InvItem-ItemAccountAssignment-OrderPriceUnit
+							accountAssignment.setPoUnitPriceOPU(Double.valueOf(poItem.getOrderPriceUnit()));
 							// TODO
 							// poItem-OrderPriceUnit
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCostCenter())) {
@@ -658,13 +669,20 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						else if ("2".equals(poItem.getDistribution())) {
 							int i = 0;
 							for (InvoiceItemAcctAssignmentDto accountAssignment : itemReturn.getInvItemAcctDtoList()) {
-								if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
-									accountAssignment.setNetValue(itemReturn.getGrossPrice());
+								if(!ServiceUtil.isEmpty(itemReturn.getInvItemAcctDtoList().get(i).getDistPerc()) && !ServiceUtil.isEmpty(itemReturn.getInvQty()) && !ServiceUtil.isEmpty(itemReturn.getGrossPrice())){
+									Double qty = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc() * itemReturn.getInvQty()) / 100;
+									Double netValue = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc() * itemReturn.getGrossPrice()) / 100;
+									accountAssignment.setNetValue(netValue);
+									accountAssignment.setQty(qty);
 								}
-								if (!ServiceUtil.isEmpty(itemReturn.getInvQty())) {
-									accountAssignment.setQty(itemReturn.getInvQty());
-								}
-								if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
+								
+//								if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
+//									accountAssignment.setNetValue(itemReturn.getGrossPrice());
+//								}
+//								if (!ServiceUtil.isEmpty(itemReturn.getInvQty())) {
+//									accountAssignment.setQty(itemReturn.getInvQty());
+//								}
+								if (!ServiceUtil.isEmpty(itemReturn.getUom())) {
 									accountAssignment.setQtyUnit(itemReturn.getUom());
 								}
 								// v. InvItem-ItemAccountAssignment-netValueOu =
@@ -677,9 +695,11 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									accountAssignment.setAvlQtyOU(qtyOpuToOu(itemReturn.getConvNum1(),
 											itemReturn.getConvDen1(), itemReturn.getAlvQtyOPU()));
 								}
-								// vii. InvItem-ItemAccountAssignment-OrderUnit
-								// =
-								// poItem-OrderUnit
+								// vii. InvItem-ItemAccountAssignment-OrderUnit/ =
+								// poItem-OrderUnit//TODO
+								if(!ServiceUtil.isEmpty(poItem.getPoUnit())){
+//									accountAssignment.setPoUnitPriceOU(poUnitPriceOU);
+								}
 								if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyOPU())) {
 									accountAssignment.setAlvQtyOPU((itemReturn.getAlvQtyOPU()));
 								} else if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyOPU())) {
@@ -715,9 +735,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 		//
 		// 1. SysSuggTaxAmount = )tax% of InvAmountBeforeTax.) +
 		// InvAmountBeforeTax.
-		Double sysSuggTax = ((itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxCode())) / 100)
-				+ itemReturn.getGrossPrice();
-		itemReturn.setSysSuggTax(sysSuggTax);
+//		Double sysSuggTax = ((itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxCode())) / 100)
+//				+ itemReturn.getGrossPrice();
+//		itemReturn.setSysSuggTax(sysSuggTax);
 		return itemReturn;
 
 	}

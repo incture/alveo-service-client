@@ -21,6 +21,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1525,17 +1527,65 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 		
 		return poHeaders;
 	}
-	 
+	
+	@Override
 	public InvoiceHeaderDto autoPostApi(InvoiceHeaderDto dto) throws URISyntaxException, IOException{
 	
 //		a. Take the OCR data and store in HANA DB with invoiceHeader-invoiceStatus=NEW
 //
 //		b. Determine VendorId using vendor address data via Odata call.
+		String supplier = null;
+		if(!ServiceUtil.isEmpty(dto.getZipCode()) && !ServiceUtil.isEmpty(dto.getVendorName())){
+
+			String vendorName = dto.getVendorName().replace(" ", "%20");
+			//Get Business Partner
+			String url = "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartnerAddress?"
+					+ "$format=json&$filter=PostalCode%20eq%20%27"+dto.getZipCode()+"%27%20and%20"
+					+ "substringof(%27"+vendorName+"%27,%20FullName)%20eq%20true";
+			Map<String, Object> map = poSearchApiServiceImpl.getDestination("SD4_DEST");
+			ResponseEntity<?> response = poSearchApiServiceImpl.consumingOdataService(url, null, "GET", map);
+			System.out.println("RESPONSE:::::::::::::::431:::" + response.getBody());
+			JSONObject node = new JSONObject(response.getBody().toString());
+			System.out.println("NODE:::::::::::::::::"+ node);
+			JSONArray resultsArray = node.getJSONObject("d").getJSONArray("results");
+			List<String> businessPartner = new ArrayList<>();
+			for (int i = 0; i < resultsArray.length(); i++) {
+				
+				if (!ServiceUtil.isEmpty(resultsArray.getJSONObject(i).getString("BusinessPartner"))) {
+					businessPartner.add(resultsArray.getJSONObject(i).getString("BusinessPartner"));
+				}
+			}
+			System.out.println("BusinessPartner::::::"+businessPartner);
+			
+			//Get Supplier
+			if(!ServiceUtil.isEmpty(businessPartner)){
+				String filter = "";
+				
+					for (String obj : businessPartner) {
+						filter = filter + "Supplier%20eq%20%27" + obj + "%27%20or%20";
+					}
+
+					String urlSup = "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_Supplier?$format=json&$filter="
+							+ filter.substring(0, filter.length() - 11);
+					ResponseEntity<?> responseSup = poSearchApiServiceImpl.consumingOdataService(urlSup, null, "GET", map);
+					System.out.println("RESPONSE:::::::::::::::431:::" + response.getBody());
+					JSONObject nodeSup = new JSONObject(response.getBody().toString());
+					System.out.println("NODE:::::::::::::::::"+ node);
+					JSONArray resultsArraySup = node.getJSONObject("d").getJSONArray("results");
+					
+					for (int i = 0; i < resultsArraySup.length(); i++) {
+						if (!ServiceUtil.isEmpty(resultsArraySup.getJSONObject(i).getString("BusinessPartner"))) {
+							supplier = (resultsArraySup.getJSONObject(i).getString("BusinessPartner"));
+							break;
+						}
+					}
+			}
+		}
 		
-		
+		System.out.println("Supplier::::::"+supplier);
 		if(ServiceUtil.isEmpty(dto.getRefpurchaseDoc()) && ServiceUtil.isEmpty(dto.getDeliveryNote())){
 			dto.setInvoiceStatusText("PO Missing/Invalid");
-			dto.setInvoiceStatus("2");
+			dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
 		}
 		else if(!ServiceUtil.isEmpty(dto.getRefpurchaseDoc())){
 //			i. Trigger OData service to fetch only PO header data(swarna)
@@ -1545,12 +1595,12 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			for(PoSearchApiDto odata : responseOdata){
 				if(!ServiceUtil.isEmpty(odata.getDocumentNumber())){
 					dto.setInvoiceStatusText("PO Missing/Invalid");
-					dto.setInvoiceStatus("2");
+					dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
 				}else{
 					if(!ServiceUtil.isEmpty(odata.getDocumentCategory())){
 						if(!"F".equals(odata.getDocumentCategory()) || !"L".equals(odata.getDocumentCategory())){
 							dto.setInvoiceStatusText("PO Missing/Invalid");
-							dto.setInvoiceStatus("2");
+							dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
 						}
 					}
 				}
@@ -1564,7 +1614,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
             	for(PoSearchApiDto odataRes : responseOdata){
                 	if(!"F".equals(odataRes.getDocumentCategory()) || !"L".equals(odataRes.getDocumentCategory())){
                 		dto.setInvoiceStatusText("PO Missing/Invalid");
-						dto.setInvoiceStatus("2");
+						dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
                 	}
                 }
             }

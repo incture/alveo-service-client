@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.ap.menabev.dto.AddPoInputDto;
 import com.ap.menabev.dto.AddPoOutputDto;
+import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.ResponseDto;
 public interface PurchaseDocumentHeaderService {
@@ -22,4 +23,5 @@ public interface PurchaseDocumentHeaderService {
 	List<ResponseDto> saveOrUpdate(List<PurchaseDocumentHeaderDto> dto);
 	AddPoOutputDto savePo(AddPoInputDto poNumbers) throws URISyntaxException, IOException, ParseException;
 	List<PurchaseDocumentHeaderDto> referencePoApi(AddPoInputDto dto);
+	InvoiceHeaderDto autoPostApi(InvoiceHeaderDto dto) throws URISyntaxException, IOException;
 }

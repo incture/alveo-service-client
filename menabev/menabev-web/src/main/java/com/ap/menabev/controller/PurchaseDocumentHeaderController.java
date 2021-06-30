@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ap.menabev.dto.AddPoInputDto;
 import com.ap.menabev.dto.AddPoOutputDto;
+import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.service.PurchaseDocumentHeaderService;
 import com.ap.menabev.dto.ResponseDto;
@@ -55,6 +56,11 @@ public class PurchaseDocumentHeaderController {
 	@PostMapping("/getReferencePoApi")
 	public List<PurchaseDocumentHeaderDto> referencePoApi(@RequestBody AddPoInputDto dto){
 		return documentHeaderService.referencePoApi(dto);
+	}
+	
+	@PostMapping("/autoPostApi")
+	public InvoiceHeaderDto autoPostApi(@RequestBody InvoiceHeaderDto dto) throws URISyntaxException, IOException{
+		return documentHeaderService.autoPostApi(dto);
 	}
 	
 }
