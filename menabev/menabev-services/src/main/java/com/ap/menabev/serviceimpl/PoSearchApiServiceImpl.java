@@ -105,7 +105,7 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 //		String auth = encodeUsernameAndPassword(
 //				"sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2",
 //				"f1ea4794-89be-46ef-a92a-4f92e9115c68$k2beHChqU4bzbhfnR9mqhm2S_nUn7z4PnBHJ4izvbtI=");
-//		httpPost.addHeader("Authorization", auth);
+		httpPost.addHeader("Authorization", auth);
 
 		HttpResponse res = client.execute(httpPost);
 
@@ -517,20 +517,13 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 		}
 		return responseDto;
 	}
-	// public static void main(String[] args) throws URISyntaxException,
-	// IOException {
-	// Map<String, Object> map = getDestination("SD4_DEST");
-	//// ResponseEntity<?> response = consumingOdataService(
-	//// "/sap/opu/odata/sap/ZP2P_API_PODETAILS_SRV/HeaderSet?$filter=Number%20eq%20%274900000015%27&$format=json",
-	//// null, "GET", map);
-	// URIBuilder builder = new URIBuilder();
-	// builder.setHost("/sap/opu/odata/sap/ZP2P_API_PODETAILS_SRV/HeaderSet")
-	// .setParameter("$filter", "Number eq '" + 49000000 +
-	// "'").setParameter("$format", "json");
-	// builder.build();
-	// System.out.println(map);
-	//
-	// }
+//	 public static void main(String[] args) throws URISyntaxException,
+//	 IOException {
+//	 Map<String, Object> map = getDestination("SD4_DEST");
+//	 
+//	 System.out.println(map);
+//	
+//	 }
 	
 
 }
