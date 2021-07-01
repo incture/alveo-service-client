@@ -49,9 +49,6 @@ sap.ui.define([
 						requestId = oArgs.id,
 						status = oArgs.status;
 					POServices.getPONonPOData("", that, requestId);
-					var invoiceItems = oPOModel.getProperty("/invoiceItems");
-					var arrUniqueInvoiceItems = that.fnFindUniqueInvoiceItems(invoiceItems);
-					that.getReferencePo(arrUniqueInvoiceItems);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -176,13 +173,13 @@ sap.ui.define([
 
 		onNonPoSubmit: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds, "ASA");
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, "ASA");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
 		SubmitForRemidiation: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds, "ASR");
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, "ASR");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 		
@@ -198,7 +195,7 @@ sap.ui.define([
 
 		onPostingDateChange: function (oEvent) {
 			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onNonPoSave(oEvent, this);
+			POServices.onPostingDateChange(oEvent, this);
 		},
 
 		onDueDateChange: function (oEvent) {
@@ -303,7 +300,7 @@ sap.ui.define([
 				data: JSON.stringify(payload),
 				async: true,
 				success: function (data, textStatus, jqXHR) {
-					this.oPOModel.setProperty("/getReferencedByPO", data);
+					this.oPOModel.setProperty("/purchaseOrders", data);
 				}.bind(this),
 				error: function (err) {
 					sap.m.MessageToast.show(err.statusText);

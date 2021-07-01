@@ -254,7 +254,7 @@
 					<ToolbarSpacer/>
 					<Button text="{i18n>AddPO}" press="onClickAddPO" class="sapUiSizeCompact SecondaryBtn"/>
 				</OverflowToolbar>
-				<VBox items="{oPOModel>/getReferencedByPO}">
+				<VBox items="{oPOModel>/purchaseOrders}">
 					<Panel expandable="true" width="auto">
 						<headerToolbar>
 							<OverflowToolbar>

@@ -28,7 +28,7 @@ sap.ui.define([
 		
 		getItemMatchPOData: function(){
 			var arr = [];
-			var getReferencedByPO = $.extend(true, [], this.oPOModel.getProperty("/getReferencedByPO"));
+			var getReferencedByPO = $.extend(true, [], this.oPOModel.getProperty("/purchaseOrders"));
 			for (var i = 0; i < getReferencedByPO.length; i++) {
 				arr = arr.concat(getReferencedByPO[i].poItem);
 			}

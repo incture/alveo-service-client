@@ -3,6 +3,12 @@
     color: #fff;
 }
 
+.sapMDialog>header.sapMDialogTitle .sapMTitle {
+    color: #fff;
+    margin: 0;
+    vertical-align: middle;
+}
+
 /* PO Non PO classes*/
 
 .TaskPage.sapMPage .sapMPageHeader {

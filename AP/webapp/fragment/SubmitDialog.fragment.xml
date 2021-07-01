@@ -6,11 +6,11 @@
 					<VBox class="sapUiTinyMargin">
 						<HBox>
 							<Label text="{i18n>InvoiceNumber}" design="Bold" class="sapUiTinyMarginEnd"/>
-							<Text text="{oPOModel>/invoiceNumber}"/>
+							<Text text="{oPOModel>/extInvNum}"/>
 						</HBox>
 						<HBox>
 							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
-							<Text text="{oPOModel>/invoiceStatus}"/>
+							<Text text="{oPOModel>/invoiceStatusText}"/>
 						</HBox>
 						<layoutData>
 							<l:GridData span="XL8 L8 M8 S6"/>
@@ -18,7 +18,7 @@
 					</VBox>
 					<HBox class="sapUiTinyMargin">
 						<Label text="{i18n>TotalValue}" design="Bold" class="sapUiTinyMarginEnd"/>
-						<Text text="{oPOModel>/totalValue}"/>
+						<Text text="{oPOModel>/invoiceTotal}"/>
 						<layoutData>
 							<l:GridData span="XL4 L4 M4 S6"/>
 						</layoutData>

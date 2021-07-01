@@ -41,6 +41,9 @@ com.menabev.AP.util.POServices = {
 			} else {
 				oVisibilityModel.setProperty("/openPdfBtnVisible", false);
 			}
+			var invoiceItems = oPOModel.getProperty("/invoiceItems");
+			var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
+			oController.getReferencePo(arrUniqueInvoiceItems);
 
 			// if (oData.messages.messageType === "E") {
 			// 	sap.m.MessageBox.success(oData.messages.messageText, {
@@ -158,6 +161,7 @@ com.menabev.AP.util.POServices = {
 			date = dateVal.getTime();
 		}
 		oPOModel.setProperty("/postingDate", date);
+		this.setChangeInd(oEvent, oController, "headerChange");
 	},
 	onDueDateChange: function (oEvent, oController) {
 		oController.errorHandlerInput(oEvent);
@@ -177,6 +181,7 @@ com.menabev.AP.util.POServices = {
 			date = dateVal.getTime();
 		}
 		oPOModel.setProperty("/dueDate", date);
+		this.setChangeInd(oEvent, oController, "headerChange");
 	},
 
 	onSubmit: function (oEvent, oController, MandatoryFileds, type) {
@@ -206,10 +211,40 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onPaymentMethodChange: function (oEvent, oController) {
-		// oController.errorHandlerselect(oEvent);
+		this.setChangeInd(oEvent, oController, "headerChange");
 	},
 	onPaymentBlockChange: function (oEvent, oController) {
-		// oController.errorHandlerselect(oEvent);
+		this.setChangeInd(oEvent, oController, "headerChange");
+	},
+
+	setChangeInd: function (oEvent, oController, changeInd) {
+		var oPOModel = oController.oPOModel;
+		var changeIndicator = oPOModel.getProperty("/changeIndicator");
+		if (!changeIndicator) {
+			oPOModel.setProperty("/changeIndicators", {});
+		}
+		if (!changeIndicator) {
+			changeIndicator = {
+				"headerChange": null,
+				"itemChange": null,
+				"costAllocationChange": null,
+				"attachementsChange": null,
+				"commentChange": null,
+				"activityLog": null,
+				"isVendoIdChanged": true,
+				"isCompanyCodeChanged": null,
+				"isInvoiceRefChanged": null,
+				"isCurrencyChanged": null,
+				"isInvoiceDateChanged": null,
+				"isBaselineDateChanged": null,
+				"isPaymentTermsChanged": null,
+				"isInvoiceTypeChanged": null,
+				"isTaxCodeChanged": null,
+				"isTaxAmountChanged": null,
+				"isInvoiceAmountChanged": null
+			};
+		}
+		oPOModel.setProperty("/changeIndicators/" + changeInd, true);
 	},
 
 	onInvTypeChange: function (oEvent, oController) {
@@ -235,11 +270,16 @@ com.menabev.AP.util.POServices = {
 		var oPOModel = oController.oPOModel;
 		var changeIndicator = oPOModel.getProperty("/changeIndicator");
 		if (!changeIndicator) {
-			oPOModel.setProperty("/changeIndicator", {});
+			oPOModel.setProperty("/changeIndicators", {});
 		}
 		if (!changeIndicator) {
 			changeIndicator = {
-				"isHeaderChanged": null,
+				"headerChange": null,
+				"itemChange": null,
+				"costAllocationChange": null,
+				"attachementsChange": null,
+				"commentChange": null,
+				"activityLog": null,
 				"isVendoIdChanged": true,
 				"isCompanyCodeChanged": null,
 				"isInvoiceRefChanged": null,
@@ -253,8 +293,8 @@ com.menabev.AP.util.POServices = {
 				"isInvoiceAmountChanged": null
 			};
 		}
-		oPOModel.setProperty("/changeIndicator/isHeaderChanged", true);
-		oPOModel.setProperty("/changeIndicator/" + transaction, true);
+		oPOModel.setProperty("/changeIndicators/headerChange", true);
+		oPOModel.setProperty("/changeIndicators/" + transaction, true);
 		var oPayload = {
 			"requestID": "APA-210609-000001",
 			"vendorID": oPOModel.getProperty("/vendorId"),
@@ -276,7 +316,7 @@ com.menabev.AP.util.POServices = {
 			"discountedDueDate1": null,
 			"discountedDueDate2": null,
 			"systemSuggestedtaxAmount": oPOModel.getProperty("/systemSuggestedtaxAmount"),
-			"changeIndicator": oPOModel.getProperty("/changeIndicator")
+			"changeIndicator": oPOModel.getProperty("/changeIndicators")
 		};
 		var sUrl = "/menabevdev/validate/header";
 		var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -288,7 +328,7 @@ com.menabev.AP.util.POServices = {
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			var oData = oEvent.getSource().getData();
 			changeIndicator = oData.changeIndicator;
-			oPOModel.setProperty("/changeIndicator", changeIndicator);
+			oPOModel.setProperty("/changeIndicators", changeIndicator);
 			oPOModel.setProperty("/vendorId", oData.vendorID);
 			oPOModel.setProperty("/compCode", oData.companyCode);
 			oPOModel.setProperty("/extInvNum", oData.invoiceReference);
@@ -415,6 +455,36 @@ com.menabev.AP.util.POServices = {
 
 			}
 		}
+
+	},
+	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode) {
+		var oPOModel = oController.oPOModel;
+		var oMandatoryModel = oController.oMandatoryModel;
+		var oSubmitData = oPOModel.getData();
+		var bCostAllocation = false;
+		//Header Mandatory feilds validation
+
+		var manLength = MandatoryFileds.length;
+		var data, count = 0;
+		for (var i = 0; i < manLength; i++) {
+			data = oPOModel.getProperty("/" + MandatoryFileds[i]);
+			if (data) {
+				oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
+			} else {
+				count += 1;
+				oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
+			}
+		}
+		oMandatoryModel.refresh();
+		if (count) {
+			// message = resourceBundle.getText("MANDATORYFIELDERROR");
+			var message = "Please fill all Mandatory fields";
+			sap.m.MessageToast.show(message);
+			return;
+		}
+		var sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit",
+			sMethod = "POST";
+		this.onAccSubmit(oController, oSubmitData, sMethod, sUrl, actionCode, "openFrag");
 
 	},
 
@@ -637,7 +707,7 @@ com.menabev.AP.util.POServices = {
 		this.calculateGrossAmount();
 	},
 
-	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, method,ok) {
+	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, method, ok) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -652,7 +722,8 @@ com.menabev.AP.util.POServices = {
 			"invoice": oData,
 			"requestId": oData.requestId,
 			"taskId": oData.taskId,
-			"actionCode": actionCode
+			"actionCode": actionCode,
+			"purchaseOrders": oData.purchaseOrders
 		};
 		busy.open();
 		oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, sMethod, false, false, oHeader);
@@ -660,15 +731,30 @@ com.menabev.AP.util.POServices = {
 			busy.close();
 			var oData = oEvent.getSource().getData();
 			var message = oData.responseStatus;
-			if (oData.status === 200) {
+			if (oEvent.getParameters().success) {
 				var ReqId = oData.invoiceHeaderDto.requestId;
-				oPOModel.setProperty("/", oData.invoiceHeaderDto);
+				oPOModel.setProperty("/", oData.invoice);
 				if (!ok && actionCode === "ASR") {
 					oController.onSubmitForRemediationFrag();
 				} else if (!ok && actionCode === "ASA") {
 					oController.onSubmitForApprovalFrag();
 				}
-			} 
+			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+				var message = "Session Lost. Press OK to refresh the page";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (sAction) {
+						location.reload(true);
+					}
+				});
+			} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+				var message = "Service Unavailable. Please try after sometime";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK]
+				});
+			}
 		});
 		oServiceModel.attachRequestFailed(function (oEvent) {
 			busy.close();

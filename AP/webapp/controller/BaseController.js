@@ -677,6 +677,12 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					busy.close();
+					// var oPOModel = this.oPOModel();
+					// oPOModel.setProperty("/", data.invoiceObject);
+					// oPOModel.setProperty("/purchaseOrders", data.referencePo);
+					// oPOModel.refresh();
+					// this.addPOFragment.close();
+
 				}.bind(this),
 				error: function (result, xhr, data) {
 					busy.close();
@@ -819,6 +825,7 @@ sap.ui.define([
 			comment.push(obj);
 			nonPOInvoiceModel.setProperty("/comment", comment);
 			nonPOInvoiceModel.setProperty("/commments", "");
+			POServices.setChangeInd("", this, "commentChange");
 		},
 		createReqid: function () {
 			var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -897,6 +904,7 @@ sap.ui.define([
 					};
 					attachment.push(obj);
 					nonPOInvoiceModel.setProperty("/attachment", attachment);
+					POServices.setChangeInd(oEvent, that, "attachementsChange");
 					MessageBox.success(success.response.message, {
 						actions: [MessageBox.Action.OK],
 						onClose: function (sAction) {
@@ -971,6 +979,7 @@ sap.ui.define([
 		},
 
 		onDocumentDelete: function (oEvent) {
+			var that = this;
 			var oServiceModel = new sap.ui.model.json.JSONModel();
 			var nonPOInvoiceModel = this.oPOModel;
 			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
@@ -988,7 +997,7 @@ sap.ui.define([
 				sap.m.MessageToast.show(oEvent.getSource().getData().message);
 				attachments.splice(index, 1);
 				nonPOInvoiceModel.setProperty("/attachments", attachments);
-
+				POServices.setChangeInd(oEvent, that, "attachementsChange");
 			});
 		},
 

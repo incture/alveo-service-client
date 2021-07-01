@@ -350,7 +350,7 @@ sap.ui.define([
 						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
-					} else if (oEvent.getParameters().errorobject.statusCode == 400) {
+					} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
 						var message = "Service Unavailable. Please try after sometime";
 						sap.m.MessageBox.information(message, {
 							styleClass: "sapUiSizeCompact",

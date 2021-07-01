@@ -31,7 +31,7 @@
 							<ColumnListItem
 								visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getInvoiceItems'}">
 								<cells>
-									<Text text="{oPOModel>shortText}"/>
+									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>vendMat}"/>
 									<Text text="{oPOModel>poUnit}"/>
 								</cells>
