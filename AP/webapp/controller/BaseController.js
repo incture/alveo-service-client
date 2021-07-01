@@ -1046,8 +1046,17 @@ sap.ui.define([
 				}
 			});
 		},
-
-		// SubmitForRemidiation:
+		
+		// To find POHistory based on the selection documentNumber and document Item
+		findPOItemDetails: function (sDocumentItem, sDocumentNumber, poHistory) {
+			var newArray = [];
+			for (var i = 0; i < poHistory.length; i++) {
+				if (poHistory[i]["documentItem"] === sDocumentItem && poHistory[i]["documentNumber"] === sDocumentNumber) {
+					newArray.push(poHistory[i]);
+				}
+			}
+			return newArray;
+		},
 
 	});
 

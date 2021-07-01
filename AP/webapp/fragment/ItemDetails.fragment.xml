@@ -19,7 +19,8 @@
 								<Button text="{i18n>TaxDetails}" press="onClickTaxDetails" type="Emphasized"/>
 								<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddItem" type="Emphasized"/>
 								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"></Button>
-								<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV" class="sapUiTinyMarginBottom"
+								<ToolbarSeparator/>
+								<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV" 
 									visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}"></Switch>
 								<Button icon="sap-icon://action-settings" enabled="false"></Button>
 							</OverflowToolbar>
@@ -258,9 +259,9 @@
 					<Panel expandable="true" width="auto">
 						<headerToolbar>
 							<OverflowToolbar>
-								<Title text="Purchase Order - {oPOModel>purOrg}"/>
+								<Title text="Purchase Order - {oPOModel>documentNumber}"/>
 								<ToolbarSpacer/>
-								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"/>
+								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>
 							</OverflowToolbar>
 						</headerToolbar>
 						<content>
@@ -330,12 +331,11 @@
 											<Text text="{oPOModel>documentItem}"/>
 											<Text text="{oPOModel>shortText}"/>
 											<Text text="{oPOModel>quantity}"/>
-											<Text text="{oPOModel>quantity}"/>
 											<Text text="{oPOModel>netPrice}"/>
 											<Text text="{oPOModel>orderPriceUnit}"/>
 											<Text text="{oPOModel>plant}"/>
 											<Text text="{oPOModel>taxCode}"/>
-											<Text text="{oPOModel>storageloc}"/>
+											<Text text="{oPOModel>storageLoc}"/>
 											<core:Icon src="sap-icon://detail-view" press="onClickPODetailView"/>
 										</cells>
 									</ColumnListItem>
