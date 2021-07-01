@@ -507,11 +507,15 @@ sap.ui.define([
 		getCostCenter: function (CompanyCode, LanguageKey) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel"),
 				currentDate = new Date(),
-				currentMonth = currentDate.getMonth() + 1;
+				currentMonth = currentDate.getMonth() + 1,
+				currentDay = currentDate.getDate();
 			if (currentMonth < 10) {
 				currentMonth = '0' + currentMonth;
 			}
-			currentDate = currentDate.getFullYear() + "" + currentMonth + "" + currentDate.getDate();
+			if(currentDay<10){
+				currentDay = '0'+currentDay;
+			}
+			currentDate = currentDate.getFullYear() + "" + currentMonth + "" + currentDay;
 			var oFilter = [];
 			oFilter.push(new sap.ui.model.Filter("CompanyCode", sap.ui.model.FilterOperator.EQ, CompanyCode));
 			oFilter.push(new sap.ui.model.Filter("LanguageKey", sap.ui.model.FilterOperator.EQ, LanguageKey));

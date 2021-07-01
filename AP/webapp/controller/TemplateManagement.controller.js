@@ -136,6 +136,7 @@ sap.ui.define([
 		deleteTemplateServiceCall: function (payload) {
 			var sUrl = "/menabevdev/NonPoTemplate/delete";
 			var that = this;
+			var busy = new sap.m.BusyDialog();
 			jQuery.ajax({
 				method: "DELETE",
 				contentType: "application/json",
@@ -540,7 +541,7 @@ sap.ui.define([
 					cache: false,
 					data: oFormData,
 					success: function (data, xhr, success) {
-						that.busyDialog.close();
+						busy.close();
 						var errorMsg = "";
 						if (success.statusText === "Error") {
 							errorMsg = "Request timed-out. Please contact your administrator";

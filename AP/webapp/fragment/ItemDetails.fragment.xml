@@ -122,11 +122,11 @@
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
-									<Input value="{oPOModel>invQty}" change="onChangeInvoiceInvQty"/>
+									<Input value="{oPOModel>invQty}" change="onInvQtyChange"/>
 									<Input value="{oPOModel>uom}" change="onChangeInvoiceQtyUom"/>
-									<Input value="{oPOModel>unitPrice}" change="onChangeInvoiceUnitPriceOPU"/>
-									<Input value="{oPOModel>pricingUnit}"/>
-									<Input value="{oPOModel>grossPrice}"/>
+									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange"/>
+									<Input value="{oPOModel>pricingUnit}"  change="onPricingUnitChange"/>
+									<Text text="{oPOModel>grossPrice}"/>
 									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
 										width="80%" change="onItemTaxCodeChange">
 										<items>

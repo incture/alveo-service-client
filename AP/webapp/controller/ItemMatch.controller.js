@@ -36,7 +36,10 @@ sap.ui.define([
 		},
 
 		onNavback: function () {
-			this.oRouter.navTo("PO");
+			var reqId = this.oPOModel.getProperty("/requestId");
+			this.oRouter.navTo("PO", {
+				id: reqId
+			});
 		},
 
 		onSelectInvoice: function (oEvent) {
