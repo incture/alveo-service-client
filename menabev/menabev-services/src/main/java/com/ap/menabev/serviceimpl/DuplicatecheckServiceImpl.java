@@ -22,6 +22,7 @@ import com.ap.menabev.dto.TwoWayMatchInputDto;
 import com.ap.menabev.invoice.InvoiceItemRepository;
 import com.ap.menabev.invoice.PurchaseDocumentHeaderRepository;
 import com.ap.menabev.service.DuplicateCheckService;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
@@ -170,58 +171,58 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			// If invoiceHeaderStatus is NOT EQUAL to “PO Missing/Invalid” or
 			// “Duplicate”
 			if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-				if (!"1".equals(checkStatus.getInvoiceStatus()) || !"2".equals(checkStatus.getInvoiceStatus())) {
+				if (!(ApplicationConstants.PO_MISSING_OR_INVALID.equals(checkStatus.getInvoiceStatus()) || ApplicationConstants.DUPLICATE_INVOICE.equals(checkStatus.getInvoiceStatus()))) {
 					// 1. Loop at invoice line items
 					for (InvoiceItemDto item : checkStatus.getInvoiceItems()) {
 
-						if ("11".equals(item.getItemStatusCode())) {
+						if (ApplicationConstants.NO_GRN.equals(item.getItemStatusCode())) {
 							// a. If itemStatus=No-GRN-04
 							//
 							// i. SetHeaderStatus=No-GRN
-							checkStatus.setInvoiceStatus("11");
+							checkStatus.setInvoiceStatus(ApplicationConstants.NO_GRN);
 							// ii. Break out of the loop
 
 							break;
 						}
-						if ("3".equals(item.getItemStatusCode()) && !"11".equals(checkStatus.getInvoiceStatus())) {
+						if (ApplicationConstants.ITEM_MISMATCH.equals(item.getItemStatusCode()) && !ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())) {
 							// b. If itemStatus=ItemMismatch AND HeaderStatus NE
 							// NO-GRN
 							//
 							// i. Set HeaderStatus = ItemMismatch
-							checkStatus.setInvoiceStatus("3");
+							checkStatus.setInvoiceStatus(ApplicationConstants.ITEM_MISMATCH);
 							// ii. Break out of the loop
 							break;
 						}
-						if ("5".equals(item.getItemStatusCode()) && !"11".equals(checkStatus.getInvoiceStatus())
-								|| !"3".equals(checkStatus.getInvoiceStatus())) {
+						if (ApplicationConstants.PRICE_MISMATCH.equals(item.getItemStatusCode()) && (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
+								|| !ApplicationConstants.PRICE_MISMATCH.equals(checkStatus.getInvoiceStatus()))) {
 							// c. If itemStatus=Price Mismtach and (HeaderStatus
 							// NE NO-GRN or HeaderStatus NE ItemMismatch)
 							//
 							// i. HeaderStatus=PriceMismatch
-							checkStatus.setInvoiceStatus("5");
+							checkStatus.setInvoiceStatus(ApplicationConstants.PRICE_MISMATCH);
 						}
-						if ("6".equals(item.getItemStatusCode()) && !"11".equals(checkStatus.getInvoiceStatus())
-								|| !"3".equals(checkStatus.getInvoiceStatus())
-								|| !"5".equals(checkStatus.getInvoiceStatus())) {
+						if (ApplicationConstants.PRICE_OR_QTY_MISMATCH.equals(item.getItemStatusCode()) && (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
+								|| !ApplicationConstants.ITEM_MISMATCH.equals(checkStatus.getInvoiceStatus())
+								|| !ApplicationConstants.PRICE_MISMATCH.equals(checkStatus.getInvoiceStatus()))) {
 							// d. If itemStatus=Price/Qty Mismatch and
 							// (HeaderStatus NE NO-GRN or Header status NE
 							// HeaderStatus NE ItemMismatch or headerStatus NE
 							// Price Mismatch)
 							//
 							// i. Header status=Price/Qty Mismatch
-							checkStatus.setInvoiceStatus("6");
+							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
 						}
-						if ("4".equals(item.getItemStatusCode()) && !"11".equals(checkStatus.getInvoiceStatus())
-								|| !"3".equals(checkStatus.getInvoiceStatus())
-								|| !"5".equals(checkStatus.getInvoiceStatus())
-								|| !"6".equals(checkStatus.getInvoiceStatus())) {
+						if (ApplicationConstants.QTY_MISMATCH.equals(item.getItemStatusCode()) && (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
+								|| !ApplicationConstants.ITEM_MISMATCH.equals(checkStatus.getInvoiceStatus())
+								|| !ApplicationConstants.PRICE_MISMATCH.equals(checkStatus.getInvoiceStatus())
+								|| !ApplicationConstants.PRICE_OR_QTY_MISMATCH.equals(checkStatus.getInvoiceStatus()))) {
 							// e. If itemStatus=Qty Mismatch and (HeaderStatus
 							// NE NO-GRN or Header status NE HeaderStatus NE
 							// ItemMismatch or headerStatus NE Price Mismatch or
 							// headerStatus NE Price/Qty Mismatch)
 							//
 							// i. HeaderStatus=QtyMismatch
-							checkStatus.setInvoiceStatus("4");
+							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
 						}
 
 					} // 2. EndLoop
@@ -232,11 +233,11 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					// b. If HeaderStatus NE QtyMimatch AND Balance = 0.00 then
 					// set headerStatus=”Ready to Post”
 
-					if (!"0.00".equals(checkStatus.getBalanceAmount()) && !"4".equals(checkStatus.getInvoiceStatus())) {
-						checkStatus.setInvoiceStatus("7");
+					if (!"0.00".equals(checkStatus.getBalanceAmount()) && !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
+						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 					}
-					if ("0.00".equals(checkStatus.getBalanceAmount()) && "4".equals(checkStatus.getInvoiceStatus())) {
-						checkStatus.setInvoiceStatus("15");
+					if ("0.00".equals(checkStatus.getBalanceAmount()) && !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
+						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
 					}
 
 				} else {
@@ -257,16 +258,16 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 		if (!ServiceUtil.isEmpty(dto)) {
 			// Manual Matching
 			if (!ServiceUtil.isEmpty(dto.getManualVsAuto())) {
-				if ("MAN".equals(dto.getManualVsAuto())) {
+				if (ApplicationConstants.MANUAL_MATCH.equals(dto.getManualVsAuto())) {
 					InvoiceItemDto invItemPoManual = matchPoToInvItem(dto, dto.getInvoiceItem(),
-							dto.getPurchaseDocumentItem(), "MAN");
+							dto.getPurchaseDocumentHeader().get(0).getPoItem().get(0), ApplicationConstants.MANUAL_MATCH);
 					return invItemPoManual;
 
 				}
 
 			}
 			// Auto case
-			else if ("AUTO".equals(dto.getManualVsAuto())) {
+			else if (ApplicationConstants.AUTO_MATCH.equals(dto.getManualVsAuto())) {
 				InvoiceItemDto itemReturn = dto.getInvoiceItem();
 				Boolean matchFound = false;
 				int i = 0;
@@ -281,7 +282,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							Integer fuzzySearchVMN = FuzzySearch.weightedRatio(poItem.getVendMat(),
 									itemReturn.getCustomerItemId().toString());
 							if (fuzzySearchVMN == 100) {
-								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, "AUTO");
+								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
 								break;
 							} else {
@@ -295,7 +296,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							Integer fuzzySearchSapMatNo = FuzzySearch.weightedRatio(poItem.getMaterial(),
 									itemReturn.getArticleNum());
 							if (fuzzySearchSapMatNo == 100) {
-								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, "AUTO");
+								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
 								break;
 							} else {
@@ -309,7 +310,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							Integer fuzzySearchUpcCode = FuzzySearch.weightedRatio(poItem.getInterArticleNum(),
 									itemReturn.getUpcCode());
 							if (fuzzySearchUpcCode == 100) {
-								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, "AUTO");
+								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
 								break;
 							} else {
@@ -323,7 +324,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							Integer fuzzySearchDescription = FuzzySearch.weightedRatio(poItem.getShortText(),
 									itemReturn.getItemText());
 							if (fuzzySearchDescription == 100) {
-								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, "AUTO");
+								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
 								break;
 							} else {
@@ -335,7 +336,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						if (matchValue > 70) {
 							if (itemReturn.getInvQty() == poItem.getQuantity()
 									&& itemReturn.getPoUnitPriceOPU() == poItem.getNetPrice()) {
-								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, "AUTO");
+								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
 								break;
 							}
@@ -361,7 +362,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							for (PurchaseDocumentItemDto poItemMatch : dto.getPurchaseDocumentHeader().get(i)
 									.getPoItem()) {
 								if (poItemMatch.getMaterial().equals(matchResult.get(0).getPMatNo())) {
-									invoiceItem = matchPoToInvItem(dto, dto.getInvoiceItem(), poItemMatch, "AUTO");
+									invoiceItem = matchPoToInvItem(dto, dto.getInvoiceItem(), poItemMatch, ApplicationConstants.AUTO_MATCH);
 									break;
 								}
 							}
