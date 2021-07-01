@@ -123,6 +123,8 @@ public interface ApplicationConstants {
     String PRICE_IS_NOT_RIGHT = "C";
     String QTY_IS_NOT_RIGHT = "D";
     String VAT_CODE_MISMATCH = "E";
+    String MANUAL_MATCH = "MAN";
+    String AUTO_MATCH = "AUTO";
 	// ----------------------------------------------------------//
 	// QA DataBase Details
 	// String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
@@ -145,13 +147,13 @@ public interface ApplicationConstants {
 	String DMS_GRANT_TYPE = "client_credentials";
 	String DMS_SCOPE = "generate-ads-output";
 	// DEV FOLDER
-	//String FOLDER = "HR1vVfGxI3pTs1EpsMV2YjgVe0OujD9fX2se8ENYtj8";
+	String FOLDER = "HR1vVfGxI3pTs1EpsMV2YjgVe0OujD9fX2se8ENYtj8";
 	String LIFE_CYCLE_STATUS_OPEN = "Open";
 	String CHANEL_TYPE_EMAIL = "Email";
 	
 
 	// QA FOLDER
-	String FOLDER = "ud3MtXve86vrngCHttSUW_KwwnMdM2KXiALY5mTLXJ4";
+//	String FOLDER = "ud3MtXve86vrngCHttSUW_KwwnMdM2KXiALY5mTLXJ4";
 	// ------------------------------------------------------------------------------------//
 	
 	
