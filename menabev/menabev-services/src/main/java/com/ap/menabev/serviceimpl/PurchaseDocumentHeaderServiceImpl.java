@@ -1710,8 +1710,10 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			System.out.println("Required PO:::" + dto.getRefpurchaseDoc());
 			addPoApiInput.setPurchaseOrder(purchaseOrder);
 			addPoApiInput.setInvoiceHeader(dto);
-			savePo(addPoApiInput);
+			AddPoOutputDto poApiResponse = savePo(addPoApiInput);
+			dto = poApiResponse.getInvoiceObject();
 		}
+		System.out.println("AutoPostApi Response:::::"+ dto);
 		return dto;
 	}
 
