@@ -7,7 +7,7 @@
 			</Toolbar>
 			<l:Grid defaultSpan="XL3 L6 M6 S12" class="sapUiSizeCompact">
 				<VBox>
-					<Table inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}" selectionChange="onSelectCustomerPO"
+					<Table inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}" selectionChange="onSelectInvoice"
 						alternateRowColors="true">
 						<headerToolbar>
 							<OverflowToolbar>
@@ -32,8 +32,8 @@
 								visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getInvoiceItems'}">
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
-									<Text text="{oPOModel>vendMat}"/>
-									<Text text="{oPOModel>poUnit}"/>
+									<Text text="{oPOModel>customerItemId}"/>
+									<Text text="{oPOModel>upcCode}"/>
 								</cells>
 							</ColumnListItem>
 						</items>
@@ -83,7 +83,7 @@
 							<ui:Column>
 								<Label/>
 								<ui:template>
-									<Button text="{i18n>Match}" type="Emphasized"
+									<Button text="{i18n>Match}" type="Emphasized" press="onClickMatch"
 										visible="{path:'oPOModel>itemCategory', formatter: 'com.menabev.AP.formatter.formatter.getMatchedBtnVisible'}"/>
 								</ui:template>
 							</ui:Column>
@@ -122,9 +122,9 @@
 						<ColumnListItem
 							visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getMatchedItems'}">
 							<cells>
-								<Text text="{oPOModel>shortText}"/>
-								<Text text="{oPOModel>vendMat}"/>
-								<Text text="{oPOModel>poUnit}"/>
+								<Text text="{oPOModel>itemText}"/>
+								<Text text="{oPOModel>customerItemId}"/>
+								<Text text="{oPOModel>upcCode}"/>
 								<Text text="{oPOModel>netPrice}"/>
 								<Text text="{oPOModel>matchedBy}"/>
 							</cells>
