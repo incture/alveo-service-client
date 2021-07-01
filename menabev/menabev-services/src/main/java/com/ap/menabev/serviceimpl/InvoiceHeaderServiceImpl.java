@@ -411,8 +411,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		ResponseDto response = new ResponseDto();
 		StringBuilder messageBuilder = new StringBuilder();
-		
+		ModelMapper mapper = new ModelMapper();
 		InvoiceHeaderDo invoiceSavedDo = null;
+		InvoiceHeaderDto invoiceHeaderSave = new InvoiceHeaderDto();
 		try {
 			String requestId = null;
 			if (!ServiceUtil.isEmpty(dto.getRequestId())) {
@@ -431,6 +432,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					invoiceHeaderDo.setInvoiceType("PO");
 				}
 				invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
+				invoiceHeaderSave = mapper.map(invoiceSavedDo, InvoiceHeaderDto.class);
 			}
 
 			// save invoice header.
@@ -438,12 +440,15 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			// save item
 			List<InvoiceItemDto> itemList = dto.getInvoiceItems();
 			if (!ServiceUtil.isEmpty(itemList)) {
+				List<InvoiceItemDto> savedItemDto = new ArrayList<>();
 				for (InvoiceItemDto invoiceItemDto : itemList) {
+					InvoiceItemDto itemSave = new InvoiceItemDto();
 					InvoiceItemDo itemDo = ObjectMapperUtils.map(invoiceItemDto, InvoiceItemDo.class);
 					if (!ServiceUtil.isEmpty(itemDo.getGuid())) {
 						logger.error("line no 263 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 						itemDo.setUpdatedAt(ServiceUtil.getEpocTime());
 						invoiceItemRepository.save(itemDo);
+						itemSave = mapper.map(itemDo, InvoiceItemDto.class);
 					} else {
 						logger.error("line no 267 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 						itemDo.setRequestId(requestId);
@@ -453,15 +458,18 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						logger.error("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 						logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()"+itemDo.getItemCode());
 						invoiceItemRepository.save(itemDo);
+					    itemSave = mapper.map(itemDo, InvoiceItemDto.class);
 					}
 					List<InvoiceItemAcctAssignmentDto> itemAccAssignmentList = invoiceItemDto.getInvItemAcctDtoList();
 					if (!ServiceUtil.isEmpty(itemAccAssignmentList)) {
-
+						List<InvoiceItemAcctAssignmentDto> itemAccountAssignmentSaveList = new ArrayList<>();
 						for (InvoiceItemAcctAssignmentDto accDto : itemAccAssignmentList) {
+							InvoiceItemAcctAssignmentDto itemAccAssignmentSave = new InvoiceItemAcctAssignmentDto();
 							InvoiceItemAcctAssignmentDo accDo = ObjectMapperUtils.map(accDto,
 									InvoiceItemAcctAssignmentDo.class);
 							if (!ServiceUtil.isEmpty(accDo.getAccountAssgnGuid())) {
 								invoiceItemAcctAssignmentRepository.save(accDo);
+								itemAccAssignmentSave = mapper.map(accDo, InvoiceItemAcctAssignmentDto.class);
 							} else {
 								accDo.setAccountAssgnGuid(UUID.randomUUID().toString());
 								accDo.setItemId(itemDo.getItemCode());
@@ -470,23 +478,29 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 								accDo.setRequestId(requestId);
 								//accDo.setCreatedOn(ServiceUtil.getEpocTime());
 								invoiceItemAcctAssignmentRepository.save(accDo);
+								itemAccAssignmentSave = mapper.map(accDo, InvoiceItemAcctAssignmentDto.class);
 							}
+							itemAccountAssignmentSaveList.add(itemAccAssignmentSave);
 						}
 					}
-
-				}
-
+					itemSave.setInvItemAcctDtoList(itemAccAssignmentList);
+					savedItemDto.add(itemSave);
+				}	
+				invoiceHeaderSave.setInvoiceItems(savedItemDto);
 			}
+			
 			List<CostAllocationDto> costAllocationDtoList = dto.getCostAllocation();
-
+			List<CostAllocationDto> costAllocationDtoSaveList = new ArrayList<>();
 			if (!ServiceUtil.isEmpty(costAllocationDtoList)) {
 				// save cost allocation
 
 				for (CostAllocationDto costAllocationDto : costAllocationDtoList) {
+					CostAllocationDto costAllocationDtoSave = new CostAllocationDto();
 					if (!ServiceUtil.isEmpty(costAllocationDto.getCostAllocationId())) {
 						CostAllocationDo costAllocationDo = ObjectMapperUtils.map(costAllocationDto,
 								CostAllocationDo.class);
 						costAllocationRepository.save(costAllocationDo);
+						costAllocationDtoSave = mapper.map(costAllocationDo, CostAllocationDto.class);
 					} else {
 						CostAllocationDo costAllocationDo = ObjectMapperUtils.map(costAllocationDto,
 								CostAllocationDo.class);
@@ -494,52 +508,63 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						costAllocationDo.setItemId(costAllocationServiceImpl.getItemID(requestId));
 						costAllocationDo.setRequestId(requestId);
 						costAllocationRepository.save(costAllocationDo);
+						costAllocationDtoSave = mapper.map(costAllocationDo, CostAllocationDto.class);
 					}
-
+					
+					costAllocationDtoSaveList.add(costAllocationDtoSave);
 				}
-
+				invoiceHeaderSave.setCostAllocation(costAllocationDtoSaveList);
 			}
 
 			List<AttachmentDto> attachemenListDto = dto.getAttachment();
-
+			List<AttachmentDto> attachemenListSaveDto = new ArrayList<>();
 			if (!ServiceUtil.isEmpty(attachemenListDto)) {
 				for (AttachmentDto attachmentDto : attachemenListDto) {
+					AttachmentDto attachemenListSave = new AttachmentDto();
 					if (!ServiceUtil.isEmpty(attachmentDto.getAttachmentId())) {
 						attachmentDto.setUpdatedAt(ServiceUtil.getEpocTime());
 						AttachmentDo attachmentDo = ObjectMapperUtils.map(attachmentDto, AttachmentDo.class);
 						attachmentRepository.save(attachmentDo);
+						attachemenListSave = mapper.map(attachmentDo, AttachmentDto.class);
 					} else {
 						attachmentDto.setAttachmentId(UUID.randomUUID().toString());
 						attachmentDto.setRequestId(requestId);
 						attachmentDto.setCreatedAt(ServiceUtil.getEpocTime());
 						AttachmentDo attachmentDo = ObjectMapperUtils.map(attachmentDto, AttachmentDo.class);
 						attachmentRepository.save(attachmentDo);
+						attachemenListSave = mapper.map(attachmentDo, AttachmentDto.class);
 					}
+					attachemenListSaveDto.add(attachemenListSave);
 				}
-
+				invoiceHeaderSave.setAttachment(attachemenListSaveDto);
 			}
 			List<CommentDto> commentsList = dto.getComment();
+			List<CommentDto> commentsListSave = new ArrayList<>();
 			if (!ServiceUtil.isEmpty(commentsList)) {
 
 				for (CommentDto commentDto : commentsList) {
+					CommentDto commentsSave = new CommentDto();
 					if (!ServiceUtil.isEmpty(commentDto.getCommentId())) {
 						commentDto.setUpdatedAt(ServiceUtil.getEpocTime());
 						CommentDo commentDo = ObjectMapperUtils.map(commentDto, CommentDo.class);
 						commentRepository.save(commentDo);
+						commentsSave = mapper.map(commentDo, CommentDto.class);
 					} else {
 						commentDto.setCommentId(UUID.randomUUID().toString());
 						commentDto.setCreatedAt(ServiceUtil.getEpocTime());
 						commentDto.setRequestId(requestId);
 						CommentDo commentDo = ObjectMapperUtils.map(commentDto, CommentDo.class);
 						commentRepository.save(commentDo);
+						commentsSave = mapper.map(commentDo, CommentDto.class);
 					}
+					commentsListSave.add(commentsSave);
 				}
+				invoiceHeaderSave.setComment(commentsListSave);
 			}
-			
 			response.setCode(ApplicationConstants.CODE_SUCCESS);
 			response.setStatus(ApplicationConstants.SUCCESS);
 			response.setMessage("Success");
-			response.setObject(invoiceSavedDo);
+			response.setObject(invoiceHeaderSave);
 			return response;
 
 		} catch (Exception e) {

@@ -357,20 +357,34 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 //		iv. HeaderCheckAPI by passing venodrChange Indicator
 //		v. Perform 2 way and 3way match (only for items that are not yet matched)
 //		1. Loop at invoiceItem where isTwoWayMatched=false.
-		for(InvoiceItemDto item : dto.getInvoiceHeader().getInvoiceItems()){
-			if(!ServiceUtil.isEmpty(item.getItemText()) && !ServiceUtil.isEmpty(item.getCustomerItemId())){
-				continue;
-			}else if(!item.getIsTwowayMatched()){
-				TwoWayMatchInputDto twoWayMatchDto = new TwoWayMatchInputDto();
-				twoWayMatchDto.setInvoiceItem(item);
-				twoWayMatchDto.setManualVsAuto("AUTO");
-				twoWayMatchDto.setPurchaseDocumentHeader(headerDto);
-				twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
-				
-				InvoiceItemDto twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
-				item.setInvItemAcctDtoList(twowayMatchUpdatedItem.getInvItemAcctDtoList());
+		System.out.println("360 " + dto);
+		List<InvoiceItemDto> updatedItems = new ArrayList<>();
+		if(!ServiceUtil.isEmpty(dto.getInvoiceHeader())){
+			for(InvoiceItemDto item : dto.getInvoiceHeader().getInvoiceItems()){
+				if(!ServiceUtil.isEmpty(item.getItemText()) && !ServiceUtil.isEmpty(item.getCustomerItemId())){
+					System.out.println("I am here 365");
+				}else if(!item.getIsTwowayMatched()){
+					System.out.println("I am here");
+					TwoWayMatchInputDto twoWayMatchDto = new TwoWayMatchInputDto();
+					twoWayMatchDto.setInvoiceItem(item);
+					twoWayMatchDto.setManualVsAuto(ApplicationConstants.AUTO_MATCH);
+					twoWayMatchDto.setPurchaseDocumentHeader(headerDto);
+					twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
+					
+					InvoiceItemDto twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
+					updatedItems.add(twowayMatchUpdatedItem);
+					
+				}
 			}
 		}
+		System.out.println("Before Item Match :::"+ dto.getInvoiceHeader());
+		if(!ServiceUtil.isEmpty(updatedItems)){
+			dto.getInvoiceHeader().setInvoiceItems(updatedItems);
+		}
+		
+		System.out.println("After Item Match :::"+ dto.getInvoiceHeader());
+		addPoReturn.setInvoiceObject(dto.getInvoiceHeader());
+		
 //		vi. Call Java service – 3wayMatchAPI by using the payload.
 //
 //		vii. Call SaveAPI with itemChangeIndicator.
@@ -1535,6 +1549,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 //		a. Take the OCR data and store in HANA DB with invoiceHeader-invoiceStatus=NEW
 //
 //		b. Determine VendorId using vendor address data via Odata call.
+		
 		List<PoSearchApiDto> forAddPoApi = new ArrayList<>(); 
 		String supplier = null;
 		if(!ServiceUtil.isEmpty(dto.getZipCode()) && !ServiceUtil.isEmpty(dto.getVendorName())){
@@ -1591,18 +1606,24 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
 		}
 		else if(!ServiceUtil.isEmpty(dto.getRefpurchaseDoc())){
+			System.out.println("REF DOC NUM:::::: 1595" + dto.getRefpurchaseDoc());
 //			i. Trigger OData service to fetch only PO header data(swarna)
 			List<String> documentNumber = new ArrayList<>();
 			documentNumber.add(dto.getRefpurchaseDoc());
-			List<PoSearchApiDto> responseOdata = poSearchApiServiceImpl.searchByDocumentNumber(documentNumber, null);
+			PoSearchApiDto poSearchApiDto = new PoSearchApiDto();
+			List<PoSearchApiDto> responseOdata = poSearchApiServiceImpl.searchByDocumentNumber(documentNumber, poSearchApiDto);
 			forAddPoApi = responseOdata;
+			System.out.println("Odata Response::::: 1602" +  responseOdata);
 			for(PoSearchApiDto odata : responseOdata){
-				if(!ServiceUtil.isEmpty(odata.getDocumentNumber())){
+				System.out.println("1604 " + odata);
+				if(ServiceUtil.isEmpty(odata.getDocumentNumber())){
 					dto.setInvoiceStatusText("PO Missing/Invalid");
 					dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
 				}else{
 					if(!ServiceUtil.isEmpty(odata.getDocumentCategory())){
-						if(!"F".equals(odata.getDocumentCategory()) || !"L".equals(odata.getDocumentCategory())){
+						System.out.println("Document Category ::" + odata.getDocumentCategory());
+						if(!("F".equals(odata.getDocumentCategory()) || "L".equals(odata.getDocumentCategory()))){
+							System.out.println("1612");
 							dto.setInvoiceStatusText("PO Missing/Invalid");
 							dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
 						}
@@ -1611,6 +1632,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			}
 		}
 		else if(!ServiceUtil.isEmpty(dto.getDeliveryNote())){
+			System.out.println("DELIVERY NOTE NUMBER::::::" + dto.getDeliveryNote());
 //			1. Extract the Purchase Document(s) from Delivery note items. You can get multiple unique numbers
 			PoSearchApiDto poSearchApiDto = new PoSearchApiDto();
 			poSearchApiDto.setDeliveryNoteNumber(dto.getDeliveryNote());
@@ -1619,7 +1641,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 //			2. Call the OData service in one shot to fetch the purchase document header(s) by passing the PO numbers from step 1 above, and find the purchase document category again.
             if(!ServiceUtil.isEmpty(responseOdata)){
             	for(PoSearchApiDto odataRes : responseOdata){
-                	if(!"F".equals(odataRes.getDocumentCategory()) || !"L".equals(odataRes.getDocumentCategory())){
+                	if(!("F".equals(odataRes.getDocumentCategory()) || "L".equals(odataRes.getDocumentCategory()))){
                 		dto.setInvoiceStatusText("PO Missing/Invalid");
 						dto.setInvoiceStatus(ApplicationConstants.PO_MISSING_OR_INVALID);
                 	}
@@ -1663,23 +1685,31 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			
 			if(!ServiceUtil.isEmpty(duplicateCheckResponse)){
 				if(duplicateCheckResponse.getIsDuplicate()){
+					System.out.println("Is duplicate 1674 " + duplicateCheckResponse.getIsDuplicate());
 					dto.setInvoiceStatus(ApplicationConstants.DUPLICATE_INVOICE);
 					dto.setInvoiceStatusText("Duplicate Invoice");
 				}
 			}
 		}
 //		ii. If invoice status = New,
+		System.out.println("I am here ::"+ dto.getInvoiceStatus());
 		if(ApplicationConstants.NEW_INVOICE.equals(dto.getInvoiceStatus())){
 			AddPoInputDto addPoApiInput = new AddPoInputDto();
 			List<PurchaseOrder> purchaseOrder = new ArrayList<>();
+			System.err.println("1685 :::"+ forAddPoApi);
 			if(!ServiceUtil.isEmpty(forAddPoApi)){
 				for(PoSearchApiDto obj : forAddPoApi){
 					PurchaseOrder setPurchaseOrder = new PurchaseOrder();
 					setPurchaseOrder.setDocumentNumber(obj.getDocumentNumber());
 					setPurchaseOrder.setDocumentCategory(obj.getDocumentCategory());
+					purchaseOrder.add(setPurchaseOrder);
 				}
 			}
-			addPoApiInput.setPurchaseOrder(purchaseOrder );
+			
+			System.err.println(purchaseOrder);
+			System.out.println("Required PO:::" + dto.getRefpurchaseDoc());
+			addPoApiInput.setPurchaseOrder(purchaseOrder);
+			addPoApiInput.setInvoiceHeader(dto);
 			savePo(addPoApiInput);
 		}
 		return dto;

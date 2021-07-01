@@ -281,6 +281,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 								&& !ServiceUtil.isEmpty(itemReturn.getCustomerItemId())) {
 							Integer fuzzySearchVMN = FuzzySearch.weightedRatio(poItem.getVendMat(),
 									itemReturn.getCustomerItemId().toString());
+							System.out.println("FUZZY_ MEAN::: A "+fuzzySearchVMN);
 							if (fuzzySearchVMN == 100) {
 								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
@@ -295,6 +296,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 								&& !ServiceUtil.isEmpty(itemReturn.getArticleNum())) {
 							Integer fuzzySearchSapMatNo = FuzzySearch.weightedRatio(poItem.getMaterial(),
 									itemReturn.getArticleNum());
+							System.out.println("FUZZY_ MEAN::: B "+fuzzySearchSapMatNo);
 							if (fuzzySearchSapMatNo == 100) {
 								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
@@ -309,6 +311,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 								&& !ServiceUtil.isEmpty(itemReturn.getUpcCode())) {
 							Integer fuzzySearchUpcCode = FuzzySearch.weightedRatio(poItem.getInterArticleNum(),
 									itemReturn.getUpcCode());
+							System.out.println("FUZZY_ MEAN::: C "+fuzzySearchUpcCode);
 							if (fuzzySearchUpcCode == 100) {
 								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
@@ -323,6 +326,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 								&& !ServiceUtil.isEmpty(itemReturn.getItemText())) {
 							Integer fuzzySearchDescription = FuzzySearch.weightedRatio(poItem.getShortText(),
 									itemReturn.getItemText());
+							System.out.println("FUZZY_ MEAN::: D "+fuzzySearchDescription);
 							if (fuzzySearchDescription == 100) {
 								itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem, ApplicationConstants.AUTO_MATCH);
 								matchFound = true;
@@ -382,10 +386,10 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 		itemReturn.setIsTwowayMatched(true);
 		itemReturn.setMatchType(matchType);
-		itemReturn.setItemCode("8");// Item Status "New"
+//		itemReturn.setItemCode(ApplicationConstants.NEW_INVOICE);// Item Status "New"
 		itemReturn.setIsSelected(true);
 		if (!ServiceUtil.isEmpty(poItem.getPriceUnit())) {
-			itemReturn.setPricingUnit(Integer.parseInt(poItem.getPriceUnit().toString()));
+			itemReturn.setPricingUnit(poItem.getPriceUnit().intValue());
 		}
 		if (!ServiceUtil.isEmpty(poItem.getOrderPriceUnit())) {
 			itemReturn.setUom(poItem.getOrderPriceUnit());
@@ -449,7 +453,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 				invoiced_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getIvQty();
 			} // TODO
 			if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals())) {
-				itemReturn.setItemStatusCode("11");
+				itemReturn.setItemStatusCode(ApplicationConstants.NO_GRN);
 				itemReturn.setItemStatusText("No-GRN");
 			}
 			if (poItem.getOrderPriceUnit().equals(poItem.getPoUnit())) {
@@ -761,9 +765,10 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 		return (convNum / convDen) * unitPriceOpu;
 	}
 
-	// public static void main(String[] args) {
-	// Integer fuzzyCheck = FuzzySearch.weightedRatio("Apple","organic");
-	// System.out.println(fuzzyCheck);
-	// }
+//	 public static void main(String[] args) {
+//	 Double b = 1.0;
+//	 Integer a = b.intValue();
+//	 System.out.println(a);
+//	 }
 
 }
