@@ -13,31 +13,77 @@ sap.ui.define([
 		onInit: function () {
 			var oComponent = this.getOwnerComponent();
 			this.oRouter = oComponent.getRouter();
-			
+
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			this.oPOModel = oPOModel;
-			
+
 			this.oRouter = this.getOwnerComponent().getRouter();
 			this.oRouter.getRoute("ItemMatch").attachPatternMatched(this.onRouteMatched, this);
-			
+
 		},
-		
+
 		onRouteMatched: function (oEvent) {
 			this.getItemMatchPOData();
 		},
-		
-		getItemMatchPOData: function(){
+
+		getItemMatchPOData: function () {
 			var arr = [];
 			var getReferencedByPO = $.extend(true, [], this.oPOModel.getProperty("/getReferencedByPO"));
 			for (var i = 0; i < getReferencedByPO.length; i++) {
 				arr = arr.concat(getReferencedByPO[i].poItem);
 			}
-			this.oPOModel.setProperty("/aItemMatchPO",arr);
+			this.oPOModel.setProperty("/aItemMatchPO", arr);
 		},
 
-		onNavback: function(){
+		onNavback: function () {
 			this.oRouter.navTo("PO");
-		}
+		},
+
+		onSelectInvoice: function (oEvent) {
+			var sPath = oEvent.getSource().getSelectedItems()[0].getBindingContext("oPOModel").getPath();
+			this.oSelectedInvoiceItem = this.oPOModel.getProperty(sPath);
+		},
+
+		onClickMatch: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			if (this.oSelectedInvoiceItem) {
+				var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+					oSelectedPOItem = oPOModel.getProperty(sPath);
+				var payload = {
+					"invoiceItem": this.oSelectedInvoiceItem,
+					"manualVsAuto": "MAN",
+					"matchOrUnmatchFlag": "M",
+					"purchaseDocumentHeader": "",
+					"purchaseDocumentItem": oSelectedPOItem,
+					"vendorId": oPOModel.getProperty("/vendorId")
+				};
+				this.fnTwoWayMatch(payload);
+			} else {
+				sap.m.MessageToast.show("Select atleast one Invoice item to Match");
+			}
+		},
+
+		fnTwoWayMatch: function (payload) {
+			var url = "/menabevdev/duplicateCheck/twoWayMatch";
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					busy.close();
+					this.oPOModel.setProperty("/", data);
+				}.bind(this),
+				error: function (err) {
+					busy.close();
+					sap.m.MessageToast.show(err.statusText);
+				}.bind(this)
+			});
+		},
 
 	});
 

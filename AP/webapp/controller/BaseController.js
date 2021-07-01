@@ -638,9 +638,7 @@ sap.ui.define([
 				selectedFilters = oEvent.getSource().getSelectedContextPaths();
 			addPOModel.setProperty("/selectedFilters", selectedFilters);
 			if (selectedFilters.length) {
-				if (selectedFilters.length === 1) {
 					this.oVisibilityModel.setProperty("/PO/enabled", true);
-				}
 			} else {
 				this.oVisibilityModel.setProperty("/PO/enabled", false);
 			}
@@ -679,7 +677,9 @@ sap.ui.define([
 					busy.close();
 					var oPOModel = this.oPOModel();
 					oPOModel.setProperty("/", data.invoiceObject);
-					oPOModel.setProperty("/getReferencedByPO", data.referencePo);
+					var aGetReferencedByPO = $.extend(true, [], oPOModel.getProperty("/getReferencedByPO"));
+					aGetReferencedByPO = aGetReferencedByPO.concat(data.referencePo);
+					oPOModel.setProperty("/getReferencedByPO", aGetReferencedByPO);
 					oPOModel.refresh();
 					this.addPOFragment.close();
 				}.bind(this),
