@@ -105,6 +105,8 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 //		String auth = encodeUsernameAndPassword(
 //				"sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2",
 //				"f1ea4794-89be-46ef-a92a-4f92e9115c68$k2beHChqU4bzbhfnR9mqhm2S_nUn7z4PnBHJ4izvbtI=");
+		
+		
 		httpPost.addHeader("Authorization", auth);
 
 		HttpResponse res = client.execute(httpPost);
@@ -220,8 +222,9 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 		//Test Cred
 //		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
 //						"b0075a12-8c25-4b14-8c46-64ceeac0ce06$dHgSH9hb4cuHRo2uigbB00FGYHFPTyMI1SDJpXWAPXQ=");
-//				
-//		httpPost.addHeader("Authorization", auth);
+
+		
+		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
 		String data = getDataFromStream(res.getEntity().getContent());
 		if (res.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
