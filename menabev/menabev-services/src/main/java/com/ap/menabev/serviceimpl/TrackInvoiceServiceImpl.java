@@ -1,6 +1,14 @@
 package com.ap.menabev.serviceimpl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.collections4.ListUtils;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,23 +34,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ap.menabev.dto.InvoiceHeaderDto;
-import com.ap.menabev.dto.OdataOutPutPayload;
-import com.ap.menabev.dto.OdataResponseDto;
-import com.ap.menabev.dto.OdataResultObject;
 import com.ap.menabev.dto.OdataTrackInvoiceObject;
 import com.ap.menabev.dto.OdataTrackInvoiceOutputPayload;
 import com.ap.menabev.dto.OdataTrackInvoiceResponseDto;
-import com.ap.menabev.dto.RemediationUser;
-import com.ap.menabev.dto.RemediationUserDto;
-import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.TrackInvoiceInputDto;
 import com.ap.menabev.dto.TrackInvoiceOdataOutputResponse;
-import com.ap.menabev.dto.TrackInvoiceOutputDto;
 import com.ap.menabev.dto.TrackInvoiceOutputPayload;
 import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
-import com.ap.menabev.service.PoSearchApiService;
 import com.ap.menabev.service.TrackInvoiceService;
 import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
@@ -76,9 +82,10 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				if (invoiceHeaderDo.getInvoiceStatus().equals("13")
 						&& invoiceHeaderDo.getInvoiceStatus().equals("14")) {
 					System.err.println("headerList sapPostedDto:" + invoiceHeaderDo.getInvoiceStatus());
-					double total=0;
-					if(!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount()) && !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())){
-					 total=invoiceHeaderDo.getGrossAmount()+invoiceHeaderDo.getTaxAmount();
+					double total = 0;
+					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
+							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
 					}
 					InvoiceHeaderDto sapPostedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 					sapPostedDto.setInvoiceTotal(total);
@@ -87,22 +94,22 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					sapPostedList.add(sapPostedDto);
 				} else if (invoiceHeaderDo.getInvoiceStatus().equals("15")) {
 					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
-					double total=0;
-					if(!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount()) && !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount()))
-						{
-					 total=invoiceHeaderDo.getGrossAmount()+invoiceHeaderDo.getTaxAmount();
-						}
+					double total = 0;
+					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
+							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
+					}
 					InvoiceHeaderDto sapRejectedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 					System.err.println("headerList rejectedDto:" + sapRejectedDto);
 					sapRejectedDto.setInvoiceTotal(total);
 					rejectedList.add(sapRejectedDto);
 				} else {
 					System.err.println("headerList pendingApprovalDto:" + invoiceHeaderDo.getInvoiceStatus());
-					double total=0;
-					if(!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount()) && !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount()))
-						{
-							total=invoiceHeaderDo.getGrossAmount()+invoiceHeaderDo.getTaxAmount();
-						}
+					double total = 0;
+					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
+							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
+					}
 					InvoiceHeaderDto sapPendingApprovaldDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 					sapPendingApprovaldDto.setInvoiceTotal(total);
 					sapPendingApprovaldDto.setInvoiceStatus("16");
@@ -310,8 +317,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		}
 
 		if (dto.getInvoiceRefNum() != null && !dto.getInvoiceRefNum().isEmpty()) {
-			filterQueryMap.put(" RR.EXT_INV_NUM =", "('" +dto.getInvoiceRefNum() + "')");
-			// correct 
+			filterQueryMap.put(" RR.EXT_INV_NUM =", "('" + dto.getInvoiceRefNum() + "')");
+			// correct
 		}
 		if (dto.getInvoiceStatus() != null && !dto.getInvoiceStatus().isEmpty()) {
 			StringBuffer rqstId = new StringBuffer();
@@ -323,7 +330,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				}
 			}
 			filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
-			// correct 
+			// correct
 		}
 
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
@@ -354,5 +361,77 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		} else {
 			return null;
 		}
+	}
+
+	public ResponseEntity<?> downloadExcel(TrackInvoiceInputDto dto) throws IOException {
+		ModelMapper modelMapper = new ModelMapper();
+		List<InvoiceHeaderDo> filterOutput = filterInvoicesMultiple(dto);
+
+		String[] columns = { "Invoice reference number", "Invoice Date", "Vendor", "CompanyCode", "GrossAmount", "Tax",
+				"Net Amount", "Payment Reference Number", "Due Date", "Invoice Status" };
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("InvoiceDetailsSheet");
+		// Create a Font for styling header cells
+		Font headerFont = workbook.createFont();
+		// headerFont.setBold(true);
+		headerFont.setFontHeightInPoints((short) 14);
+		// Create a CellStyle with the font
+		CellStyle headerCellStyle = workbook.createCellStyle();
+		headerCellStyle.setFont(headerFont);
+		// Create a Row
+		Row headerRow = sheet.createRow(0);
+		// Creating cells
+		for (int i = 0; i < columns.length; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columns[i]);
+			cell.setCellStyle(headerCellStyle);
+		}
+
+		int rowNum = 1;
+		for (InvoiceHeaderDo invoiceHeaderDo : filterOutput) {
+			InvoiceHeaderDto invoiceHeaderDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+
+			Row row = sheet.createRow(rowNum);
+
+			row.createCell(0).setCellValue(invoiceHeaderDto.getInvoice_ref_number());
+			System.err.println(invoiceHeaderDto.getInvoice_ref_number());
+
+			LocalDateTime invoiceDate = Instant.ofEpochMilli(invoiceHeaderDto.getInvoiceDate())
+					.atZone(ZoneId.systemDefault()).toLocalDateTime();
+			System.out.println("invoiceDate in formatedOrder:" + invoiceDate);
+
+			row.createCell(1).setCellValue(invoiceDate.toString());
+			System.err.println("invoiceDate.toString():" + invoiceDate.toString());
+			row.createCell(2).setCellValue(invoiceHeaderDto.getVendorId());
+			System.err.println(invoiceHeaderDto.getVendorId());
+
+			row.createCell(3).setCellValue(invoiceHeaderDto.getCompCode());
+			row.createCell(4).setCellValue(invoiceHeaderDto.getGrossAmount().doubleValue());
+			row.createCell(5).setCellValue(invoiceHeaderDto.getTaxAmount().doubleValue());
+			row.createCell(6).setCellValue(invoiceHeaderDto.getInvoiceTotal().doubleValue());
+			row.createCell(7).setCellValue(invoiceHeaderDto.getPaymentReference());
+
+			LocalDateTime dueDate = Instant.ofEpochMilli(invoiceHeaderDto.getDueDate()).atZone(ZoneId.systemDefault())
+					.toLocalDateTime();
+			System.out.println("dueDatedueDate in formatedOrder:" + dueDate);
+			row.createCell(8).setCellValue(dueDate.toString());
+
+			row.createCell(9).setCellValue(invoiceHeaderDto.getInvoiceStatus());
+
+			rowNum++;
+		}
+		for (int i = 0; i < columns.length; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		FileOutputStream fileOut1 = new FileOutputStream("InvoiceDetails.xlsx");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		workbook.write(outputStream);
+		fileOut1.close();
+		workbook.close();
+		byte[] b1 = outputStream.toByteArray();
+		String encode = Base64.getEncoder().encodeToString(b1);
+		return new ResponseEntity<String>(encode, HttpStatus.OK);
+
+		// return ResponseEntity.ok().body(new Response<String>(encode));
 	}
 }
