@@ -681,9 +681,9 @@ sap.ui.define([
 					busy.close();
 					var oPOModel = this.oPOModel();
 					oPOModel.setProperty("/", data.invoiceObject);
-					var aGetReferencedByPO = $.extend(true, [], oPOModel.getProperty("/getReferencedByPO"));
+					var aGetReferencedByPO = $.extend(true, [], oPOModel.getProperty("/purchaseOrders"));
 					aGetReferencedByPO = aGetReferencedByPO.concat(data.referencePo);
-					oPOModel.setProperty("/getReferencedByPO", aGetReferencedByPO);
+					oPOModel.setProperty("/purchaseOrders", aGetReferencedByPO);
 					oPOModel.refresh();
 					this.addPOFragment.close();
 				}.bind(this),

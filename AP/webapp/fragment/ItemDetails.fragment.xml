@@ -2,28 +2,27 @@
 	<IconTabBar>
 		<items>
 			<IconTabFilter text="{i18n>Invoice}" key="Invoice">
+				<OverflowToolbar>
+					<ToolbarSpacer/>
+					<Select forceSelection="false" valueState="{oPOModel>/invoiceDetailUIDto/vstate/taxCode}"
+						selectedKey="{oPOModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{oDropDownModel>/taxCodeResult}"
+						change="onChangeInvoiceServiceGoods">
+						<items>
+							<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}"/>
+						</items>
+					</Select>
+					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized"/>
+					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized"/>
+					<Button text="{i18n>TaxDetails}" press="onClickTaxDetails" type="Emphasized"/>
+					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddItem" type="Emphasized"/>
+					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"></Button>
+					<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV" class="sapUiTinyMarginBottom"
+						visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}"></Switch>
+					<Button icon="sap-icon://action-settings" enabled="false"></Button>
+				</OverflowToolbar>
 				<ScrollContainer width="100%" focusable="true" horizontal="true">
-					<Table items="{oPOModel>/invoiceItems}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20" id="itemdetails">
-						<headerToolbar>
-							<OverflowToolbar>
-								<ToolbarSpacer/>
-								<Select forceSelection="false" valueState="{oPOModel>/invoiceDetailUIDto/vstate/taxCode}"
-									selectedKey="{oPOModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{oDropDownModel>/taxCodeResult}"
-									change="onChangeInvoiceServiceGoods">
-									<items>
-										<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}"/>
-									</items>
-								</Select>
-								<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized"/>
-								<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized"/>
-								<Button text="{i18n>TaxDetails}" press="onClickTaxDetails" type="Emphasized"/>
-								<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddItem" type="Emphasized"/>
-								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"></Button>
-								<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV" class="sapUiTinyMarginBottom"
-									visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}"></Switch>
-								<Button icon="sap-icon://action-settings" enabled="false"></Button>
-							</OverflowToolbar>
-						</headerToolbar>
+					<Table items="{oPOModel>/invoiceItems}" alternateRowColors="false" mode="MultiSelect" growing="true" growingThreshold="20" id="itemdetails"
+						selectionChange="onItemSelect">
 						<columns>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
 								<Label design="Bold" text="{i18n>DESCRIPTION}" tooltip="{i18n>DESCRIPTION}"/>
@@ -118,30 +117,36 @@
 							</Column>
 						</columns>
 						<items>
-							<ColumnListItem highlight="{path: 'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}">
+							<ColumnListItem highlight="{path: 'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
+								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
 									<Input value="{oPOModel>invQty}" change="onInvQtyChange"/>
-									<Input value="{oPOModel>uom}" change="onChangeInvoiceQtyUom"/>
+									<HBox>
+										<Button icon="sap-icon://message-information" press="onViewUOMDetails"/>
+										<Select forceSelection="false" selectedKey="{oPOModel>uom}" items="{oPOModel>UOMList}" change="onChangeInvoiceQtyUom">
+											<items>
+												<core:ListItem key="{oPOModel>key}" text="{oPOModel>value}"/>
+											</items>
+										</Select>
+									</HBox>
 									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange"/>
-									<Input value="{oPOModel>pricingUnit}"  change="onPricingUnitChange"/>
-									<Text text="{oPOModel>grossPrice}"/>
+									<Input value="{oPOModel>pricingUnit}" change="onInvQtyChange"/>
+									<Input value="{oPOModel>grossPrice}" change="onGrossPriceChange"/>
 									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
-										width="80%" change="onItemTaxCodeChange">
+										change="onItemTaxCodeChange">
 										<items>
 											<core:ListItem key="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TxCode}" text="{oDropDownModel>TaxCodeName}"/>
 										</items>
 									</Select>
 									<Text text="{oPOModel>taxValue}"/>
 									<Text text="{oPOModel>netWorth}"/>
-									<Text text="{oPOModel>avlQtyUoM}"/>
+									<Text text="{oPOModel>alvQtyUOM}"/>
 									<Text text="{oPOModel>poUnitPriceUOM}"/>
 									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment" visible="{oPOModel>accountAssignmentCat}"/>
 									<Text text="{oPOModel>matchDocNum}"/>
 									<Text text="{oPOModel>matchDocItem}"/>
-									<Text text="{oPOModel>avlQtyUoM}"/>
-									<Text text="{oPOModel>poUnitPriceUOM}"/>
 									<Text text="{oPOModel>taxValue}"/>
 									<Text text="{oPOModel>netWorth}"/>
 									<Text text="{oPOModel>itemCategory}"/>

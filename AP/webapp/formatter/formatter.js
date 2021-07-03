@@ -350,6 +350,15 @@ com.menabev.AP.formatter.formatter = {
 			return false;
 		}
 		return true;
+	},
+
+	formatSelectionVisible: function (twowaymatch, statusCode) {
+		if (!twowaymatch || statusCode == "5" || statusCode == "6") {
+			this.addStyleClass("disableSelect");
+		} else {
+			this.removeStyleClass("disableSelect");
+		}
+		return true;
 	}
 
 };

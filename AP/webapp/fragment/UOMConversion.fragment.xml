@@ -1,0 +1,28 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<ResponsivePopover title="Notification" class="sapUiPopupWithPadding" placement="Bottom" showHeader="True">
+		<content>
+			<Table items="{oPOModel>/UOMList}" alternateRowColors="true" mode="SingleSelectMaster" growing="true" growingThreshold="20" id="itemdetails">
+				<columns>
+					<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10%">
+						<Label design="Bold" text="" tooltip="{i18n>DESCRIPTION}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+						<Label design="Bold" text="{i18n>OU}" tooltip="{i18n>QUANTITY}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+						<Label design="Bold" text="{i18n>POU}" tooltip="{i18n>UOM}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{oPOModel>desc}"/>
+							<Text text="{oPOModel>OUdetails}"/>
+							<Text text="{oPOModel>OPUdetails}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</ResponsivePopover>
+</core:FragmentDefinition>

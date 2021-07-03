@@ -45,10 +45,10 @@ sap.ui.define([
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
 				if (oEvent.getParameter("name") === "PO") {
 					that.oMandatoryModel.setProperty("/NonPO", {});
-					var oArgs = oEvent.getParameter("arguments"),
-						requestId = oArgs.id,
-						status = oArgs.status;
-					POServices.getPONonPOData("", that, requestId);
+					var oArgs = oEvent.getParameter("arguments");
+					that.requestId = oArgs.id;
+					that.status = oArgs.status;
+					POServices.getPONonPOData("", that, that.requestId);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -149,7 +149,8 @@ sap.ui.define([
 			this.fnOpenPDF(documentId, oSelectedBtnKey);
 		},
 
-		onSubmitForRemediationFrag: function () {
+		onSubmitForRemediationFrag: function (userList) {
+			this.fetchUserList();
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog);
@@ -158,13 +159,46 @@ sap.ui.define([
 			this.SubmitDialog.open();
 		},
 
-		onSubmitForApprovalFrag: function () {
+		onSubmitForApprovalFrag: function (userList) {
+			this.fetchUserList();
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog);
 			this.SubmitDialog.setModel(oPOModel, "oPOModel");
 			oPOModel.setProperty("/submitTypeTitle", "Submit For Approval");
 			this.SubmitDialog.open();
+		},
+
+		fetchUserList: function (userList) {
+			var oPOModel = this.oPOModel;
+			var length = userList.length;
+			var GRN = 0,
+				buyer = 0,
+				processLead = 0;
+			for (var i = 0; i < length; i++) {
+				if (userList[i].type === "GRN") {
+					oPOModel.setProperty("/GRNUser", userList[i].users);
+					GRN += 1;
+				} else if (userList[i].type === "Buyer") {
+					oPOModel.setProperty("/BuyerUser", userList[i].users);
+					buyer += 1;
+				} else if (userList[i].type === "ProcessLead") {
+					oPOModel.setProperty("/ProcessLeadUser", userList[i].users);
+					processLead += 1;
+				}
+			}
+			if (GRN && buyer) {
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
+			}
+			if (GRN) {
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
+			}
+			if (buyer) {
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/BuyerUser"));
+			}
+			if (processLead) {
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
+			}
 		},
 
 		onCancelSubmitDialog: function () {
@@ -182,7 +216,7 @@ sap.ui.define([
 			POServices.onPoSubmit(oEvent, this, MandatoryFileds, "ASR");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
-		
+
 		onPressOK: function (oEvent) {
 			var oPayload = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
@@ -205,7 +239,23 @@ sap.ui.define([
 
 		onClickOK: function (oEvent) {
 			var oPayload = this.oPOModel.getData();
-			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA","ok");
+			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA", "ok");
+		},
+		onItemSelect: function (oEvent) {
+			POServices.onItemSelect(oEvent, this);
+		},
+
+		onInvQtyChange: function (oEvent) {
+			POServices.onInvQtyChange(oEvent, this);
+		},
+		onViewUOMDetails: function (oEvent) {
+			POServices.onViewUOMDetails(oEvent, this);
+		},
+		onGrossPriceChange: function (oEvent) {
+			POServices.onGrossPriceChange(oEvent, this);
+		},
+		onItemTaxCodeChange: function (oEvent) {
+			POServices.onItemTaxCodeChange(oEvent, this);
 		},
 
 		onClickInvoiceAccAssignment: function (oEvent) {
@@ -256,7 +306,7 @@ sap.ui.define([
 			oPOModel.getData().invoiceItemAccAssgn.splice(index, 1);
 			oPOModel.refresh();
 		},
-		
+
 		onClickItemMatch: function () {
 			this.oRouter.navTo("ItemMatch");
 		},
@@ -277,7 +327,7 @@ sap.ui.define([
 			}
 			return newArray;
 		},
-		
+
 		getReferencePo: function (arrUniqueInvoiceItems) {
 			var payload = {
 				"requestId": "",
@@ -307,7 +357,7 @@ sap.ui.define([
 				}.bind(this)
 			});
 		},
-		
+
 		onClickPODetailView: function (oEvent) {
 			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
 				oPOModel = this.oPOModel,
@@ -329,7 +379,7 @@ sap.ui.define([
 			var newPath = sPath.split("/").slice(0, 3).join("/");
 			return newPath;
 		},
-		
+
 		onClosePODetailsDialog: function () {
 			this.POItemDetails.close();
 		},

@@ -26,7 +26,7 @@
 				</l:content>
 			</l:Grid>
 			<tnt:InfoLabel text="{i18n>submitInfoLabelMsg}" colorScheme="7" displayOnly="true"/>
-			<Table alternateRowColors="true" items="{oPOModel>/userList/users}">
+			<Table alternateRowColors="true" items="{oPOModel>/userList}">
 				<!--<headerToolbar>-->
 				<!--	<OverflowToolbar>-->
 				<!--		<ToolbarSpacer/>-->

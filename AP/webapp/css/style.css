@@ -27,6 +27,26 @@
     margin-bottom: 0.5rem;
 }
 
+.disableSelect .sapMCbBg {
+    background-color: #ffffff;
+    border: solid .125rem #ffffff;
+    display: inline-block;
+    position: absolute;
+    left: 0.8125rem;
+    top: 0.8125rem;
+    height: 1.125rem;
+    width: 1.125rem;
+    line-height: 1.125rem;
+    padding: 0;
+    text-align: center;
+    font-size: 1rem;
+    border-top-left-radius: 0.125rem;
+    border-top-right-radius: 0.125rem;
+    border-bottom-right-radius: 0.125rem;
+    border-bottom-left-radius: 0.125rem;
+    -webkit-focus-ring-color: none;
+}
+
 /*Inbox classes*/
 .sapUiSizeCompact .sapMBtn {
     height: 2.000rem;
