@@ -7,7 +7,7 @@
 			</Toolbar>
 			<l:Grid defaultSpan="XL3 L6 M6 S12" class="sapUiSizeCompact">
 				<VBox>
-					<Table inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}" selectionChange="onSelectInvoice"
+					<Table id="ItemMatchInvoiceTableId" inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}" selectionChange="onSelectInvoice"
 						alternateRowColors="true">
 						<headerToolbar>
 							<OverflowToolbar>
@@ -29,7 +29,7 @@
 						</columns>
 						<items>
 							<ColumnListItem
-								visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getInvoiceItems'}">
+								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getInvoiceItems'}">
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
@@ -57,7 +57,7 @@
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
-								<Label text="{i18n>VendorMaterial}"/>
+								<Label text="{i18n>VendorMaterial}" tooltip="{i18n>VendorMaterial}"/>
 								<ui:template>
 									<Text text="{oPOModel>vendMat}"/>
 								</ui:template>
@@ -71,7 +71,7 @@
 							<ui:Column>
 								<Label text="{i18n>ItemNo}"/>
 								<ui:template>
-									<Text text="{oPOModel>itemNumber}"/>
+									<Text text="{oPOModel>documentNumber}"/>
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
@@ -97,7 +97,7 @@
 						<OverflowToolbar>
 							<Title text="{i18n>MatchedItems}" level="H2"/>
 							<ToolbarSpacer/>
-							<Button text="Unmatch" class="sapUiTinyMarginEnd" type="Emphasized"/>
+							<Button text="Unmatch" class="sapUiTinyMarginEnd" type="Emphasized" enabled="false"/>
 							<SearchField width="30%"/>
 						</OverflowToolbar>
 					</headerToolbar>
@@ -120,7 +120,7 @@
 					</columns>
 					<items>
 						<ColumnListItem
-							visible="{parts:['oPOModel>isTwoWayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getMatchedItems'}">
+							visible="{parts:['oPOModel>isTwowayMatched','oPOModel>isDeleted'], formatter: 'com.menabev.AP.formatter.formatter.getMatchedItems'}">
 							<cells>
 								<Text text="{oPOModel>itemText}"/>
 								<Text text="{oPOModel>customerItemId}"/>

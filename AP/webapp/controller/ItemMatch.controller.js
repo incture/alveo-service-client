@@ -1,9 +1,9 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function (Controller) {
+	"com/menabev/AP/controller/BaseController"
+], function (BaseController) {
 	"use strict";
 
-	return Controller.extend("com.menabev.AP.controller.ItemMatch", {
+	return BaseController.extend("com.menabev.AP.controller.ItemMatch", {
 
 		/**
 		 * Called when a controller is instantiated and its View controls (if available) are already created.
@@ -24,6 +24,7 @@ sap.ui.define([
 
 		onRouteMatched: function (oEvent) {
 			this.getItemMatchPOData();
+			this.getView().byId("ItemMatchInvoiceTableId").removeSelections();
 		},
 
 		getItemMatchPOData: function () {
@@ -52,12 +53,31 @@ sap.ui.define([
 			if (this.oSelectedInvoiceItem) {
 				var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
 					oSelectedPOItem = oPOModel.getProperty(sPath);
+				
+				//Payload Logic //BackTracking to get purchaseDocumentHeader
+				//Get POHeader based on selected POItem 
+				var getReferencedByPO = $.extend(true, [], this.oPOModel.getProperty("/purchaseOrders"));
+				for (var i = 0; i < getReferencedByPO.length; i++) {
+					if(oSelectedPOItem.documentNumber === getReferencedByPO[i].documentNumber){
+						var poHeader = getReferencedByPO[i];
+					}
+				}
+				
+				//To find POHistory based on the selected PO Item 
+				var poHistory = this.findPOItemDetails(oSelectedPOItem.documentItem, oSelectedPOItem.documentNumber, poHeader.poHistory);                       
+				
+				// Creation of purchaseDocumentHeader with POHistory
+				poHeader.poHistory = poHistory;
+				var poItem = [];
+				poItem.push(oSelectedPOItem);
+				poHeader.poItem = poItem;
+				var purchaseDocumentHeader = [];
+				purchaseDocumentHeader.push(poHeader);
 				var payload = {
 					"invoiceItem": this.oSelectedInvoiceItem,
 					"manualVsAuto": "MAN",
 					"matchOrUnmatchFlag": "M",
-					"purchaseDocumentHeader": "",
-					"purchaseDocumentItem": oSelectedPOItem,
+					"purchaseDocumentHeader": purchaseDocumentHeader,
 					"vendorId": oPOModel.getProperty("/vendorId")
 				};
 				this.fnTwoWayMatch(payload);
@@ -79,7 +99,17 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					busy.close();
-					this.oPOModel.setProperty("/", data);
+					var oPOModel = this.oPOModel;
+					var invoiceItems = oPOModel.getProperty("/invoiceItems");
+					for (var i = 0; i < invoiceItems.length; i++) {
+						if(data.guid === invoiceItems[i].guid) {
+							invoiceItems[i] = data;
+						}
+					}
+					oPOModel.setProperty("/invoiceItems", invoiceItems);
+					oPOModel.refresh();
+					this.oSelectedInvoiceItem = "";
+					this.getView().byId("ItemMatchInvoiceTableId").removeSelections();
 				}.bind(this),
 				error: function (err) {
 					busy.close();
