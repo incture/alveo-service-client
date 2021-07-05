@@ -359,6 +359,14 @@ com.menabev.AP.formatter.formatter = {
 			this.removeStyleClass("disableSelect");
 		}
 		return true;
+	},
+
+	formatRemidiationUser: function (remidiationUser) {
+		if (remidiationUser === "GRN") {
+			return true;
+		} else if (remidiationUser === "BUYER") {
+			return false;
+		}
 	}
 
 };
