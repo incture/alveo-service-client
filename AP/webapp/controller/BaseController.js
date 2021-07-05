@@ -207,21 +207,31 @@ sap.ui.define([
 			);
 		},
 
-		getBtnVisibility: function () {
+		getBtnVisibility: function (status, requestId, invoiceType) {
 			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 			oVisibilityModel.setProperty("/NonPOInvoice", {});
-			oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
+			oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
 			oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
 			oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", false);
 			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
-			if (loggedinUserGroup === "Process_Lead") {
-				oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
-				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", true);
-				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
-			}
-			if (loggedinUserGroup === "Accountant") {
+			if (requestId === "NEW") {
+				oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
 				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
+			} else if (status === "claimed") {
+				if (loggedinUserGroup === "Process_Lead") {
+					oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
+					oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
+				} else if (loggedinUserGroup === "Accountant") {
+					oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
+					oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
+				}
+				if (invoiceType === "PO") {
+					oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", true);
+				}
 			}
 		},
 
@@ -512,8 +522,8 @@ sap.ui.define([
 			if (currentMonth < 10) {
 				currentMonth = '0' + currentMonth;
 			}
-			if(currentDay<10){
-				currentDay = '0'+currentDay;
+			if (currentDay < 10) {
+				currentDay = '0' + currentDay;
 			}
 			currentDate = currentDate.getFullYear() + "" + currentMonth + "" + currentDay;
 			var oFilter = [];
@@ -1047,7 +1057,7 @@ sap.ui.define([
 				}
 			});
 		},
-		
+
 		// To find POHistory based on the selection documentNumber and document Item
 		findPOItemDetails: function (sDocumentItem, sDocumentNumber, poHistory) {
 			var newArray = [];
@@ -1057,6 +1067,15 @@ sap.ui.define([
 				}
 			}
 			return newArray;
+		},
+
+		onChangeHdrInvAmt: function (oEvent) {
+			var oValue = oEvent.getSource().getValue();
+			if(!(oValue.indexOf(".") >= 0) && oValue.length > 8) { 
+					oValue = oValue.slice(0,8);
+			} 
+			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
+			oEvent.getSource().setValue(oValue);
 		},
 
 	});

@@ -55,7 +55,7 @@ sap.ui.define([
 
 			this.setModel(new JSONModel(), "templateModel");
 
-			this.getBtnVisibility();
+			
 			this.oRouter = this.getOwnerComponent().getRouter();
 			this.oRouter.getRoute("NonPOInvoice").attachPatternMatched(this.onRouteMatched, this);
 			this.resourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
@@ -78,6 +78,8 @@ sap.ui.define([
 			var oArgs = oEvent.getParameter("arguments"),
 				requestId = oArgs.id,
 				status = oArgs.status;
+				var invoiceType = oEvent.getParameter("name");
+			this.getBtnVisibility(status, requestId, invoiceType);
 			this.oMandatoryModel.setProperty("/NonPO", {});
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			if (requestId === "NEW") {
@@ -162,11 +164,13 @@ sap.ui.define([
 				};
 				oPOModel.setProperty("/", initializeModelData);
 				this.oVisibilityModel.setProperty("/openPdfBtnVisible", false);
+				
 			}
 			//handle if route has NonPO request Id 
 			else if (requestId) {
 				POServices.getPONonPOData("", this, requestId);
 			}
+			
 		},
 
 		//function getGLaccountValue is triggered on change of GL Account in the Cost Center table

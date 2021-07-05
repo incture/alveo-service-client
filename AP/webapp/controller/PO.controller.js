@@ -48,7 +48,9 @@ sap.ui.define([
 					var oArgs = oEvent.getParameter("arguments");
 					that.requestId = oArgs.id;
 					that.status = oArgs.status;
+					var invoiceType = oEvent.getParameter("name");
 					POServices.getPONonPOData("", that, that.requestId);
+					this.getBtnVisibility(that.status, that.requestId, invoiceType);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -61,7 +63,6 @@ sap.ui.define([
 			var oLanguage = "E";
 			var countryKey = "SA";
 			//To load all OData lookups
-			this.getBtnVisibility();
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
@@ -383,6 +384,88 @@ sap.ui.define([
 		onClosePODetailsDialog: function () {
 			this.POItemDetails.close();
 		},
+
+		onClickAddInvoiceItem: function () {
+			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
+				oPOModelData = oPOModel.getData();
+			if (!oPOModelData.invoiceItems) {
+				oPOModelData.invoiceItems = [];
+			}
+			oPOModelData.invoiceItems.unshift({
+				"accAssignmentCat": null,
+				"accountAssignmentCat": null,
+				"alvQtyOPU": null,
+				"alvQtyOU": null,
+				"alvQtyUOM": null,
+				"articleNum": "",
+				"contractItem": null,
+				"contractNum": null,
+				"convDen1": null,
+				"convNum1": null,
+				"currency": "",
+				"customerItemId": "",
+				"disPerentage": 0,
+				"discountValue": 0,
+				"extItemId": "",
+				"grBsdIv": null,
+				"grFlag": null,
+				"grossPrice": 0,
+				"guid": "",
+				"invItemAcctDtoList": [],
+				"invQty": 0,
+				"invoiceItemMessages": [],
+				"isAccAssigned": false,
+				"isDeleted": false,
+				"isSelected": false,
+				"isThreewayMatched": false,
+				"isTwowayMatched": false,
+				"itemCategory": null,
+				"itemCode": "",
+				"itemRequisationNum": null,
+				"itemStatusCode": "",
+				"itemStatusText": "",
+				"itemText": "",
+				"ivFlag": null,
+				"matchDocItem": null,
+				"matchDocNum": null,
+				"matchParam": null,
+				"matchType": null,
+				"matchedBy": null,
+				"matchpackageNumber": null,
+				"matchserviceNumber": null,
+				"netWorth": 0,
+				"orderPriceUnit": null,
+				"orderPriceUnitISO": null,
+				"orderUnit": null,
+				"orderUnitISO": null,
+				"poItemText": null,
+				"poMatNum": null,
+				"poQtyOPU": null,
+				"poQtyOU": null,
+				"poTaxCode": null,
+				"poUnitPriceOPU": null,
+				"poUnitPriceOU": null,
+				"poUnitPriceUOM": null,
+				"pricingUnit": 0,
+				"productType": null,
+				"refDocCat": null,
+				"refDocNum": 0,
+				"requestId": oPOModelData.requestId,
+				"requisationNum": null,
+				"setPoMaterialNum": null,
+				"srvBsdIv": null,
+				"sysSuggTax": null,
+				"taxCode": null,
+				"taxPercentage": 0,
+				"taxValue": 0,
+				"unitPrice": 0,
+				"uom": "",
+				"upcCode": null,
+				"updatedAt": null,
+				"updatedBy": null
+			});
+			oPOModel.refresh();
+		}
 
 	});
 

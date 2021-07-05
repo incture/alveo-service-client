@@ -6,17 +6,17 @@
 					<ToolbarSpacer/>
 					<Select forceSelection="false" valueState="{oPOModel>/invoiceDetailUIDto/vstate/taxCode}"
 						selectedKey="{oPOModel>/invoiceDetailUIDto/invoiceHeader/taxCode}" items="{oDropDownModel>/taxCodeResult}"
-						change="onChangeInvoiceServiceGoods">
+						change="onChangeInvoiceServiceGoods" visible="false">
 						<items>
 							<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}"/>
 						</items>
 					</Select>
-					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized"/>
-					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized"/>
-					<Button text="{i18n>TaxDetails}" press="onClickTaxDetails" type="Emphasized"/>
-					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddItem" type="Emphasized"/>
-					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"></Button>
-					<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV" class="sapUiTinyMarginBottom"
+					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddInvoiceItem" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<ToolbarSeparator/>
+					<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV"
 						visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}"></Switch>
 					<Button icon="sap-icon://action-settings" enabled="false"></Button>
 				</OverflowToolbar>
@@ -122,20 +122,20 @@
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
-									<Input value="{oPOModel>invQty}" change="onInvQtyChange"/>
+									<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 									<HBox>
 										<Button icon="sap-icon://message-information" press="onViewUOMDetails"/>
-										<Select forceSelection="false" selectedKey="{oPOModel>uom}" items="{oPOModel>UOMList}" change="onChangeInvoiceQtyUom">
+										<Select forceSelection="false" selectedKey="{oPOModel>uom}" items="{oPOModel>UOMList}" change="onChangeInvoiceQtyUom" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 											<items>
 												<core:ListItem key="{oPOModel>key}" text="{oPOModel>value}"/>
 											</items>
 										</Select>
 									</HBox>
-									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange"/>
-									<Input value="{oPOModel>pricingUnit}" change="onInvQtyChange"/>
-									<Input value="{oPOModel>grossPrice}" change="onGrossPriceChange"/>
+									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<Input value="{oPOModel>pricingUnit}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<Input value="{oPOModel>grossPrice}" change="onGrossPriceChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
-										change="onItemTaxCodeChange">
+										change="onItemTaxCodeChange" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
 											<core:ListItem key="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TxCode}" text="{oDropDownModel>TaxCodeName}"/>
 										</items>
@@ -172,7 +172,8 @@
 						</Input>
 						<ToolbarSpacer/>
 						<Label text="{i18n>Tax}"/>
-						<Input width="4rem" value="{oPOModel>/taxValue}" type="Number" valueState="{oPOModel>/taxValue}" change="onChangeUserInputTaxAmount">
+						<Input width="4rem" value="{oPOModel>/taxValue}" type="Number" valueState="{oPOModel>/taxValue}" change="onChangeUserInputTaxAmount"
+							enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 							<layoutData>
 								<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
 							</layoutData>
@@ -257,7 +258,7 @@
 			<IconTabFilter text="{i18n>PurchaseOrder}" key="PurchaseOrder">
 				<OverflowToolbar>
 					<ToolbarSpacer/>
-					<Button text="{i18n>AddPO}" press="onClickAddPO" class="sapUiSizeCompact SecondaryBtn"/>
+					<Button text="{i18n>AddPO}" press="onClickAddPO" class="sapUiSizeCompact SecondaryBtn" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 				</OverflowToolbar>
 				<VBox items="{oPOModel>/purchaseOrders}">
 					<Panel expandable="true" width="auto">
