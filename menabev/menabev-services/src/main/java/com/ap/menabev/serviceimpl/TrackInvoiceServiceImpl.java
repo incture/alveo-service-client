@@ -37,6 +37,7 @@ import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.OdataTrackInvoiceObject;
 import com.ap.menabev.dto.OdataTrackInvoiceOutputPayload;
 import com.ap.menabev.dto.OdataTrackInvoiceResponseDto;
+import com.ap.menabev.dto.TrackInvoiceExcelResponseDto;
 import com.ap.menabev.dto.TrackInvoiceInputDto;
 import com.ap.menabev.dto.TrackInvoiceOdataOutputResponse;
 import com.ap.menabev.dto.TrackInvoiceOutputPayload;
@@ -474,6 +475,7 @@ String paid="true";
 
 	public ResponseEntity<?> downloadExcel(TrackInvoiceInputDto dto) throws IOException {
 		ModelMapper modelMapper = new ModelMapper();
+		TrackInvoiceExcelResponseDto trackInvoiceExcelResponseDto=new TrackInvoiceExcelResponseDto();
 		List<InvoiceHeaderDo> filterOutput = filterInvoicesMultiple(dto);
 
 		String[] columns = { "Invoice reference number", "Invoice Date", "Vendor", "CompanyCode", "GrossAmount", "Tax",
@@ -549,12 +551,17 @@ String paid="true";
 		}
 		FileOutputStream fileOut1 = new FileOutputStream("InvoiceDetails.xlsx");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		
 		workbook.write(outputStream);
 		fileOut1.close();
 		workbook.close();
 		byte[] b1 = outputStream.toByteArray();
 		String encode = Base64.getEncoder().encodeToString(b1);
-		return new ResponseEntity<String>(encode, HttpStatus.OK);
+		trackInvoiceExcelResponseDto.setBase64(encode);
+		trackInvoiceExcelResponseDto.setApplicationType("application/xlsx");
+		trackInvoiceExcelResponseDto.setDocumentName("InvoiceDetails.xlsx");
+		trackInvoiceExcelResponseDto.setFileAvailability("true");
+		return new ResponseEntity<TrackInvoiceExcelResponseDto>(trackInvoiceExcelResponseDto, HttpStatus.OK);
 
 		// return ResponseEntity.ok().body(new Response<String>(encode));
 	}
