@@ -226,13 +226,19 @@
 				"target": [
 					"PO"
 				]
-			},{
-					"name": "ItemMatch",
-					"pattern": "ItemMatch",
-					"target": [
-						"ItemMatch"
-					]
-				}],
+			}, {
+				"name": "ItemMatch",
+				"pattern": "ItemMatch",
+				"target": [
+					"ItemMatch"
+				]
+			}, {
+				"name": "SchedulerLogs",
+				"pattern": "SchedulerLogs",
+				"target": [
+					"SchedulerLogs"
+				]
+			}],
 			"targets": {
 				"UploadInvoice": {
 					"viewType": "XML",
@@ -277,6 +283,10 @@
 				"ItemMatch": {
 					"viewType": "XML",
 					"viewName": "ItemMatch"
+				},
+				"SchedulerLogs": {
+					"viewType": "XML",
+					"viewName": "SchedulerLogs"
 				}
 			}
 		}

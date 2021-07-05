@@ -29,6 +29,11 @@
 		"label": "PO",
 		"key": "PO",
 		"icon": "sap-icon://action-settings"
+	},
+	{
+		"label": "Scheduler Logs",
+		"key": "SchedulerLogs",
+		"icon": "sap-icon://action-settings"
 	}],
 	"userGroups": [{
 		"key": "IT_Admin",

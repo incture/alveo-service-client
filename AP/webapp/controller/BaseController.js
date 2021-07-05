@@ -572,6 +572,7 @@ sap.ui.define([
 			this.fnSearchPOVisibilty("PO");
 			addPOModel.setProperty("/vendorId", vendorId);
 			addPOModel.setProperty("/companyCode", companyCode);
+			this.oVisibilityModel.setProperty("/PO/enabled", false);
 			this.addPOFragment.open();
 		},
 
@@ -642,7 +643,7 @@ sap.ui.define([
 				selectedFilters = oEvent.getSource().getSelectedContextPaths();
 			addPOModel.setProperty("/selectedFilters", selectedFilters);
 			if (selectedFilters.length) {
-					this.oVisibilityModel.setProperty("/PO/enabled", true);
+				this.oVisibilityModel.setProperty("/PO/enabled", true);
 			} else {
 				this.oVisibilityModel.setProperty("/PO/enabled", false);
 			}
@@ -679,10 +680,10 @@ sap.ui.define([
 				async: true,
 				success: function (data, textStatus, jqXHR) {
 					busy.close();
-					var oPOModel = this.oPOModel();
-					oPOModel.setProperty("/", data.invoiceObject);
+					var oPOModel = this.oPOModel;
 					var aGetReferencedByPO = $.extend(true, [], oPOModel.getProperty("/purchaseOrders"));
 					aGetReferencedByPO = aGetReferencedByPO.concat(data.referencePo);
+					oPOModel.setProperty("/", data.invoiceObject);
 					oPOModel.setProperty("/purchaseOrders", aGetReferencedByPO);
 					oPOModel.refresh();
 					this.addPOFragment.close();

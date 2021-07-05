@@ -1,0 +1,173 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.SchedulerLogs"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout" xmlns:ui="sap.ui.table">
+	<Page title="{i18n>SchedulerLogs}" class="sapUiSizeCompact" titleAlignment="Center">
+		<content>
+			<!--<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L2 M2 S12">-->
+			<!--	<l:content>-->
+			<!--		<VBox>-->
+			<!--			<Label text="{i18n>FromDate}" design="Bold"/>-->
+			<!--			<DateTimePicker placeholder="Enter Date" change="handleChange"/>-->
+			<!--		</VBox>-->
+			<!--		<VBox>-->
+			<!--			<Label text="{i18n>ToDate}" design="Bold"/>-->
+			<!--			<DateTimePicker placeholder="Enter Date" change="handleChange"/>-->
+			<!--		</VBox>-->
+			<!--		<CheckBox text="{i18n>EmailReader}"/>-->
+			<!--		<CheckBox text="{i18n>OutputReader}"/>-->
+			<!--		<CheckBox text="{i18n>PORefresh}"/>-->
+			<!--		<CheckBox text="{i18n>All}" selected="true"/>-->
+			<!--	</l:content>-->
+			<!--</l:Grid>-->
+			<fb:FilterBar id="SchedulerFilterBarId" search="onSearch" clear="clearFilter" showClearButton="true" class="sapUiSizeCompact">
+				<fb:filterItems>
+					<fb:FilterItem name="A" label="{i18n>FromDate}">
+						<fb:control>
+							<DateTimePicker placeholder="Enter Date" change="handleChange"/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="B" label="{i18n>ToDate}">
+						<fb:control>
+							<DateTimePicker placeholder="Enter Date" change="handleChange"/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="C" label="{i18n>EmailReader}">
+						<fb:control>
+							<CheckBox />
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="D" label="{i18n>OutputReader}">
+						<fb:control>
+							<CheckBox/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="E" label="{i18n>PORefresh}">
+						<fb:control>
+							<CheckBox/>
+						</fb:control>
+					</fb:FilterItem>
+					<fb:FilterItem name="F" label="{i18n>All}">
+						<fb:control>
+							<CheckBox selected="true"/>
+						</fb:control>
+					</fb:FilterItem>
+				</fb:filterItems>
+			</fb:FilterBar>
+			<l:Grid defaultSpan="L3 M6 S12" width="100%" class="sapUiResponsiveMargin">
+				<VBox>
+					<Label text="{i18n>EmailReader}" design="Bold"/>
+					<HBox>
+						<Label text="{i18n>Status}"/>
+						<Text text="{schedulerLogsModel>/inputTempName}"/>
+					</HBox>
+					<HBox>
+						<Label text="{i18n>LastUpdatedBy}"/>
+						<Text text="{schedulerLogsModel>/inputTempName}"/>
+					</HBox>
+				</VBox>
+				<VBox>
+					<Label text="{i18n>AbbyOutReader}" design="Bold"/>
+					<HBox>
+						<Label text="{i18n>Status}"/>
+						<Text text="{schedulerLogsModel>/inputTempName}"/>
+					</HBox>
+					<HBox>
+						<Label text="{i18n>LastUpdatedBy}"/>
+						<Text text="{schedulerLogsModel>/inputTempName}"/>
+					</HBox>
+				</VBox>
+				<VBox>
+					<Label text="{i18n>PORefresh}" design="Bold"/>
+					<HBox>
+						<Label text="{i18n>Status}"/>
+						<Text text="{schedulerLogsModel>/inputTempName}"/>
+					</HBox>
+					<HBox>
+						<Label text="{i18n>LastUpdatedBy}"/>
+						<Text text="{schedulerLogsModel>/inputTempName}"/>
+					</HBox>
+				</VBox>
+			</l:Grid>
+			<ui:Table rows="{schedulerLogsModel>/aSchedulerLogs}" visibleRowCount="7" ariaLabelledBy="title">
+				<ui:extension>
+					<OverflowToolbar>
+						<Title text="{i18n>Records}"/>
+					</OverflowToolbar>
+				</ui:extension>
+				<ui:columns>
+					<ui:Column>
+						<Label text="{i18n>RunId}"/>
+						<ui:template>
+							<Text text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column >
+						<Label text="{i18n>CycleId}"/>
+						<ui:template>
+							<Input value="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>StartDateTime}"  wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>EndDateTime}"  wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>SchedulerName}" wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>NoOfMails}" wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>Successfull}"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>NoOfAttachments}" wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>NoOfPDFs}" wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>NoOfJSON}" wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>NoOfWFs}"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+					<ui:Column>
+						<Label text="{i18n>SchedulerStart}" wrapping="true"/>
+						<ui:template>
+							<Label text="{schedulerLogsModel>Name}"/>
+						</ui:template>
+					</ui:Column>
+				</ui:columns>
+			</ui:Table>
+		</content>
+	</Page>
+</mvc:View>
