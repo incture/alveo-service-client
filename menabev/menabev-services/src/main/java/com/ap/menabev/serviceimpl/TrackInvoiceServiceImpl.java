@@ -323,113 +323,30 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		if (dto.getInvoiceStatus() != null && !dto.getInvoiceStatus().isEmpty()) {
 
 			StringBuffer rqstId = new StringBuffer();
-			
-			int check = 0;
-			int remove=0;
-			
 			for(int i=0;i<dto.getInvoiceStatus().size();i++)
 			{
 				if(dto.getInvoiceStatus().get(i).equals("16"))
 				{
-					remove=1;
+					filterQueryMap.put("RR.INVOICE_STATUS BETWEEN ", + 0 + " AND " + 15 + "");
 				}
-			}
-			
-			List<String> code= new ArrayList<>();
-
-			for (int i = 0; i < dto.getInvoiceStatus().size(); i++)
-			{
-				if (i < dto.getInvoiceStatus().size() - 1 && !dto.getInvoiceStatus().get(i+1).equals("16")) { // as 16 is not there
-															// in db
-					if (!dto.getInvoiceStatus().get(i).equals("16")) {
-						rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'" + ",");
-						check = 1;  //if dto does not contain 16
-						code.add(dto.getInvoiceStatus().get(i));
-					}
-				} else {
-					if (!dto.getInvoiceStatus().get(i).equals("16")) {
-						rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'");
-						check = 1;
-						code.add(dto.getInvoiceStatus().get(i));
-					}
-					logger.error("inside the loop" + rqstId);
-				}
-			}
-			String FIRST = "0";
-
-			if(remove==1)
-			logger.error("status code dto !!!!!!!!!!!!!!!!!!!!!!!" + dto.getInvoiceStatus());
-			
-			List<String> statuscodearray=new ArrayList<>();
-				
-			statuscodearray.add("16");
-			statuscodearray.add("15");
-			statuscodearray.add("14");
-			statuscodearray.add("13");
-						
-			for(int i=0;i<dto.getInvoiceStatus().size();i++)
-			{
-				logger.error("status code array value outsideo loop! !!!!!!!"+statuscodearray);
-				
-				for(int j=0;j<statuscodearray.size();j++)
+				if(dto.getInvoiceStatus().get(i).equals("13"))
 				{
-				logger.error("status code array value in loop! !!!!!!!"+statuscodearray);
-				
-				  if(statuscodearray.get(j).equals(dto.getInvoiceStatus().get(i)))
-				  {
-					  
-					statuscodearray.remove(j);
-				  }
-			}
-			
-			}
-		
-			logger.error("IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!"+statuscodearray);
-			StringBuffer notinQuery= new StringBuffer();
-			
-			for(int i=0;i<statuscodearray.size();i++)
-			{	
-			//notinQuery.append("'" + statuscodearray.get(i) + "'" + ",");
-			if (i < statuscodearray.size() - 1 ){ // as 16 is not there
-				notinQuery.append("'" + statuscodearray.get(i) + "'" + ",");
-             }
-			 else 
-			 {
-				 notinQuery.append("'" + statuscodearray.get(i) + "'" );
-              }
-			}
-			
-			if (check == 1 && remove ==0) //this means dto does not contain 16
-				filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
-			else if(remove ==1 && check ==0)// dto only contains 16
-				filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN ", FIRST + " AND 12");
-			else
-			{
-				//all 4 status codes are there
-				logger.error("dto size"+dto.getInvoiceStatus().size());
-				
-				
-				if(dto.getInvoiceStatus().size()==4)// if dto contains 16 and more codes
-				filterQueryMap.put("RR.INVOICE_STATUS BETWEEN ", FIRST + " AND 15");
-				else
-					filterQueryMap.put("RR.INVOICE_STATUS BETWEEN 0 AND 15 and RR.INVOICE_STATUS not in" , "(" + notinQuery + ")");
-			
-			}		
-			logger.error("histatus code list" + dto.getInvoiceStatus());
-		
-			/*StringBuffer rqstId = new StringBuffer();
-			
-			for (int i = 0; i < dto.getInvoiceStatus().size(); i++) {
-				if (i < dto.getInvoiceStatus().size() - 1) {
-					rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'" + ",");
-				} else {
-					rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'");
+
+					filterQueryMap.put("RR.INVOICE_STATUS =", "('" +13+ "')");
+
+				}
+				if(dto.getInvoiceStatus().get(i).equals("14"))
+				{
+					filterQueryMap.put("RR.INVOICE_STATUS =", "('" +14+ "')");
+
+				}
+				if(dto.getInvoiceStatus().get(i).equals("15"))
+				{
+					filterQueryMap.put("RR.INVOICE_STATUS =", "('" +15+ "')");
+
 				}
 			}
-			filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
-			// correct
-*/		}
-
+		}
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
 		AtomicInteger count = new AtomicInteger(0);
 		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
