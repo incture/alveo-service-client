@@ -403,7 +403,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
 			else if(remove ==1 && check ==0)// dto only contains 16
 				filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN ", FIRST + " AND "+12+"");
-			else
+			else 
 			{
 				//all 4 status codes are there
 				logger.error("dto size"+dto.getInvoiceStatus().size());
