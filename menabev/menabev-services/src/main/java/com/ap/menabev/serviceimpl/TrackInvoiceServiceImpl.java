@@ -327,22 +327,22 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			{
 				if(dto.getInvoiceStatus().get(i).equals("16"))
 				{
-					filterQueryMap.put("RR.INVOICE_STATUS BETWEEN ", + 0 + " AND " + 15 + "");
+					filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN ", + 0 + " AND " + 15 + "");
 				}
 				if(dto.getInvoiceStatus().get(i).equals("13"))
 				{
 
-					filterQueryMap.put("RR.INVOICE_STATUS =", "('" +13+ "')");
+					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +13+ "')");
 
 				}
 				if(dto.getInvoiceStatus().get(i).equals("14"))
 				{
-					filterQueryMap.put("RR.INVOICE_STATUS =", "('" +14+ "')");
+					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +14+ "')");
 
 				}
 				if(dto.getInvoiceStatus().get(i).equals("15"))
 				{
-					filterQueryMap.put("RR.INVOICE_STATUS =", "('" +15+ "')");
+					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +15+ "')");
 
 				}
 			}
