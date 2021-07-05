@@ -6,11 +6,11 @@
 					<VBox class="sapUiTinyMargin">
 						<HBox>
 							<Label text="{i18n>InvoiceNumber}" design="Bold" class="sapUiTinyMarginEnd"/>
-							<Text text="{oPOModel>/extInvNum}"/>
+							<Text text="{oPOModel>/invoiceNumber}"/>
 						</HBox>
 						<HBox>
 							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
-							<Text text="{oPOModel>/invoiceStatusText}"/>
+							<Text text="{oPOModel>/invoiceStatus}"/>
 						</HBox>
 						<layoutData>
 							<l:GridData span="XL8 L8 M8 S6"/>
@@ -18,7 +18,7 @@
 					</VBox>
 					<HBox class="sapUiTinyMargin">
 						<Label text="{i18n>TotalValue}" design="Bold" class="sapUiTinyMarginEnd"/>
-						<Text text="{oPOModel>/invoiceTotal}"/>
+						<Text text="{oPOModel>/totalValue}"/>
 						<layoutData>
 							<l:GridData span="XL4 L4 M4 S6"/>
 						</layoutData>
@@ -26,21 +26,25 @@
 				</l:content>
 			</l:Grid>
 			<tnt:InfoLabel text="{i18n>submitInfoLabelMsg}" colorScheme="7" displayOnly="true"/>
-			<Table alternateRowColors="true" items="{oPOModel>/userList}">
-				<!--<headerToolbar>-->
-				<!--	<OverflowToolbar>-->
-				<!--		<ToolbarSpacer/>-->
-				<!--		<Button icon="sap-icon://sys-add"/>-->
-				<!--		<Button icon="sap-icon://sys-minus"/>-->
-				<!--	</OverflowToolbar>-->
-				<!--</headerToolbar>-->
+			<Switch customTextOn="GRN" customTextOff="BUYER"
+				state="{path:'oPOModel>/selectedRemidiationGroup',formatter:'com.menabev.AP.formatter.formatter.formatRemidiationUser'}"
+				visible="{path:'oPOModel>/selectedRemidiationGroup',formatter:'com.menabev.AP.formatter.formatter.formatRemidiationUser'}"
+				change="onRemidiationSwitchToggle"></Switch>
+			<Table alternateRowColors="true">
+				<headerToolbar>
+					<OverflowToolbar>
+						<ToolbarSpacer/>
+						<Button icon="sap-icon://sys-add" press="onAddRemidiationUser"/>
+						<!--<Button icon="sap-icon://sys-minus"/>-->
+					</OverflowToolbar>
+				</headerToolbar>
 				<columns>
 					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
-						<Label design="Bold" text="{i18n>BuyerUserId}"/>
+						<Label design="Bold" text="{i18n>UserId}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
-						<Label design="Bold" text="{i18n>Group}"/>
-					</Column>
+					<!--<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">-->
+					<!--	<Label design="Bold" text="{i18n>Group}"/>-->
+					<!--</Column>-->
 					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
 						<Label design="Bold" text="{i18n>Actions}"/>
 					</Column>
@@ -48,21 +52,21 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{oPOModel>buyerUserId}"/>
-							<Text text="{oPOModel>group}"/>
-							<Text text="{oPOModel>action}"/>
+							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}"/>
+							<!--<Text text="{oPOModel>group}"/>-->
+							<Button icon="" press="onDeleteRemidiationUser"></Button>
 						</cells>
 					</ColumnListItem>
 				</items>
 			</Table>
 			<l:Grid hSpacing="1" vSpacing="0" defaultSpan="XL12 L12 M12 S12" class="sapUiSmallMarginTopBottom">
-                <Label design="Bold" text="{i18n>COMMENTS}" required="true"/>
-                <TextArea value="{oPOModel>/sComments}" placeholder="{i18n>PleaseEnterComments}" showExceededText="true" maxLength="40" width="100%" liveChange="onCommentsLiveChange"
-                    valueState="{oPOModel>/sCommentValueState}" valueLiveUpdate="true"/>
-            </l:Grid>
+				<Label design="Bold" text="{i18n>COMMENTS}" required="true"/>
+				<TextArea value="{oPOModel>/sComments}" placeholder="{i18n>PleaseEnterComments}" showExceededText="true" maxLength="40" width="100%"
+					liveChange="onCommentsLiveChange" valueState="{oPOModel>/sCommentValueState}" valueLiveUpdate="true"/>
+			</l:Grid>
 		</content>
 		<beginButton>
-			<Button text="{i18n>OK}" press="onClickOK" type="Emphasized" enabled="false"/>
+			<Button text="{i18n>Submit}" press="onPressOK" type="Emphasized" enabled="false"/>
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>Cancel}" press="onCancelSubmitDialog"/>

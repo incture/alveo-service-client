@@ -150,7 +150,9 @@ sap.ui.define([
 		},
 
 		onSubmitForRemediationFrag: function (userList) {
-			this.fetchUserList();
+			if (userList) {
+				this.fetchUserList();
+			}
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog);
@@ -160,7 +162,9 @@ sap.ui.define([
 		},
 
 		onSubmitForApprovalFrag: function (userList) {
-			this.fetchUserList();
+			if (userList) {
+				this.fetchUserList();
+			}
 			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog);
@@ -170,6 +174,7 @@ sap.ui.define([
 		},
 
 		fetchUserList: function (userList) {
+
 			var oPOModel = this.oPOModel;
 			var length = userList.length;
 			var GRN = 0,
@@ -179,7 +184,7 @@ sap.ui.define([
 				if (userList[i].type === "GRN") {
 					oPOModel.setProperty("/GRNUser", userList[i].users);
 					GRN += 1;
-				} else if (userList[i].type === "Buyer") {
+				} else if (userList[i].type === "BUYER ") {
 					oPOModel.setProperty("/BuyerUser", userList[i].users);
 					buyer += 1;
 				} else if (userList[i].type === "ProcessLead") {
@@ -188,17 +193,94 @@ sap.ui.define([
 				}
 			}
 			if (GRN && buyer) {
+				oPOModel.setProperty("/remidiationSwitchVisible", true);
+				oPOModel.setProperty("/selectedRemidiationGroup", "GRN");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
 			}
 			if (GRN) {
+				oPOModel.setProperty("/remidiationSwitchVisible", false);
+				oPOModel.setProperty("/selectedRemidiationGroup", "GRN");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
 			}
 			if (buyer) {
+				oPOModel.setProperty("/remidiationSwitchVisible", false);
+				oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/BuyerUser"));
 			}
 			if (processLead) {
+				oPOModel.setProperty("/remidiationSwitchVisible", false);
+				oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
 			}
+		},
+
+		onRemidiationSwitchToggle: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var state = oEvent.getSource().getState();
+			if (state) {
+				oPOModel.setProperty("/selectedRemidiationGroup", "GRN");
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
+			} else {
+				oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/BuyerUser"));
+			}
+			oPOModel.refresh();
+		},
+
+		onAddRemidiationUser: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var obj = {
+				"user": ""
+			};
+			var userList = oPOModel.getProperty("/userList");
+			if (!userList) {
+				userList = [];
+			}
+			userList.push(obj);
+		},
+
+		onDeleteRemidiationUser: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var userList = oPOModel.getProperty("/userList");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var spathArray = sPath.split("/");
+			var length = spathArray.length;
+			var index = spathArray[length - 1];
+			userList.splice(index, 1);
+			oPOModel.setProperty("/userList", userList);
+			oPOModel.refresh();
+		},
+
+		formUserListPayload: function () {
+			var oPOModel = this.oPOModel;
+			var userList = oPOModel.getProperty("/userList");
+			var user, count = 0;
+			var length = userList.length;
+			if (!length) {
+				sap.m.MessageToast.show("Please enter one remidiation user");
+				return;
+			}
+			for (var i = 0; i < userList.length; i++) {
+				user = userList[i].user;
+				if (!user) {
+					oPOModel.setProperty("/userList/" + i + "/userState", "Error");
+					count += 1;
+				} else {
+					oPOModel.setProperty("/userList/" + i + "/userState", "None");
+				}
+			}
+			if (count) {
+				sap.m.MessageToast.show("Please enter all mandatory fields");
+				return;
+			} else {
+				var obj = {
+					"userList": [{
+						"type": oPOModel.getProperty("/selectedRemidiationGroup"),
+						"users": oPOModel.getProperty("/userList")
+					}]
+				};
+			}
+			return obj;
 		},
 
 		onCancelSubmitDialog: function () {
@@ -219,7 +301,8 @@ sap.ui.define([
 
 		onPressOK: function (oEvent) {
 			var oPayload = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+			var userList = this.formUserListPayload();
+			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA", userList, "ok");
 		},
 
 		onNonPoSave: function (oEvent) {

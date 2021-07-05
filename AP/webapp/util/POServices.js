@@ -22,6 +22,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	getPONonPOData: function (oEvent, oController, requestId) {
+		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oVisibilityModel = oController.oVisibilityModel;
 		var sUrl = "/menabevdev/invoiceHeader/getInvoiceByReqId/" + requestId;
@@ -44,7 +45,7 @@ com.menabev.AP.util.POServices = {
 			var invoiceItems = oPOModel.getProperty("/invoiceItems");
 			var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
 			oController.getReferencePo(arrUniqueInvoiceItems);
-			this.formatUOMList(oData.invoiceItems);
+			that.formatUOMList(oData.invoiceItems);
 			// if (oData.messages.messageType === "E") {
 			// 	sap.m.MessageBox.success(oData.messages.messageText, {
 			// 		actions: [sap.m.MessageBox.Action.OK]
@@ -455,7 +456,7 @@ com.menabev.AP.util.POServices = {
 				oPayload.invoiceHeaderDto.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
 				if (oSubmitData.invoiceType == "PO") {
 					sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
-					oPayload.invoiceHeaderDto.purchaseOrder = jQuery.extend("", {}, oData.purchaseOrder);
+					oPayload.invoiceHeaderDto.purchaseOrder = jQuery.extend(true, [], oData.purchaseOrder);
 					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "openFrag");
 				} else {
 					var sUrl = "/menabevdev/invoiceHeader/accountantSubmit";
@@ -501,7 +502,7 @@ com.menabev.AP.util.POServices = {
 			"requestId": oData.requestId,
 			"taskId": oData.requestId,
 			"actionCode": actionCode,
-			"purchaseOrders": jQuery.extend("", {}, oData.purchaseOrders)
+			"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders)
 		};
 		var sUrl;
 		oPayload.invoice.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
@@ -598,7 +599,7 @@ com.menabev.AP.util.POServices = {
 		});
 	},
 
-	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, method, ok) {
+	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, userList, ok) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -618,8 +619,10 @@ com.menabev.AP.util.POServices = {
 				oPOModel.setProperty("/", oData.invoice);
 				if (!ok && actionCode === "ASR") {
 					oController.onSubmitForRemediationFrag(oData.userList);
+					return;
 				} else if (!ok && actionCode === "ASA") {
 					oController.onSubmitForApprovalFrag(oData.userList);
+					return;
 				}
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
 				var message = "Session Lost. Press OK to refresh the page";
@@ -843,30 +846,6 @@ com.menabev.AP.util.POServices = {
 		var data = oEvent.getSource().getBindingContext("oPOModel").getObject().UOMConversion;
 		this.oPOModel.setProperty("/UOMList", data);
 		this.PopoverNewNotification.openBy(oButton);
-	},
-
-	fetchUserDetail: function (userList) {
-		var oPOModel = oController.oPOModel;
-		var length = userList.length;
-		var GRN = 0,
-			buyer = 0,
-			processLead = 0;
-		for (var i = 0; i < length; i++) {
-			if (userList[i].type === "GRN") {
-				oPOModel.setProperty("/GRNUsers", userList[i].users);
-				GRN += 1;
-			} else if (userList[i].type === "Buyer") {
-				oPOModel.setProperty("/BuyerUser", userList[i].users);
-				buyer += 1;
-			} else if (userList[i].type === "ProcessLead") {
-				oPOModel.setProperty("/ProcessLeadUser", userList[i].users);
-				processLead += 1;
-			}
-		}
-		if (GRN && buyer) {}
-		if (GRN) {}
-		if (buyer) {}
-		if (processLead) {}
 	},
 
 	calculateTax: function (selItems) {
