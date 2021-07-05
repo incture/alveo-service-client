@@ -323,27 +323,43 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		if (dto.getInvoiceStatus() != null && !dto.getInvoiceStatus().isEmpty()) {
 
 			StringBuffer rqstId = new StringBuffer();
-			for(int i=0;i<dto.getInvoiceStatus().size();i++)
-			{
-				if(dto.getInvoiceStatus().get(i).equals("16"))
-				{
-					//String str=[{'0','1','2','3','4','5','6','7','8','9','10','11','12'}];
-					filterQueryMap.put(" RR.INVOICE_STATUS IN ", "('0','1','2','3','4','5','6','7','8','9','10','11','12')");//"('" +0+ "')" +" OR " +"('" +1+ "')" + + 0 + " AND " + 12 + "");
+			for (int i = 0; i < dto.getInvoiceStatus().size(); i++) {
+				if (dto.getInvoiceStatus().get(i).equals("16")) {
+					// String
+					// str=[{'0','1','2','3','4','5','6','7','8','9','10','11','12'}];
+					filterQueryMap.put(" RR.INVOICE_STATUS IN ",
+							"('0','1','2','3','4','5','6','7','8','9','10','11','12')");// "('"
+																						// +0+
+																						// "')"
+																						// +"
+																						// OR
+																						// "
+																						// +"('"
+																						// +1+
+																						// "')"
+																						// +
+																						// +
+																						// 0
+																						// +
+																						// "
+																						// AND
+																						// "
+																						// +
+																						// 12
+																						// +
+																						// "");
 				}
-				if(dto.getInvoiceStatus().get(i).equals("13"))
-				{
+				if (dto.getInvoiceStatus().get(i).equals("13")) {
 
-					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +13+ "')");
-
-				}
-				if(dto.getInvoiceStatus().get(i).equals("14"))
-				{
-					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +14+ "')");
+					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" + 13 + "')");
 
 				}
-				if(dto.getInvoiceStatus().get(i).equals("15"))
-				{
-					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +15+ "')");
+				if (dto.getInvoiceStatus().get(i).equals("14")) {
+					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" + 14 + "')");
+
+				}
+				if (dto.getInvoiceStatus().get(i).equals("15")) {
+					filterQueryMap.put(" RR.INVOICE_STATUS =", "('" + 15 + "')");
 
 				}
 			}
@@ -407,32 +423,47 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			InvoiceHeaderDto invoiceHeaderDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 
 			Row row = sheet.createRow(rowNum);
-
-			row.createCell(0).setCellValue(invoiceHeaderDto.getInvoice_ref_number());
-			System.err.println(invoiceHeaderDto.getInvoice_ref_number());
-
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getExtInvNum())) {
+				row.createCell(0).setCellValue(invoiceHeaderDto.getExtInvNum());
+				System.err.println(invoiceHeaderDto.getExtInvNum());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getInvoiceDate())) {
 			LocalDateTime invoiceDate = Instant.ofEpochMilli(invoiceHeaderDto.getInvoiceDate())
 					.atZone(ZoneId.systemDefault()).toLocalDateTime();
 			System.out.println("invoiceDate in formatedOrder:" + invoiceDate);
-
 			row.createCell(1).setCellValue(invoiceDate.toString());
 			System.err.println("invoiceDate.toString():" + invoiceDate.toString());
-			row.createCell(2).setCellValue(invoiceHeaderDto.getVendorId());
-			System.err.println(invoiceHeaderDto.getVendorId());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getVendorId())) {
+
+				row.createCell(2).setCellValue(invoiceHeaderDto.getVendorId());
+				System.err.println(invoiceHeaderDto.getVendorId());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getCompCode())) {
 
 			row.createCell(3).setCellValue(invoiceHeaderDto.getCompCode());
-			row.createCell(4).setCellValue(invoiceHeaderDto.getGrossAmount().doubleValue());
-			row.createCell(5).setCellValue(invoiceHeaderDto.getTaxAmount().doubleValue());
-			row.createCell(6).setCellValue(invoiceHeaderDto.getInvoiceTotal().doubleValue());
-			row.createCell(7).setCellValue(invoiceHeaderDto.getPaymentReference());
-
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getGrossAmount())) {
+				row.createCell(4).setCellValue(invoiceHeaderDto.getGrossAmount().doubleValue());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getTaxAmount())) {
+				row.createCell(5).setCellValue(invoiceHeaderDto.getTaxAmount().doubleValue());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getInvoiceTotal())) {
+				row.createCell(6).setCellValue(invoiceHeaderDto.getInvoiceTotal().doubleValue());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getPaymentReference())) {
+				row.createCell(7).setCellValue(invoiceHeaderDto.getPaymentReference());
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getDueDate())) {
 			LocalDateTime dueDate = Instant.ofEpochMilli(invoiceHeaderDto.getDueDate()).atZone(ZoneId.systemDefault())
 					.toLocalDateTime();
 			System.out.println("dueDatedueDate in formatedOrder:" + dueDate);
 			row.createCell(8).setCellValue(dueDate.toString());
-
-			row.createCell(9).setCellValue(invoiceHeaderDto.getInvoiceStatus());
-
+			}
+			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getInvoiceStatus())) {
+				row.createCell(9).setCellValue(invoiceHeaderDto.getInvoiceStatus());
+			}
 			rowNum++;
 		}
 		for (int i = 0; i < columns.length; i++) {
