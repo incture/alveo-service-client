@@ -50,7 +50,7 @@ sap.ui.define([
 					that.status = oArgs.status;
 					var invoiceType = oEvent.getParameter("name");
 					POServices.getPONonPOData("", that, that.requestId);
-					this.getBtnVisibility(that.status, that.requestId, invoiceType);
+					that.getBtnVisibility(that.status, that.requestId, invoiceType);
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {

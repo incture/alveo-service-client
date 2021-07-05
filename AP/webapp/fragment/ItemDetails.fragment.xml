@@ -14,7 +14,7 @@
 					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddInvoiceItem" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
-					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>
 					<ToolbarSeparator/>
 					<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV"
 						visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}"></Switch>
