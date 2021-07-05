@@ -327,7 +327,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			{
 				if(dto.getInvoiceStatus().get(i).equals("16"))
 				{
-					filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN ", + 0 + " AND " + 15 + "");
+					//String str=[{'0','1','2','3','4','5','6','7','8','9','10','11','12'}];
+					filterQueryMap.put(" RR.INVOICE_STATUS IN ", "('0','1','2','3','4','5','6','7','8','9','10','11','12')");//"('" +0+ "')" +" OR " +"('" +1+ "')" + + 0 + " AND " + 12 + "");
 				}
 				if(dto.getInvoiceStatus().get(i).equals("13"))
 				{
