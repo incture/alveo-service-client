@@ -214,20 +214,23 @@ sap.ui.define([
 			oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
 			oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
 			oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", false);
 			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			if (requestId === "NEW") {
 				oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
 				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
-			} else if (status === "claimed") {
+			} else if (status === "RESERVED") {
 				if (loggedinUserGroup === "Process_Lead") {
 					oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
 					oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
+					oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", true);
 				} else if (loggedinUserGroup === "Accountant") {
 					oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
 					oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", true);
 				}
 				if (invoiceType === "PO") {
 					oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", true);
@@ -955,37 +958,59 @@ sap.ui.define([
 			var sUrl = "/menabevdev/document/download/" + documentId;
 			oServiceModel.loadData(sUrl, "", true, "GET", false, false, this.oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
-				var Base64 = oEvent.getSource().getData().base64;
-				var fileName = oEvent.getSource().getData().documentName;
-				if (fileName && fileName.split(".") && fileName.split(".")[fileName.split(".").length - 1]) {
-					var fileType = fileName.split(".")[fileName.split(".").length - 1].toLowerCase();
-				}
-				if (!jQuery.isEmptyObject(Base64)) {
-					var u8_2 = new Uint8Array(atob(Base64).split("").map(function (c) {
-						return c.charCodeAt(0);
-					}));
-					var a = document.createElement("a");
-					document.body.appendChild(a);
-					a.style = "display: none";
-					var blob = new Blob([u8_2], {
-						type: "application/" + fileType,
-						name: fileName
+				if (oEvent.getParameters().success) {
+					var Base64 = oEvent.getSource().getData().base64;
+					var fileName = oEvent.getSource().getData().documentName;
+					if (fileName && fileName.split(".") && fileName.split(".")[fileName.split(".").length - 1]) {
+						var fileType = fileName.split(".")[fileName.split(".").length - 1].toLowerCase();
+					}
+					if (!jQuery.isEmptyObject(Base64)) {
+						var u8_2 = new Uint8Array(atob(Base64).split("").map(function (c) {
+							return c.charCodeAt(0);
+						}));
+						var a = document.createElement("a");
+						document.body.appendChild(a);
+						a.style = "display: none";
+						var blob = new Blob([u8_2], {
+							type: "application/" + fileType,
+							name: fileName
+						});
+						var url = window.URL.createObjectURL(blob);
+
+						a.href = url;
+						// if (fileType === "pdf") {
+						// 	// a.target = "_blank";
+						// 	window.open(url, fileName, "width=900px, height=600px, scrollbars=yes");
+						// } else {
+						a.download = fileName;
+						a.click();
+						// }
+
+						// window.URL.revokeObjectURL(url);
+						// }
+					}
+				} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+					var message = "Session Lost. Press OK to refresh the page";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK],
+						onClose: function (sAction) {
+							location.reload(true);
+						}
 					});
-					var url = window.URL.createObjectURL(blob);
-
-					a.href = url;
-					// if (fileType === "pdf") {
-					// 	// a.target = "_blank";
-					// 	window.open(url, fileName, "width=900px, height=600px, scrollbars=yes");
-					// } else {
-					a.download = fileName;
-					a.click();
-					// }
-
-					// window.URL.revokeObjectURL(url);
-					// }
+				} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+					var message = "Service Unavailable. Please try after sometime";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+					var message = "Service Unavailable. Please contact administrator";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
 				}
-				busy.close();
 			});
 			oServiceModel.attachRequestFailed(function (oEvent) {
 				busy.close();
@@ -1008,10 +1033,33 @@ sap.ui.define([
 			oServiceModel.loadData(sUrl, "", true, "DELETE", false, false, this.oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				busy.close();
-				sap.m.MessageToast.show(oEvent.getSource().getData().message);
-				attachments.splice(index, 1);
-				nonPOInvoiceModel.setProperty("/attachments", attachments);
-				POServices.setChangeInd(oEvent, that, "attachementsChange");
+				if (oEvent.getParameters().success) {
+					sap.m.MessageToast.show(oEvent.getSource().getData().message);
+					attachments.splice(index, 1);
+					nonPOInvoiceModel.setProperty("/attachments", attachments);
+					POServices.setChangeInd(oEvent, that, "attachementsChange");
+				} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+					var message = "Session Lost. Press OK to refresh the page";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK],
+						onClose: function (sAction) {
+							location.reload(true);
+						}
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+					var message = "Service Unavailable. Please try after sometime";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+					var message = "Service Unavailable. Please contact administrator";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				}
 			});
 		},
 
@@ -1071,9 +1119,9 @@ sap.ui.define([
 
 		onChangeHdrInvAmt: function (oEvent) {
 			var oValue = oEvent.getSource().getValue();
-			if(!(oValue.indexOf(".") >= 0) && oValue.length > 8) { 
-					oValue = oValue.slice(0,8);
-			} 
+			if (!(oValue.indexOf(".") >= 0) && oValue.length > 8) {
+				oValue = oValue.slice(0, 8);
+			}
 			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
 			oEvent.getSource().setValue(oValue);
 		},

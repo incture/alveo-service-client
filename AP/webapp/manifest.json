@@ -216,13 +216,13 @@
 				]
 			}, {
 				"name": "NonPOInvoice",
-				"pattern": "NonPOInvoice/:id:/:status:",
+				"pattern": "NonPOInvoice/:id:/:status:/:taskId:",
 				"target": [
 					"NonPOInvoice"
 				]
 			}, {
 				"name": "PO",
-				"pattern": "PO/:id:/:status:",
+				"pattern": "PO/:id:/:status:/:taskId:",
 				"target": [
 					"PO"
 				]

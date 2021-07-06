@@ -89,44 +89,67 @@ sap.ui.define([
 			oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				busy.close();
-				var data = oEvent.getSource().getData();
-				var user, userdata = [],
-					vendorId, groupData, taskGroupData, taskGroupUsers = [];
-				if (data.Resources) {
-					for (var i = 0; i < data.Resources.length; i++) {
-						user = data.Resources[i];
-						if (user.groups) {
-							for (var j = 0; j < user.groups.length; j++) {
-								groupData = groups.indexOf(user.groups[j].value);
-								if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data[
-										"urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
-									.attributes) {
-									vendorId = user["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
-								}
-								if (groupData >= 0) {
-									if (userGroup === "IT_Admin") {
-										userdata.push(user);
-									} else if (loggedinUserVendorId === vendorId) {
-										userdata.push(user);
+				if (oEvent.getParameters().success) {
+					var data = oEvent.getSource().getData();
+					var user, userdata = [],
+						vendorId, groupData, taskGroupData, taskGroupUsers = [];
+					if (data.Resources) {
+						for (var i = 0; i < data.Resources.length; i++) {
+							user = data.Resources[i];
+							if (user.groups) {
+								for (var j = 0; j < user.groups.length; j++) {
+									groupData = groups.indexOf(user.groups[j].value);
+									if (data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"] && data[
+											"urn:sap:cloud:scim:schemas:extension:custom:2.0:User"]
+										.attributes) {
+										vendorId = user["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 									}
-								}
-								if (userGroup === "IT_Admin") {
-									taskGroupData = taskGroups.indexOf(user.groups[j].value);
-									if (taskGroupData >= 0) {
-										var obj = {
-											"userId": user.emails[0].value,
-											"role": user.groups[j].value
-										};
-										taskGroupUsers.push(obj);
+									if (groupData >= 0) {
+										if (userGroup === "IT_Admin") {
+											userdata.push(user);
+										} else if (loggedinUserVendorId === vendorId) {
+											userdata.push(user);
+										}
+									}
+									if (userGroup === "IT_Admin") {
+										taskGroupData = taskGroups.indexOf(user.groups[j].value);
+										if (taskGroupData >= 0) {
+											var obj = {
+												"userId": user.emails[0].value,
+												"role": user.groups[j].value
+											};
+											taskGroupUsers.push(obj);
+										}
 									}
 								}
 							}
 						}
+						var count = userdata.length;
+						oUserDetailModel.setProperty("/userCount", count);
+						oUserDetailModel.setProperty("/users", userdata);
+						oDropDownModel.setProperty("/taskGroupUsers", taskGroupUsers);
 					}
-					var count = userdata.length;
-					oUserDetailModel.setProperty("/userCount", count);
-					oUserDetailModel.setProperty("/users", userdata);
-					oDropDownModel.setProperty("/taskGroupUsers", taskGroupUsers);
+				} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+					var message = "Session Lost. Press OK to refresh the page";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK],
+						onClose: function (sAction) {
+							location.reload(true);
+						}
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+					var message = "Service Unavailable. Please try after sometime";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+					var message = "Service Unavailable. Please contact administrator";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
 				}
 			});
 		},
@@ -183,7 +206,30 @@ sap.ui.define([
 			oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, oHeader);
 			oServiceModel.attachRequestCompleted(function (oEvent) {
 				oBusyDialog.close();
-				sap.m.MessageBox.success("Reset Password link has been sent to the Email ID -  " + oEmailId);
+				if (oEvent.getParameters().success) {
+					sap.m.MessageBox.success("Reset Password link has been sent to the Email ID -  " + oEmailId);
+				} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+					var message = "Session Lost. Press OK to refresh the page";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK],
+						onClose: function (sAction) {
+							location.reload(true);
+						}
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+					var message = "Service Unavailable. Please try after sometime";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+					var message = "Service Unavailable. Please contact administrator";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				}
 			});
 			oServiceModel.attachRequestFailed(function (oEvent) {
 				oBusyDialog.close();
@@ -220,6 +266,27 @@ sap.ui.define([
 				if (oEvent.getParameter("success")) {
 					that.getUserDetails();
 					sap.m.MessageToast.show(oName + " (" + oUserId + ")" + " is deleted successfully");
+				} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+					var message = "Session Lost. Press OK to refresh the page";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK],
+						onClose: function (sAction) {
+							location.reload(true);
+						}
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+					var message = "Service Unavailable. Please try after sometime";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+					var message = "Service Unavailable. Please contact administrator";
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK]
+					});
 				} else {
 					var oMsg = oEvent.getParameters().errorobject.responseText;
 					sap.m.MessageBox.error(oMsg);

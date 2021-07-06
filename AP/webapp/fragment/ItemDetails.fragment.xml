@@ -30,25 +30,25 @@
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>CUSTOMERITEMID}" tooltip="{i18n>DESCRIPTION}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem">
 								<Label design="Bold" text="{i18n>QUANTITY}" tooltip="{i18n>QUANTITY}"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
 								<Label design="Bold" text="{i18n>UOM}" tooltip="{i18n>UOM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem">
 								<Label design="Bold" text="{i18n>UNITPRICE}" tooltip="{i18n>UNITPRICE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem">
 								<Label design="Bold" text="{i18n>PRICINGUNIT}" tooltip="{i18n>PRICINGUNIT}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem">
 								<Label design="Bold" text="{i18n>GROSSPRICE}" tooltip="{i18n>GROSSPRICE}"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
 								<Label design="Bold" text="{i18n>TAXCODE}" tooltip="{i18n>TAXCODE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" >
 								<Label design="Bold" text="{i18n>TAXVALUE}" tooltip="{i18n>TAXVALUE}"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem">
