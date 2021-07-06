@@ -63,4 +63,9 @@ public class PurchaseDocumentHeaderController {
 		return documentHeaderService.autoPostApi(dto);
 	}
 	
+	@PostMapping("/refreshPo")
+	public AddPoOutputDto refreshPoApi(@RequestBody AddPoInputDto dto) throws URISyntaxException, IOException, ParseException{
+		return documentHeaderService.refreshPoApi(dto);
+	}
+	
 }

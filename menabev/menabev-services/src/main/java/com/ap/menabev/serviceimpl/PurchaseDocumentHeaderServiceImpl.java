@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ap.menabev.dto.AddPoInputDto;
 import com.ap.menabev.dto.AddPoInputDto.PurchaseOrder;
 import com.ap.menabev.dto.AddPoOutputDto;
+import com.ap.menabev.dto.InvoiceChangeIndicator;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceHeaderObjectDto;
 import com.ap.menabev.dto.InvoiceItemDto;
@@ -114,6 +116,9 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 
 	@Autowired
 	DuplicatecheckServiceImpl duplicatecheckServiceImpl;
+
+	@Autowired
+	InvoiceHeaderServiceImpl invoiceHeaderServiceImpl;
 
 	@Override
 	public ResponseDto save(PurchaseDocumentHeaderDto dto) {
@@ -360,7 +365,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 		List<InvoiceItemDto> updatedItems = new ArrayList<>();
 		Boolean twoWayMatch = true;
 		if (!ServiceUtil.isEmpty(dto.getInvoiceHeader())) {
-			if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getInvoiceItems())){
+			if (!ServiceUtil.isEmpty(dto.getInvoiceHeader().getInvoiceItems())) {
 				for (InvoiceItemDto item : dto.getInvoiceHeader().getInvoiceItems()) {
 
 					System.out.println("I am here Auto Match");
@@ -368,37 +373,47 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 					twoWayMatchDto.setInvoiceItem(item);
 					twoWayMatchDto.setManualVsAuto(ApplicationConstants.AUTO_MATCH);
 					twoWayMatchDto.setPurchaseDocumentHeader(headerDto);
-					if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getVendorId())){
+					if (!ServiceUtil.isEmpty(dto.getInvoiceHeader().getVendorId())) {
 						twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
 					}
-					
 
 					InvoiceItemDto twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
 					System.out.println("MATCH :::: " + twowayMatchUpdatedItem.getIsTwowayMatched());
-					if(!twowayMatchUpdatedItem.getIsTwowayMatched()){
+					if (!twowayMatchUpdatedItem.getIsTwowayMatched()) {
 						twoWayMatch = true;
 					}
-					
+
 					updatedItems.add(twowayMatchUpdatedItem);
 
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		System.out.println("Before Item Match :::" + dto.getInvoiceHeader());
 		if (!ServiceUtil.isEmpty(updatedItems)) {
-			InvoiceHeaderDto headerUpdate = new InvoiceHeaderDto();
-			headerUpdate = dto.getInvoiceHeader();
+
 			System.out.println("Item Update");
-			headerUpdate.setInvoiceItems(updatedItems);
+			dto.getInvoiceHeader().setInvoiceItems(updatedItems);
+
+		}
+
+		// SaveApi
+		if (!ServiceUtil.isEmpty(dto.getInvoiceHeader())) {
+			InvoiceChangeIndicator changeIndicators = new InvoiceChangeIndicator();
+			changeIndicators.setItemChange(true);
+			changeIndicators.setActivityLog(true);
+			changeIndicators.setAttachementsChange(true);
+			changeIndicators.setCommentChange(true);
+			changeIndicators.setCostAllocationChange(true);
+			changeIndicators.setHeaderChange(true);
+			dto.getInvoiceHeader().setChangeIndicators(changeIndicators);
+			invoiceHeaderServiceImpl.saveAPI(dto.getInvoiceHeader());
 			addPoReturn.setInvoiceObject(dto.getInvoiceHeader());
 		}
 
 		System.out.println("After Item Match :::" + addPoReturn.getInvoiceObject());
-		
-
 		// vi. Call Java service – 3wayMatchAPI by using the payload.
 		//
 		// vii. Call SaveAPI with itemChangeIndicator.
@@ -1734,6 +1749,41 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 		}
 		System.out.println("AutoPostApi Response:::::" + dto);
 		return dto;
+	}
+
+	@Override
+	public AddPoOutputDto refreshPoApi(AddPoInputDto dto) throws URISyntaxException, IOException, ParseException {
+		AddPoOutputDto poApiResponse = new AddPoOutputDto();
+		if (!ServiceUtil.isEmpty(dto.getRequestId())) {
+			ResponseEntity<?> response = invoiceHeaderServiceImpl.getInvoiceDetail(dto.getRequestId());
+			if (!ServiceUtil.isEmpty(response.getBody())) {
+				HashMap<String, String> po = new HashMap<String, String>();
+				InvoiceHeaderDto header = (InvoiceHeaderDto) response.getBody();
+				po.put(header.getRefpurchaseDoc(), header.getRefpurchaseDocCat());
+				for (InvoiceItemDto invoiceItems : header.getInvoiceItems()) {
+					po.put(invoiceItems.getRefDocNum().toString(), invoiceItems.getRefDocCat());
+				}
+				AddPoInputDto addPoApiInput = new AddPoInputDto();
+				List<PurchaseOrder> purchaseOrder = new ArrayList<>();
+				for (String i : po.keySet()) {
+					PurchaseOrder setPurchaseOrder = new PurchaseOrder();
+					setPurchaseOrder.setDocumentNumber(i);
+					if(ServiceUtil.isEmpty(po.get(i))){
+						setPurchaseOrder.setDocumentCategory("F");
+					}else{
+						setPurchaseOrder.setDocumentCategory(po.get(i));
+					}
+					
+					purchaseOrder.add(setPurchaseOrder);
+				}
+				addPoApiInput.setInvoiceHeader(header);
+				addPoApiInput.setPurchaseOrder(purchaseOrder);
+			    poApiResponse = savePo(addPoApiInput);
+				
+			}
+		}
+
+		return poApiResponse;
 	}
 
 }
