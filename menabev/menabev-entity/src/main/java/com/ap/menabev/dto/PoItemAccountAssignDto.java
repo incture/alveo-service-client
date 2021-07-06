@@ -34,4 +34,5 @@ public class PoItemAccountAssignDto {
 	private String serviceDocType;
 	private String coArea;
 	private String profitCtr;
+	private String orderId;
 }

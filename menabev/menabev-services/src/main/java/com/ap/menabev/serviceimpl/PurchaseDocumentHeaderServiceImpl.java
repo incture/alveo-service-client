@@ -398,9 +398,15 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			dto.getInvoiceHeader().setInvoiceItems(updatedItems);
 
 		}
-
+		InvoiceHeaderDto headerStatusUpdate = new InvoiceHeaderDto();
+        //Determine header Status
+		if(!ServiceUtil.isEmpty(dto.getInvoiceHeader())){
+			headerStatusUpdate = duplicatecheckServiceImpl.determineHeaderStatus(dto.getInvoiceHeader());
+			System.out.println("Header Status Update:::::::" + headerStatusUpdate);
+		}
+		
 		// SaveApi
-		if (!ServiceUtil.isEmpty(dto.getInvoiceHeader())) {
+		if (!ServiceUtil.isEmpty(headerStatusUpdate)) {
 			InvoiceChangeIndicator changeIndicators = new InvoiceChangeIndicator();
 			changeIndicators.setItemChange(true);
 			changeIndicators.setActivityLog(true);
@@ -409,8 +415,8 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			changeIndicators.setCostAllocationChange(true);
 			changeIndicators.setHeaderChange(true);
 			dto.getInvoiceHeader().setChangeIndicators(changeIndicators);
-			invoiceHeaderServiceImpl.saveAPI(dto.getInvoiceHeader());
-			addPoReturn.setInvoiceObject(dto.getInvoiceHeader());
+			invoiceHeaderServiceImpl.saveAPI(headerStatusUpdate);
+			addPoReturn.setInvoiceObject(headerStatusUpdate);
 		}
 
 		System.out.println("After Item Match :::" + addPoReturn.getInvoiceObject());
@@ -831,6 +837,10 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 				if (!ServiceUtil.isEmpty(assObj.getProfitCtr())) {
 					accDto.setProfitCtr(assObj.getProfitCtr());
 				}
+				if (!ServiceUtil.isEmpty(assObj.getOrderid())) {
+					accDto.setOrderId(assObj.getOrderid());
+				}
+				
 				poAccountAssigment.add(accDto);
 
 			}
@@ -1759,9 +1769,14 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			if (!ServiceUtil.isEmpty(response.getBody())) {
 				HashMap<String, String> po = new HashMap<String, String>();
 				InvoiceHeaderDto header = (InvoiceHeaderDto) response.getBody();
-				po.put(header.getRefpurchaseDoc(), header.getRefpurchaseDocCat());
+				if(!ServiceUtil.isEmpty(header.getRefpurchaseDoc())){
+					po.put(header.getRefpurchaseDoc(), header.getRefpurchaseDocCat());
+				}
 				for (InvoiceItemDto invoiceItems : header.getInvoiceItems()) {
-					po.put(invoiceItems.getRefDocNum().toString(), invoiceItems.getRefDocCat());
+					if(!ServiceUtil.isEmpty(invoiceItems.getRefDocNum())){
+						po.put(invoiceItems.getRefDocNum().toString(), invoiceItems.getRefDocCat());
+					}
+					
 				}
 				AddPoInputDto addPoApiInput = new AddPoInputDto();
 				List<PurchaseOrder> purchaseOrder = new ArrayList<>();

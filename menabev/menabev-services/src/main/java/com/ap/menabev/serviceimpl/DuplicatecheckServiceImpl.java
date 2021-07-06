@@ -171,8 +171,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			// If invoiceHeaderStatus is NOT EQUAL to “PO Missing/Invalid” or
 			// “Duplicate”
 			if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-				if (!(ApplicationConstants.PO_MISSING_OR_INVALID.equals(checkStatus.getInvoiceStatus())
-						|| ApplicationConstants.DUPLICATE_INVOICE.equals(checkStatus.getInvoiceStatus()))) {
+				if ((!ApplicationConstants.PO_MISSING_OR_INVALID.equals(checkStatus.getInvoiceStatus())
+						&& !ApplicationConstants.DUPLICATE_INVOICE.equals(checkStatus.getInvoiceStatus()) || ApplicationConstants.NEW_INVOICE.equals(checkStatus.getInvoiceStatus()))) {
 					// 1. Loop at invoice line items
 					for (InvoiceItemDto item : checkStatus.getInvoiceItems()) {
 
@@ -181,6 +181,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							//
 							// i. SetHeaderStatus=No-GRN
 							checkStatus.setInvoiceStatus(ApplicationConstants.NO_GRN);
+							checkStatus.setInvoiceStatusText("No GRN");
 							// ii. Break out of the loop
 
 							break;
@@ -192,6 +193,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							//
 							// i. Set HeaderStatus = ItemMismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.ITEM_MISMATCH);
+							checkStatus.setInvoiceStatusText("Item Mismatch");
 							// ii. Break out of the loop
 							break;
 						}
@@ -204,6 +206,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							//
 							// i. HeaderStatus=PriceMismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.PRICE_MISMATCH);
+							checkStatus.setInvoiceStatusText("Price Mismatch");
 						}
 						if (ApplicationConstants.PRICE_OR_QTY_MISMATCH.equals(item.getItemStatusCode())
 								&& (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
@@ -217,6 +220,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							//
 							// i. Header status=Price/Qty Mismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
+							checkStatus.setInvoiceStatusText("Qty Mismatch");
 						}
 						if (ApplicationConstants.QTY_MISMATCH.equals(item.getItemStatusCode())
 								&& (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
@@ -231,6 +235,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							//
 							// i. HeaderStatus=QtyMismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
+							checkStatus.setInvoiceStatusText("Qty Mismatch");
 						}
 
 					} // 2. EndLoop
@@ -241,14 +246,16 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					// b. If HeaderStatus NE QtyMimatch AND Balance = 0.00 then
 					// set headerStatus=”Ready to Post”
 
-					if (!"0.00".equals(checkStatus.getBalanceAmount())
-							&& !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
-						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
-					}
-					if ("0.00".equals(checkStatus.getBalanceAmount())
-							&& !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
-						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
-					}
+//					if (!"0.00".equals(checkStatus.getBalanceAmount())
+//							&& !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
+//						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
+//						checkStatus.setInvoiceStatusText("Balance Mismatch");
+//					}
+//					if ("0.00".equals(checkStatus.getBalanceAmount())
+//							&& !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
+//						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
+//						checkStatus.setInvoiceStatusText("Ready To Post");
+//					}
 
 				} else {
 					// iv. Else

@@ -58,4 +58,6 @@ public class PoItemAccountAssignDo {
 	private String coArea;
 	@Column(name="PROFITCTR",length = 10)
 	private String profitCtr;
+	@Column(name="ORDER_ID", length = 12)
+	private String orderId;
 }
