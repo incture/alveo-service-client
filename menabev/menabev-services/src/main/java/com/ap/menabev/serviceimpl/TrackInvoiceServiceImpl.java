@@ -356,8 +356,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					logger.error("inside the loop" + rqstId);
 				}
 			}
-			String FIRST = "0";
-
+			String FIRST = "'0'";
+			String LAST = "'15'";
 			if(remove==1)
 			logger.error("status code dto !!!!!!!!!!!!!!!!!!!!!!!" + dto.getInvoiceStatus());
 			
@@ -413,7 +413,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				if(dto.getInvoiceStatus().size()==4)// if dto contains 16 and more codes
 				filterQueryMap.put(" RR.INVOICE_STATUS IN ", "('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15')");//FIRST + " AND "+15+"");
 				else
-					filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN "+0+" AND "+15+" and RR.INVOICE_STATUS not in" , "(" + notinQuery + ")");
+					filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN " +FIRST+ " AND " +LAST+ " AND RR.INVOICE_STATUS NOT IN " , "(" + notinQuery + ")");
 			
 			}		
 			logger.error("histatus code list" + dto.getInvoiceStatus());
