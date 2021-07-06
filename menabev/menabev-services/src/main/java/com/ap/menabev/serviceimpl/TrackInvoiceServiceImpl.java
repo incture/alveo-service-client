@@ -324,33 +324,34 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		if (dto.getInvoiceStatus() != null && !dto.getInvoiceStatus().isEmpty()) {
 
 			StringBuffer rqstId = new StringBuffer();
-			
+
 			int check = 0;
-			int remove=0;
-			
-			for(int i=0;i<dto.getInvoiceStatus().size();i++)
-			{
-				if(dto.getInvoiceStatus().get(i).equals("16"))
-				{
-					remove=1;
+			int remove = 0;
+
+			for (int i = 0; i < dto.getInvoiceStatus().size(); i++) {
+				if (dto.getInvoiceStatus().get(i).equals("16")) {
+					remove = 1;
 				}
 			}
-			
-			List<String> code= new ArrayList<>();
 
-			for (int i = 0; i < dto.getInvoiceStatus().size(); i++)
-			{
-				if (i < dto.getInvoiceStatus().size() - 1 && !dto.getInvoiceStatus().get(i+1).equals("16")) { // as 16 is not there
-															// in db
+			List<String> code = new ArrayList<>();
+
+			for (int i = 0; i < dto.getInvoiceStatus().size(); i++) {
+				if (i < dto.getInvoiceStatus().size() - 1 && !dto.getInvoiceStatus().get(i + 1).equals("16")) { // as
+																												// 16
+																												// is
+																												// not
+																												// there
+					// in db
 					if (!dto.getInvoiceStatus().get(i).equals("16")) {
 						rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'" + ",");
-						check = 1;  //if dto does not contain 16
+						check = 1; // if dto does not contain 16
 						code.add(dto.getInvoiceStatus().get(i));
 					}
 				} else {
 					if (!dto.getInvoiceStatus().get(i).equals("16")) {
 						rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'");
-						 check = 1;
+						check = 1;
 						code.add(dto.getInvoiceStatus().get(i));
 					}
 					logger.error("inside the loop" + rqstId);
@@ -358,91 +359,93 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			}
 			String FIRST = "'0'";
 			String LAST = "'15'";
-			if(remove==1)
-			logger.error("status code dto !!!!!!!!!!!!!!!!!!!!!!!" + dto.getInvoiceStatus());
-			
-			List<String> statuscodearray=new ArrayList<>();
-				
+			if (remove == 1)
+				logger.error("status code dto !!!!!!!!!!!!!!!!!!!!!!!" + dto.getInvoiceStatus());
+
+			List<String> statuscodearray = new ArrayList<>();
+
 			statuscodearray.add("16");
 			statuscodearray.add("15");
 			statuscodearray.add("14");
 			statuscodearray.add("13");
-						
-			for(int i=0;i<dto.getInvoiceStatus().size();i++)
-			{
-				logger.error("status code array value outsideo loop! !!!!!!!"+statuscodearray);
-				
-				for(int j=0;j<statuscodearray.size();j++)
-				{
-				logger.error("status code array value in loop! !!!!!!!"+statuscodearray);
-				
-				  if(statuscodearray.get(j).equals(dto.getInvoiceStatus().get(i)))
-				  {
-					  
-					statuscodearray.remove(j);
-				  }
-			}
-			
-			}
-		
-			logger.error("IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!"+statuscodearray);
-			StringBuffer notinQuery= new StringBuffer();
-			
-			for(int i=0;i<statuscodearray.size();i++)
-			{	
-			//notinQuery.append("'" + statuscodearray.get(i) + "'" + ",");
-			if (i < statuscodearray.size() - 1 ){ // as 16 is not there
-				notinQuery.append("'" + statuscodearray.get(i) + "'" + ",");
-             }
-			 else 
-			 {
-				 notinQuery.append("'" + statuscodearray.get(i) + "'" );
-             }
-			}
-			
-			if (check == 1 && remove ==0) //this means dto does not contain 16
-				filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
-			else if(remove ==1 && check ==0)// dto only contains 16
-				filterQueryMap.put(" RR.INVOICE_STATUS IN ", "('0','1','2','3','4','5','6','7','8','9','10','11','12')");//FIRST + " AND "+12+"");
-			else 
-			{
-				//all 4 status codes are there
-				logger.error("dto size"+dto.getInvoiceStatus().size());
-				
-				
-				if(dto.getInvoiceStatus().size()==4)// if dto contains 16 and more codes
-				filterQueryMap.put(" RR.INVOICE_STATUS IN ", "('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15')");//FIRST + " AND "+15+"");
-				else
-					filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN " +FIRST+ " AND " +LAST+ " AND RR.INVOICE_STATUS NOT IN " , "(" + notinQuery + ")");
-			
-			}		
-			logger.error("histatus code list" + dto.getInvoiceStatus());
-		
-			/*StringBuffer rqstId = new StringBuffer();
+
 			for (int i = 0; i < dto.getInvoiceStatus().size(); i++) {
-				if (dto.getInvoiceStatus().get(i).equals("16")) {
-String pendingApproval="true";
-// str=[{'0','1','2','3','4','5','6','7','8','9','10','11','12'}];
-				//	filterQueryMap.put(" RR.INVOICE_STATUS IN ",
-				//			"('0','1','2','3','4','5','6','7','8','9','10','11','12')");// "('"
-				}
-				if (dto.getInvoiceStatus().get(i).equals("13")) {
-String paid="true";
-					//filterQueryMap.put(" RR.INVOICE_STATUS =", "('" + 13 + "')");
+				logger.error("status code array value outsideo loop! !!!!!!!" + statuscodearray);
 
-				}
-				if (dto.getInvoiceStatus().get(i).equals("14")) {
-				String unpaid="true";	
-					//filterQueryMap.put(" RR.INVOICE_STATUS =", "('" + 14 + "')");
+				for (int j = 0; j < statuscodearray.size(); j++) {
+					logger.error("status code array value in loop! !!!!!!!" + statuscodearray);
 
-				}
-				if (dto.getInvoiceStatus().get(i).equals("15")) {
-					String rejected="true";
-					//filterQueryMap.put(" RR.INVOICE_STATUS =", "('" + 15 + "')");
+					if (statuscodearray.get(j).equals(dto.getInvoiceStatus().get(i))) {
 
+						statuscodearray.remove(j);
+					}
+				}
+
+			}
+
+			logger.error("IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!" + statuscodearray);
+			StringBuffer notinQuery = new StringBuffer();
+
+			for (int i = 0; i < statuscodearray.size(); i++) {
+				// notinQuery.append("'" + statuscodearray.get(i) + "'" + ",");
+				if (i < statuscodearray.size() - 1) { // as 16 is not there
+					notinQuery.append("'" + statuscodearray.get(i) + "'" + ",");
+				} else {
+					notinQuery.append("'" + statuscodearray.get(i) + "'");
 				}
 			}
-*/		}
+
+			if (check == 1 && remove == 0) // this means dto does not contain 16
+				filterQueryMap.put(" RR.INVOICE_STATUS IN", "(" + rqstId + ")");
+			else if (remove == 1 && check == 0)// dto only contains 16
+				filterQueryMap.put(" RR.INVOICE_STATUS IN ",
+						"('0','1','2','3','4','5','6','7','8','9','10','11','12')");// FIRST
+																					// +
+																					// "
+																					// AND
+																					// "+12+"");
+			else {
+				// all 4 status codes are there
+				logger.error("dto size" + dto.getInvoiceStatus().size());
+
+				if (dto.getInvoiceStatus().size() == 4)// if dto contains 16 and
+														// more codes
+					filterQueryMap.put(" RR.INVOICE_STATUS IN ",
+							"('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15')");// FIRST
+																										// +
+																										// "
+																										// AND
+																										// "+15+"");
+				else
+					filterQueryMap.put(
+							" RR.INVOICE_STATUS BETWEEN " + FIRST + " AND " + LAST + " AND RR.INVOICE_STATUS NOT IN ",
+							"(" + notinQuery + ")");
+
+			}
+			logger.error("histatus code list" + dto.getInvoiceStatus());
+
+			/*
+			 * StringBuffer rqstId = new StringBuffer(); for (int i = 0; i <
+			 * dto.getInvoiceStatus().size(); i++) { if
+			 * (dto.getInvoiceStatus().get(i).equals("16")) { String
+			 * pendingApproval="true"; //
+			 * str=[{'0','1','2','3','4','5','6','7','8','9','10','11','12'}];
+			 * // filterQueryMap.put(" RR.INVOICE_STATUS IN ", //
+			 * "('0','1','2','3','4','5','6','7','8','9','10','11','12')");//
+			 * "('" } if (dto.getInvoiceStatus().get(i).equals("13")) { String
+			 * paid="true"; //filterQueryMap.put(" RR.INVOICE_STATUS =", "('" +
+			 * 13 + "')");
+			 * 
+			 * } if (dto.getInvoiceStatus().get(i).equals("14")) { String
+			 * unpaid="true"; //filterQueryMap.put(" RR.INVOICE_STATUS =", "('"
+			 * + 14 + "')");
+			 * 
+			 * } if (dto.getInvoiceStatus().get(i).equals("15")) { String
+			 * rejected="true"; //filterQueryMap.put(" RR.INVOICE_STATUS =",
+			 * "('" + 15 + "')");
+			 * 
+			 * } }
+			 */ }
 		int lastAppendingAndIndex = filterQueryMap.size() - 1;
 		AtomicInteger count = new AtomicInteger(0);
 		System.err.println("lastAppendingAndIndex " + lastAppendingAndIndex);
@@ -457,18 +460,15 @@ String paid="true";
 				}
 			} else {
 				StringBuffer rqstId = new StringBuffer();
-				if(!ServiceUtil.isEmpty(dto.getTop()) && (!ServiceUtil.isEmpty(dto.getSkip())))
-				{
-				query.append(" ORDER BY RR.REQUEST_CREATED_AT limit ");
-				rqstId.append("'" + dto.getTop() + "'" + " offset ");
+				if (!ServiceUtil.isEmpty(dto.getTop()) && (!ServiceUtil.isEmpty(dto.getSkip()))) {
+					query.append(" ORDER BY RR.REQUEST_CREATED_AT limit ");
+					rqstId.append("'" + dto.getTop() + "'" + " offset ");
 
-				rqstId.append("'" + dto.getSkip() + "'");
-				query.append(rqstId);
-				query.append(";");
+					rqstId.append("'" + dto.getSkip() + "'");
+					query.append(rqstId);
+					query.append(";");
 
-				}
-				else
-				{
+				} else {
 					query.append(" ORDER BY RR.REQUEST_CREATED_AT DESC ");
 					query.append(";");
 
@@ -477,18 +477,15 @@ String paid="true";
 		});
 		if (filterQueryMap.size() > 1) {
 			StringBuffer rqstId = new StringBuffer();
-			if(!ServiceUtil.isEmpty(dto.getTop()) && (!ServiceUtil.isEmpty(dto.getSkip())))
-			{
-			query.append(" ORDER BY RR.REQUEST_CREATED_AT limit ");
-			rqstId.append("'" + dto.getTop() + "'" + " offset ");
+			if (!ServiceUtil.isEmpty(dto.getTop()) && (!ServiceUtil.isEmpty(dto.getSkip()))) {
+				query.append(" ORDER BY RR.REQUEST_CREATED_AT limit ");
+				rqstId.append("'" + dto.getTop() + "'" + " offset ");
 
-			rqstId.append("'" + dto.getSkip() + "'");
-			query.append(rqstId);
-			query.append(";");
+				rqstId.append("'" + dto.getSkip() + "'");
+				query.append(rqstId);
+				query.append(";");
 
-			}
-			else
-			{
+			} else {
 				query.append(" ORDER BY RR.REQUEST_CREATED_AT DESC ");
 				query.append(";");
 
@@ -505,7 +502,7 @@ String paid="true";
 
 	public ResponseEntity<?> downloadExcel(TrackInvoiceInputDto dto) throws IOException {
 		ModelMapper modelMapper = new ModelMapper();
-		TrackInvoiceExcelResponseDto trackInvoiceExcelResponseDto=new TrackInvoiceExcelResponseDto();
+		TrackInvoiceExcelResponseDto trackInvoiceExcelResponseDto = new TrackInvoiceExcelResponseDto();
 		List<InvoiceHeaderDo> filterOutput = filterInvoicesMultiple(dto);
 
 		String[] columns = { "Invoice reference number", "Invoice Date", "Vendor", "CompanyCode", "GrossAmount", "Tax",
@@ -538,11 +535,11 @@ String paid="true";
 				System.err.println(invoiceHeaderDto.getExtInvNum());
 			}
 			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getInvoiceDate())) {
-			LocalDateTime invoiceDate = Instant.ofEpochMilli(invoiceHeaderDto.getInvoiceDate())
-					.atZone(ZoneId.systemDefault()).toLocalDateTime();
-			System.out.println("invoiceDate in formatedOrder:" + invoiceDate);
-			row.createCell(1).setCellValue(invoiceDate.toString());
-			System.err.println("invoiceDate.toString():" + invoiceDate.toString());
+				LocalDateTime invoiceDate = Instant.ofEpochMilli(invoiceHeaderDto.getInvoiceDate())
+						.atZone(ZoneId.systemDefault()).toLocalDateTime();
+				System.out.println("invoiceDate in formatedOrder:" + invoiceDate);
+				row.createCell(1).setCellValue(invoiceDate.toString());
+				System.err.println("invoiceDate.toString():" + invoiceDate.toString());
 			}
 			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getVendorId())) {
 
@@ -551,7 +548,7 @@ String paid="true";
 			}
 			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getCompCode())) {
 
-			row.createCell(3).setCellValue(invoiceHeaderDto.getCompCode());
+				row.createCell(3).setCellValue(invoiceHeaderDto.getCompCode());
 			}
 			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getGrossAmount())) {
 				row.createCell(4).setCellValue(invoiceHeaderDto.getGrossAmount().doubleValue());
@@ -566,10 +563,10 @@ String paid="true";
 				row.createCell(7).setCellValue(invoiceHeaderDto.getPaymentReference());
 			}
 			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getDueDate())) {
-			LocalDateTime dueDate = Instant.ofEpochMilli(invoiceHeaderDto.getDueDate()).atZone(ZoneId.systemDefault())
-					.toLocalDateTime();
-			System.out.println("dueDatedueDate in formatedOrder:" + dueDate);
-			row.createCell(8).setCellValue(dueDate.toString());
+				LocalDateTime dueDate = Instant.ofEpochMilli(invoiceHeaderDto.getDueDate())
+						.atZone(ZoneId.systemDefault()).toLocalDateTime();
+				System.out.println("dueDatedueDate in formatedOrder:" + dueDate);
+				row.createCell(8).setCellValue(dueDate.toString());
 			}
 			if (!ServiceUtil.isEmpty(invoiceHeaderDto.getInvoiceStatus())) {
 				row.createCell(9).setCellValue(invoiceHeaderDto.getInvoiceStatus());
@@ -581,7 +578,7 @@ String paid="true";
 		}
 		FileOutputStream fileOut1 = new FileOutputStream("InvoiceDetails.xlsx");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		
+
 		workbook.write(outputStream);
 		fileOut1.close();
 		workbook.close();
