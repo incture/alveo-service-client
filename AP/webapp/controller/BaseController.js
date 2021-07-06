@@ -1077,6 +1077,10 @@ sap.ui.define([
 			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
 			oEvent.getSource().setValue(oValue);
 		},
+		
+		onPressRefresh: function(){
+			
+		},
 
 	});
 

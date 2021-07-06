@@ -877,8 +877,7 @@ com.menabev.AP.util.POServices = {
 		} else if (Number(value) === 0 || parseFloat(value) === -0) {
 			return 0;
 		} else if (!isNaN(value)) {
-			value = parseFloat(value);
-			value = value.toFixed(2);
+			value = Number(value).toFixed(2);
 			value = parseFloat(value);
 		}
 		return value;

@@ -1,0 +1,142 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.TrackInvoice"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout">
+	<Page showHeader="false" showFooter="false" class="sapUiSizeCompact" showNavButton="{device>/isPhone}" navButtonPress="onNavBack">
+		<content>
+			<Panel class="inboxpanelCSSNonPO sapUiTinyMargin sapUiSizeCompact" expandable="true" expanded="{deviceModel>/expand}" headerText="Filter">
+				<l:Grid defaultSpan="XL3 L3 M6 S12" class="sapUiSizeCompact" width="100%">
+					<VBox>
+						<Label text="{i18n>InvoiceNo}" class="sapUiSizeCompact" design="Bold"/>
+						<Input value="{mFilterModel>/invReference}" placeholder="{i18n>EnterInvoiceNo}" class="margintopinFld" width="100%"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>VENDOR}" class="sapUiSizeCompact" design="Bold"/>
+						<MultiComboBox items="{oDropDownModel>/VendorIdSuggest}" selectedKeys="{mFilterModel>/vendorId}" showSecondaryValues="true" width="100%"
+							class="margintopinFld" placeholder="{i18n>enterVendor}">
+							<items>
+								<core:ListItem key="{oDropDownModel>Supplier}" text="{oDropDownModel>SupplierName} - {oDropDownModel>Supplier}"/>
+							</items>
+						</MultiComboBox>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>compCode}" class="sapUiSizeCompact" design="Bold"/>
+						<Input value="{mFilterModel>/selectedCompanyCode}" placeholder="{i18n>EnterCompanyCode}" class="margintopinFld" width="100%"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>invoiceDateRange}" class="sapUiSizeCompact" design="Bold"/>
+						<DateRangeSelection width="100%" dateValue="{mFilterModel>/invDateFrom}" secondDateValue="{mFilterModel>/invDateTo}"
+							class="margintopinFld dateError" displayFormatType="Gregorian" placeholder="{i18n>selectDate}" change="fnInvValidRange"
+							valueState="{mFilterModel>/invDateRangeState}" displayFormat="MM/dd/yyyy"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>dueDateRange}" class="sapUiSizeCompact" design="Bold"/>
+						<DateRangeSelection width="100%" dateValue="{mFilterModel>/dueDateFrom}" secondDateValue="{mFilterModel>/dueDateTo}"
+							class="margintopinFld dateError" displayFormatType="Gregorian" placeholder="{i18n>selectDate}" change="fnDueValidRange"
+							valueState="{mFilterModel>/dueDateRangeState}" displayFormat="MM/dd/yyyy"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>receivedDateRange}" class="sapUiSizeCompact" design="Bold"/>
+						<DateRangeSelection width="100%" dateValue="{mFilterModel>/receivedDateFrom}" secondDateValue="{mFilterModel>/receivedDateTo}"
+							class="margintopinFld dateError" displayFormatType="Gregorian" placeholder="{i18n>selectDate}" change="fnReciveValidRange"
+							valueState="{mFilterModel>/RecivedateRangeState}" displayFormat="MM/dd/yyyy"/>
+					</VBox>
+					<VBox>
+						<Label text="{i18n>STATUS}" class="sapUiSizeCompact" design="Bold"/>
+						<MultiComboBox items="{oDropDownModel>/statusCodeSuggest}" selectedKeys="{mFilterModel>/statusCode}" placeholder="{i18n>selectStatus}"
+							showSecondaryValues="true" width="100%" class="margintopinFld" loadItems="fnStatusSuggest">
+							<items>
+								<core:ListItem key="{oDropDownModel>statusCode}" text="{oDropDownModel>shortText}"/>
+							</items>
+						</MultiComboBox>
+					</VBox>
+					<VBox>
+						<Label></Label>
+						<HBox class="btnBox">
+							<Button text="{i18n>apply}" type="Emphasized" press="fnGetFilter" class="sapUiSmallMarginEnd" width="5rem"></Button>
+							<Button text="{i18n>Reset}" type="Ghost" press="onPressReset" width="5rem"></Button>
+						</HBox>
+					</VBox>
+				</l:Grid>
+			</Panel>
+			<Table id="idTable" items="{oTrackInvoiceModel>/invoiceDetails}" class="RDSMtable sapUiSizeCompact" autoPopinMode="true"
+				sticky="ColumnHeaders" fixedLayout="false" growing="true" growingThreshold="8" popinLayout="GridSmall" contextualWidth="Auto"
+				noDataText="{i18n>noRecordFound}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<content>
+							<Label text="{i18n>invList} - {oTrackInvoiceModel>/count}" design="Bold"/>
+							<ToolbarSpacer></ToolbarSpacer>
+							<Button text="{i18n>dwnldExcel}" tooltip="{i18n>downloadExcel}" type="Emphasized" icon="sap-icon://excel-attachment" press="onDownloadExcel"
+								width="8rem" class="RemoveCss" visible="{deviceModel>/buttonText}"></Button>
+							<Button icon="sap-icon://excel-attachment" tooltip="{i18n>downloadExcel}" visible="{deviceModel>/buttonIcon}" type="Emphasized"
+								press="onDownloadExcel"></Button>
+							<Button text="{i18n>uploadInvoice}" press="onPressUploadInvoice" class="SecondaryBtn"/>
+							<!--<Button icon="sap-icon://upload" tooltip="{i18n>upldInv}" visible="{deviceModel>/buttonIcon}" type="Emphasized"></Button>-->
+							<!--<Button text="{i18n>upload}" tooltip="{i18n>upldInv}" type="Emphasized" icon="sap-icon://upload" press="onPressGraph" width="6rem"-->
+							<!--	visible="{deviceModel>/buttonText}"></Button>-->
+							<Button tooltip="{i18n>personlisation}" type="Emphasized" icon="sap-icon://action-settings" press="onPressPersonalization" width="1rem"
+								visible="false"/>
+							<SearchField width="10rem" class="searchField" liveChange="onTableSearch"></SearchField>
+						</content>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" importance="High" width="7rem">
+						<Label text="{i18n>invoiceReference}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="6rem">
+						<Label text="{i18n>invoiceDate}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="12rem">
+						<Label text="{i18n>VENDOR}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="4rem">
+						<Label text="{i18n>comCode}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="6rem">
+						<Label text="{i18n>GrossAmt}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="5rem">
+						<Label text="{i18n>Tax}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="6rem">
+						<Label text="{i18n>NetAmt}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="5rem">
+						<Label text="{i18n>PaymentRef}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="5rem">
+						<Label text="{i18n>dueDate}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" importance="High" width="6rem">
+						<Label text="{i18n>STATUS}" design="Bold"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="3rem">
+						<Label text="{i18n>action}" design="Bold"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<Text text="{oTrackInvoiceModel>extInvNum}"/>
+						<Text text="{oTrackInvoiceModel>invoiceDate}"></Text>
+						<Text text="{oTrackInvoiceModel>vendorName}({oTrackInvoiceModel>vendorId})"></Text>
+						<Text text="{oTrackInvoiceModel>compCode}"></Text>
+						<Text text="{oTrackInvoiceModel>grossAmount}"></Text>
+						<Text text="{oTrackInvoiceModel>taxAmount}"></Text>
+						<Text text="{oTrackInvoiceModel>invoiceTotal}"></Text>
+						<Text text="{path : 'oTrackInvoiceModel>paymentReference' , formatter :'com.menabev.AP.formatter.formatter.showPaymentRef'}"></Text>
+						<Text text="{oTrackInvoiceModel>dueDate}"></Text>
+						<ObjectStatus
+							text="{path : 'oTrackInvoiceModel>invoiceStatus' , formatter :'com.menabev.AP.formatter.formatter.changeStatustext'}"
+							inverted="true" state="{path : 'oTrackInvoiceModel>invoiceStatus' , formatter :'com.menabev.AP.formatter.formatter.changeColor'}"/>
+						<Toolbar>
+							<core:Icon src="sap-icon://activity-items" class="sapUiTinyMarginEnd" tooltip="{i18n>activityFlow}" press="onOpenActivitylog"/>
+							<core:Icon src="sap-icon://pdf-attachment" tooltip="Download" press="onDownloadInvoice" visible="{oTrackInvoiceModel>/pdfBtnVisible}"></core:Icon>
+							<core:Icon src="sap-icon://refresh" tooltip="ReSubmit" class="sapUiTinyMarginBegin"
+								visible="{path : 'oTrackInvoiceModel>invoiceStatus' , formatter :'com.menabev.AP.formatter.formatter.showIcon'}"></core:Icon>
+						</Toolbar>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Page>
+</mvc:View>

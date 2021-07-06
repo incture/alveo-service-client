@@ -32,6 +32,7 @@ sap.ui.define([
 					obj.push(navItems[3]);
 					obj.push(navItems[4]);
 					obj.push(navItems[5]);
+					obj.push(navItems[6]);
 					that.oRouter.navTo("UserManagement");
 				} else if (userGroup === "Accountant") {
 					obj.push(navItems[0]);
@@ -45,10 +46,12 @@ sap.ui.define([
 				} else if (userGroup === "Supplier_Admin") {
 					obj.push(navItems[1]);
 					obj.push(navItems[2]);
-					that.oRouter.navTo("UploadInvoice");
+					obj.push(navItems[6]);
+					that.oRouter.navTo("TrackInvoice");
 				} else if (userGroup === "Supplier_Executive") {
 					obj.push(navItems[1]);
-					that.oRouter.navTo("UploadInvoice");
+					obj.push(navItems[6]);
+					that.oRouter.navTo("TrackInvoice");
 				}
 
 				StaticDataModel.setProperty("/leftPane", obj);

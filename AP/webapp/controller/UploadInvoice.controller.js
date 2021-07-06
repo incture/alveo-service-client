@@ -85,25 +85,6 @@ sap.ui.define([
 			this.errorMsg(errorMsg);
 		},
 
-		_doAjax: function (sUrl, sMethod, oData, bAbort) {
-			if (bAbort && this.PrevAjax) {
-				this.PrevAjax.abort();
-			}
-			if (oData) {
-				oData = JSON.stringify(oData);
-			}
-			var xhr = $.ajax({
-				url: sUrl,
-				method: sMethod,
-				data: oData || ""
-			});
-			if (bAbort) {
-				this.PrevAjax = xhr;
-			}
-			return xhr;
-
-		},
-
 		//Upload Invoice Fragment:UploadInvoiceFrag
 		onChangeDeliveryNote: function (oEvent) {
 			var input = oEvent.getParameter("value");
