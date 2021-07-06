@@ -14,8 +14,8 @@
 		"key": "Inbox",
 		"icon": "sap-icon://document-text"
 	}, {
-		"label": "Upload Invoice",
-		"key": "UploadInvoice",
+		"label": "Track Invoice",
+		"key": "TrackInvoice",
 		"icon": "sap-icon://document-text"
 	}, {
 		"label": "User management",
@@ -25,15 +25,16 @@
 		"label": "Config Cockpit",
 		"key": "ConfigCockpit",
 		"icon": "sap-icon://action-settings"
-	}, {
-		"label": "PO",
-		"key": "PO",
-		"icon": "sap-icon://action-settings"
-	},
+	}, 
 	{
 		"label": "Scheduler Logs",
 		"key": "SchedulerLogs",
 		"icon": "sap-icon://action-settings"
+	},
+	{
+		"label": "Dashboard",
+		"key": "Dashboard",
+		"icon": "sap-icon://document-text"
 	}],
 	"userGroups": [{
 		"key": "IT_Admin",

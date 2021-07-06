@@ -1,10 +1,118 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.Dashboard"
-	xmlns:html="http://www.w3.org/1999/xhtml">
-	<App>
-		<pages>
-			<Page title="Title">
-				<content></content>
-			</Page>
-		</pages>
-	</App>
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout" xmlns:f="sap.f" xmlns:card="sap.f.cards"
+	xmlns:w="sap.ui.integration.widgets" xmlns:viz="sap.viz.ui5.controls" xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds"
+	xmlns:vizData="sap.viz.ui5.data">
+	<f:DynamicPage>
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="{i18n>filters}"/>
+				</f:heading>
+				<f:actions>
+					<Button type="Emphasized" text="{i18n>go}" class="sapUiSizeCompact sapUiTinyMarginEnd" press="fnChartsData"/>
+					<Button type="Emphasized" text="{i18n>reset}" class="sapUiSizeCompact"/>
+				</f:actions>
+			</f:DynamicPageTitle>
+		</f:title>
+		<f:header>
+			<f:DynamicPageHeader pinnable="true">
+				<l:Grid defaultSpan="XL2 L3 M6 S12" width="100%">
+					<Input width="100%" class="sapUiTinyMarginEnd margintopinFld" placeholder="{i18n>searchVendor}"/>
+					<Input width="100%" placeholder="{i18n>searchComp}" class="sapUiTinyMarginEnd margintopinFld"/>
+					<DatePicker dateValue="{mDashboardModel>/fromDate}" placeholder="{i18n>fromDate}" width="100%" class="margintopinFld sapUiTinyMarginEnd"/>
+					<DatePicker dateValue="{mDashboardModel>/toDate}" placeholder="{i18n>toDate}" width="100%" class=" margintopinFld"/>
+				</l:Grid>
+			</f:DynamicPageHeader>
+		</f:header>
+		<f:content>
+			<l:Grid defaultSpan="XL12 L12 M12 S12" width="100%">
+				<l:Grid defaultSpan="XL3 L2 M6 S12" width="100%" content="{mDashboardModel>/Kpi}">
+					<VBox height="6rem" width="100%" class="sapUiTinyMarginTop cardCls">
+						<Label text="{mDashboardModel>label}" textAlign="Center" design="Bold" class="sapUiTinyMarginTop dashboardlvlCSS"/>
+						<Link text="{mDashboardModel>count}" class="sapUiMediumMarginTop Text"></Link>
+					</VBox>
+				</l:Grid>
+				<l:Grid defaultSpan="XL4 L4 M12 S12" width="100%">
+					<VBox class="cardCls">
+						<viz:VizFrame height="300px" width="auto" xmlns="sap.viz" vizType="donut" selectData="onClickDonutData"
+							vizProperties="{legendGroup: { layout: { position: 'right' } },interaction: {selectability: {mode: 'SINGLE'}},plotArea: { drawingEffect: 'glossy' },title:{ text:'Overall Exception wise count',alignment :'left',style:{color:'#000000'}}}">
+							<viz:dataset>
+								<vizData:FlattenedDataset data="{mDashboardModel>/exceptionReport}">
+									<vizData:dimensions>
+										<vizData:DimensionDefinition name="Status" value="{mDashboardModel>statusText}"/>
+									</vizData:dimensions>
+									<vizData:measures>
+										<vizData:MeasureDefinition name="Count" value="{mDashboardModel>count}"/>
+									</vizData:measures>
+								</vizData:FlattenedDataset>
+							</viz:dataset>
+							<viz:feeds>
+								<vizFeeds:FeedItem uid="size" type="Measure" values='Count'/>
+								<vizFeeds:FeedItem uid="color" type="Dimension" values="Status"/>
+							</viz:feeds>
+						</viz:VizFrame>
+					</VBox>
+					<VBox class="cardCls">
+						<viz:VizFrame height="313px" vizType='bar' width="auto" selectData="onClickBarData" id="barChart"
+							vizProperties="{interaction: {selectability: {mode: 'SINGLE'}},plotArea: { drawingEffect: 'normal' ,dataLabel: { position: 'inside' ,visible: true},colorPalette:['#50a853'] },title:{ text:'Invoices Pending by Vendor',alignment :'left',style:{color:'#000000'}},legend : { visible: false }}">
+							<viz:dataset>
+								<vizData:FlattenedDataset data="{graphModel>/items}">
+									<vizData:dimensions>
+										<vizData:DimensionDefinition name="Vendor" value="{graphModel>task}"/>
+									</vizData:dimensions>
+									<vizData:measures>
+										<vizData:MeasureDefinition name="Count" value="{graphModel>count}"/>
+										<vizData:MeasureDefinition name="Vendor" value="{graphModel>task}"/>
+									</vizData:measures>
+								</vizData:FlattenedDataset>
+							</viz:dataset>
+							<viz:feeds>
+								<vizFeeds:FeedItem id='valueAxisFeed1' uid="valueAxis" type="Measure" values="Count"/>
+								<vizFeeds:FeedItem id='categoryAxisFeed1' uid="categoryAxis" type="Dimension" values="Vendor"/>
+							</viz:feeds>
+						</viz:VizFrame>
+					</VBox>
+					<VBox class="cardCls">
+						<viz:VizFrame height="313px" xmlns="sap.viz" vizType="line" width="auto" selectData="onClickArea" id="areaChart"
+							vizProperties="{categoryAxis: { label: { rotation: 'false', angle: '0', truncatedLabelRatio: '100' } },interaction: {selectability: {mode: 'SINGLE'}},plotArea: { drawingEffect: 'normal',colorPalette:['#5bbe52'] } ,title:{ text:'Invoices by invoice Due date',alignment :'left',style:{color:'#000000'}},legendGroup: {layout: { position: 'bottom' } }}">
+							<viz:dataset>
+								<vizData:FlattenedDataset data="{graphModel>/milk}">
+									<vizData:dimensions>
+										<vizData:DimensionDefinition name="month" value="{graphModel>month}"/>
+									</vizData:dimensions>
+									<vizData:measures>
+										<vizData:MeasureDefinition name="count" value="{graphModel>count}"/>
+									</vizData:measures>
+								</vizData:FlattenedDataset>
+							</viz:dataset>
+							<viz:feeds>
+								<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="count"/>
+								<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="month"/>
+							</viz:feeds>
+						</viz:VizFrame>
+					</VBox>
+				</l:Grid>
+				<VBox class="cardCls">
+					<viz:VizFrame uiConfig="{applicationSet:'fiori'}" selectData="onClickAging" height='300px' width="100%" id="agingChart"
+						vizProperties="{interaction: {selectability: {mode: 'SINGLE'}},plotArea: { drawingEffect: 'normal' ,colorPalette:['#007553','#00B380','#09B363','#0DFF8E','#18F24B','#A0F533'] ,dataLabel: { position: 'inside' ,visible: true} }, title: { text : 'Aging Report',style:{color:'#000000'}},valueAxis: { title: { visible: false} }}"
+						vizType='column'>
+						<viz:dataset>
+							<vizData:FlattenedDataset data="{mDashboardModel>/agingReport/values}">
+								<vizData:dimensions>
+									<vizData:DimensionDefinition name="Days" value="{mDashboardModel>label}"/>
+								</vizData:dimensions>
+								<vizData:measures>
+									<vizData:MeasureDefinition name="Invoices" value="{mDashboardModel>count}{mDashboardModel>statusText} "/>
+								</vizData:measures>
+							</vizData:FlattenedDataset>
+						</viz:dataset>
+						<viz:feeds>
+							<vizFeeds:FeedItem id='week5' uid="valueAxis" type="Measure" values="Invoices"/>
+							<vizFeeds:FeedItem id='categoryAxisFeed' uid="categoryAxis" type="Dimension" values="Days"/>
+						</viz:feeds>
+					</viz:VizFrame>
+				</VBox>
+			</l:Grid>
+		</f:content>
+	</f:DynamicPage>
 </mvc:View>

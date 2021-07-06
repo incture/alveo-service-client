@@ -4,41 +4,149 @@ sap.ui.define([
 	"use strict";
 
 	return Controller.extend("com.menabev.AP.controller.Dashboard", {
-
-		/**
-		 * Called when a controller is instantiated and its View controls (if available) are already created.
-		 * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-		 * @memberOf com.menabev.AP.view.Dashboard
-		 */
+		
 		onInit: function () {
-
+			var mDashboardModel = this.getOwnerComponent().getModel("mDashboardModel");
+			this.mDashboardModel = mDashboardModel;
+			this.fnChartsDataDefault();
 		},
+		
+		fnChartsDataDefault: function () {
+			var mDashboardModel = this.mDashboardModel;
+			var today = new Date();
+			var past = new Date();
+			var rcvdOnFrom = past.setDate(past.getDate() - 3650);
+			var rcvdOnTo = today.getTime();
+			var pastDate = new Date(rcvdOnFrom);
+			mDashboardModel.setProperty("/toDate", today);
+			mDashboardModel.setProperty("/fromDate", pastDate);
+			var obj = {
+				"companyCode": "",
+				"currency": "",
+				"rcvdOnFrom": rcvdOnFrom,
+				"rcvdOnTo": rcvdOnTo,
+				"vendorId": []
+			};
+			var url = "/menabevdev/apDashboardCharts/getDashboardChartDetails";
+			var url2 = "/menabevdev/apDashboardCharts/getKPIDetails";
+			jQuery
+				.ajax({
+					url: url,
+					dataType: "json",
+					data: JSON.stringify(obj),
+					contentType: "application/json",
+					type: "POST",
+					success: function (results) {
+						mDashboardModel.refresh(true);
+						var data = results.charts;
+						var exceptionReport = data[0].values;
+						var agingReport = data[1];
+						for (var i = 0; i < exceptionReport.length; i++) {
+							var aTempData = exceptionReport.filter(function (oRow) {
+								if (oRow.statusText === "Duplicate Invoice" || oRow.statusText === "PO Missing or Invalid" || oRow.statusText === "No-GRN" || oRow.statusText ===
+									"Partial GRN" || oRow.statusText === "UoM Mismatch" || oRow.statusText === "Item Mismatch" || oRow.statusText ===
+									"Qty Mismatch" || oRow.statusText === "Price Mismatch" || oRow.statusText === "Balance Mismatch" || oRow.statusText ===
+									"Price/Qty") {
+									return oRow;
+								}
+							});
+						}
+						mDashboardModel.setProperty("/exceptionReport", aTempData);
+						mDashboardModel.setProperty("/agingReport", agingReport);
+					},
+					error: function (e) {
+						sap.m.MessageToast.show("Data Not Found");
 
-		/**
-		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
-		 * (NOT before the first rendering! onInit() is used for that one!).
-		 * @memberOf com.menabev.AP.view.Dashboard
-		 */
-		//	onBeforeRendering: function() {
-		//
-		//	},
+					}
+				});
+				jQuery
+				.ajax({
+					url: url2,
+					dataType: "json",
+					data: JSON.stringify(obj),
+					contentType: "application/json",
+					type: "POST",
+					success: function (results) {
+						mDashboardModel.refresh(true);
+						var data = results.charts;
+						var length = data.length;
+						if (length) {
+							mDashboardModel.setProperty("/Kpi", data);
+						}
+					},
+					error: function (e) {
+						sap.m.MessageToast.show("Data Not Found");
 
-		/**
-		 * Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
-		 * This hook is the same one that SAPUI5 controls get after being rendered.
-		 * @memberOf com.menabev.AP.view.Dashboard
-		 */
-		//	onAfterRendering: function() {
-		//
-		//	},
+					}
+				});
+		},
+		
+		fnChartsData: function () {
+			var mDashboardModel = this.mDashboardModel;
+			var receivedFrom = mDashboardModel.getProperty("/fromDate");
+			var rcvdOnFrom = receivedFrom.getTime();
+			var receivedTo = mDashboardModel.getProperty("/toDate");
+			var rcvdOnTo = receivedTo.getTime();
+			var obj = {
+				"companyCode": "",
+				"currency": "",
+				"rcvdOnFrom": rcvdOnFrom,
+				"rcvdOnTo": rcvdOnTo,
+				"vendorId": []
+			};
+			var url = "/menabevdev/apDashboardCharts/getDashboardChartDetails";
+			var url2 = "/menabevdev/apDashboardCharts/getKPIDetails";
+			jQuery
+				.ajax({
+					url: url,
+					dataType: "json",
+					data: JSON.stringify(obj),
+					contentType: "application/json",
+					type: "POST",
+					success: function (results) {
+						mDashboardModel.refresh(true);
+						var data = results.charts;
+						var exceptionReport = data[0].values;
+						var agingReport = data[1];
+						for (var i = 0; i < exceptionReport.length; i++) {
+							var aTempData = exceptionReport.filter(function (oRow) {
+								if (oRow.statusText === "Duplicate Invoice" || oRow.statusText === "PO Missing or Invalid" || oRow.statusText === "No-GRN" || oRow.statusText ===
+									"Partial GRN" || oRow.statusText === "UoM Mismatch" || oRow.statusText === "Item Mismatch" || oRow.statusText ===
+									"Qty Mismatch" || oRow.statusText === "Price Mismatch" || oRow.statusText === "Balance Mismatch" || oRow.statusText ===
+									"Price/Qty") {
+									return oRow;
+								}
+							});
+						}
+						mDashboardModel.setProperty("/exceptionReport", aTempData);
+						mDashboardModel.setProperty("/agingReport", agingReport);
+					},
+					error: function (e) {
+						sap.m.MessageToast.show("Data Not Found");
 
-		/**
-		 * Called when the Controller is destroyed. Use this one to free resources and finalize activities.
-		 * @memberOf com.menabev.AP.view.Dashboard
-		 */
-		//	onExit: function() {
-		//
-		//	}
+					}
+				});
+			jQuery
+				.ajax({
+					url: url2,
+					dataType: "json",
+					data: JSON.stringify(obj),
+					contentType: "application/json",
+					type: "POST",
+					success: function (results) {
+						mDashboardModel.refresh(true);
+						var data = results.charts;
+						var length = data.length;
+						if (length) {
+							mDashboardModel.setProperty("/Kpi", data);
+						}
+					},
+					error: function (e) {
+						sap.m.MessageToast.show("Data Not Found");
+
+					}
+				});
+		}
 
 	});
 

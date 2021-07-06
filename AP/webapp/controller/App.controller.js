@@ -26,12 +26,12 @@ sap.ui.define([
 			StaticDataModel.attachRequestCompleted(function (oEvent) {
 				var navItems = StaticDataModel.getProperty("/navItems");
 				if (userGroup === "IT_Admin") {
+					obj.push(navItems[5]);
 					obj.push(navItems[0]);
 					obj.push(navItems[1]);
 					obj.push(navItems[2]);
 					obj.push(navItems[3]);
 					obj.push(navItems[4]);
-					obj.push(navItems[5]);
 					that.oRouter.navTo("UserManagement");
 				} else if (userGroup === "Accountant") {
 					obj.push(navItems[0]);
@@ -43,12 +43,14 @@ sap.ui.define([
 					obj.push(navItems[0]);
 					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Supplier_Admin") {
+					obj.push(navItems[5]);
 					obj.push(navItems[1]);
 					obj.push(navItems[2]);
-					that.oRouter.navTo("UploadInvoice");
+					that.oRouter.navTo("TrackInvoice");
 				} else if (userGroup === "Supplier_Executive") {
+					obj.push(navItems[5]);
 					obj.push(navItems[1]);
-					that.oRouter.navTo("UploadInvoice");
+					that.oRouter.navTo("TrackInvoice");
 				}
 
 				StaticDataModel.setProperty("/leftPane", obj);

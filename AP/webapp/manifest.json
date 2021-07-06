@@ -110,6 +110,12 @@
 			"oPOModel": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
+			"oTrackInvoiceModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"mDashboardModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
 			"oDataModel": {
 				"type": "sap.ui.model.odata.ODataModel",
 				"settings": {
@@ -238,6 +244,12 @@
 				"target": [
 					"SchedulerLogs"
 				]
+			}, {
+				"name": "TrackInvoice",
+				"pattern": "TrackInvoice",
+				"target": [
+					"TrackInvoice"
+				]
 			}],
 			"targets": {
 				"UploadInvoice": {
@@ -287,6 +299,10 @@
 				"SchedulerLogs": {
 					"viewType": "XML",
 					"viewName": "SchedulerLogs"
+				},
+				"TrackInvoice": {
+					"viewType": "XML",
+					"viewName": "TrackInvoice"
 				}
 			}
 		}

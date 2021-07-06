@@ -1,0 +1,89 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<Dialog class="sapUiSizeCompact" contentWidth="55%" contentHeight="auto" showHeader="false">
+		<customHeader>
+			<Bar>
+				<contentLeft>
+					<Label text="{i18n>InvoiceNo}: " design="Bold"></Label>
+					<Title text="{olocalModel>/paymentStatus/extInvNum}"/>
+				</contentLeft>
+				<contentMiddle>
+					<Label text="{i18n>VENDOR}: " design="Bold"></Label>
+					<Title text="{parts: [{path : 'olocalModel>/paymentStatus/vendorName'},{path: 'olocalModel>/paymentStatus/vendorId'}], formatter: 'com.menabev.AP.formatter.formatter.formatActivityHeader'}"
+					class="sapUiTinyMarginEnd"/>
+					<Label text="{i18n>invoiceDate}: " design="Bold"></Label>
+					<Title text="{olocalModel>/paymentStatus/invoiceDate}"/>
+				</contentMiddle>
+				<contentRight>
+					<Button icon="sap-icon://decline" press="fncloseActivity"/>
+				</contentRight>
+			</Bar>
+		</customHeader>
+		<content>  
+			<HBox class="sapUiSizeCompact sapUiSmallMarginBegin sapUiSmallMarginTop">
+				<core:Icon src="sap-icon://activity-2" class="doneProcessCircle"/>
+				<VBox class="dashLineDone"></VBox>
+				<VBox class="poSearchactivitylogVboxDone sapUiSmallMarginBottom sapUiMediumMarginBegin">
+					<Label text="{i18n>receiving}" design="Bold" class="statusHeaderDone"/>
+					<HBox>
+						<Label text="{i18n>receivedOn}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/request_created_at}" class="sapUiSmallMarginBegin"/>
+					</HBox>
+					<HBox>
+						<Label text="{i18n>invType}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/invoiceType}" class="sapUiSmallMarginBegin"/>
+					</HBox>
+				</VBox>
+			</HBox>
+			<HBox class="sapUiSizeCompact sapUiSmallMarginBegin">
+				<core:Icon src="sap-icon://validate"
+				visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changeValidationIconCss'}"/>
+				<VBox
+				visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changValidationeDashLineCss'}"></VBox>
+				<VBox class="sapUiSmallMarginBottom sapUiMediumMarginBegin"
+				visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changeValidationBoxCss'}">
+					<Label text="{i18n>validation}" design="Bold"
+					visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changeValidationTextCss'}"></Label>
+					<HBox>
+						<Label text="{i18n>invoiceStatus}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/invoiceStatusText}" class="sapUiSmallMarginBegin"/>
+					</HBox>
+					<HBox visible="{olocalModel>/paiUnpaidPostDate}">
+						<Label text="{i18n>postDate}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/postingDate}" class="sapUiSmallMarginBegin"/>
+					</HBox>
+					<HBox visible="{olocalModel>/paiUnpaidPostDate}">
+						<Label text="{i18n>dueDate}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/dueDate}" class="sapUiSmallMarginBegin"/>
+					</HBox>
+					<HBox visible="{olocalModel>/rejDetails}">
+						<Label text="{i18n>rejReason}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/reasonForRejection}" class="sapUiSmallMarginBegin"/>
+					</HBox>
+					
+				</VBox>
+			</HBox>
+			<HBox class="sapUiSizeCompact sapUiSmallMarginBegin">
+				<core:Icon src="sap-icon://payment-approval" class="toBeDoneProcessCircle"
+				visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changePaymentIconCss'}"/>
+                <VBox class="falseDashLine"></VBox>
+				<VBox class="poSearchactivitylogVboxToBeDone sapUiSmallMarginBottom paymentBoxMargin"
+					visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changePaymentBoxCss'}">
+					<Label text="{i18n>Payment}" design="Bold" class="statusHeaderToBeDone"
+					visible="{path: 'olocalModel>/paymentStatus/invoiceStatus', formatter: 'com.menabev.AP.formatter.formatter.changePaymentTextCss'}"/>                    
+					<HBox>
+						<Label text="{i18n>STATUS}: " design="Bold"/>                        
+						<Text text="{olocalModel>/paymentStatus/invoiceStatusText}" class="sapUiSmallMarginBegin"/>
+					</HBox>									
+					<HBox visible="{olocalModel>/paidDetails}">
+						<Label text="{i18n>clearingDate}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/clearingDate}" class="sapUiSmallMarginBegin" />                       
+					</HBox>
+					<HBox visible="{olocalModel>/paidDetails}">
+						<Label text="{i18n>PaymentRef}: " design="Bold"/>
+						<Text text="{olocalModel>/paymentStatus/paymentReference}" class="sapUiSmallMarginBegin"/>                        
+					</HBox>
+				</VBox>
+			</HBox>
+		</content>
+	</Dialog>
+</core:FragmentDefinition>

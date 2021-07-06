@@ -367,6 +367,183 @@ com.menabev.AP.formatter.formatter = {
 		} else if (remidiationUser === "BUYER") {
 			return false;
 		}
-	}
+	},
+
+	changeColor: function (sValue) {
+		if (sValue === "14") {
+			sValue = "Success";
+		} else if (sValue === "13") {
+			sValue = "Indication03";
+		} else if (sValue === "15") {
+			sValue = "Error";
+		} else {
+			sValue = "None";
+		}
+		return sValue;
+	},
+	
+	changeStatustext: function (sValue) {
+		if (sValue === "14") {
+			sValue = "Paid";
+		} else if (sValue === "15") {
+			sValue = "Rejected";
+		} else if (sValue === "13") {
+			sValue = "Unpaid";
+		} else {
+			sValue = "Pending";
+		}
+		return sValue;
+	},
+	
+	showIcon: function (value) {
+		if (value === "15") {
+			value = true;
+		} else {
+			value = false;
+		}
+		return value;
+	},
+	
+	showPaymentRef: function (sValue) {
+		if (sValue == "NA") {
+			sValue = "";
+		}
+		return sValue;
+
+	},
+	
+	formatActivityHeader: function (vendorName, vendorId) {
+		if (vendorName && vendorId) {
+			var value = vendorName;
+		} else if (vendorName === "") {
+			value = vendorId;
+		} else if (vendorId === "") {
+			value = vendorName;
+		} else {
+			value = vendorName;
+		}
+		return value;
+	},
+	
+	changeValidationIconCss: function (sValue) {
+		if (sValue === "14" || sValue === "13") {
+			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
+			this.addStyleClass("doneProcessCircle");
+			sValue = true;
+		} else if (sValue === "16") {
+			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
+			this.addStyleClass("onGoingProcessCircle");
+			sValue = true;
+		} else if (sValue === "15") {
+			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
+			this.addStyleClass("rejectedProcessCircle");
+			sValue = true;
+		}
+		return sValue;
+	},
+	
+	changValidationeDashLineCss: function (sValue) {
+		if (sValue === "14" || sValue === "13") {
+			this.removeStyleClass("dashLineDone dashLineToBeDone dashLineOnGoing");
+			this.addStyleClass("dashLineDone");
+			sValue = true;
+		} else if (sValue === "16" || sValue === "15") {
+			this.removeStyleClass("dashLineDone dashLineToBeDone dashLineOnGoing");
+			this.addStyleClass("dashLineToBeDone");
+			sValue = true;
+		}
+		return sValue;
+	},
+	
+	changeValidationBoxCss: function (sValue) {
+		if (sValue === "14" || sValue === "13") {
+			this.removeStyleClass(
+				"poSearchactivitylogVboxDone poSearchactivitylogVboxOnGoing poSearchactivitylogVboxRejected poSearchactivitylogVboxToBeDone");
+			this.addStyleClass("poSearchactivitylogVboxDone");
+			sValue = true;
+		} else if (sValue === "16") {
+			this.removeStyleClass(
+				"poSearchactivitylogVboxDone poSearchactivitylogVboxOnGoing poSearchactivitylogVboxRejected poSearchactivitylogVboxToBeDone");
+			this.addStyleClass("poSearchactivitylogVboxOnGoing");
+			sValue = true;
+		} else if (sValue === "15") {
+			this.removeStyleClass(
+				"poSearchactivitylogVboxDone poSearchactivitylogVboxOnGoing poSearchactivitylogVboxRejected poSearchactivitylogVboxToBeDone");
+			this.addStyleClass("poSearchactivitylogVboxRejected");
+			sValue = true;
+		}
+		return sValue;
+	},
+	
+	changeValidationTextCss: function (sValue) {
+		if (sValue === "14" || sValue === "13") {
+			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
+			this.addStyleClass("statusHeaderDone");
+			sValue = true;
+		} else if (sValue === "16") {
+			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
+			this.addStyleClass("statusHeaderOnGoing");
+			sValue = true;
+		} else if (sValue === "15") {
+			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
+			this.addStyleClass("statusHeaderRejected");
+			sValue = true;
+		}
+		return sValue;
+	},
+	
+	changePaymentIconCss: function (sValue) {
+		if (sValue === "14") {
+			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
+			this.addStyleClass("doneProcessCircle");
+			sValue = true;
+		} else if (sValue === "13") {
+			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
+			this.addStyleClass("onGoingProcessCircle");
+			sValue = true;
+		} else if (sValue === "16" || sValue === "15") {
+			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
+			this.addStyleClass("toBeDoneProcessCircle");
+			sValue = true;
+		}
+		return sValue;
+	},
+	
+	changePaymentBoxCss: function (sValue) {
+		if (sValue === "14") {
+			this.removeStyleClass(
+				"poSearchactivitylogVboxDone poSearchactivitylogVboxOnGoing poSearchactivitylogVboxRejected poSearchactivitylogVboxToBeDone");
+			this.addStyleClass("poSearchactivitylogVboxDone");
+			sValue = true;
+		} else if (sValue === "16" || sValue === "15") {
+			this.removeStyleClass(
+				"poSearchactivitylogVboxDone poSearchactivitylogVboxOnGoing poSearchactivitylogVboxRejected poSearchactivitylogVboxToBeDone");
+			this.addStyleClass("poSearchactivitylogVboxToBeDone");
+			sValue = true;
+		} else if (sValue === "13") {
+			this.removeStyleClass(
+				"poSearchactivitylogVboxDone poSearchactivitylogVboxOnGoing poSearchactivitylogVboxRejected poSearchactivitylogVboxToBeDone");
+			this.addStyleClass("poSearchactivitylogVboxOnGoing");
+			sValue = true;
+		}
+		return sValue;
+	},
+	
+	changePaymentTextCss: function (sValue) {
+		if (sValue === "14") {
+			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
+			this.addStyleClass("statusHeaderDone");
+			sValue = true;
+		} else if (sValue === "16" || sValue === "15") {
+			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
+			this.addStyleClass("statusHeaderToBeDone");
+			sValue = true;
+		} else if (sValue === "13") {
+			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
+			this.addStyleClass("statusHeaderOnGoing");
+			sValue = true;
+		}
+		return sValue;
+	},
 
 };

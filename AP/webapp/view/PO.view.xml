@@ -21,7 +21,7 @@
 								<core:CustomData key="PO" value="PO"/>
 							</customData>
 						</Button>
-						<!--<Button icon="sap-icon://refresh" press="onPressRefresh" class="SecondaryBtn" enabled="false"/>-->
+						<Button icon="sap-icon://refresh" press="onPressRefresh" class="SecondaryBtn"/>
 					</Toolbar>
 					<IconTabBar>
 						<items>
