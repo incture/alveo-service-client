@@ -411,7 +411,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				
 				
 				if(dto.getInvoiceStatus().size()==4)// if dto contains 16 and more codes
-				filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN ", FIRST + " AND "+15+"");
+				filterQueryMap.put(" RR.INVOICE_STATUS IN ", "('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15')");//FIRST + " AND "+15+"");
 				else
 					filterQueryMap.put(" RR.INVOICE_STATUS BETWEEN "+0+" AND "+15+" and RR.INVOICE_STATUS not in" , "(" + notinQuery + ")");
 			
