@@ -35,22 +35,40 @@ com.menabev.AP.util.POServices = {
 		oServiceModel.loadData(sUrl, "", true, "GET", false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			busy.close();
-			var oData = oEvent.getSource().getData();
-			oPOModel.setProperty("/", oData);
-			if (oData.invoicePdfId) {
-				oVisibilityModel.setProperty("/openPdfBtnVisible", true);
-			} else {
-				oVisibilityModel.setProperty("/openPdfBtnVisible", false);
+			if (oEvent.getParameters().success) {
+				var oData = oEvent.getSource().getData();
+				oPOModel.setProperty("/", oData);
+				if (oData.invoicePdfId) {
+					oVisibilityModel.setProperty("/openPdfBtnVisible", true);
+				} else {
+					oVisibilityModel.setProperty("/openPdfBtnVisible", false);
+				}
+				var invoiceItems = oPOModel.getProperty("/invoiceItems");
+				var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
+				oController.getReferencePo(arrUniqueInvoiceItems);
+				that.formatUOMList(oData.invoiceItems, oController);
+			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+				var message = "Session Lost. Press OK to refresh the page";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (sAction) {
+						location.reload(true);
+					}
+				});
+			} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+				var message = "Service Unavailable. Please try after sometime";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK]
+				});
+			} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+				var message = "Service Unavailable. Please contact administrator";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK]
+				});
 			}
-			var invoiceItems = oPOModel.getProperty("/invoiceItems");
-			var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
-			oController.getReferencePo(arrUniqueInvoiceItems);
-			that.formatUOMList(oData.invoiceItems);
-			// if (oData.messages.messageType === "E") {
-			// 	sap.m.MessageBox.success(oData.messages.messageText, {
-			// 		actions: [sap.m.MessageBox.Action.OK]
-			// 	});
-			// }
 		});
 
 	},
@@ -220,32 +238,17 @@ com.menabev.AP.util.POServices = {
 
 	setChangeInd: function (oEvent, oController, changeInd) {
 		var oPOModel = oController.oPOModel;
+		var oVisibilityModel = oController.oVisibilityModel;
 		var changeIndicator = oPOModel.getProperty("/changeIndicator");
 		if (!changeIndicator) {
 			oPOModel.setProperty("/changeIndicators", {});
 		}
-		if (!changeIndicator) {
-			changeIndicator = {
-				"headerChange": null,
-				"itemChange": null,
-				"costAllocationChange": null,
-				"attachementsChange": null,
-				"commentChange": null,
-				"activityLog": null,
-				"isVendoIdChanged": true,
-				"isCompanyCodeChanged": null,
-				"isInvoiceRefChanged": null,
-				"isCurrencyChanged": null,
-				"isInvoiceDateChanged": null,
-				"isBaselineDateChanged": null,
-				"isPaymentTermsChanged": null,
-				"isInvoiceTypeChanged": null,
-				"isTaxCodeChanged": null,
-				"isTaxAmountChanged": null,
-				"isInvoiceAmountChanged": null
-			};
+		var headerChangeIndicator = oVisibilityModel.getProperty("/changeIndicator");
+		if (!headerChangeIndicator) {
+			oVisibilityModel.setProperty("/changeIndicators", {});
 		}
-		oPOModel.setProperty("/changeIndicators/" + changeInd, true);
+		oPOModel.setProperty("/changeIndicators/headerChange", true);
+		oVisibilityModel.setProperty("/changeIndicators/" + changeInd, true);
 	},
 
 	onInvTypeChange: function (oEvent, oController) {
@@ -269,33 +272,17 @@ com.menabev.AP.util.POServices = {
 
 	onHeaderChange: function (oEvent, oController, transaction) {
 		var oPOModel = oController.oPOModel;
+		var oVisibilityModel = oController.oVisibilityModel;
 		var changeIndicator = oPOModel.getProperty("/changeIndicator");
 		if (!changeIndicator) {
 			oPOModel.setProperty("/changeIndicators", {});
 		}
-		if (!changeIndicator) {
-			changeIndicator = {
-				"headerChange": null,
-				"itemChange": null,
-				"costAllocationChange": null,
-				"attachementsChange": null,
-				"commentChange": null,
-				"activityLog": null,
-				"isVendoIdChanged": true,
-				"isCompanyCodeChanged": null,
-				"isInvoiceRefChanged": null,
-				"isCurrencyChanged": null,
-				"isInvoiceDateChanged": null,
-				"isBaselineDateChanged": null,
-				"isPaymentTermsChanged": null,
-				"isInvoiceTypeChanged": null,
-				"isTaxCodeChanged": null,
-				"isTaxAmountChanged": null,
-				"isInvoiceAmountChanged": null
-			};
+		var headerChangeIndicator = oVisibilityModel.getProperty("/changeIndicator");
+		if (!headerChangeIndicator) {
+			oVisibilityModel.setProperty("/changeIndicators", {});
 		}
 		oPOModel.setProperty("/changeIndicators/headerChange", true);
-		oPOModel.setProperty("/changeIndicators/" + transaction, true);
+		oVisibilityModel.setProperty("/changeIndicators/" + transaction, true);
 		var oPayload = {
 			"requestID": "APA-210609-000001",
 			"vendorID": oPOModel.getProperty("/vendorId"),
@@ -317,7 +304,7 @@ com.menabev.AP.util.POServices = {
 			"discountedDueDate1": null,
 			"discountedDueDate2": null,
 			"systemSuggestedtaxAmount": oPOModel.getProperty("/systemSuggestedtaxAmount"),
-			"changeIndicator": oPOModel.getProperty("/changeIndicators")
+			"changeIndicator": oVisibilityModel.getProperty("/changeIndicators")
 		};
 		var sUrl = "/menabevdev/validate/header";
 		var oServiceModel = new sap.ui.model.json.JSONModel();
@@ -329,7 +316,7 @@ com.menabev.AP.util.POServices = {
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			var oData = oEvent.getSource().getData();
 			changeIndicator = oData.changeIndicator;
-			oPOModel.setProperty("/changeIndicators", changeIndicator);
+			oVisibilityModel.setProperty("/changeIndicators", changeIndicator);
 			oPOModel.setProperty("/vendorId", oData.vendorID);
 			oPOModel.setProperty("/compCode", oData.companyCode);
 			oPOModel.setProperty("/extInvNum", oData.invoiceReference);
@@ -457,7 +444,7 @@ com.menabev.AP.util.POServices = {
 				if (oSubmitData.invoiceType == "PO") {
 					sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
 					oPayload.invoiceHeaderDto.purchaseOrder = jQuery.extend(true, [], oData.purchaseOrder);
-					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "openFrag");
+					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode);
 				} else {
 					var sUrl = "/menabevdev/invoiceHeader/accountantSubmit";
 					this.saveSubmitServiceCall(oController, oPayload, sMethod, sUrl);
@@ -467,7 +454,7 @@ com.menabev.AP.util.POServices = {
 		}
 
 	},
-	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode) {
+	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode, sUrl) {
 		var oPOModel = oController.oPOModel;
 		var oMandatoryModel = oController.oMandatoryModel;
 		var oData = oPOModel.getData();
@@ -495,19 +482,24 @@ com.menabev.AP.util.POServices = {
 		if (!oData.invoiceTotal) {
 			oData.invoiceTotal = 0;
 		}
-
+		var status = oData.invoiceStatus;
+		if (actionCode == "ASR" && (status < 4 || status > 12)) {
+			sap.m.MessageToast.show("Please check invoice status before sending for remidiation");
+			return;
+		} else if (actionCode === "ASA" && status != 16) {
+			sap.m.MessageToast.show("Invoice status should be ready to post to send it for approval");
+			return;
+		}
 		var sMethod = "POST";
 		var oPayload = {
 			"invoice": oData,
 			"requestId": oData.requestId,
-			"taskId": oData.requestId,
+			"taskId": oController.taskId,
 			"actionCode": actionCode,
 			"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders)
 		};
-		var sUrl;
 		oPayload.invoice.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
-		sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
-		this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "openFrag");
+		this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode);
 
 	},
 
@@ -533,7 +525,7 @@ com.menabev.AP.util.POServices = {
 			busy.close();
 			var oData = oEvent.getSource().getData();
 			var message = oData.responseStatus;
-			if (oData.status === 200) {
+			if (oEvent.getParameters().success) {
 				var ReqId = oData.invoiceHeaderDto.requestId;
 				oPOModel.setProperty("/", oData.invoiceHeaderDto);
 				sap.m.MessageBox.success(message, {
@@ -607,7 +599,6 @@ com.menabev.AP.util.POServices = {
 		var oHeader = {
 			"Content-Type": "application/scim+json"
 		};
-
 		busy.open();
 		oServiceModel.loadData(sUrl, JSON.stringify(oData), true, sMethod, false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
@@ -617,13 +608,21 @@ com.menabev.AP.util.POServices = {
 			if (oEvent.getParameters().success) {
 				var ReqId = oData.invoice.requestId;
 				oPOModel.setProperty("/", oData.invoice);
+				oPOModel.setProperty("/purchaseOrders", oData.purchaseOrders);
 				if (!ok && actionCode === "ASR") {
 					oController.onSubmitForRemediationFrag(oData.userList);
+					oPOModel.setProperty("/actionCode", "ASR");
 					return;
 				} else if (!ok && actionCode === "ASA") {
 					oController.onSubmitForApprovalFrag(oData.userList);
+					oPOModel.setProperty("/actionCode", "ASA");
+					return;
+				} else if (!ok && actionCode === "AR") {
+					oController.onSubmitForApprovalFrag(oData.userList, "Reject Invoice");
+					oPOModel.setProperty("/actionCode", "AR");
 					return;
 				}
+
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
 				var message = "Session Lost. Press OK to refresh the page";
 				sap.m.MessageBox.information(message, {
@@ -725,6 +724,7 @@ com.menabev.AP.util.POServices = {
 		}
 	},
 	hdrInvAmtCalu: function (oEvent, oController) {
+		this.onHeaderChange(oEvent, oController, "isInvoiceAmountChanged");
 		var oPOModel = oController.oPOModel,
 			oMandatoryModel = oController.oMandatoryModel,
 			invoiceAmt = oEvent.getParameter("value");
@@ -774,7 +774,7 @@ com.menabev.AP.util.POServices = {
 			}
 		}
 		var selectedItems = oEvent.getSource().getSelectedItems();
-		var tax = this.calculateTax(selectedItems);
+		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/taxValue", this.nanValCheck(tax.totalVax));
 		oPOModel.setProperty("/itemGrossAmount", this.nanValCheck(tax.grossTotal));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
@@ -789,7 +789,7 @@ com.menabev.AP.util.POServices = {
 		oPOModel.setProperty(sPath + "/poUnitPriceUOM", selobj.poUnitPriceUOM);
 	},
 
-	formatUOMList: function (itemDetails) {
+	formatUOMList: function (itemDetails, oController) {
 		var len = itemDetails.length;
 		var data, obj1, obj2, UOMList, UOM1, UOM2;
 		for (var i = 0; i < len; i++) {
@@ -834,24 +834,24 @@ com.menabev.AP.util.POServices = {
 			}
 			itemDetails[i].UOMList = UOMList;
 		}
-		this.oPOModel.setProperty("/invoiceItems", itemDetails);
+		oController.oPOModel.setProperty("/invoiceItems", itemDetails);
 	},
 
 	onViewUOMDetails: function (oEvent, oController) {
 		var oButton = oEvent.getSource();
 		if (!this.PopoverNewNotification) {
-			this.PopoverNewNotification = sap.ui.xmlfragment("com.menabev.MenabevNeo.fragment.UOMConversion", this);
-			this.getView().addDependent(this.PopoverNewNotification);
+			oController.PopoverNewNotification = sap.ui.xmlfragment("com.menabev.AP.fragment.UOMConversion", this);
+			oController.getView().addDependent(this.PopoverNewNotification, this);
 		}
 		var data = oEvent.getSource().getBindingContext("oPOModel").getObject().UOMConversion;
-		this.oPOModel.setProperty("/UOMList", data);
-		this.PopoverNewNotification.openBy(oButton);
+		oController.oPOModel.setProperty("/UOMList", data);
+		oController.PopoverNewNotification.openBy(oButton);
 	},
 
-	calculateTax: function (selItems) {
+	calculateTax: function (selItems, oController) {
 		var length = selItems.length;
-		var unplannedCost = this.oPOModel.getProperty("/unplannedCost");
-		var invoiceTotal = this.oPOModel.getProperty("/invoiceTotal");
+		var unplannedCost = oController.oPOModel.getProperty("/unplannedCost");
+		var invoiceTotal = oController.oPOModel.getProperty("/invoiceTotal");
 		var tax, gross, totalVax = 0,
 			grossTotal = 0;
 		for (var i = 0; i < length; i++) {
@@ -892,10 +892,25 @@ com.menabev.AP.util.POServices = {
 		var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
 		oPOModel.setProperty(sPath + "/taxCode", taxCode);
 		oPOModel.setProperty(sPath + "/taxPercentage", taxPercentage);
+		var gross = this.nanValCheck(oContextObj.grossPrice);
+		var taxAmount = this.calculateLineItemTax(oContextObj);
+		oContextObj.taxValue = taxAmount;
+		var netWorth = parseFloat(gross) + parseFloat(taxAmount);
+		netWorth = netWorth.toFixed(2);
+		oContextObj.netWorth = netWorth;
+		oPOModel.setProperty(sPath, oContextObj);
+		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
+		var tax = this.calculateTax(selectedItems, oController);
+		oPOModel.setProperty("/taxValue", this.nanValCheck(tax.totalVax));
+		oPOModel.setProperty("/itemGrossAmount", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
+		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
+		oPOModel.refresh();
 	},
 
 	// Item level calculation
 	onInvQtyChange: function (oEvent, oController) {
+		this.setChangeInd(oEvent, oController, "itemChange");
 		var oPOModel = oController.oPOModel;
 		var oContextObj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 		var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
@@ -908,7 +923,7 @@ com.menabev.AP.util.POServices = {
 		oContextObj.netWorth = netWorth;
 		oPOModel.setProperty(sPath, oContextObj);
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
-		var tax = this.calculateTax(selectedItems);
+		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/taxValue", this.nanValCheck(tax.totalVax));
 		oPOModel.setProperty("/itemGrossAmount", this.nanValCheck(tax.grossTotal));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
@@ -935,10 +950,11 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onGrossPriceChange: function (oEvent, oController) {
+		this.setChangeInd(oEvent, oController, "itemChange");
 		var oPOModel = oController.oPOModel;
 		var oContextObj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 		var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
-		var gross = oContextObj.grossPrice;
+		var gross = this.nanValCheck(oContextObj.grossPrice);
 		var unitPrice = this.calculateUnitPrice(oContextObj);
 		oContextObj.unitPrice = unitPrice;
 		var taxAmount = this.calculateLineItemTax(oContextObj);
@@ -948,7 +964,7 @@ com.menabev.AP.util.POServices = {
 		oContextObj.netWorth = netWorth;
 		oPOModel.setProperty(sPath, oContextObj);
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
-		var tax = this.calculateTax(selectedItems);
+		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/taxValue", this.nanValCheck(tax.totalVax));
 		oPOModel.setProperty("/itemGrossAmount", this.nanValCheck(tax.grossTotal));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
@@ -965,6 +981,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	onPricingUnitChange: function (oEvent, oController) {
+		this.setChangeInd(oEvent, oController, "itemChange");
 		var oPOModel = oController.oPOModel;
 		var oContextObj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 		var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
@@ -978,7 +995,7 @@ com.menabev.AP.util.POServices = {
 		oContextObj.netWorth = netWorth;
 		oPOModel.setProperty(sPath, oContextObj);
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
-		var tax = this.calculateTax(selectedItems);
+		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/taxValue", this.nanValCheck(tax.totalVax));
 		oPOModel.setProperty("/itemGrossAmount", this.nanValCheck(tax.grossTotal));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));

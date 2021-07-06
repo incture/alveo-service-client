@@ -25,6 +25,36 @@
 					</HBox>
 				</l:content>
 			</l:Grid>
+			<Table alternateRowColors="true" items="{oPOModel>/userList}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Text text="{oPOModel>/selectedRemidiationGroup}"/>
+						<ToolbarSpacer/>
+						<Button icon="sap-icon://sys-add" press="onAddRemidiationUser"/>
+						<!--<Button icon="sap-icon://sys-minus"/>-->
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
+						<Label design="Bold" text="{i18n>UserId}"/>
+					</Column>
+					<!--<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">-->
+					<!--	<Label design="Bold" text="{i18n>Group}"/>-->
+					<!--</Column>-->
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="10%">
+						<Label design="Bold" text="{i18n>Actions}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}"/>
+							<!--<Text text="{oPOModel>group}"/>-->
+							<Button icon="sap-icon://delete" press="onDeleteRemidiationUser" type="Reject"></Button>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
 			<tnt:InfoLabel text="{i18n>rejectInfoLabelMsg}" renderMode="Narrow" colorScheme="1" displayOnly="true"/>
 			<HBox class="sapUiSmallMargin">
 				<Label text="{i18n>selectReasonCode}" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
@@ -34,13 +64,13 @@
 				</Select>
 			</HBox>
 			<l:Grid hSpacing="1" vSpacing="0" defaultSpan="XL12 L12 M12 S12" class="sapUiSmallMarginTopBottom">
-                <Label design="Bold" text="{i18n>Comments}" required="true"/>
-                <TextArea value="{oPOModel>/sComments}" placeholder="{i18n>PleaseEnterComments}" showExceededText="true" maxLength="40" 
-                	width="100%" liveChange="onCommentsLiveChange" valueState="{oPOModel>/sCommentValueState}" valueLiveUpdate="true"/>
-            </l:Grid>
+				<Label design="Bold" text="{i18n>Comments}" required="true"/>
+				<TextArea value="{oPOModel>/sComments}" placeholder="{i18n>PleaseEnterComments}" showExceededText="true" maxLength="40" width="100%"
+					liveChange="onCommentsLiveChange" valueState="{oPOModel>/sCommentValueState}" valueLiveUpdate="true"/>
+			</l:Grid>
 		</content>
 		<beginButton>
-			<Button text="{i18n>Reject}" type="Reject" press="onNonPoRejectConfirm" enabled="false"/>
+			<Button text="{i18n>Reject}" type="Reject" press="onNonPoRejectConfirm"/>
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>Cancel}" press="onNonPoRejectCancel"/>

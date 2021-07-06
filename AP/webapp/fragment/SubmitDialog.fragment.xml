@@ -6,7 +6,7 @@
 					<VBox class="sapUiTinyMargin">
 						<HBox>
 							<Label text="{i18n>InvoiceNumber}" design="Bold" class="sapUiTinyMarginEnd"/>
-							<Text text="{oPOModel>/invoiceNumber}"/>
+							<Text text="{oPOModel>/extInvNum}"/>
 						</HBox>
 						<HBox>
 							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
@@ -18,21 +18,21 @@
 					</VBox>
 					<HBox class="sapUiTinyMargin">
 						<Label text="{i18n>TotalValue}" design="Bold" class="sapUiTinyMarginEnd"/>
-						<Text text="{oPOModel>/totalValue}"/>
+						<Text text="{oPOModel>/invoiceTotal}"/>
 						<layoutData>
 							<l:GridData span="XL4 L4 M4 S6"/>
 						</layoutData>
 					</HBox>
 				</l:content>
 			</l:Grid>
-			<tnt:InfoLabel text="{i18n>submitInfoLabelMsg}" colorScheme="7" displayOnly="true"/>
-			<Switch customTextOn="GRN" customTextOff="BUYER"
+			<!--<tnt:InfoLabel text="{i18n>submitInfoLabelMsg}" colorScheme="7" displayOnly="true"/>-->
+			<Switch customTextOn="GRN" customTextOff="BUY"
 				state="{path:'oPOModel>/selectedRemidiationGroup',formatter:'com.menabev.AP.formatter.formatter.formatRemidiationUser'}"
-				visible="{path:'oPOModel>/selectedRemidiationGroup',formatter:'com.menabev.AP.formatter.formatter.formatRemidiationUser'}"
-				change="onRemidiationSwitchToggle"></Switch>
-			<Table alternateRowColors="true">
+				visible="{oPOModel>/remidiationSwitchVisible}" change="onRemidiationSwitchToggle"></Switch>
+			<Table alternateRowColors="true" items="{oPOModel>/userList}">
 				<headerToolbar>
 					<OverflowToolbar>
+						<Text text="{oPOModel>/selectedRemidiationGroup}"/>
 						<ToolbarSpacer/>
 						<Button icon="sap-icon://sys-add" press="onAddRemidiationUser"/>
 						<!--<Button icon="sap-icon://sys-minus"/>-->
@@ -45,7 +45,7 @@
 					<!--<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">-->
 					<!--	<Label design="Bold" text="{i18n>Group}"/>-->
 					<!--</Column>-->
-					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">
+					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="10%">
 						<Label design="Bold" text="{i18n>Actions}"/>
 					</Column>
 				</columns>
@@ -54,7 +54,7 @@
 						<cells>
 							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}"/>
 							<!--<Text text="{oPOModel>group}"/>-->
-							<Button icon="" press="onDeleteRemidiationUser"></Button>
+							<Button icon="sap-icon://delete" press="onDeleteRemidiationUser" type="Reject"></Button>
 						</cells>
 					</ColumnListItem>
 				</items>
@@ -66,7 +66,7 @@
 			</l:Grid>
 		</content>
 		<beginButton>
-			<Button text="{i18n>Submit}" press="onPressOK" type="Emphasized" enabled="false"/>
+			<Button text="{i18n>Submit}" press="onPressOK" type="Emphasized"/>
 		</beginButton>
 		<endButton>
 			<Button text="{i18n>Cancel}" press="onCancelSubmitDialog"/>

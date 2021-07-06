@@ -48,6 +48,7 @@ sap.ui.define([
 					var oArgs = oEvent.getParameter("arguments");
 					that.requestId = oArgs.id;
 					that.status = oArgs.status;
+					that.taskId = oArgs.taskId;
 					var invoiceType = oEvent.getParameter("name");
 					POServices.getPONonPOData("", that, that.requestId);
 					that.getBtnVisibility(that.status, that.requestId, invoiceType);
@@ -152,11 +153,12 @@ sap.ui.define([
 
 		onSubmitForRemediationFrag: function (userList) {
 			if (userList) {
-				this.fetchUserList();
+				this.fetchUserList(userList);
 			}
 			var oPOModel = this.getModel("oPOModel");
+			oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
-			this.getView().addDependent(this.SubmitDialog);
+			this.getView().addDependent(this.SubmitDialog, this);
 			this.SubmitDialog.setModel(oPOModel, "oPOModel");
 			oPOModel.setProperty("/submitTypeTitle", "Submit For Remediation");
 			this.SubmitDialog.open();
@@ -164,20 +166,38 @@ sap.ui.define([
 
 		onSubmitForApprovalFrag: function (userList) {
 			if (userList) {
-				this.fetchUserList();
+				this.fetchUserList(userList);
 			}
 			var oPOModel = this.getModel("oPOModel");
+			oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
+			oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
-			this.getView().addDependent(this.SubmitDialog);
+			this.getView().addDependent(this.SubmitDialog, this);
 			this.SubmitDialog.setModel(oPOModel, "oPOModel");
 			oPOModel.setProperty("/submitTypeTitle", "Submit For Approval");
 			this.SubmitDialog.open();
+		},
+
+		onSubmitForRejection: function (userList, title) {
+			if (userList) {
+				this.fetchUserList(userList);
+			}
+			var oPOModel = this.getModel("oPOModel");
+			oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
+			oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
+			this.RejectDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.RejectDialog", this);
+			this.getView().addDependent(this.SubmitDialog, this);
+			this.RejectDialog.setModel(oPOModel, "oPOModel");
+			oPOModel.setProperty("/submitTypeTitle", "Reject Task");
+			this.RejectDialog.open();
 		},
 
 		fetchUserList: function (userList) {
 
 			var oPOModel = this.oPOModel;
 			var length = userList.length;
+			oPOModel.setProperty("/remidiationSwitchVisible", false);
+			oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
 			var GRN = 0,
 				buyer = 0,
 				processLead = 0;
@@ -195,20 +215,17 @@ sap.ui.define([
 			}
 			if (GRN && buyer) {
 				oPOModel.setProperty("/remidiationSwitchVisible", true);
-				oPOModel.setProperty("/selectedRemidiationGroup", "GRN");
-				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
-			}
-			if (GRN) {
+				oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
+				oPOModel.setProperty("/userList", oPOModel.getProperty("/BuyerUser"));
+			} else if (GRN) {
 				oPOModel.setProperty("/remidiationSwitchVisible", false);
 				oPOModel.setProperty("/selectedRemidiationGroup", "GRN");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/GRNUser"));
-			}
-			if (buyer) {
+			} else if (buyer) {
 				oPOModel.setProperty("/remidiationSwitchVisible", false);
 				oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/BuyerUser"));
-			}
-			if (processLead) {
+			} else if (processLead) {
 				oPOModel.setProperty("/remidiationSwitchVisible", false);
 				oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
 				oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
@@ -238,6 +255,7 @@ sap.ui.define([
 				userList = [];
 			}
 			userList.push(obj);
+			oPOModel.setProperty("/userList", userList);
 		},
 
 		onDeleteRemidiationUser: function (oEvent) {
@@ -289,21 +307,113 @@ sap.ui.define([
 		},
 
 		onNonPoSubmit: function (oEvent) {
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, "ASA");
+			var sUrl, actionCode;
+			var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
+			if (userGroup === "Accountant") {
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				actionCode = "ASA";
+			} else if (userGroup === "Buyer") {
+				sUrl = "/menabevdev/invoiceHeader/buyer/buyerSubmit";
+				actionCode = "A";
+			} else if (userGroup === "Process_Lead") {
+				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
+				actionCode = "PA";
+			}
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+		},
+
+		onNonPoRejectConfirm: function (oEvent) {
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var sUrl, actionCode;
+			var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
+			if (userGroup === "Accountant") {
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				actionCode = "AR";
+			}
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+		},
+
+		onNonPoReSend: function (oEvent) {
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var sUrl, actionCode;
+			var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
+			if (userGroup === "Accountant") {
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				actionCode = "ASA";
+			} else if (userGroup === "Buyer") {
+				sUrl = "/menabevdev/invoiceHeader/buyer/buyerSubmit";
+				actionCode = "A";
+			} else if (userGroup === "Process_Lead") {
+				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
+				actionCode = "PRS";
+			}
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
 		SubmitForRemidiation: function (oEvent) {
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, "ASR");
+			var sUrl, actionCode;
+			if (userGroup === "Accountant") {
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				actionCode = "ASR";
+			}
+			// else if (userGroup === "Buyer") {
+			// 	sUrl = "/menabevdev/invoiceHeader/buyer/buyerSubmit";
+			// 	actionCode = "";
+			// } else if (userGroup === "Process_Lead") {
+			// 	sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
+			// 	actionCode = "";
+			// }
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
+		onRejectTask: function (oEvent) {
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var sUrl, actionCode;
+			if (userGroup === "Accountant") {
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				actionCode = "AR";
+			} else if (userGroup === "Buyer") {
+				sUrl = "/menabevdev/invoiceHeader/buyer/buyerSubmit";
+				actionCode = "R";
+			} else if (userGroup === "Process_Lead") {
+				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
+				actionCode = "PR";
+			}
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+		},
+
 		onPressOK: function (oEvent) {
-			var oPayload = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var oPOModel = this.oPOModel;
+			var oData = oPOModel.getProperty("/");
+			var sMethod = "POST";
+			var sUrl;
 			var userList = this.formUserListPayload();
-			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA", userList, "ok");
+			if (userList) {
+				var oPayload = {
+					"invoice": oData,
+					"requestId": oData.requestId,
+					"taskId": this.taskId,
+					"actionCode": oPOModel.getProperty("/actionCode"),
+					"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders),
+					"userList": userList.userList
+				};
+				oPayload.invoice.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				this.SubmitDialog.close();
+				POServices.onAccSubmit(this, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmitOk", "ASA", userList, "ok");
+			}
+
 		},
 
 		onNonPoSave: function (oEvent) {
@@ -321,10 +431,6 @@ sap.ui.define([
 			POServices.onDueDateChange(oEvent, this);
 		},
 
-		onClickOK: function (oEvent) {
-			var oPayload = this.oPOModel.getData();
-			POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA", "ok");
-		},
 		onItemSelect: function (oEvent) {
 			POServices.onItemSelect(oEvent, this);
 		},

@@ -228,12 +228,14 @@ sap.ui.define([
 				if (oContextObj.invoiceType === "NON-PO") {
 					this.oRouter.navTo("NonPOInvoice", {
 						id: reqId,
-						status: oContextObj.status
+						status: oContextObj.status,
+						taskId: oContextObj.taskId
 					});
 				} else {
 					this.oRouter.navTo("PO", {
 						id: reqId,
-						status: oContextObj.status
+						status: oContextObj.status,
+						taskId: oContextObj.taskId
 					});
 				}
 			},
@@ -360,6 +362,12 @@ sap.ui.define([
 						oTaskInboxModel.setProperty("/draftCount", 0);
 						oTaskInboxModel.setProperty("/openTask", {});
 						oTaskInboxModel.setProperty("/draftTask", {});
+					} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+						var message = "Service Unavailable. Please contact administrator";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
 					}
 
 				});
@@ -472,11 +480,34 @@ sap.ui.define([
 				oServiceModel.loadData(sUrl, JSON.stringify(obj), true, "POST", false, false, oHeader);
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					busy.close();
-					var data = oEvent.getSource().getData();
-					oTaskInboxModel.setProperty(sPath, data.inbox);
-					var message = data.message;
-					sap.m.MessageToast.show(message);
-					oTaskInboxModel.refresh();
+					if (oEvent.getParameters().success) {
+						var data = oEvent.getSource().getData();
+						oTaskInboxModel.setProperty(sPath, data.inbox);
+						var message = data.message;
+						sap.m.MessageToast.show(message);
+						oTaskInboxModel.refresh();
+					} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+						var message = "Session Lost. Press OK to refresh the page";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK],
+							onClose: function (sAction) {
+								location.reload(true);
+							}
+						});
+					} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+						var message = "Service Unavailable. Please try after sometime";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
+					} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+						var message = "Service Unavailable. Please contact administrator";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
+					}
 				});
 
 				// jQuery
@@ -600,9 +631,33 @@ sap.ui.define([
 				oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "DELETE", false, false, oHeader);
 				oServiceModel.attachRequestCompleted(function (oEvent) {
 					busy.close();
-					that.getInboxData(1);
-					sap.m.MessageToast.show(oEvent.getSource().getData().message);
+					if (oEvent.getParameters().success) {
+						that.getInboxData(1);
+						sap.m.MessageToast.show(oEvent.getSource().getData().message);
+					} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+						var message = "Session Lost. Press OK to refresh the page";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK],
+							onClose: function (sAction) {
+								location.reload(true);
+							}
+						});
+					} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+						var message = "Service Unavailable. Please try after sometime";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
+					} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+						var message = "Service Unavailable. Please contact administrator";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
+					}
 				});
 			}
+
 		});
 	});
