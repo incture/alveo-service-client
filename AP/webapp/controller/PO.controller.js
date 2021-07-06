@@ -157,7 +157,6 @@ sap.ui.define([
 				this.fetchUserList(userList);
 			}
 			var oPOModel = this.getModel("oPOModel");
-			oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog, this);
 			this.SubmitDialog.setModel(oPOModel, "oPOModel");

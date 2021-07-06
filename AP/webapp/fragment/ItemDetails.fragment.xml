@@ -118,7 +118,7 @@
 						</columns>
 						<items>
 							<ColumnListItem highlight="{path: 'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
-								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode',oPOModel>isSelected'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
+								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode','oPOModel>isSelected'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
