@@ -350,7 +350,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				} else {
 					if (!dto.getInvoiceStatus().get(i).equals("16")) {
 						rqstId.append("'" + dto.getInvoiceStatus().get(i) + "'");
-						check = 1;
+						 check = 1;
 						code.add(dto.getInvoiceStatus().get(i));
 					}
 					logger.error("inside the loop" + rqstId);
