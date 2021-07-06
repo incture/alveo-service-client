@@ -55,13 +55,17 @@ sap.ui.define([
 
 				StaticDataModel.setProperty("/leftPane", obj);
 				StaticDataModel.refresh();
-				if (userGroup != "IT_Admin") {
-					that.getView().byId("sideNav").getItems()[0].addStyleClass("sideNavItemSelected");
-					var text = that.getView().byId("sideNav").getItems()[0].getItems()[1].getText();
+				if (userGroup === "Supplier_Admin" || userGroup === "Supplier_Executive") {
+					that.getView().byId("sideNav").getItems()[1].addStyleClass("sideNavItemSelected");
+					var text = that.getView().byId("sideNav").getItems()[1].getItems()[1].getText();
+					StaticDataModel.setProperty("/selectedApp", text);
+				} else if (userGroup === "IT_Admin"){
+					that.getView().byId("sideNav").getItems()[3].addStyleClass("sideNavItemSelected");
+					var text = that.getView().byId("sideNav").getItems()[3].getItems()[1].getText();
 					StaticDataModel.setProperty("/selectedApp", text);
 				} else {
-					that.getView().byId("sideNav").getItems()[2].addStyleClass("sideNavItemSelected");
-					var text = that.getView().byId("sideNav").getItems()[2].getItems()[1].getText();
+					that.getView().byId("sideNav").getItems()[0].addStyleClass("sideNavItemSelected");
+					var text = that.getView().byId("sideNav").getItems()[0].getItems()[1].getText();
 					StaticDataModel.setProperty("/selectedApp", text);
 				}
 			});
