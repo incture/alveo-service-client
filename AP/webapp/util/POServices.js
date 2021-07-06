@@ -622,6 +622,14 @@ com.menabev.AP.util.POServices = {
 					oPOModel.setProperty("/actionCode", "AR");
 					return;
 				}
+				var message = oData.message;
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (sAction) {
+						oController.oRouter.navTo("Inbox");
+					}
+				});
 
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
 				var message = "Session Lost. Press OK to refresh the page";

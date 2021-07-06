@@ -170,6 +170,7 @@ sap.ui.define([
 			}
 			var oPOModel = this.getModel("oPOModel");
 			oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
+			oPOModel.setProperty("/remidiationSwitchVisible", false);
 			oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog, this);
@@ -184,6 +185,7 @@ sap.ui.define([
 			}
 			var oPOModel = this.getModel("oPOModel");
 			oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
+			oPOModel.setProperty("/remidiationSwitchVisible", false);
 			oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
 			this.RejectDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.RejectDialog", this);
 			this.getView().addDependent(this.SubmitDialog, this);
@@ -498,7 +500,11 @@ sap.ui.define([
 		},
 
 		onClickItemMatch: function () {
-			this.oRouter.navTo("ItemMatch");
+			this.oRouter.navTo("ItemMatch", {
+				id: this.oPOModel.getProperty("/requestId"),
+				status: this.tatus,
+				taskId: this.taskId
+			});
 		},
 
 		fnFindUniqueInvoiceItems: function (arr) {

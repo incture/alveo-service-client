@@ -1,14 +1,20 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.ItemMatch"
 	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout" xmlns:ui="sap.ui.table">
-	<Page title="{oPOModel>/requestId} - Item Match" showNavButton="true" navButtonPress="onNavback" class="sapUiSizeCompact">
+	<Page class="sapUiSizeCompact TaskPage">
+		<customHeader>
+			<OverflowToolbar>
+				<Button icon="sap-icon://nav-back" press="onNavback"/>
+				<Title text="{oPOModel>/requestId}"></Title>
+			</OverflowToolbar>
+		</customHeader>
 		<content>
 			<Toolbar>
 				<Title text="{i18n>UnmatchedItems}" level="H2"/>
 			</Toolbar>
 			<l:Grid defaultSpan="XL3 L6 M6 S12" class="sapUiSizeCompact">
 				<VBox>
-					<Table id="ItemMatchInvoiceTableId" inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}" selectionChange="onSelectInvoice"
-						alternateRowColors="true">
+					<Table id="ItemMatchInvoiceTableId" inset="false" mode="SingleSelectMaster" items="{oPOModel>/invoiceItems}"
+						selectionChange="onSelectInvoice" alternateRowColors="true">
 						<headerToolbar>
 							<OverflowToolbar>
 								<Title text="{i18n>Invoices}" level="H2"/>
@@ -65,19 +71,19 @@
 							<ui:Column>
 								<Label text="{i18n>UPC}"/>
 								<ui:template>
-									<Text text="{oPOModel>poUnit}"/>
+									<Text text="{oPOModel>UPCCode}"/>
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
-								<Label text="{i18n>ItemNo}"/>
+								<Label text="{i18n>PONo}"/>
 								<ui:template>
 									<Text text="{oPOModel>documentNumber}"/>
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
-								<Label text="{i18n>NetPrice}"/>
+								<Label text="{i18n>ItemNo}"/>
 								<ui:template>
-									<Text text="{oPOModel>netPrice}"/>
+									<Text text="{oPOModel>documentItem}"/>
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
