@@ -23,7 +23,7 @@
 						</Button>
 						<Button icon="sap-icon://refresh" press="onPressRefresh" class="SecondaryBtn"/>
 					</Toolbar>
-					<IconTabBar>
+					<IconTabBar selectedKey="{oVisibilityModel>/selectedtabKey}">
 						<items>
 							<IconTabFilter text="{i18n>INVOICEHEADERDETAILS}" key="invoiceheaderdetails">
 								<core:Fragment fragmentName="com.menabev.AP.fragment.POHeader" type="XML"/>

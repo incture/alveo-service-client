@@ -352,11 +352,16 @@ com.menabev.AP.formatter.formatter = {
 		return true;
 	},
 
-	formatSelectionVisible: function (twowaymatch, statusCode) {
+	formatSelectionVisible: function (twowaymatch, statusCode, isSelected) {
 		if (!twowaymatch || statusCode == "5" || statusCode == "6") {
 			this.addStyleClass("disableSelect");
 		} else {
 			this.removeStyleClass("disableSelect");
+		}
+		if (isSelected) {
+			this.setSelected(true);
+		} else {
+			this.setSelected(false);
 		}
 		return true;
 	},
@@ -381,7 +386,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changeStatustext: function (sValue) {
 		if (sValue === "14") {
 			sValue = "Paid";
@@ -394,7 +399,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	showIcon: function (value) {
 		if (value === "15") {
 			value = true;
@@ -403,7 +408,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return value;
 	},
-	
+
 	showPaymentRef: function (sValue) {
 		if (sValue == "NA") {
 			sValue = "";
@@ -411,7 +416,7 @@ com.menabev.AP.formatter.formatter = {
 		return sValue;
 
 	},
-	
+
 	formatActivityHeader: function (vendorName, vendorId) {
 		if (vendorName && vendorId) {
 			var value = vendorName;
@@ -424,7 +429,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return value;
 	},
-	
+
 	changeValidationIconCss: function (sValue) {
 		if (sValue === "14" || sValue === "13") {
 			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
@@ -441,7 +446,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changValidationeDashLineCss: function (sValue) {
 		if (sValue === "14" || sValue === "13") {
 			this.removeStyleClass("dashLineDone dashLineToBeDone dashLineOnGoing");
@@ -454,7 +459,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changeValidationBoxCss: function (sValue) {
 		if (sValue === "14" || sValue === "13") {
 			this.removeStyleClass(
@@ -474,7 +479,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changeValidationTextCss: function (sValue) {
 		if (sValue === "14" || sValue === "13") {
 			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");
@@ -491,7 +496,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changePaymentIconCss: function (sValue) {
 		if (sValue === "14") {
 			this.removeStyleClass("doneProcessCircle onGoingProcessCircle rejectedProcessCircle toBeDoneProcessCircle");
@@ -508,7 +513,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changePaymentBoxCss: function (sValue) {
 		if (sValue === "14") {
 			this.removeStyleClass(
@@ -528,7 +533,7 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
-	
+
 	changePaymentTextCss: function (sValue) {
 		if (sValue === "14") {
 			this.removeStyleClass("statusHeaderDone statusHeaderOnGoing statusHeaderRejected statusHeaderToBeDone");

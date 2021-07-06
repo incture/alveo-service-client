@@ -234,7 +234,7 @@
 				]
 			}, {
 				"name": "ItemMatch",
-				"pattern": "ItemMatch",
+				"pattern": "ItemMatch/:id:/:status:/:taskId:",
 				"target": [
 					"ItemMatch"
 				]

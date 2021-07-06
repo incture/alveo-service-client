@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
-	<IconTabBar>
+	<IconTabBar selectedKey="{oVisibilityModel>/selectedInvKey}">
 		<items>
-			<IconTabFilter text="{i18n>Invoice}" key="Invoice">
+			<IconTabFilter text="{i18n>Invoice}"  key="Invoice">
 				<OverflowToolbar>
 					<ToolbarSpacer/>
 					<Select forceSelection="false" valueState="{oPOModel>/invoiceDetailUIDto/vstate/taxCode}"
@@ -118,7 +118,7 @@
 						</columns>
 						<items>
 							<ColumnListItem highlight="{path: 'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
-								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
+								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode',oPOModel>isSelected'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
@@ -178,7 +178,7 @@
 								<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
 							</layoutData>
 						</Input>
-						<Text text="/{oPOModel>/invoiceDetailUIDto/invoiceHeader/taxAmount}"/>
+						<Text text="/{oPOModel>/sysSusgestedTaxAmount}"/>
 						<Button icon="sap-icon://notes" press="openTaxDetails" type="Emphasized" tooltip="{i18n>TaxDetails}"/>
 						<ToolbarSpacer/>
 						<Label text="{i18n>Discount}">
@@ -208,7 +208,7 @@
 								<OverflowToolbarLayoutData group="5"/>
 							</layoutData>
 						</Label>
-						<Input width="9.5rem" value="{oPOModel>/grossPrice}" enabled="false">
+						<Input width="9.5rem" value="{oPOModel>/grossAmount}" enabled="false">
 							<layoutData>
 								<OverflowToolbarLayoutData shrinkable="true" minWidth="100px" group="5"/>
 							</layoutData>

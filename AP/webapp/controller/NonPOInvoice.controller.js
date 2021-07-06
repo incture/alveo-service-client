@@ -256,7 +256,9 @@ sap.ui.define([
 		},
 
 		onTaxCodeChange: function (oEvent) {
-			POServices.onTaxCodeChange(oEvent, this);
+			this.errorHandlerselect(oEvent);
+			POServices.onHeaderChange(oEvent, this, "isTaxCodeChanged");
+			POServices.onChangeHeaderTax(oEvent, this);
 		},
 
 		onTaxAmtChange: function (oEvent) {

@@ -34,7 +34,6 @@ sap.ui.define([
 			this.oDataAPIModel = oDataAPIModel;
 			var ZP2P_API_EC_GL_SRV = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
 			this.ZP2P_API_EC_GL_SRV = ZP2P_API_EC_GL_SRV;
-
 			var getResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 			this.getResourceBundle = getResourceBundle;
 			oMandatoryModel.setProperty("/NonPO", {});
@@ -52,6 +51,8 @@ sap.ui.define([
 					var invoiceType = oEvent.getParameter("name");
 					POServices.getPONonPOData("", that, that.requestId);
 					that.getBtnVisibility(that.status, that.requestId, invoiceType);
+					oVisibilityModel.setProperty("/selectedInvKey", "Invoice");
+					oVisibilityModel.setProperty("/selectedtabKey", "invoiceheaderdetails");
 				}
 			});
 			oPOModel.attachRequestCompleted(function (oEvent) {
@@ -502,7 +503,7 @@ sap.ui.define([
 		onClickItemMatch: function () {
 			this.oRouter.navTo("ItemMatch", {
 				id: this.oPOModel.getProperty("/requestId"),
-				status: this.tatus,
+				status: this.status,
 				taskId: this.taskId
 			});
 		},
