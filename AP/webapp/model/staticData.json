@@ -25,11 +25,7 @@
 		"label": "Config Cockpit",
 		"key": "ConfigCockpit",
 		"icon": "sap-icon://action-settings"
-	}, {
-		"label": "PO",
-		"key": "PO",
-		"icon": "sap-icon://action-settings"
-	},
+	}, 
 	{
 		"label": "Scheduler Logs",
 		"key": "SchedulerLogs",

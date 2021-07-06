@@ -10,7 +10,9 @@ sap.ui.define([
 	"sap/m/MessageBox"
 ], function (Controller, JSONModel, formatter, Device, MessageToast, UnifiedLibrary, DateTypeRange, MessageBox) {
 	"use strict";
-
+	
+	var mandatoryFields = ["pOrder", "deliveryNote"];
+	
 	return Controller.extend("com.menabev.AP.controller.TrackInvoice", {
 		formatter: formatter,
 
