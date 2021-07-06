@@ -397,7 +397,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			 else 
 			 {
 				 notinQuery.append("'" + statuscodearray.get(i) + "'" );
-              }
+             }
 			}
 			
 			if (check == 1 && remove ==0) //this means dto does not contain 16
