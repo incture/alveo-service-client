@@ -22,7 +22,7 @@ public class InvoiceHeaderCheckDto {
 	private Long invoiceDate;
 	private Long postingDate;
 	private Long baselineDate;
-	private String dueDate;
+	private Long dueDate;
 	private String paymentTerms;
 	private String invoiceStatus;
 	private String invoiceType;
