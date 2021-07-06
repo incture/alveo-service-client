@@ -81,7 +81,7 @@
 				</headerToolbar>
 				<columns>
 					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" importance="High" width="7rem">
-						<Label text="{i18n>invoiceReference}" design="Bold"/>
+						<Label text="{i18n>Invoice}" design="Bold"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="6rem">
 						<Label text="{i18n>invoiceDate}" design="Bold"/>

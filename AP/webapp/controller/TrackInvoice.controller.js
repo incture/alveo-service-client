@@ -803,11 +803,10 @@ sap.ui.define([
 								errorMsg = "Request timed-out. Please contact your administrator";
 								that.errorMsg(errorMsg);
 							} else {
-								MessageBox.success(success.message, {
-									actions: [MessageBox.Action.OK],
+								sap.m.MessageBox.success(success.message, {
+									actions: [sap.m.MessageBox.Action.OK],
 									onClose: function (sAction) {
-										if (sAction === MessageBox.Action.OK) {
-											// that.UploadInvoice.close();
+										if (sAction === sap.m.MessageBox.Action.OK) {
 											that.onUploadInvoiceFragCancel();
 										}
 									}
@@ -884,7 +883,7 @@ sap.ui.define([
 				}.bind(this),
 				error: function (error) {
 					var errorMsg = "";
-					errorMsg = JSON.parse(error.responseText);
+					errorMsg = JSON.parse(error.response.body);
 					errorMsg = errorMsg.error.message.value;
 					this.errorMsg(errorMsg);
 				}.bind(this)
