@@ -456,13 +456,43 @@ String paid="true";
 					query.append(" AND ");
 				}
 			} else {
-				query.append(" ORDER BY RR.REQUEST_CREATED_AT DESC");
+				StringBuffer rqstId = new StringBuffer();
+				if(!ServiceUtil.isEmpty(dto.getTop()) && (!ServiceUtil.isEmpty(dto.getSkip())))
+				{
+				query.append(" ORDER BY RR.REQUEST_CREATED_AT limit ");
+				rqstId.append("'" + dto.getTop() + "'" + " offset ");
+
+				rqstId.append("'" + dto.getSkip() + "'");
+				query.append(rqstId);
 				query.append(";");
+
+				}
+				else
+				{
+					query.append(" ORDER BY RR.REQUEST_CREATED_AT DESC ");
+					query.append(";");
+
+				}
 			}
 		});
 		if (filterQueryMap.size() > 1) {
-			query.append(" ORDER BY RR.REQUEST_CREATED_AT DESC");
+			StringBuffer rqstId = new StringBuffer();
+			if(!ServiceUtil.isEmpty(dto.getTop()) && (!ServiceUtil.isEmpty(dto.getSkip())))
+			{
+			query.append(" ORDER BY RR.REQUEST_CREATED_AT limit ");
+			rqstId.append("'" + dto.getTop() + "'" + " offset ");
+
+			rqstId.append("'" + dto.getSkip() + "'");
+			query.append(rqstId);
 			query.append(";");
+
+			}
+			else
+			{
+				query.append(" ORDER BY RR.REQUEST_CREATED_AT DESC ");
+				query.append(";");
+
+			}
 		}
 		System.err.println("Query : Check " + query.toString());
 		invoiceOrderList = invoiceHeaderRepoFilter.getFilterDetails(query.toString());
