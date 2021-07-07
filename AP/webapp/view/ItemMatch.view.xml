@@ -55,7 +55,7 @@
 								<SearchField width="30%"/>
 							</OverflowToolbar>
 						</ui:extension>
-						<ui:columns>
+						<ui:columns visible="{oPOModel>POMatched}">
 							<ui:Column>
 								<Label text="{i18n>PODescription}"/>
 								<ui:template>
