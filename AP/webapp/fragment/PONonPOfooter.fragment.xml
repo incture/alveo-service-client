@@ -1,16 +1,16 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons">
 	<Button text="{i18n>Approve}" type="Default" tooltip="{i18n>Approve}" press="onNonPoApprove" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}" enabled="false"/>
+		visible="{oVisibilityModel>/NonPOInvoice/ApproveBtnVisible}" enabled="false"/>
 	<Button text="{i18n>ReSend}" type="Default" tooltip="{i18n>ReSend}" press="onNonPoReSend" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/PLBtnVisible}" enabled="false"/>
+		visible="{oVisibilityModel>/NonPOInvoice/ReSendBtnVisible}" enabled="false"/>
 	<Button text="{i18n>Save}" type="Default" tooltip="{i18n>Save}" press="onNonPoSave" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
+		visible="{oVisibilityModel>/NonPOInvoice/SaveBtnVisible}"/>
 	<Button text="{i18n>Submit}" type="Emphasized" tooltip="{i18n>Submit}" press="onNonPoSubmit" class="btnEmphasized sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
+		visible="{oVisibilityModel>/NonPOInvoice/SubmitBtnVisible}"/>
 	<Button text="{i18n>SubmitForRemidiation}" type="Emphasized" tooltip="{i18n>SubmitForRemidiation}" press="SubmitForRemidiation"
-		class="btnEmphasized sapUiTinyMarginEnd" visible="{oVisibilityModel>/NonPOInvoice/SubmitRemediationBtn}"/>
+		class="btnEmphasized sapUiTinyMarginEnd" visible="{oVisibilityModel>/NonPOInvoice/SubmitRemedBtnVisible}"/>
 	<Button text="{i18n>Reject}" type="Reject" tooltip="{i18n>Reject}" press="onRejectTask" class="sapUiTinyMarginEnd"
 		visible="{oVisibilityModel>/NonPOInvoice/RejectBtnVisible}"/>
 	<Button text="{i18n>Cancel}" type="Reject" tooltip="{i18n>Reject}" press="onCancelChanges" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/AccBtnVisible}"/>
+		visible="{oVisibilityModel>/NonPOInvoice/CancelBtnVisible}"/>
 </core:FragmentDefinition>

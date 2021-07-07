@@ -11,8 +11,8 @@
 							<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}"/>
 						</items>
 					</Select>
-					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
-					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
+					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
 					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddInvoiceItem" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>
 					<ToolbarSeparator/>
@@ -258,7 +258,7 @@
 			<IconTabFilter text="{i18n>PurchaseOrder}" key="PurchaseOrder">
 				<OverflowToolbar>
 					<ToolbarSpacer/>
-					<Button text="{i18n>AddPO}" press="onClickAddPO" class="sapUiSizeCompact SecondaryBtn" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+					<Button text="{i18n>AddPO}" press="onClickAddPO" class="sapUiSizeCompact SecondaryBtn" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
 				</OverflowToolbar>
 				<VBox items="{oPOModel>/purchaseOrders}">
 					<Panel expandable="true" width="auto">
@@ -312,7 +312,7 @@
 										<Label design="Bold" text="{i18n>Quantity}" tooltip="{i18n>Quantity}"/>
 									</Column>
 									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
-										<Label design="Bold" text="{i18n>OrderUnitSKU}" tooltip="{i18n>OrderUnitSKU}"/>
+										<Label design="Bold" text="{i18n>NetPrice}" tooltip="{i18n>OrderUnitSKU}"/>
 									</Column>
 									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
 										<Label design="Bold" text="{i18n>OrderUnit}" tooltip="{i18n>OrderUnit}"/>
