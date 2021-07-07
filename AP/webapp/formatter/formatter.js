@@ -296,6 +296,13 @@ com.menabev.AP.formatter.formatter = {
 			return false;
 		}
 	},
+	formatPOInvVisible: function (POState) {
+		if (POState === true) {
+			return false;
+		} else {
+			return true;
+		}
+	},
 
 	formatPOItemCatVisible: function (POState, itemCat) {
 		if (POState === true && itemCat == "D") {

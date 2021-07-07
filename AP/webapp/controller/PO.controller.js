@@ -207,7 +207,7 @@ sap.ui.define([
 				if (userList[i].type === "GRN") {
 					oPOModel.setProperty("/GRNUser", userList[i].users);
 					GRN += 1;
-				} else if (userList[i].type === "BUYER ") {
+				} else if (userList[i].type === "BUYER") {
 					oPOModel.setProperty("/BuyerUser", userList[i].users);
 					buyer += 1;
 				} else if (userList[i].type === "ProcessLead") {
@@ -306,6 +306,14 @@ sap.ui.define([
 
 		onCancelSubmitDialog: function () {
 			this.SubmitDialog.close();
+		},
+
+		onClickThreeWayMatch: function (oEvent) {
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var sUrl, actionCode;
+			sUrl = "/menabevdev/validate/threeWayMatch";
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
 		onNonPoSubmit: function (oEvent) {

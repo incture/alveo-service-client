@@ -44,6 +44,12 @@
 		"scope-references": [
 			"$XSAPPNAME.Supplier_Executive"
 		]
+	}, {
+		"name": "GRN",
+		"description": "UAA GRN",
+		"scope-references": [
+			"$XSAPPNAME.GRN"
+		]
 	}],
 	"scopes": [{
 		"name": "$XSAPPNAME.Accountant",
@@ -51,19 +57,20 @@
 	}, {
 		"name": "$XSAPPNAME.Process_Lead",
 		"description": "UAA Process_Lead"
-	},
-	{
+	}, {
 		"name": "$XSAPPNAME.Buyer",
 		"description": "UAA Buyer"
 	}, {
 		"name": "$XSAPPNAME.IT_Admin",
 		"description": "UAA IT_Admin"
-	},
-	{
+	}, {
 		"name": "$XSAPPNAME.Supplier_Admin",
 		"description": "UAA Supplier_Admin"
 	}, {
 		"name": "$XSAPPNAME.Supplier_Executive",
 		"description": "UAA Supplier_Executive"
+	}, {
+		"name": "$XSAPPNAME.GRN",
+		"description": "UAA GRN"
 	}]
 }

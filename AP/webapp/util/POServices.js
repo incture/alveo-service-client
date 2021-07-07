@@ -37,12 +37,16 @@ com.menabev.AP.util.POServices = {
 			busy.close();
 			if (oEvent.getParameters().success) {
 				var oData = oEvent.getSource().getData();
-				oPOModel.setProperty("/", oData);
+
 				if (oData.invoicePdfId) {
 					oVisibilityModel.setProperty("/openPdfBtnVisible", true);
 				} else {
 					oVisibilityModel.setProperty("/openPdfBtnVisible", false);
 				}
+				if (!oData.postingDate) {
+					oVisibilityModel.setProperty("/postingDate", new Date().getTime());
+				}
+				oPOModel.setProperty("/", oData);
 				var invoiceItems = oPOModel.getProperty("/invoiceItems");
 				var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
 				oController.getReferencePo(arrUniqueInvoiceItems);
@@ -258,8 +262,8 @@ com.menabev.AP.util.POServices = {
 
 	onTaxCodeChange: function (oEvent, oController) {
 		oController.errorHandlerselect(oEvent);
-		this.onHeaderChange(oEvent, oController, "isTaxCodeChanged");
 		this.changeItemTax(oEvent, oController);
+		this.onHeaderChange(oEvent, oController, "isTaxCodeChanged");
 	},
 
 	onTaxAmtChange: function (oEvent, oController) {
@@ -483,23 +487,28 @@ com.menabev.AP.util.POServices = {
 			oData.invoiceTotal = 0;
 		}
 		var status = oData.invoiceStatus;
-		if (actionCode == "ASR" && (status < 4 || status > 12)) {
-			sap.m.MessageToast.show("Please check invoice status before sending for remidiation");
-			return;
-		} else if (actionCode === "ASA" && status != 16) {
-			sap.m.MessageToast.show("Invoice status should be ready to post to send it for approval");
-			return;
+		if (actionCode) {
+			if (actionCode == "ASR" && (status < 4 || status > 12)) {
+				sap.m.MessageToast.show("Please check invoice status before sending for remidiation");
+				return;
+			} else if (actionCode === "ASA" && status != 16) {
+				sap.m.MessageToast.show("Invoice status should be ready to post to send it for approval");
+				return;
+			}
+			var sMethod = "POST";
+			var oPayload = {
+				"invoice": oData,
+				"requestId": oData.requestId,
+				"taskId": oController.taskId,
+				"actionCode": actionCode,
+				"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders)
+			};
+			oPayload.invoice.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
+			this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode);
+		} else {
+			var sMethod = "POST";
+			this.onAccSubmit(oController, oData, sMethod, sUrl);
 		}
-		var sMethod = "POST";
-		var oPayload = {
-			"invoice": oData,
-			"requestId": oData.requestId,
-			"taskId": oController.taskId,
-			"actionCode": actionCode,
-			"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders)
-		};
-		oPayload.invoice.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
-		this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode);
 
 	},
 
@@ -524,7 +533,7 @@ com.menabev.AP.util.POServices = {
 		oServiceModel.attachRequestCompleted(function (oEvent) {
 			busy.close();
 			var oData = oEvent.getSource().getData();
-			var message = oData.responseStatus;
+			var message = oData.message;
 			if (oEvent.getParameters().success) {
 				if (!save) {
 					oPOModel.setProperty("/", oData.invoiceHeaderDto);
