@@ -18,5 +18,7 @@ public interface PoHistoryRepository extends JpaRepository<PoHistoryDo, String> 
 
 	@Query("select ph from PoHistoryDo ph where ph.documentNumber= ?1")
 	public List<PoHistoryDo> getHistory(String documentNumber);
+	@Query("select ph from PoHistoryDo ph where ph.refDocItem=?1 and ph.refDocNum=?2 order by ph.entryDate")
+	public List<PoHistoryDo> getByItemAndPO(String matchedItem, String matchedPo);
 
 }

@@ -127,6 +127,10 @@ public interface ApplicationConstants {
     String AUTO_MATCH = "AUTO";
     String THREE_WAY_MATCH_SUCCESS = "18";
     String PENDING_APPROVAL = "16";
+    String QUANTITY_HIGH_MSG_NUMBER = "504";
+	String QUANTITY_LOW_MSG_NUMBER="";
+	String PRICE_HIGH_MSG_NUMBER = "082";
+	String PRICE_LOW_MSG_NUMBER = "084";
 	// ----------------------------------------------------------//
 	// QA DataBase Details
 	// String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
