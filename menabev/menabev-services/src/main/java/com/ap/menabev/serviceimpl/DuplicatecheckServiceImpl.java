@@ -463,6 +463,12 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						&& "1".equals(poItem.getProductType()) && "".equals(poItem.getMaterial()))) {
 
 			System.out.println("448");
+			if(!ServiceUtil.isEmpty(poItem.getShortText())){
+				itemReturn.setItemText(poItem.getShortText());
+			}
+			if(!ServiceUtil.isEmpty(poItem.getInterArticleNum())){
+				itemReturn.setArticleNum(poItem.getInterArticleNum());
+			}
 			if (!ServiceUtil.isEmpty(poItem.getDocumentItem())) {
 				itemReturn.setMatchDocItem(poItem.getDocumentItem());
 			}
@@ -930,6 +936,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			System.out.println("No GRN TEST" + dto.getPurchaseDocumentHeader().get(0));
 			itemReturn.setItemStatusCode(ApplicationConstants.NO_GRN);
 			itemReturn.setItemStatusText("No GRN");
+			itemReturn.setIsSelected(false);
 		}
 		// Calculate sysSuggTaxAmount
 		//

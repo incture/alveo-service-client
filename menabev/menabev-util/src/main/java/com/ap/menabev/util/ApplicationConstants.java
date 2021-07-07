@@ -114,7 +114,7 @@ public interface ApplicationConstants {
 	String PRICE_MISMATCH = "10";
 	String PRICE_OR_QTY_MISMATCH  = "11";
 	String BALANCE_MISMATCH = "12";
-	String READY_TO_POST = "16";
+	String READY_TO_POST = "17";
 	String SAP_POSTED = "13";
 	String PAID ="14";
 	String UNPAID ="13";
@@ -125,7 +125,8 @@ public interface ApplicationConstants {
     String VAT_CODE_MISMATCH = "E";
     String MANUAL_MATCH = "MAN";
     String AUTO_MATCH = "AUTO";
-    String THREE_WAY_MATCH_SUCCESS = "17";
+    String THREE_WAY_MATCH_SUCCESS = "18";
+    String PENDING_APPROVAL = "16";
 	// ----------------------------------------------------------//
 	// QA DataBase Details
 	// String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";
