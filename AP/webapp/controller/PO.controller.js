@@ -86,6 +86,10 @@ sap.ui.define([
 		getPONonPOData: function (oEvent) {
 			POServices.getPONonPOData(oEvent, this);
 		},
+		
+		onChangeUserInputTaxAmount:  function (oEvent) {
+			POServices.onChangeUserInputTaxAmount(oEvent, this);
+		},
 
 		// VendorIdSuggest: function (oEvent) {
 		// 	POServices.VendorIdSuggest(oEvent, this);

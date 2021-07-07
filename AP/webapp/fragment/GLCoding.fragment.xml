@@ -10,7 +10,7 @@
 		</customHeader>
 		<content>
 			<VBox class="sapUiSmallMargin">
-				<Table items="{oPOModel>/invoiceItemAccAssgn}" sticky="ColumnHeaders">
+				<Table items="{oPOModel>/invItemAcctDtoList}" sticky="ColumnHeaders">
 					<columns>
 						<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 							<Label text="{i18n>GLAccount}" design="Bold" required="true"/>

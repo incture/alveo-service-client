@@ -710,7 +710,7 @@ com.menabev.AP.util.POServices = {
 		var oPOModel = oController.oPOModel,
 			taxCode = taxDetails.TxCode,
 			taxPercentage = taxDetails.TaxRate,
-			itemTaxPercentage, itemGrossPrice, itemTaxAmount;
+			itemTaxPercentage, itemGrossPrice, itemTaxAmount, itemNetWorth;
 		oPOModel.setProperty("/taxPercentage", taxPercentage);
 		oPOModel.setProperty("/taxConditionType", taxDetails.TaxConditionType);
 		var invoiceItems = oPOModel.getProperty("/invoiceItems");
@@ -724,13 +724,15 @@ com.menabev.AP.util.POServices = {
 				itemGrossPrice = this.nanValCheck(oPOModel.getProperty("/invoiceItems/" + i + "/grossPrice"));
 				itemTaxAmount = (taxPercentage * itemGrossPrice) / 100;
 				itemTaxAmount = itemTaxAmount.toFixed(2);
+				itemNetWorth = this.nanValCheck(itemTaxAmount) + this.nanValCheck(itemGrossPrice);
 				oPOModel.setProperty("/invoiceItems/" + i + "/taxValue", itemTaxAmount);
+				oPOModel.setProperty("/invoiceItems/" + i + "/netWorth", itemNetWorth);
 			}
 		}
 		var selectedItems = oController.getView().byId("itemdetails").getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 	},
@@ -829,7 +831,7 @@ com.menabev.AP.util.POServices = {
 		var selectedItems = oEvent.getSource().getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 	},
@@ -901,6 +903,19 @@ com.menabev.AP.util.POServices = {
 		oController.PopoverNewNotification.openBy(oButton);
 	},
 
+	calculateGross: function (oEvent, oController) {
+		var oPOModel = oController.oPOModel;
+		var taxValue = this.nanValCheck(oPOModel.getProperty("/taxValue"));
+		var totalBaseRate = this.nanValCheck(oPOModel.getProperty("/totalBaseRate"));
+		var unplannedCost = this.nanValCheck(oPOModel.getProperty("/unplannedCost"));
+		var invoiceTotal = this.nanValCheck(oPOModel.getProperty("/invoiceTotal"));
+		var headerGross = this.nanValCheck(taxValue) + this.nanValCheck(totalBaseRate) + this.nanValCheck(unplannedCost);
+		var bal = this.nanValCheck(invoiceTotal) - this.nanValCheck(headerGross);
+		oPOModel.setProperty("/grossAmount", this.nanValCheck(headerGross));
+		oPOModel.setProperty("/balanceAmount", this.nanValCheck(bal));
+		this.setChangeInd(oEvent, oController, "headerChange");
+	},
+
 	calculateTax: function (selItems, oController) {
 		var length = selItems.length;
 		var unplannedCost = oController.oPOModel.getProperty("/unplannedCost");
@@ -957,7 +972,7 @@ com.menabev.AP.util.POServices = {
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 		oPOModel.refresh();
@@ -980,7 +995,7 @@ com.menabev.AP.util.POServices = {
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 		oPOModel.refresh();
@@ -1021,7 +1036,7 @@ com.menabev.AP.util.POServices = {
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 		oPOModel.refresh();
@@ -1052,7 +1067,7 @@ com.menabev.AP.util.POServices = {
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
 		oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.grossTotal));
+		oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
 		oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 		oPOModel.refresh();

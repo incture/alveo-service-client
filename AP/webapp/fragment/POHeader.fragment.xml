@@ -125,7 +125,7 @@
 			<VBox>
 				<Label text="{i18n>UNPLANNEDCOST}"/>
 				<Input value="{oPOModel>/unplannedCost}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/unplannedCostState}"/>
+					valueState="{oMandatoryModel>/NonPO/unplannedCostState}" change="calculateGross"/>
 			</VBox>
 			<VBox>
 				<Label text="{i18n>INVOICETYPE}" required="true"/>
