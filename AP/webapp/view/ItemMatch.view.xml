@@ -127,10 +127,10 @@
 							<Label text="{i18n>UPC}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Label text="{i18n>MatchDocNum}"/>
+							<Label text="{i18n>PONo}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Label text="{i18n>MatchDocItem}"/>
+							<Label text="{i18n>Item}"/>
 						</Column>
 					</columns>
 					<items>
@@ -143,8 +143,8 @@
 								<Text text="{oPOModel>poItemText}"/>
 								<Text text="{oPOModel>poMatNum}"/>
 								<Text text="{oPOModel>upcCode}"/>
-								<Text text="{oPOModel>PONo}"/>
-								<Text text="{oPOModel>Item}"/>
+								<Text text="{oPOModel>matchDocNum}"/>
+								<Text text="{oPOModel>matchDocItem}"/>
 							</cells>
 						</ColumnListItem>
 					</items>

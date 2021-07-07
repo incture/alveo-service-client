@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"com/menabev/AP/controller/BaseController",
 	"sap/ui/model/json/JSONModel",
 	"com/menabev/AP/formatter/formatter",
 	"sap/ui/Device",
@@ -8,12 +8,12 @@ sap.ui.define([
 	"sap/ui/unified/DateTypeRange",
 	"sap/ui/core/library",
 	"sap/m/MessageBox"
-], function (Controller, JSONModel, formatter, Device, MessageToast, UnifiedLibrary, DateTypeRange, MessageBox) {
+], function (BaseController, JSONModel, formatter, Device, MessageToast, UnifiedLibrary, DateTypeRange, MessageBox) {
 	"use strict";
 
 	var mandatoryFields = ["pOrder", "deliveryNote"];
 
-	return Controller.extend("com.menabev.AP.controller.TrackInvoice", {
+	return BaseController.extend("com.menabev.AP.controller.TrackInvoice", {
 		formatter: formatter,
 
 		onInit: function () {
@@ -90,23 +90,6 @@ sap.ui.define([
 			var oTable = this.byId("idTable");
 			var oBinding = oTable.getBinding("items");
 			oBinding.filter(aFilters);
-		},
-
-		fnVendorSuggest: function (oEvent, oController) {
-			var oDataAPIModel = this.oDataAPIModel;
-			var oDropDownModel = this.oDropDownModel;
-			// var value = oEvent.getParameter("suggestValue");
-			oDropDownModel.setProperty("/VendorIdSuggest", {});
-			var url = "/A_Supplier?$format=json";
-			oDataAPIModel.read(url, {
-				success: function (oData, header) {
-					var data = oData.results;
-					oDropDownModel.setProperty("/VendorIdSuggest", data);
-					oDropDownModel.refresh();
-				},
-				error: function (oData) {}
-			});
-
 		},
 
 		onDownloadInvoice: function (oEvent) {
@@ -322,11 +305,19 @@ sap.ui.define([
 			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
 			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
 			var mFilterModel = this.mFilterModel;
+			var vendorId = mFilterModel.getProperty("/vendorId");
+			if (!vendorId) {
+				vendorId = [];
+				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+				vendorId.push(loggedinUserVendorId);
+			}
 			mFilterModel.refresh(true);
 			// var compCode = "1010";
+			mFilterModel.setProperty("/vendorId", vendorId);
 			mFilterModel.setProperty("/selectedCompanyCode", compCode);
 			var obj = {
-				"companyCode": compCode
+				"companyCode": compCode,
+				"vendorId": vendorId
 			};
 			var url = "/menabevdev/trackinvoice/fetchTrackInvoice";
 			jQuery
@@ -401,6 +392,7 @@ sap.ui.define([
 				selectedCompany = mFilterModel.getProperty("/selectedCompanyCode");
 			vendorId = mFilterModel.getProperty("/vendorId");
 			if (!vendorId) {
+				vendorId = [];
 				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 				vendorId.push(loggedinUserVendorId);
 			}
