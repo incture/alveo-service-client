@@ -211,29 +211,41 @@ sap.ui.define([
 			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
 			oVisibilityModel.setProperty("/NonPOInvoice", {});
 			oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
-			oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
-			oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
-			oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/ApproveBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/ReSendBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/SaveBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemedBtnVisible", false);
 			oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", false);
+			oVisibilityModel.setProperty("/NonPOInvoice/actionBtnEnable", false);
 			var loggedinUserGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			if (requestId === "NEW") {
 				oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
-				oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
-				oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/SaveBtnVisible", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 			} else if (status === "RESERVED") {
 				if (loggedinUserGroup === "Process_Lead") {
 					oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
-					oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", true);
-					oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", false);
+					oVisibilityModel.setProperty("/NonPOInvoice/ApproveBtnVisible", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/ReSendBtnVisible", true);
 				} else if (loggedinUserGroup === "Accountant") {
 					oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
-					oVisibilityModel.setProperty("/NonPOInvoice/PLBtnVisible", false);
-					oVisibilityModel.setProperty("/NonPOInvoice/AccBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/actionBtnEnable", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/SaveBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", true);
-				}
-				if (invoiceType === "PO") {
-					oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", true);
+					if (invoiceType === "PO") {
+						oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", true);
+					}
+				} else if (loggedinUserGroup === "Buyer") {
+					oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
+					oVisibilityModel.setProperty("/NonPOInvoice/actionBtnEnable", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", true);
+					oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 				}
 			}
 		},
@@ -1125,10 +1137,29 @@ sap.ui.define([
 			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
 			oEvent.getSource().setValue(oValue);
 		},
-		
-		onPressRefresh: function(){
-			
+
+		onPressRefresh: function () {
+
 		},
+
+		fnHideMatchedPO: function () {
+			var oPOModel = this.oPOModel;
+			var POItem = oPOModel.getProperty("/aItemMatchPO");
+			var invoiceItems = oPOModel.getProperty("/invoiceItems");
+			for (var i = 0; i < POItem.length; i++) {
+				var PODocNum = POItem[i].documentNumber;
+				var PODocItem = POItem[i].documentItem;
+				for (var j = 0; j < invoiceItems.length; j++) {
+					if (invoiceItems[j].isTwowayMatched && !invoiceItems[j].isDeleted) {
+						if(PODocNum === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
+							POItem[i].POMatched = true;
+						}
+					}
+				}
+			}
+			oPOModel.setProperty("/aItemMatchPO", POItem);
+			oPOModel.refresh();
+		}
 
 	});
 

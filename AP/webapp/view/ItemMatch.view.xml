@@ -24,13 +24,13 @@
 						</headerToolbar>
 						<columns>
 							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>Description}"/>
+								<Label text="{i18n>InvDescription}"/>
 							</Column>
 							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>VendorMaterial}"/>
+								<Label text="{i18n>MaterialNum}"/>
 							</Column>
 							<Column minScreenWidth="Tablet" demandPopin="true">
-								<Label text="{i18n>UPC}"/>
+								<Label text="{i18n>ArticleId}"/>
 							</Column>
 						</columns>
 						<items>
@@ -39,7 +39,7 @@
 								<cells>
 									<Text text="{oPOModel>itemText}"/>
 									<Text text="{oPOModel>customerItemId}"/>
-									<Text text="{oPOModel>upcCode}"/>
+									<Text text="{oPOModel>articleNum}"/>
 								</cells>
 							</ColumnListItem>
 						</items>
@@ -57,13 +57,13 @@
 						</ui:extension>
 						<ui:columns>
 							<ui:Column>
-								<Label text="{i18n>Description}"/>
+								<Label text="{i18n>PODescription}"/>
 								<ui:template>
-									<Text text="{oPOModel>shortText}"/>
+									<Text text="{oPOModel>shortText}" textAlign="Begin"/>
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
-								<Label text="{i18n>VendorMaterial}" tooltip="{i18n>VendorMaterial}"/>
+								<Label text="{i18n>VendorMaterial}" tooltip="{i18n>VendorMaterial}" wrapping="true"/>
 								<ui:template>
 									<Text text="{oPOModel>vendMat}"/>
 								</ui:template>
@@ -71,7 +71,7 @@
 							<ui:Column>
 								<Label text="{i18n>UPC}"/>
 								<ui:template>
-									<Text text="{oPOModel>UPCCode}"/>
+									<Text text="{oPOModel>interArticleNum}"/>
 								</ui:template>
 							</ui:Column>
 							<ui:Column>
@@ -109,7 +109,16 @@
 					</headerToolbar>
 					<columns>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Label text="{i18n>Description}"/>
+							<Label text="{i18n>InvDescription}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>MaterialNum}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>ArticleId}"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label text="{i18n>PODescription}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Label text="{i18n>VendorMaterial}"/>
@@ -118,10 +127,10 @@
 							<Label text="{i18n>UPC}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Label text="{i18n>NetPrice}"/>
+							<Label text="{i18n>MatchDocNum}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Label text="{i18n>MatchedBy}"/>
+							<Label text="{i18n>MatchDocItem}"/>
 						</Column>
 					</columns>
 					<items>
@@ -130,9 +139,12 @@
 							<cells>
 								<Text text="{oPOModel>itemText}"/>
 								<Text text="{oPOModel>customerItemId}"/>
+								<Text text="{oPOModel>articleNum}"/>
+								<Text text="{oPOModel>poItemText}"/>
+								<Text text="{oPOModel>poMatNum}"/>
 								<Text text="{oPOModel>upcCode}"/>
-								<Text text="{oPOModel>netPrice}"/>
-								<Text text="{oPOModel>matchedBy}"/>
+								<Text text="{oPOModel>matchDocNum}"/>
+								<Text text="{oPOModel>matchDocItem}"/>
 							</cells>
 						</ColumnListItem>
 					</items>

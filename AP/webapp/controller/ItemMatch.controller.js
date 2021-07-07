@@ -60,6 +60,7 @@ sap.ui.define([
 				arr = arr.concat(getReferencedByPO[i].poItem);
 			}
 			this.oPOModel.setProperty("/aItemMatchPO", arr);
+			this.fnHideMatchedPO();
 		},
 
 		onNavback: function () {
