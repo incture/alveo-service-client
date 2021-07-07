@@ -244,7 +244,14 @@ public class ServiceUtil {
 		String formatted = format.format(date);
 		return formatted;
 	}
-
+	
+	public static String getDateByEpoc(Long epoc,String pattern) {
+		Date date = new Date(epoc);
+		DateFormat format = new SimpleDateFormat(pattern);
+		String formatted = format.format(date);
+		return formatted;
+	}
+	
 	public static Long getEpocTime() {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss:sss");
 		Date dateToBeFormatted = new Date();
@@ -850,12 +857,14 @@ public class ServiceUtil {
 		// TODO Auto-generated method stub
 		try {
 			Long epoch =  new SimpleDateFormat("yyyy-MM-dd").parse(invDateString).getTime();
-			Long epochLong = epoch/1000;
+			Long epochLong = epoch;
 			return epochLong;
 		} catch (Exception e) {
 			return 0L;
 		}
 	}
+	
+	
 
 	// delay execution code.
 
