@@ -3,6 +3,8 @@ package com.ap.menabev.dto;
 
 import java.util.List;
 
+import javax.persistence.Column;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -86,6 +88,9 @@ public class InvoiceItemDto {
 	private Integer convDen1;
 	//Add it after confirming with PK
     private Double sysSuggTax;
+    private Boolean grNonValInd;
+	private String distributionInd;
+	private String partialInvInd;
 	
 	
 

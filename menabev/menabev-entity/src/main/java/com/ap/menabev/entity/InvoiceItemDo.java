@@ -171,5 +171,10 @@ public class InvoiceItemDo implements Serializable {
 	private Integer convNum1;
 	@Column(name = "CONV_DEN_1")
 	private Integer convDen1;
-
+	@Column(name = "GR_NON_VAL_IND")
+	private Boolean grNonValInd;
+	@Column(name = "DISTRIBUTION_IND" , length  = 1)
+	private String distributionInd;
+	@Column(name = "PARTIAL_INV_IND" , length = 1)
+	private String partialInvInd;
 }

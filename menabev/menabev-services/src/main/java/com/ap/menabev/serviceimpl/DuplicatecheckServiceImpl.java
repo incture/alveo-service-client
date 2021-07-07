@@ -464,7 +464,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 			System.out.println("448");
 			if(!ServiceUtil.isEmpty(poItem.getShortText())){
-				itemReturn.setItemText(poItem.getShortText());
+				itemReturn.setPoItemText(poItem.getShortText());
 			}
 			if(!ServiceUtil.isEmpty(poItem.getInterArticleNum())){
 				itemReturn.setArticleNum(poItem.getInterArticleNum());
@@ -524,6 +524,15 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			}
 			if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
 				itemReturn.setAccountAssignmentCat(poItem.getAccountAssCat());
+			}
+			if(!ServiceUtil.isEmpty(poItem.getGr_non_val())){
+				itemReturn.setGrNonValInd(poItem.getGr_non_val());
+			}
+			if(!ServiceUtil.isEmpty(poItem.getDistribution())){
+				itemReturn.setDistributionInd(poItem.getDistribution());
+			}
+			if(!ServiceUtil.isEmpty(poItem.getPartInv())){
+				itemReturn.setPartialInvInd(poItem.getPartInv());
 			}
 
 			// vii. Set InvItem-poQtuOpu = poItem-qtyOpu//TODO
