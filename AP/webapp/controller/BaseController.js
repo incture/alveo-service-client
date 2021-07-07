@@ -239,7 +239,7 @@ sap.ui.define([
 					oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/RejectBtnVisible", true);
 					if (invoiceType === "PO") {
-						oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemediationBtn", true);
+						oVisibilityModel.setProperty("/NonPOInvoice/SubmitRemedBtnVisible", true);
 					}
 				} else if (loggedinUserGroup === "Buyer") {
 					oVisibilityModel.setProperty("/NonPOInvoice/editable", false);
@@ -1151,7 +1151,7 @@ sap.ui.define([
 				var PODocItem = POItem[i].documentItem;
 				for (var j = 0; j < invoiceItems.length; j++) {
 					if (invoiceItems[j].isTwowayMatched && !invoiceItems[j].isDeleted) {
-						if(PODocNum === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
+						if(Number(PODocNum) === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
 							POItem[i].POMatched = true;
 						}
 					}
