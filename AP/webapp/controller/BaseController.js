@@ -1138,8 +1138,60 @@ sap.ui.define([
 			oEvent.getSource().setValue(oValue);
 		},
 
-		onPressRefresh: function () {
-
+		onPressPORefresh: function(){
+			if (!this.oRefreshDialog) {
+				this.oRefreshDialog = new sap.m.Dialog({
+					type: sap.m.DialogType.Message,
+					title: "Confirm",
+					content: new Text({ text: "Do you want to refresh this invoice?" }),
+					beginButton: new sap.m.Button({
+						type: sap.m.ButtonType.Emphasized,
+						text: "Submit",
+						press: function () {
+							this.oRefreshDialog.close();
+							this.fnRefreshPOServiceCall(this.requestId);
+							sap.m.MessageToast.show("PO is Refreshed!");
+						}.bind(this)
+					}),
+					endButton: new sap.m.Button({
+						text: "Cancel",
+						press: function () {
+							this.oRefreshDialog.close();
+						}.bind(this)
+					})
+				});
+			}
+			this.oRefreshDialog.open();
+		},
+		
+		fnRefreshPOServiceCall: function(requestId){
+			var oPOModel = this.oPOModel;
+			var payload = {
+				"requestId": requestId
+			};
+			var url = "/menabevdev/purchaseDocumentHeader/refreshPo";
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					busy.close();
+					oPOModel.setProperty("/", data.invoiceObject);
+					oPOModel.setProperty("/purchaseOrders", data.referencePo);
+					oPOModel.refresh();
+				}.bind(this),
+				error: function (error) {
+					busy.close();
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
+			});
 		},
 
 		fnHideMatchedPO: function () {

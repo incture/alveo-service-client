@@ -10,9 +10,9 @@ sap.ui.define([
 	"sap/m/MessageBox"
 ], function (Controller, JSONModel, formatter, Device, MessageToast, UnifiedLibrary, DateTypeRange, MessageBox) {
 	"use strict";
-	
+
 	var mandatoryFields = ["pOrder", "deliveryNote"];
-	
+
 	return Controller.extend("com.menabev.AP.controller.TrackInvoice", {
 		formatter: formatter,
 
@@ -24,6 +24,8 @@ sap.ui.define([
 			oTrackInvoiceModel.setProperty("/pdfBtnVisible", false);
 			var mFilterModel = new sap.ui.model.json.JSONModel();
 			this.getView().setModel(mFilterModel, "mFilterModel");
+			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+			this.oUserDetailModel = oUserDetailModel;
 			// this.oVisibilityModel = oVisibilityModel;
 			this.oTrackInvoiceModel = oTrackInvoiceModel;
 			this.mFilterModel = mFilterModel;
@@ -149,7 +151,7 @@ sap.ui.define([
 					}
 				});
 		},
-		
+
 		onDownloadExcel: function () {
 			var mFilterModel = this.mFilterModel;
 			mFilterModel.refresh(true);
@@ -271,7 +273,7 @@ sap.ui.define([
 					}
 				});
 		},
-		
+
 		onOpenActivitylog: function (oEvent) {
 			var oTrackInvoiceModel = this.oTrackInvoiceModel;
 			var sPath = oEvent.getSource().getBindingContext("oTrackInvoiceModel").getPath();
@@ -309,17 +311,19 @@ sap.ui.define([
 			}
 			this.fragActivityLog.open();
 		},
-		
+
 		fncloseActivity: function () {
 			this.fragActivityLog.close();
 			this.olocalModel.refresh(true);
 		},
-		
+
 		fnDefaultFilter: function () {
 			var that = this;
+			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
+			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
 			var mFilterModel = this.mFilterModel;
 			mFilterModel.refresh(true);
-			var compCode = "1010";
+			// var compCode = "1010";
 			mFilterModel.setProperty("/selectedCompanyCode", compCode);
 			var obj = {
 				"companyCode": compCode
@@ -386,8 +390,9 @@ sap.ui.define([
 					}
 				});
 		},
-		
+
 		fnGetFilter: function () {
+			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
 			var mFilterModel = this.mFilterModel;
 			mFilterModel.refresh(true);
 			var that = this,
@@ -395,7 +400,11 @@ sap.ui.define([
 			var invReference = mFilterModel.getProperty("/invReference"),
 				selectedCompany = mFilterModel.getProperty("/selectedCompanyCode");
 			vendorId = mFilterModel.getProperty("/vendorId");
-			// vendorId.push(vendor);
+			if (!vendorId) {
+				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+				vendorId.push(loggedinUserVendorId);
+			}
+			
 			var statusCode = mFilterModel.getProperty("/statusCode");
 			var invDateFrom = mFilterModel.getProperty("/invDateFrom");
 			if (invDateFrom !== undefined) {
@@ -535,7 +544,7 @@ sap.ui.define([
 				});
 
 		},
-		
+
 		fnReciveValidRange: function (oEvent) {
 			var mFilterModel = this.mFilterModel;
 			var sValue = oEvent.getParameter("value"),
@@ -550,7 +559,7 @@ sap.ui.define([
 			}
 
 		},
-		
+
 		fnDueValidRange: function (oEvent) {
 			var mFilterModel = this.mFilterModel;
 			var sValue = oEvent.getParameter("value"),
@@ -565,7 +574,7 @@ sap.ui.define([
 			}
 
 		},
-		
+
 		fnInvValidRange: function (oEvent) {
 			var mFilterModel = this.mFilterModel;
 			var sValue = oEvent.getParameter("value"),
@@ -580,13 +589,19 @@ sap.ui.define([
 			}
 
 		},
-		
+
 		onPressReset: function () {
+			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
+				compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value,
+				vendorId = [],
+				loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+			vendorId.push(loggedinUserVendorId);
+			
 			var mFilterModel = this.mFilterModel;
 			var oTrackInvoiceModel = this.oTrackInvoiceModel;
 			mFilterModel.setProperty("/invReference", "");
-			mFilterModel.setProperty("/vendorId", []);
-			mFilterModel.setProperty("/selectedCompanyCode", "");
+			mFilterModel.setProperty("/vendorId", vendorId);
+			mFilterModel.setProperty("/selectedCompanyCode", compCode);
 			mFilterModel.setProperty("/invDateFrom", null);
 			mFilterModel.setProperty("/invDateTo", null);
 			mFilterModel.setProperty("/receivedDateFrom", null);
@@ -599,7 +614,7 @@ sap.ui.define([
 			oTrackInvoiceModel.refresh(true);
 			mFilterModel.refresh(true);
 		},
-		
+
 		//Start of Upload Invoice:UploadInvoiceFrag
 		//To open Uplaod Invoice Fragment:UploadInvoiceFrag 
 		onPressUploadInvoice: function (oEvent) {

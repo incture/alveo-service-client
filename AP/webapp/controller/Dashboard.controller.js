@@ -4,14 +4,22 @@ sap.ui.define([
 	"use strict";
 
 	return Controller.extend("com.menabev.AP.controller.Dashboard", {
-		
+
 		onInit: function () {
 			var mDashboardModel = this.getOwnerComponent().getModel("mDashboardModel");
 			this.mDashboardModel = mDashboardModel;
+			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
+			this.oUserDetailModel = oUserDetailModel;
 			this.fnChartsDataDefault();
 		},
-		
+
 		fnChartsDataDefault: function () {
+			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
+				loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value,
+				vendorId = [];
+			vendorId.push(loggedinUserVendorId);
+			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
+			
 			var mDashboardModel = this.mDashboardModel;
 			var today = new Date();
 			var past = new Date();
@@ -21,11 +29,11 @@ sap.ui.define([
 			mDashboardModel.setProperty("/toDate", today);
 			mDashboardModel.setProperty("/fromDate", pastDate);
 			var obj = {
-				"companyCode": "",
+				"companyCode": compCode,
 				"currency": "",
 				"rcvdOnFrom": rcvdOnFrom,
 				"rcvdOnTo": rcvdOnTo,
-				"vendorId": []
+				"vendorId": vendorId
 			};
 			var url = "/menabevdev/apDashboardCharts/getDashboardChartDetails";
 			var url2 = "/menabevdev/apDashboardCharts/getKPIDetails";
@@ -43,7 +51,8 @@ sap.ui.define([
 						var agingReport = data[1];
 						for (var i = 0; i < exceptionReport.length; i++) {
 							var aTempData = exceptionReport.filter(function (oRow) {
-								if (oRow.statusText === "Duplicate Invoice" || oRow.statusText === "PO Missing or Invalid" || oRow.statusText === "No-GRN" || oRow.statusText ===
+								if (oRow.statusText === "Duplicate Invoice" || oRow.statusText === "PO Missing or Invalid" || oRow.statusText === "No-GRN" ||
+									oRow.statusText ===
 									"Partial GRN" || oRow.statusText === "UoM Mismatch" || oRow.statusText === "Item Mismatch" || oRow.statusText ===
 									"Qty Mismatch" || oRow.statusText === "Price Mismatch" || oRow.statusText === "Balance Mismatch" || oRow.statusText ===
 									"Price/Qty") {
@@ -59,7 +68,7 @@ sap.ui.define([
 
 					}
 				});
-				jQuery
+			jQuery
 				.ajax({
 					url: url2,
 					dataType: "json",
@@ -80,19 +89,24 @@ sap.ui.define([
 					}
 				});
 		},
-		
+
 		fnChartsData: function () {
+			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
+				loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value,
+				vendorId = [];
+			vendorId.push(loggedinUserVendorId);
+			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
 			var mDashboardModel = this.mDashboardModel;
 			var receivedFrom = mDashboardModel.getProperty("/fromDate");
 			var rcvdOnFrom = receivedFrom.getTime();
 			var receivedTo = mDashboardModel.getProperty("/toDate");
 			var rcvdOnTo = receivedTo.getTime();
 			var obj = {
-				"companyCode": "",
+				"companyCode": compCode,
 				"currency": "",
 				"rcvdOnFrom": rcvdOnFrom,
 				"rcvdOnTo": rcvdOnTo,
-				"vendorId": []
+				"vendorId": vendorId
 			};
 			var url = "/menabevdev/apDashboardCharts/getDashboardChartDetails";
 			var url2 = "/menabevdev/apDashboardCharts/getKPIDetails";
@@ -110,7 +124,8 @@ sap.ui.define([
 						var agingReport = data[1];
 						for (var i = 0; i < exceptionReport.length; i++) {
 							var aTempData = exceptionReport.filter(function (oRow) {
-								if (oRow.statusText === "Duplicate Invoice" || oRow.statusText === "PO Missing or Invalid" || oRow.statusText === "No-GRN" || oRow.statusText ===
+								if (oRow.statusText === "Duplicate Invoice" || oRow.statusText === "PO Missing or Invalid" || oRow.statusText === "No-GRN" ||
+									oRow.statusText ===
 									"Partial GRN" || oRow.statusText === "UoM Mismatch" || oRow.statusText === "Item Mismatch" || oRow.statusText ===
 									"Qty Mismatch" || oRow.statusText === "Price Mismatch" || oRow.statusText === "Balance Mismatch" || oRow.statusText ===
 									"Price/Qty") {

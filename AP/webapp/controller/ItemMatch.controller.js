@@ -65,6 +65,10 @@ sap.ui.define([
 
 		onNavback: function () {
 			var reqId = this.oPOModel.getProperty("/requestId");
+			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
+			if(changeIndicators) {
+				
+			}
 			this.oRouter.navTo("PO", {
 				id: reqId,
 				status: this.status,
@@ -138,7 +142,9 @@ sap.ui.define([
 						}
 					}
 					oPOModel.setProperty("/invoiceItems", invoiceItems);
+					oPOModel.setProperty("/changeIndicators", true);
 					oPOModel.refresh();
+					this.fnHideMatchedPO();
 					this.oSelectedInvoiceItem = "";
 					this.getView().byId("ItemMatchInvoiceTableId").removeSelections();
 					POServices.onNonPoSave("", that);

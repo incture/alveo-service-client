@@ -143,8 +143,8 @@
 								<Text text="{oPOModel>poItemText}"/>
 								<Text text="{oPOModel>poMatNum}"/>
 								<Text text="{oPOModel>upcCode}"/>
-								<Text text="{oPOModel>matchDocNum}"/>
-								<Text text="{oPOModel>matchDocItem}"/>
+								<Text text="{oPOModel>PONo}"/>
+								<Text text="{oPOModel>Item}"/>
 							</cells>
 						</ColumnListItem>
 					</items>
