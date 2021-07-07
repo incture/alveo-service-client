@@ -125,6 +125,7 @@ public interface ApplicationConstants {
     String VAT_CODE_MISMATCH = "E";
     String MANUAL_MATCH = "MAN";
     String AUTO_MATCH = "AUTO";
+    String THREE_WAY_MATCH_SUCCESS = "17";
 	// ----------------------------------------------------------//
 	// QA DataBase Details
 	// String DRIVER_CLASS_NAME = "com.sap.db.jdbc.Driver";

@@ -30,5 +30,6 @@ public @Data class InvoiceItemAcctAssignmentDto {
     private Double avlQtyOU;
     private Double poUnitPriceOPU;
     private Double poUnitPriceOU;
+    private String coArea;
 
 }

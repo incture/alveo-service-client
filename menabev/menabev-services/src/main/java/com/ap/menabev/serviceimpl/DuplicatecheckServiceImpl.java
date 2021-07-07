@@ -237,25 +237,35 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
 							checkStatus.setInvoiceStatusText("Qty Mismatch");
 						}
+						if(ApplicationConstants.READY_TO_POST.equals(item.getItemStatusCode())
+								&& (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
+										|| !ApplicationConstants.ITEM_MISMATCH.equals(checkStatus.getInvoiceStatus())
+										|| !ApplicationConstants.PRICE_MISMATCH.equals(checkStatus.getInvoiceStatus())
+										|| !ApplicationConstants.PRICE_OR_QTY_MISMATCH
+												.equals(checkStatus.getInvoiceStatus()) || !ApplicationConstants.QTY_MISMATCH
+												.equals(checkStatus.getInvoiceStatus()))){
+//							If ItemStatus=”ReadyToPost” and (HeaderStatus NE NO-GRN AND Header
+//							status NE ItemMismatch AND headerStatus NE Price Mismatch AND headerStatus NE Price/Qty Mismatch AND HeaderStatus NE QtyMismatch)
+//									i. Set HeaderStatus = “3Way Success”
+							checkStatus.setInvoiceStatus(ApplicationConstants.THREE_WAY_MATCH_SUCCESS);
+							checkStatus.setInvoiceStatusText("3Way Success");
+						}
 
-					} // 2. EndLoop
-						// a. If HeaderStatus NE QtyMismtch AND Balance is NE
-						// 0.00
-						// then set headerStatus=”Balance Mismatch”
+					} 
+//					a. If HeaderStatus = “3way success” AND Balance is NE 0.00 then set headerStatus=”Balance Mismatch”
+//
+//							b. If HeaderStatus = “3way success” AND Balance = 0.00 then set headerStatus=”Ready to Post”
 
-					// b. If HeaderStatus NE QtyMimatch AND Balance = 0.00 then
-					// set headerStatus=”Ready to Post”
-
-//					if (!"0.00".equals(checkStatus.getBalanceAmount())
-//							&& !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
-//						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
-//						checkStatus.setInvoiceStatusText("Balance Mismatch");
-//					}
-//					if ("0.00".equals(checkStatus.getBalanceAmount())
-//							&& !ApplicationConstants.QTY_MISMATCH.equals(checkStatus.getInvoiceStatus())) {
-//						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
-//						checkStatus.setInvoiceStatusText("Ready To Post");
-//					}
+					if (!"0.00".equals(checkStatus.getBalanceAmount())
+							&& ApplicationConstants.THREE_WAY_MATCH_SUCCESS.equals(checkStatus.getInvoiceStatus())) {
+						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
+						checkStatus.setInvoiceStatusText("Balance Mismatch");
+					}
+					if ("0.00".equals(checkStatus.getBalanceAmount())
+							&& ApplicationConstants.THREE_WAY_MATCH_SUCCESS.equals(checkStatus.getInvoiceStatus())) {
+						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
+						checkStatus.setInvoiceStatusText("Ready To Post");
+					}
 
 				} else {
 					// iv. Else
@@ -447,7 +457,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 		if ((("0".equals(poItem.getItemCategory())) && ServiceUtil.isEmpty(poItem.getAccountAssCat())
 				&& "1".equals(poItem.getProductType()))
-				|| ("0".equals(poItem.getItemCategory()) && "K".equals(poItem.getAccountAssCat())
+				|| ("0".equals(poItem.getItemCategory()) && "K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())
 						&& "2".equals(poItem.getProductType()))
 				|| ("0".equals(poItem.getItemCategory()) && !ServiceUtil.isEmpty(poItem.getAccountAssCat())
 						&& "1".equals(poItem.getProductType()) && "".equals(poItem.getMaterial()))) {
@@ -517,10 +527,14 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			Double deliv_qty = null;
 			Double invoiced_qty = null;
 			if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals())) {
-				deliv_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getDelivQty();
+				if(!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getDelivQty())){
+					deliv_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getDelivQty();
+				}
 			}
 			if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals())) {
-				invoiced_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getIvQty();
+				if(!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getIvQty())){
+					invoiced_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getIvQty();
+				}
 			} // TODO
 
 			if (poItem.getOrderPriceUnit().equals(poItem.getPoUnit())) {
@@ -588,12 +602,32 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							accountAssignment.setPoUnitPriceOPU(Double.valueOf(poItem.getOrderPriceUnit()));
 							// TODO
 							// poItem-OrderPriceUnit
-							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCostCenter())) {
-								accountAssignment.setCostCenter(poItem.getPoAccountAssigment().get(0).getCostCenter());
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCostCenter())){
+									accountAssignment.setCostCenter(poItem.getPoAccountAssigment().get(0).getCostCenter());
+								}
 							}
-							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getGlAccount())) {
-								accountAssignment.setGlAccount(poItem.getPoAccountAssigment().get(0).getGlAccount());
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getGlAccount())){
+									accountAssignment.setGlAccount(poItem.getPoAccountAssigment().get(0).getGlAccount());
+								}
 							}
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCoArea())){
+									accountAssignment.setCoArea(poItem.getPoAccountAssigment().get(0).getCoArea());
+								}
+							}
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getProfitCtr())){
+									accountAssignment.setProfitCtr(poItem.getPoAccountAssigment().get(0).getProfitCtr());
+								}
+							}
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getOrderId())){
+									accountAssignment.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
+								}
+							}
+							
 
 							accountAssignmentArray.add(accountAssignment);
 
@@ -655,13 +689,34 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 								// x.
 								// InvItem-ItemAccountAssignment-OrderPriceUnit
 								// poItem-OrderPriceUnit
-								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getCostCenter())) {
-									accountAssignment
-											.setCostCenter(poItem.getPoAccountAssigment().get(i).getCostCenter());
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getCostCenter())){
+										accountAssignment
+										.setCostCenter(poItem.getPoAccountAssigment().get(i).getCostCenter());
+									}
+									
 								}
-								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getGlAccount())) {
-									accountAssignment
-											.setGlAccount(poItem.getPoAccountAssigment().get(i).getGlAccount());
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getGlAccount())){
+										accountAssignment
+										.setGlAccount(poItem.getPoAccountAssigment().get(i).getGlAccount());
+									}
+									
+								}
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCoArea())){
+										accountAssignment.setCoArea(poItem.getPoAccountAssigment().get(0).getCoArea());
+									}
+								}
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getProfitCtr())){
+										accountAssignment.setProfitCtr(poItem.getPoAccountAssigment().get(0).getProfitCtr());
+									}
+								}
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getOrderId())){
+										accountAssignment.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
+									}
 								}
 								accountAssignmentArray.add(accountAssignment);
 								i++;
@@ -755,6 +810,21 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getGlAccount())) {
 								accountAssignment.setGlAccount(poItem.getPoAccountAssigment().get(0).getGlAccount());
 							}
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCoArea())){
+									accountAssignment.setCoArea(poItem.getPoAccountAssigment().get(0).getCoArea());
+								}
+							}
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getProfitCtr())){
+									accountAssignment.setProfitCtr(poItem.getPoAccountAssigment().get(0).getProfitCtr());
+								}
+							}
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getOrderId())){
+									accountAssignment.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
+								}
+							}
 
 							accountAssignmentArray.add(accountAssignment);
 
@@ -816,13 +886,34 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 								// x.
 								// InvItem-ItemAccountAssignment-OrderPriceUnit
 								// poItem-OrderPriceUnit
-								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getCostCenter())) {
-									accountAssignment
-											.setCostCenter(poItem.getPoAccountAssigment().get(i).getCostCenter());
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getCostCenter())){
+										accountAssignment
+										.setCostCenter(poItem.getPoAccountAssigment().get(i).getCostCenter());
+									}
+									
 								}
-								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getGlAccount())) {
-									accountAssignment
-											.setGlAccount(poItem.getPoAccountAssigment().get(i).getGlAccount());
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getGlAccount())){
+										accountAssignment
+										.setGlAccount(poItem.getPoAccountAssigment().get(i).getGlAccount());
+									}
+									
+								}
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCoArea())){
+										accountAssignment.setCoArea(poItem.getPoAccountAssigment().get(0).getCoArea());
+									}
+								}
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getProfitCtr())){
+										accountAssignment.setProfitCtr(poItem.getPoAccountAssigment().get(0).getProfitCtr());
+									}
+								}
+								if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+									if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getOrderId())){
+										accountAssignment.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
+									}
 								}
 								accountAssignmentArray.add(accountAssignment);
 								i++;

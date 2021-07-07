@@ -67,6 +67,8 @@ public @Data class InvoiceItemAcctAssignmentDo implements Serializable{
     private String wbsElement;
     @Column(name = "CR_DB_INDICATOR")
     private String crDbIndicator;
+    @Column(name="CO_AREA",length = 4)
+	private String coArea;
 
 }
 
