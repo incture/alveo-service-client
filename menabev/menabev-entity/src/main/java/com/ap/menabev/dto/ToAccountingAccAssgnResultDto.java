@@ -40,6 +40,8 @@ public class ToAccountingAccAssgnResultDto {
 	private String Costcenter;
 	@JsonProperty("")
 	private String ProfitCtr;
-	@JsonProperty("")
-	private String CoArea;
+	@JsonProperty("CoArea")
+	private String coArea;
+	@JsonProperty("Orderid")
+	private String orderId;
 }
