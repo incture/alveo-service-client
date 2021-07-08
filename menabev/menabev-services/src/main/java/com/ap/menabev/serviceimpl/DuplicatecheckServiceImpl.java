@@ -517,8 +517,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 				Double sysSugTax = (itemReturn.getGrossPrice() * Double.valueOf(poItem.getTaxCode())) / 100;
 				itemReturn.setSysSuggTax(sysSugTax);
 			}
-			if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) && !ServiceUtil.isEmpty(itemReturn.getTaxCode())) {
-				Double taxValue = (itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxCode())) / 100;
+			if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) && !ServiceUtil.isEmpty(itemReturn.getTaxValue())) {
+				Double taxValue = (itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxValue())) / 100;
 				itemReturn.setTaxValue(taxValue);
 			}
 			if (!ServiceUtil.isEmpty(poItem.getConvNum1())) {
