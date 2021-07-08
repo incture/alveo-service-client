@@ -690,7 +690,7 @@ sap.ui.define([
 			var payload = {
 				"invoiceHeader": this.oPOModel.getData(),
 				"purchaseOrder": purchaseOrder,
-				"requestId": "string"
+				"requestId": this.oPOModel.getData().requestId
 			};
 			//service call to preview the Add PO
 			var busy = new sap.m.BusyDialog();
@@ -1138,19 +1138,20 @@ sap.ui.define([
 			oEvent.getSource().setValue(oValue);
 		},
 
-		onPressPORefresh: function(){
+		onPressPORefresh: function () {
 			if (!this.oRefreshDialog) {
 				this.oRefreshDialog = new sap.m.Dialog({
 					type: sap.m.DialogType.Message,
 					title: "Confirm",
-					content: new Text({ text: "Do you want to refresh this invoice?" }),
+					content: new sap.m.Text({
+						text: "Do you want to refresh this invoice?"
+					}),
 					beginButton: new sap.m.Button({
 						type: sap.m.ButtonType.Emphasized,
 						text: "Submit",
 						press: function () {
 							this.oRefreshDialog.close();
 							this.fnRefreshPOServiceCall(this.requestId);
-							sap.m.MessageToast.show("PO is Refreshed!");
 						}.bind(this)
 					}),
 					endButton: new sap.m.Button({
@@ -1163,8 +1164,8 @@ sap.ui.define([
 			}
 			this.oRefreshDialog.open();
 		},
-		
-		fnRefreshPOServiceCall: function(requestId){
+
+		fnRefreshPOServiceCall: function (requestId) {
 			var oPOModel = this.oPOModel;
 			var payload = {
 				"requestId": requestId
@@ -1184,6 +1185,7 @@ sap.ui.define([
 					oPOModel.setProperty("/", data.invoiceObject);
 					oPOModel.setProperty("/purchaseOrders", data.referencePo);
 					oPOModel.refresh();
+					sap.m.MessageToast.show("PO is Refreshed!");
 				}.bind(this),
 				error: function (error) {
 					busy.close();
@@ -1203,7 +1205,9 @@ sap.ui.define([
 				var PODocItem = POItem[i].documentItem;
 				for (var j = 0; j < invoiceItems.length; j++) {
 					if (invoiceItems[j].isTwowayMatched && !invoiceItems[j].isDeleted) {
-						if(Number(PODocNum) === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
+						if (Number(PODocNum) === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
+							POItem[i].POMatched = true;
+						} else {
 							POItem[i].POMatched = false;
 						}
 					}
@@ -1211,8 +1215,21 @@ sap.ui.define([
 			}
 			oPOModel.setProperty("/aItemMatchPO", POItem);
 			oPOModel.refresh();
+			this.fnFilterMatchedPO();
 		},
-		
+
+		fnFilterMatchedPO: function () {
+			var filters = [];
+			var oTable = this.getView().byId("itemMatchPOTableId");
+			if (oTable) {
+				var rows = oTable.getBinding("rows");
+				filters = new sap.ui.model.Filter([
+					new sap.ui.model.Filter("POMatched", sap.ui.model.FilterOperator.NE, true)
+				]);
+				rows.filter(filters, "Application");
+			}
+		},
+
 		fnVendorSuggest: function (oEvent, oController) {
 			var oDataAPIModel = this.oDataAPIModel;
 			var oDropDownModel = this.oDropDownModel;
@@ -1228,6 +1245,14 @@ sap.ui.define([
 				error: function (oData) {}
 			});
 
+		},
+		
+		onClickThreeWayMatch: function (oEvent) {
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+			var sUrl, actionCode;
+			sUrl = "/menabevdev/validate/threeWayMatch";
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
 	});

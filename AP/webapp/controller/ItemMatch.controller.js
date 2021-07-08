@@ -67,7 +67,7 @@ sap.ui.define([
 			var reqId = this.oPOModel.getProperty("/requestId");
 			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
 			if(changeIndicators) {
-				
+				this.onClickThreeWayMatch("");
 			}
 			this.oRouter.navTo("PO", {
 				id: reqId,

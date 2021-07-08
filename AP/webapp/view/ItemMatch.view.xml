@@ -46,7 +46,7 @@
 					</Table>
 				</VBox>
 				<VBox>
-					<ui:TreeTable rows="{path:'oPOModel>/aItemMatchPO', parameters: {arrayNames:['poItemServices']}}" selectionMode="None"
+					<ui:TreeTable id="itemMatchPOTableId" rows="{path:'oPOModel>/aItemMatchPO', parameters: {arrayNames:['poItemServices']}}" selectionMode="None"
 						alternateRowColors="true" visibleRowCount="5">
 						<ui:extension>
 							<OverflowToolbar>
@@ -57,7 +57,7 @@
 						</ui:extension>
 						<ui:columns visible="{oPOModel>POMatched}">
 							<ui:Column>
-								<Label text="{i18n>PODescription}"/>
+								<Label text="{i18n>PODescription}" wrapping="true"/>
 								<ui:template>
 									<Text text="{oPOModel>shortText}" textAlign="Begin"/>
 								</ui:template>

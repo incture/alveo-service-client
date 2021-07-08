@@ -21,7 +21,7 @@
 								<core:CustomData key="PO" value="PO"/>
 							</customData>
 						</Button>
-						<Button icon="sap-icon://refresh" press="onPressRefresh" class="SecondaryBtn"/>
+						<Button icon="sap-icon://refresh" press="onPressPORefresh" class="SecondaryBtn"/>
 					</Toolbar>
 					<IconTabBar selectedKey="{oVisibilityModel>/selectedtabKey}">
 						<items>

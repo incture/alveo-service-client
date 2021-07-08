@@ -312,14 +312,6 @@ sap.ui.define([
 			this.SubmitDialog.close();
 		},
 
-		onClickThreeWayMatch: function (oEvent) {
-			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			var sUrl, actionCode;
-			sUrl = "/menabevdev/validate/threeWayMatch";
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
-			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
-		},
-
 		onNonPoSubmit: function (oEvent) {
 			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
