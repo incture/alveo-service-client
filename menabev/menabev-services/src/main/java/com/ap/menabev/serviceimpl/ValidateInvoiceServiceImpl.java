@@ -40,6 +40,8 @@ import com.ap.menabev.dto.ToItem;
 import com.ap.menabev.dto.ToMatchInput;
 import com.ap.menabev.dto.ToMatchOutput;
 import com.ap.menabev.dto.ToMatchOutputDto;
+import com.ap.menabev.dto.ToResult;
+import com.ap.menabev.dto.ToReturnDto;
 import com.ap.menabev.dto.ToTax;
 import com.ap.menabev.dto.ToTaxDto;
 import com.ap.menabev.dto.VendorCheckDto;
@@ -60,6 +62,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
+	static String itemId = null;
 	private static final Logger logger = LoggerFactory.getLogger(ValidateInvoiceServiceImpl.class);
 	@Autowired
 	DuplicateCheckService duplicateCheckService;
@@ -390,6 +393,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 	@Override
 	public InvoiceHeaderDto postToERP(InvoiceHeaderDto invoiceHeaderDto) {
+
+		String itemId = null;
 		// here from invoice header need to get the reqid and fetch details from
 		// database
 		try {
@@ -460,7 +465,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			d.setPstngDate(pstngDate);
 			String blineDate = "\\/Date(" + invoiceHeaderDto.getBaseLineDate() + ")\\/";
 			d.setBlineDate(blineDate);
-			d.setCompCode(invoiceHeaderDto.getCompanyCode());
+			d.setCompCode(invoiceHeaderDto.getCompCode());
 			d.setCurrency(invoiceHeaderDto.getCurrency());
 			invoiceHeaderDto.getInvoiceGross();
 			d.setGrossAmount(String.valueOf(invoiceHeaderDto.getInvoiceTotal())); // checked
@@ -512,7 +517,16 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			String payload = objectMapper.writeValueAsString(rootDto);
+			ResponseEntity<?> responseFromOdta = postToERPOdataCall(payload);
+			rootDto = objectMapper.readValue(responseFromOdta.getBody().toString(), PostToERPRootDto.class);
 
+			List<ToReturnDto> returnList = rootDto.getD().getToReturn().getResults();
+
+			ToResult resultObject = rootDto.getD().getToResult();
+			if (!ServiceUtil.isEmpty(resultObject)) {
+				resultObject.getInvDocNo();
+				resultObject.getFiscYear();
+			}
 			return null;
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -524,7 +538,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 	@Override
 	public ThreeWayMatchOutputDto threeWayMatch(InvoiceHeaderDto invoiceHeaderDto) {
 		// TODO Auto-generated method stub
-
 		ThreeWayMatchOutputDto threeWayMatchOutputDto = ObjectMapperUtils.map(invoiceHeaderDto,
 				ThreeWayMatchOutputDto.class);
 		List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload = new ArrayList<>();
@@ -532,32 +545,47 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		try {
 			purchaseOrder.add(threeWayMatchOutputDto.getRefpurchaseDoc());
 			List<ThreeWayInvoiceItemDto> itemList = threeWayMatchOutputDto.getInvoiceItems();
+			logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "" + itemList.size());
 			for (ThreeWayInvoiceItemDto invoiceItemDto : itemList) {
-				if (invoiceItemDto.getIsTwowayMatched() && invoiceItemDto.getItemStatusCode() != "NO-GRN") {
+				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "invoiceItemDto.getIsTwowayMatched()"
+						+ invoiceItemDto.getIsTwowayMatched());
+				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>"
+						+ "invoiceItemDto.getItemStatusCode().equals()"
+						+ !invoiceItemDto.getItemStatusCode().equals("5"));
+				if (invoiceItemDto.getIsTwowayMatched() && !invoiceItemDto.getItemStatusCode().equals("5")) {
+
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>inside if block at line 555");
 					List<ItemThreeWayMatchPaylod> eachItemThreewayMatchPayload = new ArrayList<>();
 					String matchedItem = invoiceItemDto.getMatchDocItem();// po
 																			// item
 																			// no
 					String matchedPo = String.valueOf(invoiceItemDto.getMatchDocNum());// po
 																						// no
-
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>matchedItem " + matchedItem
+							+ " matchedPo " + matchedPo);
 					List<PoHistoryDo> poHistoryDoList = poHistoryRepository.getByItemAndPO(matchedItem, matchedPo);
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					List<PoHistoryDto> poHistoryDtoList = ObjectMapperUtils.mapAll(poHistoryDoList, PoHistoryDto.class);
-
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					// pass serial_no if required in poHistoryTotal
 					PoHistoryTotalsDo poHistoryTotalsDo = poHistoryTotalsRepository.getHistoryTotals(matchedItem,
 							matchedPo);
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					PoHistoryTotalsDto poHistoryTotalsDto = ObjectMapperUtils.map(poHistoryTotalsDo,
 							PoHistoryTotalsDto.class);
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					ConsumtionLogicOutputDto consumtionLogicOutput = cosumptionLogic(invoiceHeaderDto, invoiceItemDto,
 							poHistoryDtoList, poHistoryTotalsDto);
+					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>consumtionLogicOutput"
+							+ consumtionLogicOutput);
 					eachItemThreewayMatchPayload.addAll(consumtionLogicOutput.getItemThreeWayMatchPaylod());
 					invoiceItemDto.setItemThreeWayMatchPayload(eachItemThreewayMatchPayload);
 					itemThreeWayMatchPayload.addAll(consumtionLogicOutput.getItemThreeWayMatchPaylod());
 
 				}
 			}
-
+			//making itemId to null again 
+			itemId = null;
 			// call odata service
 
 			ToMatchInput ToMatchInput = new ToMatchInput();
@@ -575,24 +603,29 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			String payload = objectMapper.writeValueAsString(threeWayMatchOdataDto);
 			ResponseEntity<?> responseFromOData = threeWayMatchOdataCall(payload);
-			System.err.println(responseFromOData.getStatusCode());
+			System.err.println("responseFromOData validateserviceimpl line 603" + responseFromOData.getStatusCode());
 			String responseBody = responseFromOData.getBody().toString();
 			ThreeWayMatchOdataDto threeWayMatchOdataResponse = objectMapper.readValue(responseBody,
 					ThreeWayMatchOdataDto.class);
+			System.err.println(threeWayMatchOdataResponse);
+			logger.error("threeWayMatchOdataResponse>>>>>>>>>>>>>>>>>" + threeWayMatchOdataResponse);
 			List<ToMatchOutputDto> messageResponse = threeWayMatchOdataResponse.getD().getToMatchOutput().getResults();
-			//get status code
-			
+			// get status code
+
 			Boolean flag = false;
 			for (ThreeWayInvoiceItemDto invoiceItemDto : itemList) {
 				int priceMismatchCount = 0;
 				int qtyMismatchCount = 0;
 				if (!ServiceUtil.isEmpty(messageResponse)) {
+					logger.error("inside messageResponse not empty");
 					List<ItemMessageDto> messageItemList = invoiceItemDto.getInvoiceItemMessages();
 					String reqId = invoiceItemDto.getRequestId();
-					String itemCode = invoiceItemDto.getItemCode();
+					String itemCode = invoiceItemDto.getMatchDocItem();
 					for (ToMatchOutputDto toMatchOutputDto : messageResponse) {
 						if (toMatchOutputDto.getRequestId().equalsIgnoreCase(reqId)
-								&& toMatchOutputDto.getInvoiceItem().equalsIgnoreCase(itemCode)) {
+								&& toMatchOutputDto.getReferenceInvoiceItem().equalsIgnoreCase(itemCode)) {
+							
+							logger.error("inside matched item "+toMatchOutputDto.getInvoiceItem()+" and req id "+toMatchOutputDto.getRequestId());
 							int msgNo = 1;
 							ItemMessageDto dto = new ItemMessageDto();
 							dto.setItemId(toMatchOutputDto.getInvoiceItem());
@@ -601,12 +634,12 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							dto.setMessageNo(toMatchOutputDto.getMessageNumber());
 							dto.setMessageType(toMatchOutputDto.getMessageType());
 							dto.setMessageText(toMatchOutputDto.getMessageText());
-							messageItemList.add(dto);
+							boolean added = messageItemList.add(dto);
+							System.err.println(added);
 							msgNo++;
 
 							if (ApplicationConstants.QUANTITY_HIGH_MSG_NUMBER
-									.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())
-									) {
+									.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())) {
 								qtyMismatchCount++;
 							} else if (ApplicationConstants.PRICE_HIGH_MSG_NUMBER
 									.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())
@@ -614,24 +647,25 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 											.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())) {
 								priceMismatchCount++;
 							}
-							
-							if(priceMismatchCount>0 && qtyMismatchCount>0){
+
+							if (priceMismatchCount > 0 && qtyMismatchCount > 0) {
 								invoiceItemDto.setItemStatusCode(ApplicationConstants.PRICE_OR_QTY_MISMATCH);
 								invoiceItemDto.setItemStatusText("Price/Qty");
-								
-							}else{
-								if(priceMismatchCount>0){
+
+							} else {
+								if (priceMismatchCount > 0) {
 									invoiceItemDto.setItemStatusCode(ApplicationConstants.PRICE_MISMATCH);
 									invoiceItemDto.setItemStatusText("Price Mismatch");
 								}
-								if(qtyMismatchCount>0){
+								if (qtyMismatchCount > 0) {
 									invoiceItemDto.setItemStatusCode(ApplicationConstants.QTY_MISMATCH);
 									invoiceItemDto.setItemStatusText("Qty Mismatch");
 								}
-									
+
 							}
 							invoiceItemDto.setIsThreewayMatched(false);
 						} else {
+							
 							invoiceItemDto.setItemStatusCode(ApplicationConstants.THREE_WAY_MATCH_SUCCESS);
 							invoiceItemDto.setItemStatusText("Ready to Post");
 							invoiceItemDto.setIsThreewayMatched(true);
@@ -651,7 +685,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			// threeWayMatchOutputDto.setInvoiceStatus("17");
 			// threeWayMatchOutputDto.setInvoiceStatusText("Ready To Post");
 			// }
-
 			String headerStatus = duplicateCheckService.determineHeaderStatus(invoiceHeaderDto).getInvoiceStatus();
 			String headerStatusText = duplicateCheckService.determineHeaderStatus(invoiceHeaderDto)
 					.getInvoiceStatusText();
@@ -677,8 +710,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		// TODO Auto-generated method stub
 		return messageDtoList;
 	}
-
-	private static String itemId = null;
 
 	// public static void main(String[] args) {
 	// ObjectMapper objectMapper = new ObjectMapper();
@@ -739,12 +770,15 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			// "{\"d\":{\"Vendor\":\"1000031\",\"ToMatchInput\":{\"results\":[{\"Vendor\":\"1000031\",\"InvoiceItem\":\"000001\",\"PurchasingDocumentNumber\":\"4100000127\",\"PurchasingDocumentItem\":\"00010\",\"BaseUnit\":\"KG\",\"DntrConvOpuOu\":\"1\",\"NmtrConvOpuOu\":\"1\",\"QtyOrdPurReq\":\"100\",\"PostingDate\":\"20.05.2021\",\"CompanyCode\":\"1010\",\"ReferenceDocument\":\"5000000267\",\"Quantity\":\"200\",\"NetValDC\":\"400.00\",\"NoQuantityLogic\":\"\",\"ItemCategory\":\"0\",\"QtyInvoiced\":\"0\",\"ReturnsItem\":\"\",\"DrCrInd\":\"S\",\"SubDrCrInd\":\"\",\"CurrencyKey\":\"SAR\",\"GrBasedIvInd\":\"X\",\"QtyGoodsReceived\":\"100\",\"GoodsReceiptInd\":\"X\",\"TranslationDate\":\"20.05.2021\",\"UpdatePODelCosts\":\"\",\"PostInvInd\":\"X\",\"DelItemAllocInd\":\"X\",\"RetAllocInd\":\"X\",\"IvOrigin\":\"\",\"QtyOpu\":\"200\",\"InvValFC\":\"0.00\",\"EstPriceInd\":\"\",\"GrNonValInd\":\"\",\"NetValSrvFC\":\"0\",\"AmtDC\":\"400\",\"ValGrFC\":\"400\",\"NewInputVal\":\"\"},{\"Vendor\":\"1000031\",\"InvoiceItem\":\"000002\",\"PurchasingDocumentNumber\":\"4100000127\",\"PurchasingDocumentItem\":\"00010\",\"BaseUnit\":\"KG\",\"DntrConvOpuOu\":\"1\",\"NmtrConvOpuOu\":\"1\",\"QtyOrdPurReq\":\"100\",\"PostingDate\":\"20.05.2021\",\"CompanyCode\":\"1010\",\"ReferenceDocument\":\"5000000267\",\"Quantity\":\"10\",\"NetValDC\":\"400.00\",\"NoQuantityLogic\":\"\",\"ItemCategory\":\"0\",\"QtyInvoiced\":\"0\",\"ReturnsItem\":\"\",\"DrCrInd\":\"S\",\"SubDrCrInd\":\"\",\"CurrencyKey\":\"SAR\",\"GrBasedIvInd\":\"X\",\"QtyGoodsReceived\":\"100\",\"GoodsReceiptInd\":\"X\",\"TranslationDate\":\"20.05.2021\",\"UpdatePODelCosts\":\"\",\"PostInvInd\":\"X\",\"DelItemAllocInd\":\"X\",\"RetAllocInd\":\"X\",\"IvOrigin\":\"\",\"QtyOpu\":\"10\",\"InvValFC\":\"0.00\",\"EstPriceInd\":\"\",\"GrNonValInd\":\"\",\"NetValSrvFC\":\"0\",\"AmtDC\":\"400\",\"ValGrFC\":\"400\",\"NewInputVal\":\"\"}]},\"ToMatchOutput\":{\"results\":[]}}}";
 			ResponseEntity<?> responseFromOdata = OdataHelperClass.getOdataServiceToken(endPointurl, null, "GET",
 					destinationInfo);
+			logger.error("responseFromOdata.getStatusCodeValue()------------------------------"
+					+ responseFromOdata.getStatusCodeValue());
 			if (responseFromOdata.getStatusCodeValue() == 200) {
 				Header[] header = (Header[]) responseFromOdata.getBody();
 
 				responsePost = OdataHelperClass.postOdataServiceToken(endPointurl, entity, "POST", destinationInfo,
 						header);
 			}
+			logger.error("before return line 774" + responsePost);
 			return responsePost;
 			// return header;
 
@@ -771,70 +805,88 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			String accAssignmentCat = invoiceItemDto.getAccAssignmentCat();
 			Boolean goodsReceiptFlag = invoiceItemDto.getGrFlag();
 			Boolean grBsdIvFlag = invoiceItemDto.getGrBsdIv();
-			Boolean invoiceReceiptFlag = invoiceItemDto.getIvFlag(); // "" null
+			Boolean invoiceReceiptFlag = invoiceItemDto.getIvFlag();
+
+			logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()------>itemCategory" + itemCategory
+					+ "accAssignmentCat" + accAssignmentCat + "goodsReceiptFlag" + goodsReceiptFlag + "grBsdIvFlag"
+					+ grBsdIvFlag + "invoiceReceiptFlag" + invoiceReceiptFlag);
+			// "" null
 			if (ServiceUtil.isEmpty(itemCategory)
 					&& (ServiceUtil.isEmpty(accAssignmentCat) || accAssignmentCat.equalsIgnoreCase("K"))
 					&& goodsReceiptFlag && grBsdIvFlag && invoiceReceiptFlag) {
 				// Raw Mterial Scenario
 				// invqty in po ou
 				// invqty in po opu
-
+				logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()------>inside if block line no 811");
 				// invunitprice in po ou
 				// invunitprice in po opu
 
 				// invpriceunit (opu)
 				Integer invpriceunitOPU = invoiceItemDto.getPricingUnit();
-
-				Double invItemQtyPoOU = null;
-				Double invItemQtyPoOPU = null;
+				logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()------>invpriceunitOPU  =" + invpriceunitOPU);
+				Double invItemQtyPoOU = 0.0;
+				Double invItemQtyPoOPU = 0.0;
 				String uom = invoiceItemDto.getUom();
-
+				logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()------>uom  " + uom);
 				if (uom.equals(invoiceItemDto.getOrderUnit())) {
-					invItemQtyPoOU = invoiceItemDto.getInvQty();
+					logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()------>invoiceItemDto.getOrderUnit()  "
+							+ invoiceItemDto.getOrderUnit());
+					invItemQtyPoOU = (Double) invoiceItemDto.getInvQty();
+					logger.error("invItemQtyPoOU  " + invItemQtyPoOU);
 				} else if (uom.equals(invoiceItemDto.getOrderPriceUnit())) {
-					invItemQtyPoOPU = invoiceItemDto.getInvQty();
+					invItemQtyPoOPU = (Double) invoiceItemDto.getInvQty();
+					logger.error(
+							"ValidateInvoiceServiceImpl.cosumptionLogic()------>invItemQtyPoOPU  " + invItemQtyPoOPU);
 				}
 
 				Integer den = invoiceItemDto.getConvDen1();
 				Integer num = invoiceItemDto.getConvNum1();
 				if (!ServiceUtil.isEmpty(invItemQtyPoOU)) {
-					invItemQtyPoOPU = (num / den) * invItemQtyPoOU;
+					invItemQtyPoOPU = (double) (num / den) * invItemQtyPoOU;
+					logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()---Line 835--->invItemQtyPoOPU ==="
+							+ invItemQtyPoOPU);
 				} else if (!ServiceUtil.isEmpty(invItemQtyPoOPU)) {
-					invItemQtyPoOU = (den / num) * invItemQtyPoOPU;
+					invItemQtyPoOU = (double) (den / num) * invItemQtyPoOPU;
+					logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()---Line 838--->invItemQtyPoOU   "
+							+ invItemQtyPoOU);
 				}
 
-				Double invoiceUnitPrice = (invoiceItemDto.getGrossPrice() * invpriceunitOPU)
+				Double invoiceUnitPrice = (Double) (invoiceItemDto.getGrossPrice() * invpriceunitOPU)
 						/ invoiceItemDto.getInvQty();
-
+				logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()---Line 843--->invoiceUnitPrice   "
+						+ invoiceUnitPrice);
 				// invoiceUnitPrice in po OU
-				Double invoiceUnitPricePoOU = null;
-				Double invoiceUnitPricePoOPU = null;
+				Double invoiceUnitPricePoOU = 0.00;
+				Double invoiceUnitPricePoOPU = 0.00;
 				// invoiceUnitPrice in po OPU
 
 				if (uom.equals(invoiceItemDto.getOrderUnit())) {
-					invoiceUnitPricePoOU = invoiceUnitPrice;
+					invoiceUnitPricePoOU = (double) invoiceUnitPrice;
+
 				} else if (uom.equals(invoiceItemDto.getOrderPriceUnit())) {
-					invoiceUnitPricePoOPU = invoiceUnitPrice;
+					invoiceUnitPricePoOPU = (double) invoiceUnitPrice;
 				}
 
 				if (!ServiceUtil.isEmpty(invoiceUnitPricePoOU)) {
-					invoiceUnitPricePoOPU = (den / num) * invoiceUnitPricePoOU;
+					invoiceUnitPricePoOPU = (double) (den / num) * invoiceUnitPricePoOU;
 				} else if (!ServiceUtil.isEmpty(invoiceUnitPricePoOPU)) {
-					invoiceUnitPricePoOU = (num / den) * invoiceUnitPricePoOPU;
+					invoiceUnitPricePoOU = (double) (num / den) * invoiceUnitPricePoOPU;
 				}
 
-				Double remainingQTY = invItemQtyPoOU;
+				Double remainingQTY = (double) invItemQtyPoOU;
 
-				Double remainingAmount = invoiceItemDto.getGrossPrice();
+				Double remainingAmount = (double) invoiceItemDto.getGrossPrice();
 
-				Double settledQTY = null;
-				Double unSettledQTY = null;
+				Double settledQTY = 0.00;
+				Double unSettledQTY = 0.00;
 
 				List<GRDto> grDtoList = new ArrayList<>();
 				for (int i = 0; i < poHistoryDtoList.size(); i++) {
 
 					PoHistoryDto poHistoryDto = poHistoryDtoList.get(i);
-
+					logger.error(
+							"ValidateInvoiceServiceImpl.cosumptionLogic()------>" + poHistoryDto.getHistoryCategory()
+									+ "poHistoryDto.getGoodsMvmtType()" + poHistoryDto.getGoodsMvmtType());
 					if ("E".equalsIgnoreCase(poHistoryDto.getHistoryCategory())
 							&& "101".equals(poHistoryDto.getGoodsMvmtType())) {
 
@@ -877,19 +929,25 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						try {
 							if (ServiceUtil.isEmpty(itemId)) {
 								inputPayload.setInvoiceItem("000001");
+								itemId =inputPayload.getInvoiceItem();
 							} else {
 								inputPayload.setInvoiceItem(String.format("%06d", Integer.parseInt(itemId) + 1));
+								itemId = inputPayload.getInvoiceItem();
 							}
 						} catch (Exception e) {
 							logger.error("threeway consumtion logic" + e.getMessage());
 						}
-						Double unStlQty = grDto.getHDocUnStlQty();
+						Double unStlQty = (double) grDto.getHDocUnStlQty();
 						if (remainingQTY >= unStlQty) {
-							String[] str = String.valueOf(unStlQty).split(".");
-							inputPayload.setQuantity(str[0]);
+							logger.error("remainingQTY  " + remainingQTY + "unStlQty   " + unStlQty);
+
+							String doubleAsString = String.valueOf(unStlQty);
+							int indexOfDecimal = doubleAsString.indexOf(".");
+							inputPayload.setQuantity(doubleAsString.substring(0, indexOfDecimal));
 						} else {
-							String[] str = String.valueOf(remainingQTY).split(".");
-							inputPayload.setQuantity(str[0]);
+							String doubleAsString = String.valueOf(remainingQTY);
+							int indexOfDecimal = doubleAsString.indexOf(".");
+							inputPayload.setQuantity(doubleAsString.substring(0, indexOfDecimal));
 						}
 						remainingQTY = remainingQTY - Double.valueOf(inputPayload.getQuantity());
 
@@ -897,8 +955,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							// last item
 							if (remainingQTY > 0) {
 								String qty = String.valueOf(Double.valueOf(inputPayload.getQuantity()) + remainingQTY);
-								String[] qtyArr = qty.split(".");
-								inputPayload.setQuantity(qtyArr[0]);
+								int indexOfDecimal = qty.indexOf(".");
+								inputPayload.setQuantity(qty.substring(0, indexOfDecimal));
 								remainingQTY = 0.0;
 							}
 
@@ -906,23 +964,30 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						// default values
 						// set reqID and item id for ref
 						inputPayload.setRequestId(invoiceHeaderDto.getRequestId());
-						inputPayload.setReferenceInvoiceItem(invoiceItemDto.getItemCode());
+						inputPayload.setReferenceInvoiceItem(invoiceItemDto.getMatchDocItem());
 						inputPayload.setVendor(invoiceHeaderDto.getVendorId());
 						inputPayload.setPurchasingDocumentNumber(String.valueOf(invoiceItemDto.getMatchDocNum()));
 						inputPayload.setPurchasingDocumentItem(invoiceItemDto.getMatchDocItem());
-						inputPayload.setBaseUnit("");
+						inputPayload.setBaseUnit(uom);// check with meghana
+														// added baseunit as uom
+														// ,but was seting as ""
 						inputPayload.setDntrConvOpuOu(String.valueOf(den));
 						inputPayload.setNmtrConvOpuOu(String.valueOf(num));
 						inputPayload.setQtyOrdPurReq(String.valueOf(invoiceItemDto.getPoQtyOU()));
 						inputPayload.setPostingDate(
 								ServiceUtil.getDateByEpoc(invoiceHeaderDto.getPostingDate(), "dd.MM.yyyy"));
-						inputPayload.setCompanyCode(invoiceHeaderDto.getCompanyCode());
+						inputPayload.setCompanyCode(invoiceHeaderDto.getCompCode());
 						// change
-
-						// inputPayload.setNetValDC(invoiceItemDto.g);//PO_NET_PRICE
+						// check with meghana inputPayload.setNetValDC will be
+						// PO_NET_PRICE
+						// in Invoice Item Table
+						inputPayload.setNetValDC(
+								String.valueOf(invoiceItemDto.getPoQtyOU() * invoiceItemDto.getPoUnitPriceOU()));
+						// PO_NET_PRICE
 						// in Invoice Item Table
 						inputPayload.setNoQuantityLogic("");
-						inputPayload.setItemCategory(invoiceItemDto.getItemCategory());
+						inputPayload.setItemCategory(
+								invoiceItemDto.getItemCategory() == null ? "" : invoiceItemDto.getItemCategory());
 						inputPayload.setQtyInvoiced(String.valueOf(grDto.getHDocStlQty()));
 						inputPayload.setReturnsItem("");
 						inputPayload.setDrCrInd("S");
@@ -937,18 +1002,21 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						inputPayload.setDelItemAllocInd("");
 						inputPayload.setRetAllocInd("");
 						inputPayload.setIvOrigin("");
-						String qtyOPU = String.valueOf((num / den) * Double.valueOf(inputPayload.getQuantity()));
-						inputPayload.setQtyOpu(qtyOPU.split(".")[0]);
+						String qtyOPU = String
+								.valueOf((double) (num / den) * Double.valueOf(inputPayload.getQuantity()));
+						int indexOfDecimal = qtyOPU.indexOf(".");
+						inputPayload.setQtyOpu(qtyOPU.substring(0, indexOfDecimal));
 						inputPayload.setEstPriceInd("");
-						// inputPayload.setGrNonValInd(invoiceItemDto.get);//
+						inputPayload.setGrNonValInd("");//
 						// discuss with PK
 						inputPayload.setNewInputVal("");
-						inputPayload
-								.setInvValFC(String.valueOf(grDto.getHDocStlQty() * invoiceItemDto.getPoUnitPriceOU()));
+						inputPayload.setInvValFC(
+								String.valueOf((double) grDto.getHDocStlQty() * invoiceItemDto.getPoUnitPriceOU()));
 
-						String valgrFc = String.valueOf(grDto.getHDocQty() * invoiceItemDto.getPoUnitPriceOU());
-						String[] valgrFcArr = valgrFc.split(".");
-						inputPayload.setValGrFC(valgrFcArr[0]);
+						String valgrFc = String
+								.valueOf((double) grDto.getHDocQty() * invoiceItemDto.getPoUnitPriceOU());
+						int valgrFcInt = valgrFc.indexOf(".");
+						inputPayload.setValGrFC(valgrFc.substring(0, valgrFcInt));
 						// change
 						if (ServiceUtil.isEmpty(accAssignmentCat) || (accAssignmentCat.equalsIgnoreCase("K")
 								&& invoiceItemDto.getProductType().equalsIgnoreCase("1"))) {
@@ -962,13 +1030,18 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						}
 
 						if (i == grDtoList.size() - 1) {
-							inputPayload.setAmtDC(String.valueOf(remainingAmount).split(".")[0]);
+							String amtDCString = String.valueOf(remainingAmount);
+							int amtDCInt = amtDCString.indexOf(".");
+							inputPayload.setAmtDC(amtDCString.substring(0, amtDCInt));
 							remainingAmount = 0.0;
 						} else {
-							Double amountDC = invoiceUnitPricePoOU * (Double.valueOf(inputPayload.getQuantity())
-									/ Double.valueOf(invoiceItemDto.getPricingUnit()));
-							inputPayload.setAmtDC(String.valueOf(amountDC).split(".")[0]);
-							remainingAmount = remainingAmount - amountDC;
+							Double amountDC = (double) invoiceUnitPricePoOU
+									* (Double.valueOf(inputPayload.getQuantity())
+											/ Double.valueOf(invoiceItemDto.getPricingUnit()));
+							String amtDCString = String.valueOf(amountDC);
+							int amtDCInt = amtDCString.indexOf(".");
+							inputPayload.setAmtDC(amtDCString.substring(0, amtDCInt));
+							remainingAmount = (double) remainingAmount - amountDC;
 						}
 
 						// here we need to form inv_itm_acc_ass
@@ -1030,31 +1103,37 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 								toAccAssgnDto.setCoArea("");// TODO to be added
 															// by Lakhu in
 															// InvoiceItemAcctAssignmentDto
-								if (1 == 1) {
-									// if in item distribution filed is blank &
-									// partial inv indicator is blank --- > then
-									// its a single acc assgn
-
-									toAccAssgnDto.setItemAmount(inputPayload.getAmtDC());
-									toAccAssgnDto.setQuantity(inputPayload.getQuantity());
-									toAccAssgnDto.setPoPrQnt(inputPayload.getQtyOpu());
-								} else if (2 == 2) {
-									// if in item distribution filed is "2" &
-									// partial inv indicator is "2" --- > then
-									// its a multiple acc assgn based on %
-									// proportional
-
-									Double itemAmount = (invitmaccassgn.getDistPerc()
-											* Double.valueOf(inputPayload.getAmtDC()) / 100);
-									toAccAssgnDto.setItemAmount(String.valueOf(itemAmount));
-									Double quantity = (invitmaccassgn.getDistPerc()
-											* Double.valueOf(inputPayload.getQuantity()) / 100);
-									toAccAssgnDto.setQuantity(String.valueOf(quantity));
-									Double poPrQnt = (invitmaccassgn.getDistPerc()
-											* Double.valueOf(inputPayload.getQtyOpu()) / 100);
-									toAccAssgnDto.setPoPrQnt(String.valueOf(poPrQnt));
-
-								}
+								// if (1 == 1) {
+								// // if in item distribution filed is blank &
+								// // partial inv indicator is blank --- > then
+								// // its a single acc assgn
+								//
+								// toAccAssgnDto.setItemAmount(inputPayload.getAmtDC());
+								// toAccAssgnDto.setQuantity(inputPayload.getQuantity());
+								// toAccAssgnDto.setPoPrQnt(inputPayload.getQtyOpu());
+								// } else if (2 == 2) {
+								// // if in item distribution filed is "2" &
+								// // partial inv indicator is "2" --- > then
+								// // its a multiple acc assgn based on %
+								// // proportional
+								//
+								// Double itemAmount =
+								// (invitmaccassgn.getDistPerc()
+								// * Double.valueOf(inputPayload.getAmtDC()) /
+								// 100);
+								// toAccAssgnDto.setItemAmount(String.valueOf(itemAmount));
+								// Double quantity =
+								// (invitmaccassgn.getDistPerc()
+								// * Double.valueOf(inputPayload.getQuantity())
+								// / 100);
+								// toAccAssgnDto.setQuantity(String.valueOf(quantity));
+								// Double poPrQnt =
+								// (invitmaccassgn.getDistPerc()
+								// * Double.valueOf(inputPayload.getQtyOpu()) /
+								// 100);
+								// toAccAssgnDto.setPoPrQnt(String.valueOf(poPrQnt));
+								//
+								// }
 								resultsList.add(toAccAssgnDto);
 							}
 						}
@@ -1110,5 +1189,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 	//
 	// return map;
 	// }
-
+	
+	
 }
