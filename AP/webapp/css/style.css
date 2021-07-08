@@ -589,8 +589,7 @@
 }
 
 /*to adjust the width of popover suggestions*/
-.glaccount,
-.sapMPopoverCont {
+.glaccount.sapMPopoverCont {
     width: auto !important;
 }
 

@@ -35,7 +35,7 @@
 					<items>
 						<ColumnListItem>
 							<cells>
-								<Input value="{oPOModel>glAccount}" filterSuggests="false" showSuggestion="true" class="glaccount"
+								<Input value="{oPOModel>glAccount}" filterSuggests="false" showSuggestion="true" class="glaccount" editable="false" 
 									suggestionItems="{oDropDownModel>/GLAccountResult}" suggestionItemSelected="AAGlAccountSelected" suggest="glAccountSuggest"
 									change="errorHandler" valueState="{oPOModel>glError}" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 									<suggestionItems>
@@ -43,20 +43,20 @@
 									</suggestionItems>
 								</Input>
 								<Text class="sapUiTinyMarginEnd" text="{oPOModel>materialDescription}"/>
-								<Select selectedKey="{oPOModel>debitOrCredit}" change="onInvoiceDetailsChangeCrDr" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+								<Select selectedKey="{oPOModel>debitOrCredit}" change="onInvoiceDetailsChangeCrDr" enabled="{oVisibilityModel>/NonPOInvoice/editable}" enabled="false">
 									<core:Item text="Debit" key="H"/>
 									<core:Item text="Credit" key="S"/>
 								</Select>
 								<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
-									valueState="{oPOModel>costCenterError}" change="onChangeCostCenter" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+									valueState="{oPOModel>costCenterError}" change="onChangeCostCenter" enabled="{oVisibilityModel>/NonPOInvoice/editable}" enabled="false">
 									<items>
 										<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
 									</items>
 								</Select>
-								<Input value="{oPOModel>qty}" type="Number" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
-								<Input value="{oPOModel>amount}" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+								<Input value="{oPOModel>qty}" type="Number" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"  editable="false" />
+								<Input value="{oPOModel>amount}" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"  editable="false" />
 								<Button type="Reject" icon="sap-icon://delete" tooltip="{i18n>Delete}" press="deleteNonPoItemData" class="sapUiTinyMarginEnd"
-									enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									enabled="false"/>
 							</cells>
 						</ColumnListItem>
 					</items>

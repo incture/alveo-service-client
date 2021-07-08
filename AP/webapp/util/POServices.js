@@ -37,7 +37,6 @@ com.menabev.AP.util.POServices = {
 			busy.close();
 			if (oEvent.getParameters().success) {
 				var oData = oEvent.getSource().getData();
-
 				if (oData.invoicePdfId) {
 					oVisibilityModel.setProperty("/openPdfBtnVisible", true);
 				} else {
@@ -318,27 +317,50 @@ com.menabev.AP.util.POServices = {
 		};
 		oServiceModel.loadData(sUrl, JSON.stringify(oPayload), true, "POST", false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
-			var oData = oEvent.getSource().getData();
-			changeIndicator = oData.changeIndicator;
-			oVisibilityModel.setProperty("/changeIndicators", changeIndicator);
-			oPOModel.setProperty("/vendorId", oData.vendorID);
-			oPOModel.setProperty("/compCode", oData.companyCode);
-			oPOModel.setProperty("/extInvNum", oData.invoiceReference);
-			oPOModel.setProperty("/invoiceTotal", oData.invoiceAmount);
-			oPOModel.setProperty("/grossAmount", oData.grossAmount);
-			oPOModel.setProperty("/taxAmount", oData.taxAmount);
-			oPOModel.setProperty("/balanceAmount", oData.balanceAmount);
-			oPOModel.setProperty("/taxCode", oData.taxCode);
-			oPOModel.setProperty("/currency", oData.currency);
-			oPOModel.setProperty("/invoiceDate", oData.invoiceDate);
-			oPOModel.setProperty("/postingDate", oData.postingDate);
-			oPOModel.setProperty("/baseLineDate", oData.baselineDate);
-			oPOModel.setProperty("/dueDate", oData.dueDate);
-			oPOModel.setProperty("/paymentTerms", oData.paymentTerms);
-			oPOModel.setProperty("/invoiceStatus", oData.invoiceStatus);
-			oPOModel.setProperty("/invoiceType", oData.invoiceType);
-			if (oData.messages && oData.messages.messageType === "E") {
-				sap.m.MessageBox.success(oData.messages.messageText, {
+			if (oEvent.getParameters().success) {
+				var oData = oEvent.getSource().getData();
+				changeIndicator = oData.changeIndicator;
+				oVisibilityModel.setProperty("/changeIndicators", changeIndicator);
+				oPOModel.setProperty("/vendorId", oData.vendorID);
+				oPOModel.setProperty("/compCode", oData.companyCode);
+				oPOModel.setProperty("/extInvNum", oData.invoiceReference);
+				oPOModel.setProperty("/invoiceTotal", oData.invoiceAmount);
+				oPOModel.setProperty("/grossAmount", oData.grossAmount);
+				oPOModel.setProperty("/taxAmount", oData.taxAmount);
+				oPOModel.setProperty("/balanceAmount", oData.balanceAmount);
+				oPOModel.setProperty("/taxCode", oData.taxCode);
+				oPOModel.setProperty("/currency", oData.currency);
+				oPOModel.setProperty("/invoiceDate", oData.invoiceDate);
+				oPOModel.setProperty("/postingDate", oData.postingDate);
+				oPOModel.setProperty("/baseLineDate", oData.baselineDate);
+				oPOModel.setProperty("/dueDate", oData.dueDate);
+				oPOModel.setProperty("/paymentTerms", oData.paymentTerms);
+				oPOModel.setProperty("/invoiceStatus", oData.invoiceStatus);
+				oPOModel.setProperty("/invoiceType", oData.invoiceType);
+				if (oData.messages && oData.messages.messageType === "E") {
+					sap.m.MessageBox.success(oData.messages.messageText, {
+						actions: [sap.m.MessageBox.Action.OK]
+					});
+				}
+			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
+				var message = "Session Lost. Press OK to refresh the page";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK],
+					onClose: function (sAction) {
+						location.reload(true);
+					}
+				});
+			} else if (oEvent.getParameters().errorobject.statusCode == 400 || oEvent.getParameters().errorobject.statusCode == 404) {
+				var message = "Service Unavailable. Please try after sometime";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
+					actions: [sap.m.MessageBox.Action.OK]
+				});
+			} else if (oEvent.getParameters().errorobject.statusCode == 500) {
+				var message = "Service Unavailable. Please contact administrator";
+				sap.m.MessageBox.information(message, {
+					styleClass: "sapUiSizeCompact",
 					actions: [sap.m.MessageBox.Action.OK]
 				});
 			}
@@ -528,6 +550,7 @@ com.menabev.AP.util.POServices = {
 		// if (draft) {
 		// 	oPayload.invoiceHeaderDto.docStatus = "Draft";
 		// }
+		var PO = jQuery.extend(true, [], oData.purchaseOrder);
 		busy.open();
 		oServiceModel.loadData(sUrl, JSON.stringify(oData), true, sMethod, false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
@@ -540,6 +563,7 @@ com.menabev.AP.util.POServices = {
 				} else {
 					oPOModel.setProperty("/", oData);
 				}
+				oPOModel.purchaseOrder("/", PO);
 				sap.m.MessageBox.success(message, {
 					actions: [sap.m.MessageBox.Action.OK],
 					onClose: function (sAction) {
@@ -635,14 +659,15 @@ com.menabev.AP.util.POServices = {
 					return;
 				}
 				var message = oData.message;
-				sap.m.MessageBox.information(message, {
-					styleClass: "sapUiSizeCompact",
-					actions: [sap.m.MessageBox.Action.OK],
-					onClose: function (sAction) {
-						oController.oRouter.navTo("Inbox");
-					}
-				});
-
+				if (actionCode) {
+					sap.m.MessageBox.information(message, {
+						styleClass: "sapUiSizeCompact",
+						actions: [sap.m.MessageBox.Action.OK],
+						onClose: function (sAction) {
+							oController.oRouter.navTo("Inbox");
+						}
+					});
+				}
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
 				var message = "Session Lost. Press OK to refresh the page";
 				sap.m.MessageBox.information(message, {
@@ -895,8 +920,8 @@ com.menabev.AP.util.POServices = {
 	onViewUOMDetails: function (oEvent, oController) {
 		var oButton = oEvent.getSource();
 		if (!oController.PopoverNewNotification) {
-			oController.PopoverNewNotification = sap.ui.xmlfragment("com.menabev.AP.fragment.UOMConversion", this);
-			oController.getView().addDependent(this.PopoverNewNotification, this);
+			oController.PopoverNewNotification = sap.ui.xmlfragment("com.menabev.AP.fragment.UOMConversion", oController);
+			oController.getView().addDependent(oController.PopoverNewNotification, oController);
 		}
 		var data = oEvent.getSource().getBindingContext("oPOModel").getObject().UOMConversion;
 		oController.oPOModel.setProperty("/UOMList", data);
@@ -984,6 +1009,7 @@ com.menabev.AP.util.POServices = {
 		var oPOModel = oController.oPOModel;
 		var oContextObj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 		var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+		var quantity = this.nanValCheck(oContextObj.invQty);
 		var gross = this.calculateGrossAmount(oContextObj);
 		oContextObj.grossPrice = gross;
 		var taxAmount = this.calculateLineItemTax(oContextObj);
@@ -991,6 +1017,17 @@ com.menabev.AP.util.POServices = {
 		var netWorth = parseFloat(gross) + parseFloat(taxAmount);
 		netWorth = netWorth.toFixed(2);
 		oContextObj.netWorth = netWorth;
+		var distributionInd = oContextObj.invItemAcctDtoList;
+		var GL = oContextObj.invItemAcctDtoList;
+		var quantity = this.nanValCheck(oContextObj.invQty);
+		if (!distributionInd && GL.length) {
+			GL[0].qty = quantity;
+			GL[0].netValue = gross;
+			oContextObj.invItemAcctDtoList = GL;
+		} else if (distributionInd && GL.length) {
+			var GLAss = this.updateGL(GL, sPath, gross, quantity);
+			oContextObj.invItemAcctDtoList = GLAss;
+		}
 		oPOModel.setProperty(sPath, oContextObj);
 		var selectedItems = oEvent.getSource().getParent().getParent().getSelectedItems();
 		var tax = this.calculateTax(selectedItems, oController);
@@ -1000,6 +1037,19 @@ com.menabev.AP.util.POServices = {
 		oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 		oPOModel.refresh();
 
+	},
+
+	updateGL: function (GL, gross, quantity) {
+		var len = GL.length;
+		var per;
+		quantity = this.nanValCheck(quantity);
+		gross = this.nanValCheck(gross);
+		for (var i = 0; i < len; i++) {
+			per = this.nanValCheck(GL[i].distPerc);
+			GL[i].qty = (per * quantity) / 100;
+			GL[i].netValue = (per * gross) / 100;
+		}
+		return GL;
 	},
 
 	calculateGrossAmount: function (oContextObj) {

@@ -10,7 +10,7 @@
 						</HBox>
 						<HBox>
 							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
-							<Text text="{oPOModel>/invoiceStatus}"/>
+							<Text text="{oPOModel>/invoiceStatusText}"/>
 						</HBox>
 						<layoutData>
 							<l:GridData span="XL8 L8 M8 S6"/>

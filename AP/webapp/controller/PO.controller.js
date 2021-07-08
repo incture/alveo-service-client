@@ -465,8 +465,8 @@ sap.ui.define([
 		onClickInvoiceAccAssignment: function (oEvent) {
 			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
 			var oPOModel = this.oPOModel;
-			var invoiceItemAccAssgn = oPOModel.getProperty(sPath + "/invoiceItemAccAssgn");
-			oPOModel.setProperty("/invoiceItemAccAssgn", invoiceItemAccAssgn);
+			var invoiceItemAccAssgn = oPOModel.getProperty(sPath + "/invItemAcctDtoList");
+			oPOModel.setProperty("/invItemAcctDtoList", invoiceItemAccAssgn);
 			this.GLCodingDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.GLCoding", this);
 			this.getView().addDependent(this.GLCodingDialog);
 			this.GLCodingDialog.open();
@@ -479,10 +479,10 @@ sap.ui.define([
 		addGLCodingRow: function (oEvent) {
 			var oPOModel = this.getView().getModel("oPOModel"),
 				oPOModelData = oPOModel.getData();
-			if (!oPOModelData.invoiceItemAccAssgn) {
-				oPOModelData.invoiceItemAccAssgn = [];
+			if (!oPOModelData.invItemAcctDtoList) {
+				oPOModelData.invItemAcctDtoList = [];
 			}
-			oPOModelData.invoiceItemAccAssgn.unshift({
+			oPOModelData.invItemAcctDtoList.unshift({
 				"accountAssgnGuid": "",
 				"requestId": "",
 				"itemId": "",
