@@ -1,5 +1,7 @@
 package com.ap.menabev.util;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,11 +14,15 @@ public class MainTestClass {
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		
-		StringBuilder url = new StringBuilder();
+	/*	StringBuilder url = new StringBuilder();
 		List<String> value = new  ArrayList<String>();
 		value.add("DKASYAP");
 		value.add("ARUN");
 		value.add("SMEGHANA");
+		
+		
+		
+		
 		
 		
 			
@@ -59,7 +65,20 @@ public class MainTestClass {
 		              boolean oneIsNull = checkForFilterPrameter("jhsad",null);
 		              System.err.println("3.oneNull "+oneIsNull);
 		              
-		              
+		              */
+		
+		LocalDateTime endDate1 = LocalDateTime.parse(LocalDateTime.now(ZoneId.of("GMT+05:30")).toString());
+		
+		
+		String endTime = "PT" + endDate1.getHour() + "H" + endDate1.getMinute() + "M" + endDate1.getSecond() + "S";
+
+		LocalDateTime startDate = endDate1.minusSeconds((1 * 35 * 60));
+
+		String startTime = "PT" + startDate.getHour() + "H" + startDate.getMinute() + "M" + startDate.getSecond() + "S";
+
+		System.err.println( "endDate1"+endDate1);
+		System.err.println("startDate1"+startDate);
+
 		               
 	
 	}

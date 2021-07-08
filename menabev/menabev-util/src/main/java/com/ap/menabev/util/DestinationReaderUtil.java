@@ -28,12 +28,12 @@ public class DestinationReaderUtil {
 		System.err.println("28 destination");
 		HttpClient client = HttpClientBuilder.create().build();
 
-		HttpPost httpPost = new HttpPost(MenabevApplicationConstant.DESTINATION_TOKEN_URL);
+		HttpPost httpPost = new HttpPost(ApplicationConstants.DESTINATION_TOKEN_URL);
 		httpPost.addHeader("Content-Type", "application/json");
 
 		// Encoding username and password
-		String auth = HelperClass.encodeUsernameAndPassword(MenabevApplicationConstant.DESTINATION_CLIENT_ID,
-				MenabevApplicationConstant.DESTINATION_CLIENT_SECRET);
+		String auth = HelperClass.encodeUsernameAndPassword(ApplicationConstants.DESTINATION_CLIENT_ID,
+				ApplicationConstants.DESTINATION_CLIENT_SECRET);
 		
 		
 		httpPost.addHeader("Authorization", auth);
@@ -48,7 +48,7 @@ public class DestinationReaderUtil {
 			
 			System.err.println("jwtdestinationToken "+jwtToken);
 
-			HttpGet httpGet = new HttpGet(MenabevApplicationConstant.DESTINATION_BASE_URL
+			HttpGet httpGet = new HttpGet(ApplicationConstants.DESTINATION_BASE_URL
 					+ "/destination-configuration/v1/destinations/" + destinationName);
 
 			httpGet.addHeader("Content-Type", "application/json");
@@ -117,11 +117,11 @@ public class DestinationReaderUtil {
 	public static String getJwtTokenForAuthenticationForSapApi() throws URISyntaxException, IOException {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost(MenabevApplicationConstant.WORKFLOW_TOKEN_URL);
+		HttpPost httpPost = new HttpPost(ApplicationConstants.WORKFLOW_TOKEN_URL);
 		httpPost.addHeader("Content-Type", "application/json");
 		// Encoding username and password
-		String auth = HelperClass.encodeUsernameAndPassword(MenabevApplicationConstant.WORKFLOW_CLIENT_ID,
-				MenabevApplicationConstant.WORKFLOW_CLIENT_SECRETE);
+		String auth = HelperClass.encodeUsernameAndPassword(ApplicationConstants.WORKFLOW_CLIENT_ID,
+				ApplicationConstants.WORKFLOW_CLIENT_SECRETE);
 		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
 		System.err.println( " 92 rest" + res);

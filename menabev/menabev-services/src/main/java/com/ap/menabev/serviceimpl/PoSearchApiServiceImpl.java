@@ -51,6 +51,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.ap.menabev.dto.PoSearchApiDto;
 import com.ap.menabev.service.PoSearchApiService;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 
 @Service
@@ -92,15 +93,14 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 		System.err.println("28 destination");
 		HttpClient client = HttpClientBuilder.create().build();
 
-		HttpPost httpPost = new HttpPost(
-				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+		HttpPost httpPost = new HttpPost(ApplicationConstants.DESTINATION_TOKEN_URL);
 		httpPost.addHeader("Content-Type", "application/json");
 
 		// Encoding username and password
 		//Dev Credentials
 		String auth = encodeUsernameAndPassword(
-				"sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2",
-				"2af4f4c4-7265-4d95-b544-01e917937a1e$HlHDn__C2aLbv2PqTcyq251kX4P9QZmZDShfUEFw8NQ=");
+				ApplicationConstants.DESTINATION_CLIENT_ID,
+				ApplicationConstants.DESTINATION_CLIENT_SECRET);
 		//Test Credentials
 //		String auth = encodeUsernameAndPassword(
 //				"sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2",
@@ -119,8 +119,7 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 
 			System.err.println("jwtdestinationToken " + jwtToken);
 
-			HttpGet httpGet = new HttpGet("https://destination-configuration.cfapps.eu20.hana.ondemand.com"
-					+ "/destination-configuration/v1/destinations/" + destinationName);
+			HttpGet httpGet = new HttpGet(ApplicationConstants.DESTINATION_BASE_URL + destinationName);
 
 			httpGet.addHeader("Content-Type", "application/json");
 
@@ -214,10 +213,10 @@ public class PoSearchApiServiceImpl implements PoSearchApiService {
 	public static String getConectivityProxy() throws URISyntaxException, IOException {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost(
-				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+				ApplicationConstants.CONECTIVITY_TOKEN_URL);
 		//Dev Cred
-		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
-				"d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=");
+		String auth = encodeUsernameAndPassword(ApplicationConstants.CONECTIVITY_CLIENT_ID,
+				ApplicationConstants.CONECTIVITY_CLIENT_SECRET);
 		
 		//Test Cred
 //		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",

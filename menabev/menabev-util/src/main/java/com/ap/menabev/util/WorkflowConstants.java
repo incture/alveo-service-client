@@ -30,6 +30,8 @@ public interface WorkflowConstants {
 	String TOP_KEY = "$top";
 	String PAGE_NUM_KEY = "$skip";
 	String FIND_COUNT_OF_TASKS_KEY = "$inlinecount";
+	String ORDER_BY = "$orderby";
+	String ORDER_BY_CREATED_AT = "createdAt%20desc";		
 
 	String FIND_COUNT_OF_TASKS_VALUE = "allpages";
 	String TOP_VALUE = "1000";

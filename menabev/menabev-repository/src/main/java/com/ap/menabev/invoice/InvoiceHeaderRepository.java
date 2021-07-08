@@ -35,13 +35,12 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "Delete from InvoiceHeaderDo i where i.requestId=:requestId")
 	int deleteInvoiceHeader(@Param("requestId") String requestId);
+	@Query(value = "select i from InvoiceHeaderDo i where i.request_created_by IN (:taskOwnerId) and i.invoiceStatus='1'")
+	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserId(@Param("taskOwnerId") List<String> taskOwnerId);
+	
+	@Query(value = "select i from InvoiceHeaderDo i where i.request_created_by IN (:taskOwnerId) and i.requestId=:requestId and i.invoiceStatus='1' order by request_created_at desc")
+	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserIdAndRequestId(@Param("taskOwnerId") List<String> taskOwnerId,@Param("requestId") String requestId);
 
-	@Query(value = "select i from InvoiceHeaderDo i where i.taskOwner IN (:taskOwner) and i.invoiceStatus='9'")
-	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserId(@Param("taskOwner") List<String> taskOwnerId);
-
-	@Query(value = "select i from InvoiceHeaderDo i where i.taskOwner IN (:taskOwnerId) and i.requestId=:requestId and i.invoiceStatus='9' order by request_created_at desc")
-	List<InvoiceHeaderDo> getInvoiceHeaderDocStatusByUserIdAndRequestId(@Param("taskOwner") List<String> taskOwnerId,
-			@Param("requestId") String requestId);
 
 	@Query("select i.refpurchaseDoc from InvoiceHeaderDo i where i.requestId=:requestId")
 	Long getRefDocNumByReqId(@Param("requestId") String requestId);

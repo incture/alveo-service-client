@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ap.menabev.entity.SequenceGeneratorEntity;
 import com.ap.menabev.service.SequenceGeneratorService;
 import com.ap.menabev.service.SequenceGeneratorServices;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.DateUtils;
 import com.ap.menabev.util.MenabevApplicationConstant;
 
@@ -111,7 +112,7 @@ public class SequenceGenerator implements SequenceGeneratorServices{
 		AtomicInteger counter = null;
 
 		switch (seqCode) {
-		case MenabevApplicationConstant.INVOICE_SEQUENCE:
+		case ApplicationConstants.INVOICE_SEQUENCE:
 			counter = invoiceSeqValue;
 			break;
 
@@ -160,7 +161,7 @@ public class SequenceGenerator implements SequenceGeneratorServices{
 	private void setCounterVariable(String seqCode, int count) {
 
 		switch (seqCode) {
-		case MenabevApplicationConstant.INVOICE_SEQUENCE:
+		case ApplicationConstants.INVOICE_SEQUENCE:
 			invoiceSeqValue.set(++count);
 			break;
 

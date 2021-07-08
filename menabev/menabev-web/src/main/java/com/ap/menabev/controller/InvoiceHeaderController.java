@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ap.menabev.dto.ActivityLogDto;
 import com.ap.menabev.dto.ClaimAndReleaseDto;
 import com.ap.menabev.dto.CreateInvoiceHeaderDto;
 import com.ap.menabev.dto.DeleteDraftInputDto;
@@ -33,7 +34,9 @@ import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.service.InvoiceHeaderService;
 import com.ap.menabev.service.SequenceGeneratorService;
+import com.ap.menabev.serviceimpl.ActivityLogServiceImpl;
 import com.ap.menabev.serviceimpl.FilterMultipleHeaderSearchDto;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.MenabevApplicationConstant;
 
 @RestController
@@ -46,6 +49,8 @@ public class InvoiceHeaderController {
 	InvoiceHeaderRepository repo;
 	@Autowired
 	private SequenceGeneratorService seqService;
+	@Autowired
+	private ActivityLogServiceImpl activity;
 
 	@PostMapping("/saveAPI")
 	public InvoiceHeaderDto saveAPI(@RequestBody InvoiceHeaderDto dto) {
@@ -68,6 +73,11 @@ public class InvoiceHeaderController {
 		return headerService.getInvoiceDetail(requestId);
 	}
 
+	@GetMapping("/getActivtiyByReqId/{requestId}")
+	@ResponseBody
+	public List<ActivityLogDto> getByActivityRequestId(@PathVariable String requestId) {
+		return activity.getLogs(requestId);
+	}
 	@GetMapping("/getInvoiceByReqId/{requestId}/item")
 	public ResponseEntity<?> getByInvoiceRequestIdItem(@PathVariable String requestId) {
 		return headerService.getInvoiceItemDetail(requestId);
@@ -138,7 +148,7 @@ public class InvoiceHeaderController {
 	@GetMapping(params = { "sequnceCode" })
 	public ResponseDto getCurrentSequnceOfInvoice(@RequestParam(name = "sequnceCode") String sequnceCode) {
 		ResponseDto response = new ResponseDto();
-		String sequencId = seqService.getSequenceNoByMappingId(MenabevApplicationConstant.INVOICE_SEQUENCE, "INV");
+		String sequencId = seqService.getSequenceNoByMappingId(ApplicationConstants.INVOICE_SEQUENCE, "INV");
 		response.setCode("200");
 		response.setMessage(sequencId);
 		response.setStatus("Success");
@@ -178,6 +188,29 @@ public class InvoiceHeaderController {
 		return headerService.accountantSubmitOkApi(invoiceSubmit);
 	}
 	
+	@PostMapping("/processLead/processLeadSubmit")
+	public ResponseEntity<?> processleadInvoiceSubmitOk(@RequestBody InvoiceSubmitDto invoiceSubmit)
+			throws URISyntaxException, IOException {
+		return headerService.processLeadSubmit(invoiceSubmit);
+	}
+	@PostMapping("/buyer/buyerSubmit")
+	public ResponseEntity<?> buyerInvoiceSubmitOk(@RequestBody InvoiceSubmitDto invoiceSubmit)
+			throws URISyntaxException, IOException {
+		return headerService.buyerSubmit(invoiceSubmit);
+	}
+	
+	
+	
+	@GetMapping("/odata")
+	public ResponseEntity<?> submitThreeWay() throws IOException, URISyntaxException{
+		return headerService.postOdataCall();
+	}
+	
+	@GetMapping("/supplierInfo/{vendorId}")
+	public ResponseEntity<?> getSupplier(@PathVariable String vendorId) throws URISyntaxException, IOException{
+		return headerService.getSupplierEmailAddress(vendorId);
+		
+	}
 	
 	
 

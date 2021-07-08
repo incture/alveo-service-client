@@ -25,4 +25,5 @@ public class InboxOutputDto {
 	private String createdAt;
 	private List<String> recipientUsers;
 	private List<String> recipientGroups;
+	private Long requestCreatedAt;
 }

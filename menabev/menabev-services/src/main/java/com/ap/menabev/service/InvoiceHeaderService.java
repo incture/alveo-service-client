@@ -67,6 +67,9 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit);
 	ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination)
 			throws ClientProtocolException, IOException, URISyntaxException;
-	ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId);	
+	ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId);
+	ResponseEntity<?> postOdataCall() throws IOException, URISyntaxException;
+	ResponseEntity<?> buyerSubmit(InvoiceSubmitDto invoiceSubmit);
+	ResponseEntity<?> getSupplierEmailAddress(String vendorId) throws URISyntaxException, IOException;	
 
 }

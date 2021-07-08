@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.ap.menabev.entity.SequenceGeneratorEntity;
 import com.ap.menabev.invoice.SequenceGeneratorRepository;
 import com.ap.menabev.service.SequenceGeneratorService;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.DateUtils;
 import com.ap.menabev.util.MenabevApplicationConstant;
 
@@ -172,7 +173,7 @@ public class SequenceGeneratorServiceImpl implements SequenceGeneratorService{
 		if(sequence!= null){
 
 		switch (sequence.getSeqCode()) {
-		case MenabevApplicationConstant.INVOICE_SEQUENCE:
+		case ApplicationConstants.INVOICE_SEQUENCE:
 			counter.set(sequence.getCounter()+1);
 			break;
 		default:
@@ -185,7 +186,7 @@ public class SequenceGeneratorServiceImpl implements SequenceGeneratorService{
 			  int newUpdatedMappingIdCount = updateSeqRecordByMappingIdForCounter(seqCode, mappingId);
 			  
 			  switch (seqCode) {
-				case MenabevApplicationConstant.INVOICE_SEQUENCE:
+				case ApplicationConstants.INVOICE_SEQUENCE:
 					counter.set(newUpdatedMappingIdCount);
 					break;
 				default:

@@ -258,15 +258,15 @@ public class HelperClass {
 		return false;
 	}
 	
-	public static ResponseEntity<?> completeTask(String taskId) {
+	public static ResponseEntity<?> completeTask(String taskId,String payload) {
 
 		try {
 
 			HttpClient client = HttpClientBuilder.create().build();
 
 			String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
-			String url = MenabevApplicationConstant.WORKFLOW_REST_BASE_URL + "/v1/task-instances/" + taskId;
-			String payload = "{\"context\": {},\"status\":\"COMPLETED\",\"priority\": \"MEDIUM\"}";
+			String url = ApplicationConstants.WORKFLOW_REST_BASE_URL + "/v1/task-instances/" + taskId;
+			//String payload = "{\"context\": {},\"status\":\"COMPLETED\",\"priority\": \"MEDIUM\"}";
 
 			HttpPatch httpPatch = new HttpPatch(url);
 			httpPatch.addHeader("Authorization", "Bearer " + jwToken);

@@ -315,7 +315,7 @@ public class AutomationServiceImpl implements AutomationService {
 				// trigger workflow 
 				TriggerWorkflowContext context = new TriggerWorkflowContext();
 				context.setRequestId(invoiceHeaderAutoPost.getRequestId());
-				context.setExtInvNumb(invoiceHeaderAutoPost.getInvoice_ref_number());
+				context.setInvoice_ref_number(invoiceHeaderAutoPost.getInvoice_ref_number());
 				context.setNonPo(false);
 				context.setManualNonPo(false);
 				context.setAccountantUser(lists.get(0).getUserOrGroup());

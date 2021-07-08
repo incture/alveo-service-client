@@ -58,23 +58,23 @@ public class TestController {
 	}
 
 	@GetMapping("/post")
-	public PostToERPRootDto threeWayMatch() {
+	public String threeWayMatch() {
 		try {
 			Map<String, Object> destinationMap = Odata.getDestination("SD4_DEST");
 			String payload = "{\"d\":{\"InvoiceReferenceNumber\":\"INV-5600000007\",\"InvoiceInd\":\"X\",\"DocDate\":\"\\/Date(1623888000000)\\/\",\"PstngDate\":\"\\/Date(1623888000000)\\/\",\"CompCode\":\"1010\",\"Currency\":\"SAR\",\"GrossAmount\":\"20\",\"Pmnttrms\":\"V007\",\"BlineDate\":\"\\/Date(1623888000000)\\/\",\"ToItem\":{\"results\":[{\"InvoiceReferenceNumber\":\"INV-5600000007\",\"InvoiceDocItem\":\"000001\",\"PoNumber\":\"5600000007\",\"PoItem\":\"00010\",\"RefDoc\":\"5000000097\",\"RefDocYear\":\"2021\",\"RefDocIt\":\"0001\",\"TaxCode\":\"I1\",\"ItemAmount\":\"20\",\"Quantity\":\"1\",\"PoUnit\":\"KG\",\"PoUnitIso\":\"KG\",\"PoPrQnt\":\"1\",\"PoPrUom\":\"KG\",\"PoPrUomIso\":\"KG\",\"ToAccounting\":{\"results\":[]}}]},\"ToGlAccount\":{\"results\":[]},\"ToTax\":{\"results\":[]},\"ToWithholdingTax\":{\"results\":[]},\"ToReturn\":{\"results\":[]},\"ToResult\":{}}}";
 			ResponseEntity<?> responseFromOData = ValidateInvoiceServiceImpl.postToERPOdataCall((payload));
 			System.err.println(responseFromOData.getStatusCode());
-			ObjectMapper objectMapper = new ObjectMapper();
+			/*ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			PostToERPRootDto rootDto = objectMapper.readValue(responseFromOData.getBody().toString(),
-					PostToERPRootDto.class);
+					PostToERPRootDto.class);*/
 
-			return rootDto;
+			return responseFromOData.toString();
 
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			return null;
+			return e.toString();
 		}
 
 	}

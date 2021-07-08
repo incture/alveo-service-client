@@ -123,8 +123,8 @@ public class ABBYYJSONConverter {
 					itemsDtoList.add(itemDto);
 				}
 			} else if ("InvoiceNumber".equalsIgnoreCase(name)) {
-				// headerDto.setExtInvNum(headerObj.getString("Value"));
 				headerDto.setInvoice_ref_number(headerObj.getString("Value"));
+				headerDto.setExtInvNum(headerObj.getString("Value"));
 			} else if ("InvoiceDate".equalsIgnoreCase(name)) {
 				String invDateString = headerObj.getString("Value");//
 				headerDto.setInvoiceDate(ServiceUtil.getStringToEpoch(invDateString));

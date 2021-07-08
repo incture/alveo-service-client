@@ -21,8 +21,8 @@ public class TriggerWorkflowContext implements WorkflowContextDto{
 	private String invoiceType;
 	private String invoiceStatus;
 	private String invoiceStatusText;
-	private String extInvNumb;
-	
+	private String invoice_ref_number;
+	private String remediationUserType;
 	
 	
 	@Override
@@ -39,8 +39,17 @@ public class TriggerWorkflowContext implements WorkflowContextDto{
 				+ "\",\"invoiceType\":\"" + this.getInvoiceType()
 				+ "\",\"invoiceStatus\":\"" + this.getInvoiceStatus()
 				+ "\",\"invoiceStatusText\":\"" + this.getInvoiceStatusText()
-				+ "\",\"extInvNumb\":\"" + this.getExtInvNumb()
+				+ "\",\"invoice_ref_number\":\"" + this.getInvoice_ref_number()
+				+ "\",\"remediationUserType\":\"" + this.getRemediationUserType()
 				+ "\"}}";
+	}
+
+
+
+	@Override
+	public String toUpdateTaskString() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

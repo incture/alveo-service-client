@@ -95,19 +95,13 @@ public class OdataHelperClass {
 			// have to fetch from Connectivity SK through VCAP //TODO
 			String proxyHost = "10.0.4.5";
 			int proxyPort = 20003;
-			// JSONObject jsonObj = new
-			// JSONObject(System.getenv("VCAP_SERVICES"));
-
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
 			credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort), new UsernamePasswordCredentials(
 					(String) destinationInfo.get("User"), (String) destinationInfo.get("Password")));
-
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-
 			clientBuilder.setProxy(new HttpHost(proxyHost, proxyPort))
 					.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy())
 					.setDefaultCredentialsProvider(credsProvider).disableCookieManagement();
-
 			HttpClient httpClient = clientBuilder.build();
 			HttpRequestBase httpRequestBase = null;
 			String jsonMessage = null;
@@ -122,7 +116,6 @@ public class OdataHelperClass {
 			} else if (method.equalsIgnoreCase("POST")) {
 				httpRequestBase = new HttpPost(destinationInfo.get("URL") + url);
 				try {
-
 					logger.error("entity " + entity);
 					input = new StringEntity(entity);
 					input.setContentType("application/json");
@@ -136,25 +129,20 @@ public class OdataHelperClass {
 				httpRequestBase.addHeader("sap-client", (String) destinationInfo.get("sap-client"));
 			}
 			httpRequestBase.addHeader("accept", "application/json");
-
 			Header[] headers = getAccessToken((String) destinationInfo.get("URL") + url,
 					(String) destinationInfo.get("User"), (String) destinationInfo.get("Password"), httpClient,
 					proxyHost, proxyPort, (String) destinationInfo.get("sap-client"), jwToken);
 			String token = null;
 			List<String> cookies = new ArrayList<>();
 			if (headers.length != 0) {
-
 				for (Header header : headers) {
-
 					if (header.getName().equalsIgnoreCase("x-csrf-token")) {
 						token = header.getValue();
 						logger.error("token --- " + token);
 					}
-
 					if (header.getName().equalsIgnoreCase("set-cookie")) {
 						cookies.add(header.getValue());
 					}
-
 				}
 			}
 
@@ -166,9 +154,7 @@ public class OdataHelperClass {
 				httpRequestBase.addHeader("SAP-Connectivity-SCC-Location_ID",
 						(String) destinationInfo.get("CloudConnectorLocationId"));
 				httpRequestBase.addHeader("X-CSRF-Token", "fetch");
-
 			}
-			
 			if (token != null) {
 				httpRequestBase.addHeader("X-CSRF-Token", token);
 			}
@@ -193,7 +179,6 @@ public class OdataHelperClass {
 			e.printStackTrace();
 			return new ResponseEntity<String>("Error" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 	
 	
