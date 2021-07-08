@@ -91,9 +91,6 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 	private String createStringForQuery(InvoiceHeaderObjectDto dto) {
 		String query = "";
-		if (!ServiceUtil.isEmpty(dto.getRequestId())) {
-			query = query + "requestId like '" + dto.getRequestId() + "' and ";
-		}
 		if (!ServiceUtil.isEmpty(dto.getVendorId())) {
 			query = query + "vendorId like '" + dto.getVendorId() + "' and ";
 		}
@@ -400,10 +397,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						List<MatchingHistoryDto> matchResult = matchingHistoryServiceImpl.get(match);
 
 						System.out.println("HERE ::: 384" + matchResult.size());
-						if (matchResult.size() > 1) {
-							return itemReturn;
+						if (matchResult.size() == 1) {
 
-						} else {
 							for (i = 0; i < dto.getPurchaseDocumentHeader().size(); i++) {
 								for (PurchaseDocumentItemDto poItemMatch : dto.getPurchaseDocumentHeader().get(i)
 										.getPoItem()) {
@@ -414,6 +409,10 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									}
 								}
 							}
+						
+
+						} else {
+							return itemReturn;
 						}
 					}
 
@@ -455,12 +454,18 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			itemReturn.setContractItem(poItem.getContractItm());
 		}
 
+//		if ((("0".equals(poItem.getItemCategory())) && ServiceUtil.isEmpty(poItem.getAccountAssCat())
+//				&& "1".equals(poItem.getProductType()))
+//				|| ("0".equals(poItem.getItemCategory()) && ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()))
+//						&& "2".equals(poItem.getProductType()))
+//				|| ("0".equals(poItem.getItemCategory()) && ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()))
+//						&& "1".equals(poItem.getProductType()) && "".equals(poItem.getMaterial())))  TODO  Discuss with PK
 		if ((("0".equals(poItem.getItemCategory())) && ServiceUtil.isEmpty(poItem.getAccountAssCat())
 				&& "1".equals(poItem.getProductType()))
-				|| ("0".equals(poItem.getItemCategory()) && "K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())
+				|| ("0".equals(poItem.getItemCategory()) && ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()))
 						&& "2".equals(poItem.getProductType()))
-				|| ("0".equals(poItem.getItemCategory()) && !ServiceUtil.isEmpty(poItem.getAccountAssCat())
-						&& "1".equals(poItem.getProductType()) && "".equals(poItem.getMaterial()))) {
+				|| ("0".equals(poItem.getItemCategory()) && ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()))
+						&& "1".equals(poItem.getProductType()))) {
 
 			System.out.println("448");
 			if(!ServiceUtil.isEmpty(poItem.getShortText())){
@@ -574,7 +579,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 				// Account Assignment
 				if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
-					if ("K".equals(poItem.getAccountAssCat())) {
+					if ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()) ) {
 						List<InvoiceItemAcctAssignmentDto> accountAssignmentArray = new ArrayList<>();
 						// For Single
 						if ("".equals(poItem.getDistribution())) {
@@ -776,7 +781,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 				itemReturn.setPoUnitPriceOPU(poItem.getNetPrice());
 				// 6. Invitem- PoUnitPrice(OU) = fn(OU)
 				if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
-					if ("K".equals(poItem.getAccountAssCat())) {
+					if ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())) {
 						List<InvoiceItemAcctAssignmentDto> accountAssignmentArray = new ArrayList<>();
 						// For Single
 						if ("".equals(poItem.getDistribution())) {
