@@ -16,11 +16,28 @@
 		</f:title>
 		<f:header>
 			<f:DynamicPageHeader pinnable="true">
-				<l:Grid defaultSpan="XL2 L3 M6 S12" width="100%">
-					<Input width="100%" class="sapUiTinyMarginEnd margintopinFld" placeholder="{i18n>searchVendor}"/>
-					<Input width="100%" placeholder="{i18n>searchComp}" class="sapUiTinyMarginEnd margintopinFld"/>
-					<DatePicker dateValue="{mDashboardModel>/fromDate}" placeholder="{i18n>fromDate}" width="100%" class="margintopinFld sapUiTinyMarginEnd"/>
-					<DatePicker dateValue="{mDashboardModel>/toDate}" placeholder="{i18n>toDate}" width="100%" class=" margintopinFld"/>
+				<l:Grid defaultSpan="XL3 L3 M6 S12" width="100%">
+					<VBox>
+						<Label text="{i18n>vendor}:" design="Bold"></Label>
+						<MultiComboBox items="{oDropDownModel>/VendorIdSuggest}" selectedKeys="{mDashboardModel>/vendorId}" showSecondaryValues="true" width="100%"
+							class="sapUiTinyMarginEnd margintopinFld" placeholder="{i18n>searchVendor}">
+							<items>
+								<core:ListItem key="{oDropDownModel>Supplier}" text="{oDropDownModel>SupplierName} - {oDropDownModel>Supplier}"/>
+							</items>
+						</MultiComboBox>
+					</VBox>
+					<VBox>
+						<Label design="Bold" text="{i18n>compCode}:"></Label>
+						<Input value="{mDashboardModel>/compCode}" width="100%" placeholder="{i18n>searchComp}" class="sapUiTinyMarginEnd margintopinFld"/>
+					</VBox>
+					<VBox>
+						<Label design="Bold" text="{i18n>receivedFrom}:"></Label>
+						<DatePicker dateValue="{mDashboardModel>/fromDate}" placeholder="{i18n>fromDate}" width="100%" class="margintopinFld sapUiTinyMarginEnd"/>
+					</VBox>
+					<VBox>
+						<Label design="Bold" text="{i18n>receivedTo}:"></Label>
+						<DatePicker dateValue="{mDashboardModel>/toDate}" placeholder="{i18n>toDate}" width="100%" class=" margintopinFld"/>
+					</VBox>
 				</l:Grid>
 			</f:DynamicPageHeader>
 		</f:header>

@@ -1204,14 +1204,31 @@ sap.ui.define([
 				for (var j = 0; j < invoiceItems.length; j++) {
 					if (invoiceItems[j].isTwowayMatched && !invoiceItems[j].isDeleted) {
 						if(Number(PODocNum) === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
-							POItem[i].POMatched = true;
+							POItem[i].POMatched = false;
 						}
 					}
 				}
 			}
 			oPOModel.setProperty("/aItemMatchPO", POItem);
 			oPOModel.refresh();
-		}
+		},
+		
+		fnVendorSuggest: function (oEvent, oController) {
+			var oDataAPIModel = this.oDataAPIModel;
+			var oDropDownModel = this.oDropDownModel;
+			oDropDownModel.setProperty("/VendorIdSuggest", {});
+			var url = "/A_Supplier?$format=json";
+			oDataAPIModel.read(url, {
+				success: function (oData, header) {
+					var data = oData.results;
+					oDropDownModel.setSizeLimit(5000);
+					oDropDownModel.setProperty("/VendorIdSuggest", data);
+					oDropDownModel.refresh();
+				},
+				error: function (oData) {}
+			});
+
+		},
 
 	});
 

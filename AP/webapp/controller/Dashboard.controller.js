@@ -1,9 +1,9 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function (Controller) {
+	"com/menabev/AP/controller/BaseController"
+], function (BaseController) {
 	"use strict";
 
-	return Controller.extend("com.menabev.AP.controller.Dashboard", {
+	return BaseController.extend("com.menabev.AP.controller.Dashboard", {
 
 		onInit: function () {
 			var mDashboardModel = this.getOwnerComponent().getModel("mDashboardModel");
@@ -28,6 +28,8 @@ sap.ui.define([
 			var pastDate = new Date(rcvdOnFrom);
 			mDashboardModel.setProperty("/toDate", today);
 			mDashboardModel.setProperty("/fromDate", pastDate);
+			mDashboardModel.setProperty("/compCode", compCode);
+			mDashboardModel.setProperty("/vendorId", vendorId);
 			var obj = {
 				"companyCode": compCode,
 				"currency": "",
