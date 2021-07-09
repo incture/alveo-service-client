@@ -299,9 +299,9 @@ public class AutomationServiceImpl implements AutomationService {
 				}
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
 				System.err.println("InvoiceHeader "+response );
-				
+				InvoiceHeaderDto    invoiceHeaderAutoPost = (InvoiceHeaderDto) response.getObject();
 				// call autoposting method 
-				InvoiceHeaderDto    invoiceHeaderAutoPost =  purchaseHeaderService.autoPostApi((InvoiceHeaderDto) response.getObject());
+				//InvoiceHeaderDto    invoiceHeaderAutoPost =  purchaseHeaderService.autoPostApi((InvoiceHeaderDto) response.getObject());
 				// calling rule file and worklfow 
 				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
 				determination.setCompCode(invoiceHeaderAutoPost.getCompCode());

@@ -709,6 +709,53 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 			}
 			invoiceHeaderSave.setComment(commentsListSave);
 		}
+		
+		List<ActivityLogDto> acitvityList = dto.getActivityLog();
+		List<ActivityLogDto> activityListSave = new ArrayList<>();
+		if (!ServiceUtil.isEmpty(acitvityList)) {
+			for (ActivityLogDto acctivityLogDto : acitvityList) {
+				ActivityLogDto activityLogDtoSave = new ActivityLogDto();
+				if (!ServiceUtil.isEmpty(acctivityLogDto.getGuid())) {
+					acctivityLogDto.setGuid(acctivityLogDto.getGuid());
+					acctivityLogDto.setUpdatedAt(ServiceUtil.getEpocTime().longValue());
+					ActivityLogDo activityLogDo = ObjectMapperUtils.map(acctivityLogDto, ActivityLogDo.class);
+					activityLogRepo.save(activityLogDo);
+					activityLogDtoSave = mapper.map(activityLogDo, ActivityLogDto.class);
+				} 
+				activityListSave.add(activityLogDtoSave);
+			}
+			
+			ActivityLogDto activityLogDtoSave = new ActivityLogDto();
+		    ActivityLogDto acctivityLogDto = new ActivityLogDto();
+			acctivityLogDto.setGuid(UUID.randomUUID().toString());
+			acctivityLogDto.setCreatedAt(ServiceUtil.getEpocTime());
+			acctivityLogDto.setRequestId(requestId);
+			acctivityLogDto.setInvoiceStatusCode("0");
+			acctivityLogDto.setInvoiceStatusText("NEW");
+			acctivityLogDto.setTaskStatus("READY");
+			acctivityLogDto.setWorkflowStatus("IN-PROGRESS");
+			ActivityLogDo activityLogDo = ObjectMapperUtils.map(acctivityLogDto, ActivityLogDo.class);
+			activityLogRepo.save(activityLogDo);
+			activityLogDtoSave = mapper.map(activityLogDo, ActivityLogDto.class);
+			activityListSave.add(activityLogDtoSave);
+		}else {
+			ActivityLogDto activityLogDtoSave = new ActivityLogDto();
+			    ActivityLogDto acctivityLogDto = new ActivityLogDto();
+				acctivityLogDto.setGuid(UUID.randomUUID().toString());
+				acctivityLogDto.setCreatedAt(ServiceUtil.getEpocTime());
+				acctivityLogDto.setRequestId(requestId);
+				acctivityLogDto.setInvoiceStatusCode("0");
+				acctivityLogDto.setInvoiceStatusText("NEW");
+				acctivityLogDto.setTaskStatus("READY");
+				acctivityLogDto.setWorkflowStatus("IN-PROGRESS");
+				ActivityLogDo activityLogDo = ObjectMapperUtils.map(acctivityLogDto, ActivityLogDo.class);
+				activityLogRepo.save(activityLogDo);
+				activityLogDtoSave = mapper.map(activityLogDo, ActivityLogDto.class);
+				activityListSave.add(activityLogDtoSave);
+			}
+		
+			invoiceHeaderSave.setActivityLog(activityListSave);
+		
 		response.setCode(ApplicationConstants.CODE_SUCCESS);
 		response.setStatus(ApplicationConstants.SUCCESS);
 		response.setMessage("Success");
@@ -3310,6 +3357,8 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 			}
 			ActivityLogDto activity = createActivityLogForPoOrNonPo(invoiceSubmitOk.getInvoice());
 			activitLogs.add(activity);
+		                 List<ActivityLogDo>  activitLogDos  =ObjectMapperUtils.mapAll(activitLogs, ActivityLogDo.class);
+			activityLogRepo.saveAll(activitLogDos);
 		return activitLogs;
 		}
 		
@@ -3349,7 +3398,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 					
 					payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
 					// complete task 
-					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_LEAD_APPROVAL");
 				      invoiceSubmit.getInvoice().setActivityLog(activity);
 				ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
 					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
@@ -3379,7 +3428,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
 						  // success 
 						      // save all the things - activity log and comments
-						  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+						  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_LEAD_REJECTION");
 					      invoiceSubmit.getInvoice().setActivityLog(activity);
 					      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
 								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
@@ -3406,7 +3455,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 						  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
 							  // success 
 							  // save all things - activity log and comments
-							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_REJECTION");
 						      invoiceSubmit.getInvoice().setActivityLog(activity);
 						      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
 									 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
@@ -3438,7 +3487,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 				if(invoiceSubmit.getActionCode().equals(ApplicationConstants.BUYER_APPROVE)){
 					payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
 					// complete task 
-					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"BUYER_APPROVE");
 				      invoiceSubmit.getInvoice().setActivityLog(activity);
 				ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
 					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
@@ -3468,7 +3517,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 						  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
 							  // success 
 							  // save all things - activity log and comments
-							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"ACCOUNTTANT_SUBMIT_REMEDIATION");
+							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"BUYER_REJECT");
 						      invoiceSubmit.getInvoice().setActivityLog(activity);
 						      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
 									 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();

@@ -49,7 +49,7 @@ public class CardBuilder {
         JsonNode taskContextNode = task.getContext();
         taskFormNode.set("data", taskContextNode);
 
-        taskFormNode.set("cardSubmissionUrl", new TextNode(cardSubmissionUrl + "/submit-card/" + task.getInfo().get("id").asText()));
+        taskFormNode.set("cardSubmissionUrl", new TextNode(cardSubmissionUrl + "/submit-card/" + task.getInfo().get("id").asText()+"/"+task.getInfo().get("subject").asText()));
 
         taskFormNode.set("originator", new TextNode(originator));
 

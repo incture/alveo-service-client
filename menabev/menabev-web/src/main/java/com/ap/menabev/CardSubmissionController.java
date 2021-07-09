@@ -3,6 +3,8 @@ package com.ap.menabev;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Scanner;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -25,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ap.menabev.dto.AddPoInputDto;
+import com.ap.menabev.dto.AddPoOutputDto;
+import com.ap.menabev.service.PurchaseDocumentHeaderService;
 import com.ap.menabev.servicegrnimpl.ActionableMessageTokenValidationResult;
 import com.ap.menabev.servicegrnimpl.ActionableMessageTokenValidator;
 import com.ap.menabev.servicegrnimpl.HttpUtils;
@@ -55,12 +60,14 @@ public class CardSubmissionController {
     @Autowired
     private MailConfig mailConfig;
 
+    @Autowired
+    private PurchaseDocumentHeaderService pruchaseDocument;
     @Value("${card.submission.url}")
     private String cardSubmissionUrl;
 
-    @RequestMapping(value = "/submit-card/{taskId}/action/{actionId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<String> submitCard(@PathVariable String taskId, @PathVariable String actionId,
-            @RequestHeader(value = "Authorization") String auth, @RequestBody String body) {
+    @RequestMapping(value = "/submit-card/{taskId}/{requestId}/action/{actionId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<String> submitCard(@PathVariable String taskId,@PathVariable String requestId, @PathVariable String actionId,
+            @RequestHeader(value = "Authorization") String auth, @RequestBody String body) throws URISyntaxException, IOException, ParseException {
         LOG.info("Submitting card for task {} with action {} and body {}...", taskId, actionId, body);
 
         // The email address used to send the Adaptive Card
@@ -111,14 +118,24 @@ public class CardSubmissionController {
             return new ResponseEntity<>(null, headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return submitCardToWorkflow(taskId, actionId, accessToken);
+        return submitCardToWorkflow(taskId, requestId,actionId, accessToken);
     }
 
     /*
      * Processes the card and submits the user's action to CP Workflow.
      */
-    private ResponseEntity<String> submitCardToWorkflow(String taskId, String actionId, String accessToken) {
-        String workflowAPI = vcapConfig.getWorkflowRestUrl();
+    private ResponseEntity<String> submitCardToWorkflow(String taskId,String requestId ,String actionId, String accessToken) throws URISyntaxException, IOException, ParseException {
+       
+    	
+    	// calling Po Refresh Api
+    	AddPoInputDto input =new  AddPoInputDto();
+    	input.setRequestId(requestId);
+    	System.err.println("CARD-ACTION-STATUS "+"input for PoRefrech"+input );
+    	AddPoOutputDto  result = pruchaseDocument.refreshPoApi(input);
+    	System.err.println("CARD-ACTION-STATUS "+"output for PoRefresh");
+    	// activity Log 
+    	
+    	String workflowAPI = vcapConfig.getWorkflowRestUrl();
         String taskInstanceUrl = workflowAPI + "/v1/task-instances/" + taskId;
         HttpPatch httpPatch = new HttpPatch(taskInstanceUrl);
         httpPatch.setHeader("Authorization", "Bearer " + accessToken);
