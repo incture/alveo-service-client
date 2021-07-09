@@ -168,8 +168,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			// If invoiceHeaderStatus is NOT EQUAL to “PO Missing/Invalid” or
 			// “Duplicate”
 			if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-				if ((!ApplicationConstants.PO_MISSING_OR_INVALID.equals(checkStatus.getInvoiceStatus())
-						&& !ApplicationConstants.DUPLICATE_INVOICE.equals(checkStatus.getInvoiceStatus()) || ApplicationConstants.NEW_INVOICE.equals(checkStatus.getInvoiceStatus()))) {
+				if ((!ApplicationConstants.DUPLICATE_INVOICE.equals(checkStatus.getInvoiceStatus()))) {
 					// 1. Loop at invoice line items
 					for (InvoiceItemDto item : checkStatus.getInvoiceItems()) {
 

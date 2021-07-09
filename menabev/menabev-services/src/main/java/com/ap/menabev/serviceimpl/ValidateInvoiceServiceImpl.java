@@ -231,9 +231,11 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// Missing or …. any other status till Ready to Post.
 					// then set status = Balance Mismatch
 					String statusCode = invoiceHeaderCheckDto.getInvoiceStatus();
-					if (balanceAmount > 0.0 && !(statusCode.equals("1") || statusCode.equals("2")
-							|| statusCode.equals("7") || statusCode.equals("8") || statusCode.equals("9"))) {
-						invoiceHeaderCheckDto.setInvoiceStatus("10");
+					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE) || statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
+							|| statusCode.equals(ApplicationConstants.NO_GRN) || statusCode.equals(ApplicationConstants.PARTIAL_GRN) || statusCode.equals(ApplicationConstants.UOM_MISMATCH) || 
+							statusCode.equals(ApplicationConstants.ITEM_MISMATCH) || statusCode.equals(ApplicationConstants.QTY_MISMATCH) || statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
+							||statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 					}
 
 					InvoiceHeaderObjectDto duplicateCheckDto = duplicateCheckService
@@ -329,9 +331,11 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// 4. If Header Status NE Duplicate or PO Missing or …. any
 					// other status then set status = Balance Mismatch
 					String statusCode = invoiceHeaderCheckDto.getInvoiceStatus();
-					if (balanceAmount > 0.0 && !(statusCode.equals("1") || statusCode.equals("2")
-							|| statusCode.equals("7") || statusCode.equals("8") || statusCode.equals("9"))) {
-						invoiceHeaderCheckDto.setInvoiceStatus("10");
+					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE) || statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
+							|| statusCode.equals(ApplicationConstants.NO_GRN) || statusCode.equals(ApplicationConstants.PARTIAL_GRN) || statusCode.equals(ApplicationConstants.UOM_MISMATCH) || 
+							statusCode.equals(ApplicationConstants.ITEM_MISMATCH) || statusCode.equals(ApplicationConstants.QTY_MISMATCH) || statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
+							||statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 					}
 					return invoiceHeaderCheckDto;
 				}
@@ -677,7 +681,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				} else {
 					flag = true;
 					invoiceItemDto.setIsThreewayMatched(true);
-					invoiceItemDto.setItemStatusCode("17");
+					invoiceItemDto.setItemStatusCode(ApplicationConstants.READY_TO_POST);
 					invoiceItemDto.setItemStatusText("Ready To Post");
 				}
 
@@ -812,6 +816,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					+ "accAssignmentCat" + accAssignmentCat + "goodsReceiptFlag" + goodsReceiptFlag + "grBsdIvFlag"
 					+ grBsdIvFlag + "invoiceReceiptFlag" + invoiceReceiptFlag);
 			// "" null
+			
 			if ("0".equalsIgnoreCase(itemCategory)
 					&& (ServiceUtil.isEmpty(accAssignmentCat) || accAssignmentCat.equalsIgnoreCase("K")
 							|| accAssignmentCat.equalsIgnoreCase("F"))
@@ -922,7 +927,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					}
 
 				}
-
+				System.err.println("GR DTO LIST:::::" + grDtoList);
 				for (int i = 0; i < grDtoList.size(); i++) {
 					if (remainingQTY > 0) {
 						GRDto grDto = grDtoList.get(i);
@@ -977,7 +982,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						inputPayload.setNmtrConvOpuOu(String.valueOf(num));
 						inputPayload.setQtyOrdPurReq(String.valueOf(invoiceItemDto.getPoQtyOU()));
 						inputPayload.setPostingDate(
-								ServiceUtil.getDateByEpoc(invoiceHeaderDto.getPostingDate(), "dd.MM.yyyy"));
+								ServiceUtil.getDateByEpoc(invoiceHeaderDto.getPostingDate(), "dd.MM.yyyy"));//TODO
 						inputPayload.setCompanyCode(invoiceHeaderDto.getCompCode());
 						// change
 						// check with meghana inputPayload.setNetValDC will be
@@ -1048,7 +1053,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						}
 
 						// here we need to form inv_itm_acc_ass
-
+						System.err.println("AFTER INPUT PAYLOAD SET INSIDE::::::::" + inputPayload);
 						ItemThreeWayAccAssgnPaylod accAssgnDto = new ItemThreeWayAccAssgnPaylod();
 						// inputPayload
 						// invoiceHeaderDto
@@ -1149,21 +1154,25 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						toAccounting.setResults(resultsList);
 						accAssgnDto.setToAccounting(toAccounting);
 						itemThreeWayAccAssgnPaylod.add(accAssgnDto);
+						System.err.println("INPUT PAYLOAD :::::" + inputPayload);
 						threeWayInputPayloadList.add(inputPayload);
 					} else {
+						System.err.println("INSIDE BREAK");
 						break;
 					}
 				}
+				System.err.println("OUTSIDE FOR LOOP GR DTO LIST:::::"+ grDtoList);
 
 			} else {
-				// nothing
+				System.err.println("ELSE PART");
 			}
-
+			System.err.println("AFTER ELSE INPUT PAYLOAD LIST 3WAY:::" + threeWayInputPayloadList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		consumtionLogicOutputDto.setItemThreeWayMatchPaylod(threeWayInputPayloadList);
 		consumtionLogicOutputDto.setItemThreeWayAccAssgnPaylod(itemThreeWayAccAssgnPaylod);
+		System.err.println("INPUT PAYLOAD LIST:::::::" + consumtionLogicOutputDto);
 		return consumtionLogicOutputDto;
 	}
 
