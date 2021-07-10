@@ -127,6 +127,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// a. Call determinePaymentTermsOdata service and
 					// setPaymentTerms
 
+					
+					//copy from here -----
 					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
@@ -157,46 +159,17 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							}
 							//get payment terms details
 							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							
+							
+							
+							
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
-								JSONObject json2 = new JSONObject(jsonString2);
-								logger.error("JSON:::" + json2);
-								if (json2.has("d")) {
-									logger.error("JSON:::" + json2.has("d"));
-									JSONObject dObject2 = json2.getJSONObject("d");
-									logger.error("dObject" + dObject2);
-									JSONArray resultsArray2 = dObject2.getJSONArray("results");
-									for (int i = 0; i < resultsArray2.length(); i++) {
-										String ZBD1T = null;
-										String ZBD2T = null;
-										String ZBD3T = null;
-										JSONObject resultObject2 = (JSONObject) resultsArray2.get(i);
-										if(resultObject2.has("BaseLineDateType")){
-											String BaseLineDateType = resultObject2.getString("BaseLineDateType");
-											if(BaseLineDateType==null || BaseLineDateType=="")
-												invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getBaselineDate());
-											else if("D".equalsIgnoreCase(BaseLineDateType))
-												invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getPostingDate());
-											else if("B".equalsIgnoreCase(BaseLineDateType))
-												invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getInvoiceDate());
-										}
-										if(resultObject2.has("CashDiscDays1")){
-											ZBD1T = resultObject2.getString("CashDiscDays1");
-										}
-										if(resultObject2.has("CashDiscDays2")){
-											ZBD2T = resultObject2.getString("CashDiscDays2");
-										}
-										if(resultObject2.has("NetPmntTermPeriod")){
-											ZBD3T =  resultObject2.getString("NetPmntTermPeriod");
-										}
-										
-										
-									}
-								}
+								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2,invoiceHeaderCheckDto);
 							}
 						}
 					}
-
+					//---to this line
 					// b. Determine baseline date configuration and
 					// SetBaselineDate
 					//
@@ -421,6 +394,71 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			invoiceHeaderCheckDto.setMessages(messagesList);
 			return invoiceHeaderCheckDto;
 		}
+		return invoiceHeaderCheckDto;
+	}
+
+	private InvoiceHeaderCheckDto calculateBaseDueDates(String string, InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
+
+		
+		JSONObject json2 = new JSONObject(string);
+		logger.error("JSON:::" + json2);
+		if (json2.has("d")) {
+			logger.error("JSON:::" + json2.has("d"));
+			JSONObject dObject2 = json2.getJSONObject("d");
+			logger.error("dObject" + dObject2);
+			JSONArray resultsArray2 = dObject2.getJSONArray("results");
+			for (int i = 0; i < resultsArray2.length(); i++) {
+				String ZBD1T = null;
+				String ZBD2T = null;
+				String ZBD3T = null;
+				JSONObject resultObject2 = (JSONObject) resultsArray2.get(i);
+				if(resultObject2.has("BaseLineDateType")){
+					String BaseLineDateType = resultObject2.getString("BaseLineDateType");
+					if(BaseLineDateType==null || BaseLineDateType=="")
+						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getBaselineDate());
+					else if("D".equalsIgnoreCase(BaseLineDateType))
+						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getPostingDate());
+					else if("B".equalsIgnoreCase(BaseLineDateType))
+						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getInvoiceDate());
+				}
+				if(resultObject2.has("CashDiscDays1")){
+					ZBD1T = resultObject2.getString("CashDiscDays1");
+				}
+				if(resultObject2.has("CashDiscDays2")){
+					ZBD2T = resultObject2.getString("CashDiscDays2");
+				}
+				if(resultObject2.has("NetPmntTermPeriod")){
+					ZBD3T =  resultObject2.getString("NetPmntTermPeriod");
+				}
+				Long period = 0L;
+				// 1st condition
+				if(!ZBD3T.equalsIgnoreCase("0"))
+					period = Long.valueOf(ZBD3T);
+				else{
+					if(!ZBD2T.equalsIgnoreCase("0"))
+						period = Long.valueOf(ZBD2T);
+					else
+						period = Long.valueOf(ZBD1T);
+				}
+				
+					invoiceHeaderCheckDto.setDueDate(invoiceHeaderCheckDto.getBaselineDate()+period);
+				//2nd cond
+				
+				if(!ZBD2T.equalsIgnoreCase("0")){
+					invoiceHeaderCheckDto.setDiscountedDueDate2(invoiceHeaderCheckDto.getBaselineDate()+Long.valueOf(ZBD2T));
+				}
+				else{
+					invoiceHeaderCheckDto.setDiscountedDueDate2(invoiceHeaderCheckDto.getDueDate());
+				}
+				if(!ZBD1T.equalsIgnoreCase("0") || !ZBD2T.equalsIgnoreCase("0")){
+					invoiceHeaderCheckDto.setDiscountedDueDate1(invoiceHeaderCheckDto.getBaselineDate()+Long.valueOf(ZBD1T));
+					
+				}else{
+					invoiceHeaderCheckDto.setDiscountedDueDate1(invoiceHeaderCheckDto.getDueDate());
+				}
+			}
+		}
+	
 		return invoiceHeaderCheckDto;
 	}
 
