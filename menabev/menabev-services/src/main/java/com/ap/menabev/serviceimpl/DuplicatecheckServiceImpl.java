@@ -92,22 +92,22 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 	private String createStringForQuery(InvoiceHeaderObjectDto dto) {
 		String query = "";
 		if (!ServiceUtil.isEmpty(dto.getVendorId())) {
-			query = query + "vendorId like '" + dto.getVendorId() + "' and ";
+			query = query + "vendorId =" + dto.getVendorId() + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-			query = query + "invoiceStatus like '" + dto.getInvoiceStatus() + "' and ";
+			query = query + "invoiceStatus =" + dto.getInvoiceStatus() + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceReference())) {
-			query = query + "extInvNum like '" + dto.getInvoiceReference() + "' and ";
+			query = query + "extInvNum =" + dto.getInvoiceReference() + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceDate())) {
 			query = query + "invoiceDate =" + dto.getInvoiceDate() + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceAmount())) {
-			query = query + "grossAmount like '" + dto.getInvoiceAmount() + "' and ";
+			query = query + "grossAmount =" + dto.getInvoiceAmount() + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getCompanyCode())) {
-			query = query + "compCode like '" + dto.getCompanyCode() + "' and ";
+			query = query + "compCode =" + dto.getCompanyCode() + " and ";
 		}
 		return query;
 	}
