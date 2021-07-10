@@ -38,7 +38,10 @@ import com.ap.menabev.dto.AddPoOutputDto;
 import com.ap.menabev.dto.InvoiceChangeIndicator;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceHeaderObjectDto;
+import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.InvoiceItemDto;
+import com.ap.menabev.dto.ItemMessageDto;
+import com.ap.menabev.dto.ItemThreeWayMatchPaylod;
 import com.ap.menabev.dto.PoDeliveryCostHistoryDto;
 import com.ap.menabev.dto.PoHeaderOdata;
 import com.ap.menabev.dto.PoHistoryDto;
@@ -51,6 +54,8 @@ import com.ap.menabev.dto.PurchaseDocumentHeaderDto;
 import com.ap.menabev.dto.PurchaseDocumentItemDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.RootOdata;
+import com.ap.menabev.dto.ThreeWayInvoiceItemDto;
+import com.ap.menabev.dto.ThreeWayMatchOutputDto;
 import com.ap.menabev.dto.ToDeliveryCostHistoryOata;
 import com.ap.menabev.dto.ToHistoryOdata;
 import com.ap.menabev.dto.ToHistoryTotalOdata;
@@ -119,6 +124,9 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 
 	@Autowired
 	InvoiceHeaderServiceImpl invoiceHeaderServiceImpl;
+
+	@Autowired
+	ValidateInvoiceServiceImpl validateInvoiceServiceImpl;
 
 	@Override
 	public ResponseDto save(PurchaseDocumentHeaderDto dto) {
@@ -368,7 +376,6 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			}
 		}
 
-		// iv. HeaderCheckAPI by passing venodrChange Indicator
 		// v. Perform 2 way and 3way match (only for items that are not yet
 		// matched)
 		// 1. Loop at invoiceItem where isTwoWayMatched=false.
@@ -416,8 +423,66 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			System.out.println("Header Status Update:::::::" + headerStatusUpdate);
 		}
 
-		// SaveApi
+		// Three Way match Integration
+		ThreeWayMatchOutputDto headerChangeThreeWayMatch = new ThreeWayMatchOutputDto();
 		if (!ServiceUtil.isEmpty(headerStatusUpdate)) {
+			headerStatusUpdate.setPostingDate(new Date().getTime());
+			headerChangeThreeWayMatch = validateInvoiceServiceImpl.threeWayMatch(headerStatusUpdate);
+		}
+		System.out.println("Three Way Match Response:::::::" + headerChangeThreeWayMatch);
+		InvoiceHeaderDto afterThreeWayMatch = new InvoiceHeaderDto();
+		if (!ServiceUtil.isEmpty(headerChangeThreeWayMatch)) {
+			ModelMapper mapper = new ModelMapper();
+			afterThreeWayMatch = mapper.map(headerChangeThreeWayMatch, InvoiceHeaderDto.class);
+			List<InvoiceItemDto> afterThreeWayMatchItems = new ArrayList<>();
+			if (!ServiceUtil.isEmpty(headerChangeThreeWayMatch.getInvoiceItems())) {
+				
+				for (ThreeWayInvoiceItemDto threeWayItems : headerChangeThreeWayMatch.getInvoiceItems()) {
+					InvoiceItemDto item = new InvoiceItemDto();
+					item = mapper.map(threeWayItems, InvoiceItemDto.class);
+					// Item Messages
+					List<ItemMessageDto> itemMessagesList = new ArrayList<>();
+					if (!ServiceUtil.isEmpty(threeWayItems.getInvoiceItemMessages())) {
+
+						for (ItemMessageDto itemMessages : threeWayItems.getInvoiceItemMessages()) {
+							ItemMessageDto setInvoiceItemMessages = new ItemMessageDto();
+							setInvoiceItemMessages = mapper.map(itemMessages, ItemMessageDto.class);
+							itemMessagesList.add(setInvoiceItemMessages);
+						}
+					}
+					item.setInvoiceItemMessages(itemMessagesList);
+
+					// Item Account Assignment
+					List<InvoiceItemAcctAssignmentDto> itemAccountAsssList = new ArrayList<>();
+					if (!ServiceUtil.isEmpty(threeWayItems.getInvItemAcctDtoList())) {
+
+						for (InvoiceItemAcctAssignmentDto accountAss : threeWayItems.getInvItemAcctDtoList()) {
+							InvoiceItemAcctAssignmentDto setAccountAss = new InvoiceItemAcctAssignmentDto();
+							setAccountAss = mapper.map(accountAss, InvoiceItemAcctAssignmentDto.class);
+							itemAccountAsssList.add(setAccountAss);
+						}
+					}
+					item.setInvItemAcctDtoList(itemAccountAsssList);
+					// Item ThreeWayMatchPayload
+					List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayloadList = new ArrayList<>();
+					if (!ServiceUtil.isEmpty(threeWayItems.getItemThreeWayMatchPayload())) {
+
+						for (ItemThreeWayMatchPaylod itemThreeWayMatchPayload : threeWayItems.getItemThreeWayMatchPayload()) {
+							ItemThreeWayMatchPaylod setItemThreeWayMatchPayload = new ItemThreeWayMatchPaylod();
+							setItemThreeWayMatchPayload = mapper.map(itemThreeWayMatchPayload, ItemThreeWayMatchPaylod.class);
+							itemThreeWayMatchPayloadList.add(setItemThreeWayMatchPayload);
+						}
+					}
+					item.setItemThreeWayMatchPayload(itemThreeWayMatchPayloadList);
+					afterThreeWayMatchItems.add(item);
+				}
+			}
+			afterThreeWayMatch.setInvoiceItems(afterThreeWayMatchItems);
+			System.out.println("432:::::" + afterThreeWayMatch);
+		}
+
+		// SaveApi
+		if (!ServiceUtil.isEmpty(afterThreeWayMatch)) {
 			InvoiceChangeIndicator changeIndicators = new InvoiceChangeIndicator();
 			changeIndicators.setItemChange(true);
 			changeIndicators.setActivityLog(true);
@@ -426,8 +491,8 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			changeIndicators.setCostAllocationChange(true);
 			changeIndicators.setHeaderChange(true);
 			dto.getInvoiceHeader().setChangeIndicators(changeIndicators);
-			invoiceHeaderServiceImpl.saveAPI(headerStatusUpdate);
-			addPoReturn.setInvoiceObject(headerStatusUpdate);
+			invoiceHeaderServiceImpl.saveAPI(afterThreeWayMatch);
+			addPoReturn.setInvoiceObject(afterThreeWayMatch);
 		}
 
 		System.out.println("After Item Match :::" + addPoReturn.getInvoiceObject());
@@ -666,10 +731,10 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			if (!ServiceUtil.isEmpty(obj.getTaxCode())) {
 				item.setTaxCode(obj.getTaxCode());
 			}
-			if (!ServiceUtil.isEmpty(obj.getAcctasscat())) {
+			if (!ServiceUtil.isEmpty(obj.isNoMoreGr())) {
 				item.setNoMoreGr((obj.isNoMoreGr()));
 			}
-			if (!ServiceUtil.isEmpty(obj.getAcctasscat())) {
+			if (!ServiceUtil.isEmpty(obj.isFinalInv())) {
 				item.setFinalInvInd(obj.isFinalInv());
 			}
 			if (!ServiceUtil.isEmpty(obj.getItemCat())) {
@@ -1818,5 +1883,6 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 
 		return poApiResponse;
 	}
+	
 
 }

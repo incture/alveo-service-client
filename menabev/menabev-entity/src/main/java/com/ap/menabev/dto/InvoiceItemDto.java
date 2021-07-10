@@ -91,6 +91,7 @@ public class InvoiceItemDto {
     private Boolean grNonValInd;
 	private String distributionInd;
 	private String partialInvInd;
+	private List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload;
 	
 	
 
