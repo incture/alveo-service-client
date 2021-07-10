@@ -66,7 +66,7 @@ public class CardMailer {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
             	 LOG.info("Sending e-mail {} to {}...password and mailUser", subject, recipientsAsString,mailConfig.getMailUser(),mailConfig.getMailPassword());
-                return new PasswordAuthentication(mailConfig.getMailUser(), mailConfig.getMailPassword());
+                return new PasswordAuthentication("arun.gauda@incture.com","3Pg13ec022@");
             }
         });
 

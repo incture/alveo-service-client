@@ -69,7 +69,7 @@ public class TaskChangeListenerJob {
                   
         
     private static long lastSync = new Date().getTime();
-   // @Scheduled(fixedDelay = 3000)
+    @Scheduled(fixedDelay = 3000)
     public void pullMessages() {
         LOG.info("Checking for new task updates..."+ lastSync);
 

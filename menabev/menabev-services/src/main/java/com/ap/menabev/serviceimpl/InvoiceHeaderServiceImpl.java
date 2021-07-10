@@ -591,11 +591,23 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 			List<InvoiceItemDto> savedItemDto = new ArrayList<>();
 			for (InvoiceItemDto invoiceItemDto : itemList) {
 				InvoiceItemDto itemSave = new InvoiceItemDto();
+				System.err.println("ItemDto "+ invoiceItemDto);
 				InvoiceItemDo itemDo = ObjectMapperUtils.map(invoiceItemDto, InvoiceItemDo.class);
 				if (!ServiceUtil.isEmpty(itemDo.getGuid())) {
 					logger.error("line no 263 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 					itemDo.setUpdatedAt(ServiceUtil.getEpocTime());
-					invoiceItemRepository.save(itemDo);
+					System.err.println("saved do of item if"+itemDo);
+					
+					if(!ServiceUtil.isEmpty(invoiceItemDto.getIsDeleted())){
+						if(invoiceItemDto.getIsDeleted()==true){
+							itemDo.setIsDeleted(true);
+						}else {
+							itemDo.setIsDeleted(false);
+						}
+						}else {
+							itemDo.setIsDeleted(false);
+						}
+					itemDo =	invoiceItemRepository.save(itemDo);
 					itemSave = mapper.map(itemDo, InvoiceItemDto.class);
 				} else {
 					logger.error("line no 267 of InvoiceHeaderServiceImpl.saveOrUpdate()");
@@ -605,7 +617,18 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 					//itemDo.setItem(invoiceItemServiceImpl.getItemId());
 					logger.error("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 					logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()"+itemDo.getItemCode());
-					invoiceItemRepository.save(itemDo);
+					if(!ServiceUtil.isEmpty(invoiceItemDto.getIsDeleted())){
+					if(invoiceItemDto.getIsDeleted()==true){
+						itemDo.setIsDeleted(true);
+					}else {
+						itemDo.setIsDeleted(false);
+					}
+					}else {
+						itemDo.setIsDeleted(false);
+					}
+					System.err.println("saved do of item else"+itemDo);
+					
+					itemDo = invoiceItemRepository.save(itemDo);
 				    itemSave = mapper.map(itemDo, InvoiceItemDto.class);
 				}
 				List<InvoiceItemAcctAssignmentDto> itemAccAssignmentList = invoiceItemDto.getInvItemAcctDtoList();
@@ -760,6 +783,8 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		response.setStatus(ApplicationConstants.SUCCESS);
 		response.setMessage("Success");
 		response.setObject(invoiceHeaderSave);
+		
+		System.err.println("SaveOrUpdate InvoiceHeaderSave"+invoiceHeaderSave);
 		return response;
 
 	} catch (Exception e) {
@@ -1129,8 +1154,9 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 			}
 		ActivityLogDto activity = new ActivityLogDto();
 		activity.setGuid(UUID.randomUUID().toString());
-		activity.setActionCode("CREATED");// set the action code
-		activity.setActionCodeText("CREATED");
+		// change this accodring to the flow 
+		activity.setActionCode("C");// set the action code
+		activity.setActionCodeText("C");
 		activity.setCreatedAt(ServiceUtil.getEpocTime());
 		activity.setCreatedBy(invoiceHeader.getTaskOwner());
 		activity.setInvoiceStatusCode(invoiceHeader.getInvoiceStatus());
@@ -3367,8 +3393,8 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		public ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader){
 			ActivityLogDto activity = new ActivityLogDto();
 			activity.setGuid(UUID.randomUUID().toString());
-			activity.setActionCode("CREATED");// set the action code
-			activity.setActionCodeText("CREATED");
+			activity.setActionCode("C");// set the action code
+			activity.setActionCodeText("C");
 			activity.setCreatedAt(ServiceUtil.getEpocTime());
 			activity.setCreatedBy(invoiceHeader.getTaskOwner());
 			activity.setInvoiceStatusCode(invoiceHeader.getInvoiceStatus());
