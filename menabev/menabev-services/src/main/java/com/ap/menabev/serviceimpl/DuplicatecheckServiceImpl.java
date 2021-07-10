@@ -17,6 +17,7 @@ import com.ap.menabev.dto.InvoiceHeaderObjectDto;
 import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.MatchingHistoryDto;
+import com.ap.menabev.dto.PoHistoryDto;
 import com.ap.menabev.dto.PurchaseDocumentItemDto;
 import com.ap.menabev.dto.TwoWayMatchInputDto;
 import com.ap.menabev.invoice.InvoiceItemRepository;
@@ -996,15 +997,32 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 				}
 			}
 		}
-		System.out.println("No GRN TEST Outside" + dto.getPurchaseDocumentHeader().get(0));
-		if (ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistory())) {
-			System.out.println("No GRN TEST" + dto.getPurchaseDocumentHeader().get(0));
+		System.out.println("No GRN TEST Outside" + dto.getPurchaseDocumentHeader());
+		if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistory())) {
+			Boolean historyFound = false;
+			System.out.println("Inside FOR NOGRN"+ poItem.getDocumentItem() +"HISTORY=="+ dto.getPurchaseDocumentHeader().get(0).getPoHistory());
+			for(PoHistoryDto poHistory : dto.getPurchaseDocumentHeader().get(0).getPoHistory()){
+				System.out.println("Inside FOR NOGRN"+ poItem.getDocumentItem() +"HISTORY=="+ poHistory.getDocumentItem());
+				if(poItem.getDocumentItem().equals(poHistory.getDocumentItem())){
+					historyFound = true;
+					break;
+				}
+			}
+			
+			if(historyFound){
+				itemReturn.setItemStatusCode(ApplicationConstants.GRN_PASSED);
+				itemReturn.setItemStatusText("GRN Passed");
+			}else{
+				itemReturn.setItemStatusCode(ApplicationConstants.NO_GRN);
+				itemReturn.setItemStatusText("No GRN");
+				itemReturn.setIsSelected(false);
+			}
+			
+		}else{
+			System.out.println("No GRN TEST ELSE" + dto.getPurchaseDocumentHeader().get(0));
 			itemReturn.setItemStatusCode(ApplicationConstants.NO_GRN);
 			itemReturn.setItemStatusText("No GRN");
 			itemReturn.setIsSelected(false);
-		}else{
-			itemReturn.setItemStatusCode(ApplicationConstants.GRN_PASSED);
-			itemReturn.setItemStatusText("GRN Passed");
 		}
 		// Calculate sysSuggTaxAmount
 		//
