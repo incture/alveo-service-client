@@ -3613,7 +3613,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		}
 		@Override
 		public ResponseEntity<?> getSupplierEmailAddress(String vendorId) throws URISyntaxException, IOException{
-			 ResponseEntity<?> responsePost  = new ResponseEntity<>("Failed",HttpStatus.BAD_REQUEST);
+			 ResponseEntity<?> responsePost  = new ResponseEntity<>("Failed ",HttpStatus.BAD_REQUEST);
 			  // call Destination Service 
             Map<String, Object> destinationInfo = OdataHelperClass.getDestination("SD4_DEST");
             String endPointurl = "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner"
@@ -3625,6 +3625,8 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
           if(responseFromOdata.getStatusCodeValue()==200||responseFromOdata.getStatusCodeValue()==201){
         	  SupplierOdata obj = new Gson().fromJson(responseFromOdata.getBody().toString(), SupplierOdata.class);
         	  System.err.println("supplierOdata "+obj);
+          }else {
+        	  responsePost = new ResponseEntity<>("Failed due to "+responseFromOdata.getBody().toString(),HttpStatus.BAD_REQUEST); 
           }
 			//return header;
 		return responseFromOdata;

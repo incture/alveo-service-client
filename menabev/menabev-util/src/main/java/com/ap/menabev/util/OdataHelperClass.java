@@ -169,8 +169,8 @@ public class OdataHelperClass {
 				String dataFromStream = getDataFromStream(httpResponse.getEntity().getContent());
 				return new ResponseEntity<String>(dataFromStream, HttpStatus.OK);
 			} else if (httpResponse.getStatusLine().getStatusCode() == 201) {
-				// logic for 201 //TODO
-				return new ResponseEntity<String>("from block 201", HttpStatus.OK);
+				String dataFromStream = getDataFromStream(httpResponse.getEntity().getContent());
+				return new ResponseEntity<String>(dataFromStream, HttpStatus.OK);
 			} else {
 				String responseFromECC = getDataFromStream(httpResponse.getEntity().getContent());
 				return new ResponseEntity<String>(responseFromECC, HttpStatus.BAD_REQUEST);
@@ -413,6 +413,8 @@ public class OdataHelperClass {
 		}
 		return null;
 	}
+	
+
 
 	private static Header[] getAccessToken(String url, String username, String password, HttpClient client,
 			String proxyHost, int proxyPort, String sapClient, String token)
@@ -428,6 +430,126 @@ public class OdataHelperClass {
 		httpGet.addHeader("Content-Type", "application/json");
 		httpGet.addHeader("sap-client", sapClient);
 		httpGet.addHeader("SAP-Connectivity-SCC-Location_ID", "DEVHEC");
+		HttpResponse response = client.execute(httpGet);
+                 System.err.println("response "+ response + response.getEntity());
+		return response.getAllHeaders();
+
+	}
+		
+	public static ResponseEntity<?> postService(String url, String entity,
+			Map<String, Object> destinationInfo) throws IOException, URISyntaxException {
+		try {
+			// have to fetch from Connectivity SK through VCAP //TODO
+			String proxyHost = "10.0.4.5";
+			int proxyPort = 20003;
+			// JSONObject jsonObj = new
+			// JSONObject(System.getenv("VCAP_SERVICES"));
+
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort), new UsernamePasswordCredentials(
+					(String) destinationInfo.get("User"), (String) destinationInfo.get("Password")));
+
+			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+
+			clientBuilder.setProxy(new HttpHost(proxyHost, proxyPort))
+					.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy())
+					.setDefaultCredentialsProvider(credsProvider);
+
+			HttpClient httpClient = clientBuilder.build();
+			HttpRequestBase httpRequestBase = null;
+			HttpResponse httpResponse = null;
+			StringEntity input = null;
+			String jwToken = getConectivityProxy();
+			System.err.println("jwToken ="+jwToken);
+				httpRequestBase = new HttpPost(destinationInfo.get("URL") + url);
+				try {
+
+					logger.error("entity " + entity);
+					input = new StringEntity(entity);
+					input.setContentType("application/json");
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+				logger.error("inputEntity " + input);
+				((HttpPost) httpRequestBase).setEntity(input);
+			
+			if (destinationInfo.get("sap-client") != null) {
+				httpRequestBase.addHeader("sap-client", (String) destinationInfo.get("sap-client"));
+			}
+			httpRequestBase.addHeader("accept", "application/json");
+
+			Header[] headers = getPostAccessToken((String) destinationInfo.get("URL") + url,
+					(String) destinationInfo.get("User"), (String) destinationInfo.get("Password"), httpClient,(String) destinationInfo.get("sap-client"),	(String) destinationInfo.get("CloudConnectorLocationId"), jwToken);
+			String token = null;
+			List<String> cookies = new ArrayList<>();
+			if (headers.length != 0) {
+
+				for (Header header : headers) {
+
+					if (header.getName().equalsIgnoreCase("x-csrf-token")) {
+						token = header.getValue();
+						logger.error("token --- " + token);
+					}
+
+					if (header.getName().equalsIgnoreCase("set-cookie")) {
+						cookies.add(header.getValue());
+					}
+
+				}
+			}
+
+			if (destinationInfo.get("User") != null && destinationInfo.get("Password") != null) {
+				String encoded = encodeUsernameAndPassword((String) destinationInfo.get("User"),
+						(String) destinationInfo.get("Password"));
+				httpRequestBase.addHeader("Authorization", encoded);
+				httpRequestBase.setHeader("Proxy-Authorization", "Bearer " + jwToken);
+				httpRequestBase.addHeader("SAP-Connectivity-SCC-Location_ID",
+						(String) destinationInfo.get("CloudConnectorLocationId"));
+				httpRequestBase.addHeader("X-CSRF-Token", "fetch");
+
+			}
+			
+			if (token != null) {
+				httpRequestBase.addHeader("X-CSRF-Token", token);
+			}
+			if (!cookies.isEmpty()) {
+				for (String cookie : cookies) {
+					String tmp = cookie.split(";", 2)[0];
+					httpRequestBase.addHeader("Cookie", tmp);
+				}
+			}
+			httpResponse = httpClient.execute(httpRequestBase);
+			if (httpResponse.getStatusLine().getStatusCode() == 200) {
+				String responseFromECC = getDataFromStream(httpResponse.getEntity().getContent());
+				return new ResponseEntity<String>(responseFromECC, HttpStatus.OK);
+			} else if (httpResponse.getStatusLine().getStatusCode() == 201) {
+				String responseFromECC = getDataFromStream(httpResponse.getEntity().getContent());
+				return new ResponseEntity<String>(responseFromECC, HttpStatus.OK);
+			} else {
+				String responseFromECC = getDataFromStream(httpResponse.getEntity().getContent());
+				return new ResponseEntity<String>(responseFromECC, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>("Error" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+	
+	private static Header[] getPostAccessToken(String url, String username, String password, HttpClient client,
+			String sapClient,String cloudConnectorId, String token)
+			throws ClientProtocolException, IOException {
+
+		System.err.println(" input  accessToken "+ url + username + password +sapClient+token);
+		HttpGet httpGet = new HttpGet(url);
+		String encoded = encodeUsernameAndPassword(username,password);
+		httpGet.addHeader("Authorization", encoded);
+		// Encoding username and password
+		httpGet.setHeader("Proxy-Authorization", "Bearer " + token);
+		httpGet.addHeader("X-CSRF-Token", "fetch");
+		httpGet.addHeader("Content-Type", "application/json");
+		httpGet.addHeader("sap-client", sapClient);
+		httpGet.addHeader("SAP-Connectivity-SCC-Location_ID", cloudConnectorId);
 		HttpResponse response = client.execute(httpGet);
                  System.err.println("response "+ response + response.getEntity());
 		return response.getAllHeaders();

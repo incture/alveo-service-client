@@ -1,5 +1,8 @@
 package com.ap.menabev.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 public interface ApplicationConstants {
 	
 	String APMAILBOX = "APMAILBOX";
@@ -24,12 +27,13 @@ public interface ApplicationConstants {
 	String BOUNCER_PORT = "mail.smtp.from";
 	String OUTLOOK_HOST = "outlook.office365.com";
 	Integer OUTLOOK_PORT = 993;
-	String EMAIL_FROM = "accpay@menabev.com";
+	//String EMAIL_FROM = "accpay@menabev.com";
 	String PROCESSED_FOLDER = "PROCESSED";
 	String UNPROCESSED_FOLDER = "UNPROCESSED";
 	String INBOX_FOLDER = "INBOX";
 	String UNSEEN_FLAGTERM = "unseen";
 	String SEEN_FLAGTERM = "seen";
+	List<String> EMAIL_FROM = Arrays.asList("accpay@menabev.com","dipanjan.baidya@incture.com","anushri.br@incture.com");
 	// ----------------------------------------------------------//
 	// ABBYY SFTP Configuration Details
 //	Integer SESSION_TIME_OUT = 10000;
@@ -165,15 +169,15 @@ public interface ApplicationConstants {
 	
 
 	// QA FOLDER
-    //String FOLDER = "ud3MtXve86vrngCHttSUW_KwwnMdM2KXiALY5mTLXJ4";
+   // String FOLDER = "ud3MtXve86vrngCHttSUW_KwwnMdM2KXiALY5mTLXJ4";
 	// ------------------------------------------------------------------------------------//
 	 // worklfow service key
 	//Dev
-    public static final String WORKFLOW_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
+   public static final String WORKFLOW_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 	public static final String WORKFLOW_CLIENT_ID = "sb-clone-a3d7240c-7019-465b-b91b-07ad27fee8c0!b3189|workflow!b246";
 	public static final String WORKFLOW_CLIENT_SECRETE = "63f7cf76-0a32-4675-933b-776e34de0ef2$Ldp9wLW-VlhVrRec1w-HRfMqTORzQC0RD_UIoBnQiGY=";
 	// QA 
-   /* public static final String WORKFLOW_TOKEN_URL = "https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
+ /*  public static final String WORKFLOW_TOKEN_URL = "https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 	public static final String WORKFLOW_CLIENT_ID = "sb-clone-438954f0-66df-475d-9856-c006fbcc3fe2!b3073|workflow!b246";
 	public static final String WORKFLOW_CLIENT_SECRETE = "b6f8a88e-ce98-45b6-8b3e-17d4ccdce3ec$07VY759NN4MiaStbPQW77HXos2rg2THB9HOBP3iiFnE=";
 	*/
@@ -200,7 +204,7 @@ public interface ApplicationConstants {
 		public static final String CONECTIVITY_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 	 
 	//Connectivity Service Key Details For QA
-		/*public static final String CONECTIVITY_CLIENT_ID = "sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5";
+	  /*  public static final String CONECTIVITY_CLIENT_ID = "sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5";
 		public static final String CONECTIVITY_CLIENT_SECRET = "9c5a2d59-abb3-4c8f-bdba-c3b0222ceb25$iBxUjgTsDHnBRBuByPBR7qfSnY77pLPYV-_QZkhzC5I=";
 		public static final String CONECTIVITY_TOKEN_URL = "https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 		*/
@@ -211,8 +215,9 @@ public interface ApplicationConstants {
 		public static final String DESTINATION_CLIENT_SECRET = "2af4f4c4-7265-4d95-b544-01e917937a1e$HlHDn__C2aLbv2PqTcyq251kX4P9QZmZDShfUEFw8NQ=";
 		public static final String DESTINATION_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 		public static final String DESTINATION_BASE_URL = "https://destination-configuration.cfapps.eu20.hana.ondemand.com/destination-configuration/v1/destinations/";
+		
 		//Destination Service Key details for QA
-	   /* public static final String DESTINATION_CLIENT_ID = "sb-clone4e56aaf015b44e7e9abcbc4fab151c7d!b3073|destination-xsappname!b2";
+	 /*  public static final String DESTINATION_CLIENT_ID = "sb-clone4e56aaf015b44e7e9abcbc4fab151c7d!b3073|destination-xsappname!b2";
 		public static final String DESTINATION_CLIENT_SECRET = "524ca357-c878-44f9-80ef-de7ec2fd7a6f$6AARTEnbSvVaq9lZREb73HxkJdFem3wMWvSReCQByLA=";
 		public static final String DESTINATION_TOKEN_URL = "https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 		public static final String DESTINATION_BASE_URL = "https://destination-configuration.cfapps.eu20.hana.ondemand.com/destination-configuration/v1/destinations/";
