@@ -219,7 +219,7 @@ public class Email {
 	}
 
 	public Message[] fetchUnReadMessagesFromSharedMailBox(String host, Integer port, String user, String password,
-			String folderName, String flagTerm, String emailFrom) {
+			String folderName, String flagTerm, List<String> emailFromList) {
 		Message[] filteredMessages = null;
 		try {
 			logger.error("inside fetchUnReadMessagesFromSharedMailBox");
@@ -248,14 +248,16 @@ public class Email {
 						addresses = msg.getFrom();
 						for (int i = 0; i < addresses.length; i++) {
 							// System.err.println(addresses[i]);
-							if (addresses[i].toString().toLowerCase().contains(emailFrom.toLowerCase())
-									|| addresses[i].toString().equalsIgnoreCase(emailFrom)
-									|| addresses[i].toString().toLowerCase().contains("accpay@menabev.com")
-									|| addresses[i].toString().toLowerCase().contains("dipanjan.baidya@incture.com")
-									|| addresses[i].toString().toLowerCase().contains("anushri.br@incture.com")) {
+							String addressFrom = addresses[i].toString().toLowerCase();
+							
+							for(String emailFrom : emailFromList){
+								if (addressFrom.contains(emailFrom.toLowerCase())
+										|| addresses[i].toString().equalsIgnoreCase(emailFrom)) {
 
-								return true;
+									return true;
+								}
 							}
+							
 						}
 					} catch (MessagingException e) {
 						// TODO Auto-generated catch block

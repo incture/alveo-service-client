@@ -1,4 +1,4 @@
-package com.ap.menabev.controller;
+ package com.ap.menabev.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,5 +26,10 @@ public class ValidateInvoiceController {
 	@PostMapping("/threeWayMatch")
 	public ThreeWayMatchOutputDto threeWayMatch(@RequestBody InvoiceHeaderDto invoiceHeaderDto){
 		return validateInvoiceService.threeWayMatch(invoiceHeaderDto);
+	}
+	
+	@PostMapping("/postToERP")
+	public InvoiceHeaderDto postToERP(@RequestBody InvoiceHeaderDto invoiceHeaderDto){
+		return validateInvoiceService.postToERP(invoiceHeaderDto);
 	}
 }

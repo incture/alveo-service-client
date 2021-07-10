@@ -39,7 +39,7 @@ public class OcrScheduler  implements Runnable {
 		// scheduler.
 
 		SchedulerConfigurationDo entity = schedulerConfigurationRepository.getSchedulerData(
-				"OCR Scheduler Configuration", ServiceUtil.getFormattedDateinString("yyyy-MM-dd"));
+				"Email Scheduler Configuration", ServiceUtil.getFormattedDateinString("yyyy-MM-dd"));
 		logger.error("SchedulerConfigurationDo entity" + entity);
 		if (!ServiceUtil.isEmpty(entity)) {
 //			automationService.extractInvoiceFromSharedEmailBoxInScheduler(entity);
@@ -108,7 +108,7 @@ public class OcrScheduler  implements Runnable {
 
 		}
 		schedulerRunDo.setSchedulerConfigID(entity.getScId());
-		schedulerRunDo.setSchedulerName("OCR Reader");
+		schedulerRunDo.setSchedulerName("Email Reader");
 		SchedulerRunDo schedulerRunEntity = schedulerRunRepository.save(schedulerRunDo);
 
 	}

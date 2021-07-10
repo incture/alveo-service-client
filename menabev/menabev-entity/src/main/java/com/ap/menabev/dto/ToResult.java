@@ -10,8 +10,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ToResult {
-	@JsonProperty("__metadata")
-	private Object __metadata;
 	@JsonProperty("ReferenceInvoiceNumber")
 	private String referenceInvoiceNumber;
 	@JsonProperty("InvDocNo")
@@ -26,4 +24,7 @@ public class ToResult {
 	private Boolean discShift;
 	@JsonProperty("RefDocCategory")
 	private String refDocCategory;
+
+	
+
 }

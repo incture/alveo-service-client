@@ -24,8 +24,8 @@ public class PostToERPDto {
 	private String currency;
 	@JsonProperty("GrossAmount")
 	private String grossAmount;
-	@JsonProperty("pmnttrms")
-	private String Pmnttrms;
+	@JsonProperty("Pmnttrms")
+	private String pmnttrms;
 	@JsonProperty("BlineDate")
 	private String blineDate;
 	@JsonProperty("ToItem")

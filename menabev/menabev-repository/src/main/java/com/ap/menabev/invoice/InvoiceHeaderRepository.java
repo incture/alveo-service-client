@@ -54,7 +54,7 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, 
 	@Transactional(TxType.REQUIRES_NEW)
 	@Modifying(clearAutomatically = true)
 	@Query(value = "UPDATE InvoiceHeaderDo i SET i.fiscalYear=:fiscalYear,i.sapInvoiceNumber=:sapInvoiceNumber where i.requestId=:requestId")
-	int updateLifecycleStatus(@Param("fiscalYear") String fiscalYear,
+	int updateHeader(@Param("fiscalYear") String fiscalYear,
 			@Param("sapInvoiceNumber") String sapInvoiceNumber, @Param("requestId") String requestId);
 
 }

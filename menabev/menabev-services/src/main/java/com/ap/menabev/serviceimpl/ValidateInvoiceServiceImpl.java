@@ -36,17 +36,21 @@ import com.ap.menabev.dto.ThreeWayMatchOutputDto;
 import com.ap.menabev.dto.ThreeWayMatchingRootNode;
 import com.ap.menabev.dto.ToAccountingAccAssgn;
 import com.ap.menabev.dto.ToAccountingAccAssgnResultDto;
+import com.ap.menabev.dto.ToGlAccount;
 import com.ap.menabev.dto.ToItem;
 import com.ap.menabev.dto.ToMatchInput;
 import com.ap.menabev.dto.ToMatchOutput;
 import com.ap.menabev.dto.ToMatchOutputDto;
 import com.ap.menabev.dto.ToResult;
+import com.ap.menabev.dto.ToReturn;
 import com.ap.menabev.dto.ToReturnDto;
 import com.ap.menabev.dto.ToTax;
 import com.ap.menabev.dto.ToTaxDto;
+import com.ap.menabev.dto.ToWithholdingTax;
 import com.ap.menabev.dto.VendorCheckDto;
 import com.ap.menabev.entity.PoHistoryDo;
 import com.ap.menabev.entity.PoHistoryTotalsDo;
+import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.invoice.PoHistoryRepository;
 import com.ap.menabev.invoice.PoHistoryTotalsRepository;
 import com.ap.menabev.invoice.PurchaseDocumentHeaderRepository;
@@ -57,7 +61,9 @@ import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -66,6 +72,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 	private static final Logger logger = LoggerFactory.getLogger(ValidateInvoiceServiceImpl.class);
 	@Autowired
 	DuplicateCheckService duplicateCheckService;
+	@Autowired
+	InvoiceHeaderRepository invoiceHeaderRepository;
 
 	@Override
 	public InvoiceHeaderCheckDto invoiceHeaderCheck(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
@@ -231,10 +239,15 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// Missing or …. any other status till Ready to Post.
 					// then set status = Balance Mismatch
 					String statusCode = invoiceHeaderCheckDto.getInvoiceStatus();
-					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE) || statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
-							|| statusCode.equals(ApplicationConstants.NO_GRN) || statusCode.equals(ApplicationConstants.PARTIAL_GRN) || statusCode.equals(ApplicationConstants.UOM_MISMATCH) || 
-							statusCode.equals(ApplicationConstants.ITEM_MISMATCH) || statusCode.equals(ApplicationConstants.QTY_MISMATCH) || statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
-							||statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
+					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE)
+							|| statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
+							|| statusCode.equals(ApplicationConstants.NO_GRN)
+							|| statusCode.equals(ApplicationConstants.PARTIAL_GRN)
+							|| statusCode.equals(ApplicationConstants.UOM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.ITEM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.QTY_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 					}
 
@@ -331,10 +344,15 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// 4. If Header Status NE Duplicate or PO Missing or …. any
 					// other status then set status = Balance Mismatch
 					String statusCode = invoiceHeaderCheckDto.getInvoiceStatus();
-					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE) || statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
-							|| statusCode.equals(ApplicationConstants.NO_GRN) || statusCode.equals(ApplicationConstants.PARTIAL_GRN) || statusCode.equals(ApplicationConstants.UOM_MISMATCH) || 
-							statusCode.equals(ApplicationConstants.ITEM_MISMATCH) || statusCode.equals(ApplicationConstants.QTY_MISMATCH) || statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
-							||statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
+					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE)
+							|| statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
+							|| statusCode.equals(ApplicationConstants.NO_GRN)
+							|| statusCode.equals(ApplicationConstants.PARTIAL_GRN)
+							|| statusCode.equals(ApplicationConstants.UOM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.ITEM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.QTY_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 					}
 					return invoiceHeaderCheckDto;
@@ -430,28 +448,37 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				Double itemTaxAmount = threeWayInvoiceItemDto.getTaxValue();
 				Double itemGrossPrice = threeWayInvoiceItemDto.getGrossPrice();
 				String itemTaxCode = threeWayInvoiceItemDto.getTaxCode();
+				if (!ServiceUtil.isEmpty(itemTaxCode) || itemTaxCode != null) {
+					if (toTaxDtoMap.containsKey(itemTaxCode)) {
+						ToTaxDto valueDto = toTaxDtoMap.get(itemTaxCode);
+						valueDto.setTaxAmount(String.valueOf(Double.valueOf(valueDto.getTaxAmount()) + itemTaxAmount));
+						valueDto.setTaxBaseAmount(
+								String.valueOf(Double.valueOf(valueDto.getTaxBaseAmount()) + itemGrossPrice));
+						toTaxDtoMap.put(itemTaxCode, valueDto);
+					} else {
 
-				if (toTaxDtoMap.containsKey(itemTaxCode)) {
-					ToTaxDto valueDto = toTaxDtoMap.get(itemTaxCode);
-					valueDto.setTaxAmount(String.valueOf(Double.valueOf(valueDto.getTaxAmount()) + itemTaxAmount));
-					valueDto.setTaxBaseAmount(
-							String.valueOf(Double.valueOf(valueDto.getTaxBaseAmount()) + itemGrossPrice));
-					toTaxDtoMap.put(itemTaxCode, valueDto);
-				} else {
-
-					ToTaxDto valueDto = new ToTaxDto();
-					valueDto.setInvoiceReferenceNumber(invoiceHeaderDto.getInvoice_ref_number());
-					valueDto.setTaxCode(itemTaxCode);
-					valueDto.setTaxAmount(String.valueOf(itemTaxAmount));
-					valueDto.setTaxBaseAmount(String.valueOf(itemGrossPrice));
-					toTaxDtoMap.put(itemTaxCode, valueDto);
+						ToTaxDto valueDto = new ToTaxDto();
+						valueDto.setInvoiceReferenceNumber(invoiceHeaderDto.getInvoice_ref_number());
+						valueDto.setTaxCode(itemTaxCode);
+						valueDto.setTaxAmount(String.valueOf(itemTaxAmount));
+						valueDto.setTaxBaseAmount(String.valueOf(itemGrossPrice));
+						toTaxDtoMap.put(itemTaxCode, valueDto);
+					}
 				}
 				// END - creating tax map
 			}
 
 			PostToERPRootDto rootDto = new PostToERPRootDto();
 			PostToERPDto d = new PostToERPDto();
+			ToResult toResult = new ToResult();
 
+			ToReturn toReturn = new ToReturn();
+			ToWithholdingTax toWithholdingTax = new ToWithholdingTax();
+			toWithholdingTax.setResults(new ArrayList<>());
+			d.setToWithholdingTax(toWithholdingTax);
+			ToGlAccount toGlAccount = new ToGlAccount();
+			toGlAccount.setResults(new ArrayList<>());
+			d.setToGlAccount(toGlAccount);
 			d.setInvoiceReferenceNumber(invoiceHeaderDto.getInvoice_ref_number());
 
 			if (invoiceHeaderDto.getTransactionType().contains("Invoice")
@@ -463,7 +490,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			else
 				d.setInvoiceInd("");
 
-			String docDate = "\\/Date(" + invoiceHeaderDto.getDocumentDate() + ")\\/";
+			String docDate = "\\/Date(" + invoiceHeaderDto.getInvoiceDate() + ")\\/";
 			d.setDocDate(docDate);
 			String pstngDate = "\\/Date(" + invoiceHeaderDto.getPostingDate() + ")\\/";
 			d.setPstngDate(pstngDate);
@@ -479,57 +506,76 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 																					// setting
 																					// invoice
 																					// total
-			d.setPmnttrms(invoiceHeaderDto.getPaymentTerms());
-			d.setPmntBlock(invoiceHeaderDto.getPaymentBlock());
+			d.setPmnttrms(invoiceHeaderDto.getPaymentTerms() == null ? "" : invoiceHeaderDto.getPaymentTerms());
+			d.setPmntBlock(invoiceHeaderDto.getPaymentBlock() == null ? "" : invoiceHeaderDto.getPaymentBlock());
 			d.setDelCosts(String.valueOf(invoiceHeaderDto.getUnplannedCost()));
-			d.setPymtMeth(invoiceHeaderDto.getPaymentMethod());
+			d.setPymtMeth(invoiceHeaderDto.getPaymentMethod() == null ? "" : invoiceHeaderDto.getPaymentBlock());
 			ToItem toItem = new ToItem();
 			toItem.setResults(itemAccAssgnDtoList);
 			d.setToItem(toItem);
 			ToTax toTax = new ToTax();
 
-			// for (ThreeWayInvoiceItemDto item : itemDtoList) {
-			// Double itemTaxAmount = item.getTaxValue();
-			// Double itemGrossPrice = item.getGrossPrice();
-			// String itemTaxCode = item.getTaxCode();
-			//
-			// if (toTaxDtoMap.containsKey(itemTaxCode)) {
-			// ToTaxDto valueDto = toTaxDtoMap.get(itemTaxCode);
-			// valueDto.setTaxAmount(String.valueOf(Double.valueOf(valueDto.getTaxAmount())
-			// + itemTaxAmount));
-			// valueDto.setTaxBaseAmount(String.valueOf(Double.valueOf(valueDto.getTaxBaseAmount())
-			// + itemGrossPrice));
-			// toTaxDtoMap.put(itemTaxCode, valueDto);
-			// } else {
-			//
-			// ToTaxDto valueDto = new ToTaxDto();
-			// valueDto.setInvoiceReferenceNumber(invoiceHeaderDto.getInvoice_ref_number());
-			// valueDto.setTaxCode(itemTaxCode);
-			// valueDto.setTaxAmount(String.valueOf(itemTaxAmount));
-			// valueDto.setTaxBaseAmount(String.valueOf(itemGrossPrice));
-			// toTaxDtoMap.put(itemTaxCode, valueDto);
-			// }
-			// }
+		
 			List<ToTaxDto> results = new ArrayList<>();
-			for (Map.Entry<String, ToTaxDto> entry : toTaxDtoMap.entrySet()) {
-				results.add(entry.getValue());
+			if (!ServiceUtil.isEmpty(toTaxDtoMap)) {
+				for (Map.Entry<String, ToTaxDto> entry : toTaxDtoMap.entrySet()) {
+					results.add(entry.getValue());
+				}
 			}
 			toTax.setResults(results);
 			d.setToTax(toTax);
+			toResult.setDiscShift(false);
+			toResult.setFiscYear("");
+			toResult.setInvDocNo("");
+			toResult.setReferenceInvoiceNumber("");
+			toResult.setRefDocCategory("");
+			toResult.setReasonRev("");
+			d.setToResult(toResult);
+			toReturn.setResults(new ArrayList<>());
+			d.setToReturn(toReturn);
 			rootDto.setD(d);
 			// post to erp
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			String payload = objectMapper.writeValueAsString(rootDto);
-			ResponseEntity<?> responseFromOdta = postToERPOdataCall(payload);
-			rootDto = objectMapper.readValue(responseFromOdta.getBody().toString(), PostToERPRootDto.class);
 
-			List<ToReturnDto> returnList = rootDto.getD().getToReturn().getResults();
+			String payload = objectMapper.writeValueAsString(rootDto);
+			logger.error("STRINGgggggggggggggggg" + payload);
+			ResponseEntity<?> responseFromOdta = postToERPOdataCall(payload);
+			logger.error("responseFromOdta responseFromOdta" + responseFromOdta);
+			rootDto = objectMapper.readValue(responseFromOdta.getBody().toString(), PostToERPRootDto.class);
+			logger.error("rootDto rootDto" + rootDto);
 
 			ToResult resultObject = rootDto.getD().getToResult();
+
+			List<HeaderMessageDto> messageList = new ArrayList<>();
 			if (!ServiceUtil.isEmpty(resultObject)) {
-				resultObject.getInvDocNo();
-				resultObject.getFiscYear();
+				String sapInvoiceNumber = resultObject.getInvDocNo();
+				String fiscalYear = resultObject.getFiscYear();
+				// update in database
+				int isUpated = invoiceHeaderRepository.updateHeader(fiscalYear, sapInvoiceNumber,
+						invoiceHeaderDto.getRequestId());
+				if (isUpated > 0) {
+					System.err.println("inside is updated");
+					HeaderMessageDto messageDto = new HeaderMessageDto();
+					messageDto.setMessageText("Posted to SAP " + resultObject.getInvDocNo());
+					messageDto.setMessageType("S");
+					messageDto.setMsgClass("Success");
+					messageList.add(messageDto);
+				}
+				invoiceHeaderDto.setHeaderMessages(messageList);
+
+			} else {
+				List<ToReturnDto> returnList = rootDto.getD().getToReturn().getResults();
+				for (ToReturnDto toReturnDto : returnList) {
+					HeaderMessageDto messageDto = new HeaderMessageDto();
+					// messageDto.setMessageId(toReturnDto.getId());
+					messageDto.setMessageNumber(toReturnDto.getNumber());
+					messageDto.setMessageText(toReturnDto.getMessage());
+					messageDto.setMessageType(toReturnDto.getType());
+					messageDto.setMsgClass(toReturnDto.getId());
+					messageList.add(messageDto);
+				}
+				invoiceHeaderDto.setHeaderMessages(messageList);
 			}
 			return null;
 		} catch (Exception e) {
@@ -538,6 +584,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		return invoiceHeaderDto;
 
 	}
+	
 
 	@Override
 	public ThreeWayMatchOutputDto threeWayMatch(InvoiceHeaderDto invoiceHeaderDto) {
@@ -716,23 +763,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		return messageDtoList;
 	}
 
-	// public static void main(String[] args) {
-	// ObjectMapper objectMapper = new ObjectMapper();
-	// objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-	// false);
-	// String payload =
-	// "{\"ToMatchInput\":{\"results\":[{\"AAAAAAAAAAA\":\"BBBBBBBB\",\"Vendor\":\"1000031\",\"InvoiceItem\":\"000001\",\"PurchasingDocumentNumber\":\"4100000127\",\"PurchasingDocumentItem\":\"00010\",\"BaseUnit\":\"KG\",\"DntrConvOpuOu\":\"1\",\"NmtrConvOpuOu\":\"1\",\"QtyOrdPurReq\":\"100\",\"PostingDate\":\"20.05.2021\",\"CompanyCode\":\"1010\",\"ReferenceDocument\":\"5000000267\",\"Quantity\":\"200\",\"NetValDC\":\"400.00\",\"NoQuantityLogic\":\"\",\"ItemCategory\":\"0\",\"QtyInvoiced\":\"0\",\"ReturnsItem\":\"\",\"DrCrInd\":\"S\",\"SubDrCrInd\":\"\",\"CurrencyKey\":\"SAR\",\"GrBasedIvInd\":\"X\",\"QtyGoodsReceived\":\"100\",\"GoodsReceiptInd\":\"X\",\"TranslationDate\":\"20.05.2021\",\"UpdatePODelCosts\":\"\",\"PostInvInd\":\"X\",\"DelItemAllocInd\":\"X\",\"RetAllocInd\":\"X\",\"IvOrigin\":\"\",\"QtyOpu\":\"200\",\"InvValFC\":\"0.00\",\"EstPriceInd\":\"\",\"GrNonValInd\":\"\",\"NetValSrvFC\":\"0\",\"AmtDC\":\"400\",\"ValGrFC\":\"400\",\"NewInputVal\":\"\"},{\"AAAAAAAAAAA\":\"BBBBBBBB\",\"Vendor\":\"1000031\",\"InvoiceItem\":\"000002\",\"PurchasingDocumentNumber\":\"4100000127\",\"PurchasingDocumentItem\":\"00010\",\"BaseUnit\":\"KG\",\"DntrConvOpuOu\":\"1\",\"NmtrConvOpuOu\":\"1\",\"QtyOrdPurReq\":\"100\",\"PostingDate\":\"20.05.2021\",\"CompanyCode\":\"1010\",\"ReferenceDocument\":\"5000000267\",\"Quantity\":\"10\",\"NetValDC\":\"400.00\",\"NoQuantityLogic\":\"\",\"ItemCategory\":\"0\",\"QtyInvoiced\":\"0\",\"ReturnsItem\":\"\",\"DrCrInd\":\"S\",\"SubDrCrInd\":\"\",\"CurrencyKey\":\"SAR\",\"GrBasedIvInd\":\"X\",\"QtyGoodsReceived\":\"100\",\"GoodsReceiptInd\":\"X\",\"TranslationDate\":\"20.05.2021\",\"UpdatePODelCosts\":\"\",\"PostInvInd\":\"X\",\"DelItemAllocInd\":\"X\",\"RetAllocInd\":\"X\",\"IvOrigin\":\"\",\"QtyOpu\":\"10\",\"InvValFC\":\"0.00\",\"EstPriceInd\":\"\",\"GrNonValInd\":\"\",\"NetValSrvFC\":\"0\",\"AmtDC\":\"400\",\"ValGrFC\":\"400\",\"NewInputVal\":\"\"}]}}";
-	// try {
-	// Reader reader = new StringReader(payload);
-	// ThreeWayMatchingRootNode node = objectMapper.readValue(reader,
-	// ThreeWayMatchingRootNode.class);
-	// System.out.println(node);
-	// } catch (Exception e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	//
-	// }
 	public static ResponseEntity<?> postToERPOdataCall(String entity) {
 
 		try {
@@ -816,7 +846,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					+ "accAssignmentCat" + accAssignmentCat + "goodsReceiptFlag" + goodsReceiptFlag + "grBsdIvFlag"
 					+ grBsdIvFlag + "invoiceReceiptFlag" + invoiceReceiptFlag);
 			// "" null
-			
+
 			if ("0".equalsIgnoreCase(itemCategory)
 					&& (ServiceUtil.isEmpty(accAssignmentCat) || accAssignmentCat.equalsIgnoreCase("K")
 							|| accAssignmentCat.equalsIgnoreCase("F"))
@@ -858,7 +888,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							+ invItemQtyPoOU);
 				}
 
-				Double invoiceUnitPrice = (Double) (invoiceItemDto.getGrossPrice() * invpriceunitOPU)
+				Double invoiceUnitPrice = (double) (invoiceItemDto.getGrossPrice() * invpriceunitOPU)
 						/ invoiceItemDto.getInvQty();
 				logger.error("ValidateInvoiceServiceImpl.cosumptionLogic()---Line 843--->invoiceUnitPrice   "
 						+ invoiceUnitPrice);
@@ -917,11 +947,22 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						for (GRDto grDto : grDtoList) {
 							String docItem = grDto.getHDocItem();
 							String docNum = grDto.getHdocNum();
-							if (poHistoryDto.getRefDocItem().equals(docItem)
-									&& poHistoryDto.getRefDocNum().equals(docNum)) {
-								grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
-								grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+							String rDocItem = grDto.getRefDoc();
+							String rDocNum = grDto.getRefDocItem();
+							if (invoiceItemDto.getProductType().equalsIgnoreCase("2")) {
+								if (poHistoryDto.getRefDocItem().equals(rDocItem)
+										&& poHistoryDto.getRefDocNum().equals(rDocNum)) {
+									grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
+									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+								}
+							} else {
+								if (poHistoryDto.getRefDocItem().equals(docItem)
+										&& poHistoryDto.getRefDocNum().equals(docNum)) {
+									grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
+									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+								}
 							}
+
 						}
 
 					}
@@ -982,7 +1023,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						inputPayload.setNmtrConvOpuOu(String.valueOf(num));
 						inputPayload.setQtyOrdPurReq(String.valueOf(invoiceItemDto.getPoQtyOU()));
 						inputPayload.setPostingDate(
-								ServiceUtil.getDateByEpoc(invoiceHeaderDto.getPostingDate(), "dd.MM.yyyy"));//TODO
+								ServiceUtil.getDateByEpoc(invoiceHeaderDto.getPostingDate(), "dd.MM.yyyy"));// TODO
 						inputPayload.setCompanyCode(invoiceHeaderDto.getCompCode());
 						// change
 						// check with meghana inputPayload.setNetValDC will be
@@ -1078,7 +1119,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							accAssgnDto.setSheetItem(grDto.getRefDocItem());
 						}
 
-						accAssgnDto.setTaxCode(invoiceItemDto.getTaxCode());
+						accAssgnDto.setTaxCode(invoiceItemDto.getTaxCode() == null ? "" : invoiceItemDto.getTaxCode());
 						accAssgnDto.setItemAmount(inputPayload.getAmtDC());
 						accAssgnDto.setQuantity(inputPayload.getQuantity());
 						accAssgnDto.setPoPrQnt(inputPayload.getQtyOpu());
@@ -1153,6 +1194,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						ToAccountingAccAssgn toAccounting = new ToAccountingAccAssgn();
 						toAccounting.setResults(resultsList);
 						accAssgnDto.setToAccounting(toAccounting);
+						System.err.println("PAYLOAD :::::" + accAssgnDto);
 						itemThreeWayAccAssgnPaylod.add(accAssgnDto);
 						System.err.println("INPUT PAYLOAD :::::" + inputPayload);
 						threeWayInputPayloadList.add(inputPayload);
@@ -1161,7 +1203,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						break;
 					}
 				}
-				System.err.println("OUTSIDE FOR LOOP GR DTO LIST:::::"+ grDtoList);
+				System.err.println("OUTSIDE FOR LOOP GR DTO LIST:::::" + grDtoList);
 
 			} else {
 				System.err.println("ELSE PART");
@@ -1175,36 +1217,5 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		System.err.println("INPUT PAYLOAD LIST:::::::" + consumtionLogicOutputDto);
 		return consumtionLogicOutputDto;
 	}
-
-	// private Map<GRDto, List<IRDto>> getGrAndItem(List<PoHistoryDto>
-	// poHistoryDtoList) {
-	// // TODO Auto-generated method stub
-	// Map<GRDto, List<IRDto>> map = new HashMap<>();
-	// for (PoHistoryDto poHistoryDto : poHistoryDtoList) {
-	// if ("E".equalsIgnoreCase(poHistoryDto.getHistoryCategory())) {
-	// GRDto grDto = new GRDto();
-	// map.put(grDto, null);
-	//
-	// } else if ("Q".equalsIgnoreCase(poHistoryDto.getHistoryCategory())) {
-	// GRDto grDto = new GRDto();
-	// grDto.setHDoc(poHistoryDto.getHistoryDocument());
-	// grDto.setHDocItem(poHistoryDto.getHistoryDocumentItem());
-	//
-	// IRDto irDto = new IRDto();
-	// // set grdto for the ir
-	// if (map.containsKey(grDto)) {
-	// List<IRDto> value = map.get(grDto);
-	// value.add(irDto);
-	// map.put(grDto, value);
-	// } else {
-	// List<IRDto> value = new ArrayList<>();
-	// value.add(irDto);
-	// map.put(grDto, value);
-	// }
-	// }
-	// }
-	//
-	// return map;
-	// }
 
 }

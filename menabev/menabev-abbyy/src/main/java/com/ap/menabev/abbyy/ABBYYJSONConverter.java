@@ -128,6 +128,7 @@ public class ABBYYJSONConverter {
 			} else if ("InvoiceDate".equalsIgnoreCase(name)) {
 				String invDateString = headerObj.getString("Value");//
 				headerDto.setInvoiceDate(ServiceUtil.getStringToEpoch(invDateString));
+				headerDto.setDocumentDate(ServiceUtil.getStringToEpoch(invDateString));
 			} else if ("InvoiceTotal".equalsIgnoreCase(name) || "InvoiceTotal".equalsIgnoreCase(name)) {
 				if (!ServiceUtil.isEmpty(headerObj.getString("Value")))
 					headerDto.setInvoiceTotal(new Double(headerObj.getString("Value").replace(",", "")));
