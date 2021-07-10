@@ -1672,7 +1672,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 		// invoiceHeader-invoiceStatus=NEW
 		//
 		// b. Determine VendorId using vendor address data via Odata call.
-
+		System.out.println("INPUT AUTOPOST ::::::: " + dto);
 		List<PoSearchApiDto> forAddPoApi = new ArrayList<>();
 		String supplier = null;
 		if (!ServiceUtil.isEmpty(dto.getZipCode()) && !ServiceUtil.isEmpty(dto.getVendorName())) {
@@ -1795,8 +1795,8 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			if (!ServiceUtil.isEmpty(dto.getInvoiceDate())) {
 				duplicateCheckDto.setInvoiceDate(dto.getInvoiceDate());
 			}
-			if (!ServiceUtil.isEmpty(dto.getRefpurchaseDoc())) {
-				duplicateCheckDto.setInvoiceReference(dto.getRefpurchaseDoc());
+			if (!ServiceUtil.isEmpty(dto.getExtInvNum())) {
+				duplicateCheckDto.setInvoiceReference(dto.getExtInvNum());
 			}
 			if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
 				duplicateCheckDto.setInvoiceStatus(dto.getInvoiceStatus());
