@@ -1002,6 +1002,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			itemReturn.setItemStatusCode(ApplicationConstants.NO_GRN);
 			itemReturn.setItemStatusText("No GRN");
 			itemReturn.setIsSelected(false);
+		}else{
+			itemReturn.setItemStatusCode(ApplicationConstants.GRN_PASSED);
+			itemReturn.setItemStatusText("GRN Passed");
 		}
 		// Calculate sysSuggTaxAmount
 		//

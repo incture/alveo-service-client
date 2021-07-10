@@ -121,6 +121,8 @@ public interface ApplicationConstants {
 	String PRICE_OR_QTY_MISMATCH  = "11";
 	String BALANCE_MISMATCH = "12";
 	String READY_TO_POST = "17";
+	String GRN_PASSED = "19";
+	String DUPLICATE_PASSED = "20";
 	String SAP_POSTED = "13";
 	String PAID ="14";
 	String UNPAID ="13";
@@ -137,6 +139,7 @@ public interface ApplicationConstants {
 	String QUANTITY_LOW_MSG_NUMBER="";
 	String PRICE_HIGH_MSG_NUMBER = "082";
 	String PRICE_LOW_MSG_NUMBER = "084";
+	
 	
 	public static final String MENABEV_ODATA_DESTINATION_NAME = "";
 	public static final String TASK_COMPLETED = "COMPLETED";
