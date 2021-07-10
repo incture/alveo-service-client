@@ -48,21 +48,38 @@ import org.springframework.web.client.RestTemplate;
 
 import com.ap.menabev.dto.InvoiceHeaderCheckDto;
 
-
 public class Odata {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(Odata.class);
-	public static ResponseEntity<?> getPaymentTerms(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
+
+	public static ResponseEntity<?> getPaymentTermsDetails(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
 		try {
 			Map<String, Object> map = getDestination("SD4_DEST");
 			return consumingOdataService(
-					"/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_SupplierCompany?$format=json&$filter=%20Supplier%20eq%20%27"+invoiceHeaderCheckDto.getVendorID()+"%27%20and%20CompanyCode%20eq%20%27"+invoiceHeaderCheckDto.getCompanyCode()+"%27",
+					"/sap/opu/odata/sap/ZP2P_API_EC_GL_SRV/PaymentTermSet?$filter=PmntTerm%20eq%20%27" + invoiceHeaderCheckDto.getPaymentTerms()
+							+ "%27%20and%20LanguageKey%20eq%20%27E%27",
 					null, "GET", map);
 
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public static ResponseEntity<?> getPaymentTerms(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
+		try {
+			Map<String, Object> map = getDestination("SD4_DEST");
+			return consumingOdataService(
+					"/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_SupplierCompany?$format=json&$filter=%20Supplier%20eq%20%27"
+							+ invoiceHeaderCheckDto.getVendorID() + "%27%20and%20CompanyCode%20eq%20%27"
+							+ invoiceHeaderCheckDto.getCompanyCode() + "%27",
+					null, "GET", map);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -207,7 +224,7 @@ public class Odata {
 		}
 		return null;
 	}
-	
+
 	public static ResponseEntity<?> consumingOdataService(String url, String entity, String method,
 			Map<String, Object> destinationInfo) throws IOException, URISyntaxException {
 
@@ -261,9 +278,7 @@ public class Odata {
 			}
 			httpRequestBase.addHeader("accept", "application/json");
 
-			Header[] headers = getAccessToken(
-					(String) destinationInfo.get("URL")
-							+ url,
+			Header[] headers = getAccessToken((String) destinationInfo.get("URL") + url,
 					(String) destinationInfo.get("User"), (String) destinationInfo.get("Password"), httpClient,
 					proxyHost, proxyPort, (String) destinationInfo.get("sap-client"), jwToken);
 			String token = null;
@@ -312,8 +327,7 @@ public class Odata {
 				if (httpResponse.getStatusLine().getStatusCode() == 200) {
 					String dataFromStream = getDataFromStream(httpResponse.getEntity().getContent());
 					logger.error("dataFromStream" + dataFromStream);
-					return new ResponseEntity<String>(dataFromStream,
-							HttpStatus.OK);
+					return new ResponseEntity<String>(dataFromStream, HttpStatus.OK);
 
 				} else {
 					String responseFromECC = httpResponse.getEntity().toString();
@@ -324,20 +338,17 @@ public class Odata {
 							HttpStatus.BAD_REQUEST);
 				}
 
-
 			} catch (IOException e) {
 				e.printStackTrace();
-				return  new ResponseEntity<String>("Exception in ODATA consumtion block" + e.getMessage(),
+				return new ResponseEntity<String>("Exception in ODATA consumtion block" + e.getMessage(),
 						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-			
 		}
 
 		return new ResponseEntity<String>(jsonMessage, HttpStatus.OK);
 
 	}
-	
 
 	private static Header[] getAccessToken(String url, String username, String password, HttpClient client,
 			String proxyHost, int proxyPort, String sapClient, String token)

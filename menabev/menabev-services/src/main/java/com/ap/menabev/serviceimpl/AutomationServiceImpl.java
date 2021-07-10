@@ -247,27 +247,33 @@ public class AutomationServiceImpl implements AutomationService {
 				// channelSftp.ls("*.json");
 				Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
 				logger.error("Vector<ChannelSftp.LsEntry> filelist" + filelist.size());
-				for (ChannelSftp.LsEntry entry : filelist) {
-					try {
-						logger.error("INSIDE JSON " + entry.getFilename());
-						if (entry.getFilename().contains(".json")) {
-							logger.error("INSIDE JSON ");
-							InputStream is = channelSftp.get(entry.getFilename());
-							ObjectMapper mapper = new ObjectMapper();
-							Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
-							JSONObject jsonObject = new JSONObject(jsonMap);
-							if (jsonObject.has("Documents")) {
-								InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
-								headerList.add(output);
+				for (int i = 0; i < 2; i++) {
+					if(i<=filelist.size()){
+						ChannelSftp.LsEntry entry = filelist.get(i);
+						try {
+							logger.error("INSIDE JSON " + entry.getFilename());
+							if (entry.getFilename().contains(".json")) {
+								logger.error("INSIDE JSON ");
+								InputStream is = channelSftp.get(entry.getFilename());
+								ObjectMapper mapper = new ObjectMapper();
+								Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
+								JSONObject jsonObject = new JSONObject(jsonMap);
+								if (jsonObject.has("Documents")) {
+									InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
+									headerList.add(output);
+								}
+								is.close();
 							}
-							is.close();
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-						response.setMessage("Error while reading json" + e.getMessage());
+							channelSftp.rm(entry.getFilename());
+						} catch (Exception e) {
+							e.printStackTrace();
+							response.setMessage("Error while reading json" + e.getMessage());
 
+						}
+					
 					}
 				}
+				for (ChannelSftp.LsEntry entry : filelist) {}
 			} catch (Exception e) {
 				e.printStackTrace();
 				response.setMessage("Error while opening sftp" + e.getMessage());
@@ -299,9 +305,9 @@ public class AutomationServiceImpl implements AutomationService {
 				}
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
 				System.err.println("InvoiceHeader "+response );
-				InvoiceHeaderDto    invoiceHeaderAutoPost = (InvoiceHeaderDto) response.getObject();
+//				InvoiceHeaderDto    invoiceHeaderAutoPost = (InvoiceHeaderDto) response.getObject();
 				// call autoposting method 
-				//InvoiceHeaderDto    invoiceHeaderAutoPost =  purchaseHeaderService.autoPostApi((InvoiceHeaderDto) response.getObject());
+				InvoiceHeaderDto  invoiceHeaderAutoPost =  purchaseHeaderService.autoPostApi((InvoiceHeaderDto) response.getObject());
 				// calling rule file and worklfow 
 				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
 				determination.setCompCode(invoiceHeaderAutoPost.getCompCode());

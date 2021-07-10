@@ -145,15 +145,62 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 									String paymentTerms = resultObject.getString("PaymentTerms");
 									invoiceHeaderCheckDto.setPaymentTerms(paymentTerms);
 								}
+								if (resultObject.has("PaymentMethodsList")) {
+									String paymentMethods = resultObject.getString("PaymentMethodsList");
+									invoiceHeaderCheckDto.setPaymentMethod(paymentMethods);
+								}
+								if (resultObject.has("PaymentBlockingReason")) {
+									String paymentReason = resultObject.getString("PaymentBlockingReason");
+									invoiceHeaderCheckDto.setPaymentBlock(paymentReason);
+								}
 
 							}
-
+							//get payment terms details
+							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							if (response.getStatusCode() == HttpStatus.OK) {
+								String jsonString2 = (String) response.getBody();
+								JSONObject json2 = new JSONObject(jsonString2);
+								logger.error("JSON:::" + json2);
+								if (json2.has("d")) {
+									logger.error("JSON:::" + json2.has("d"));
+									JSONObject dObject2 = json2.getJSONObject("d");
+									logger.error("dObject" + dObject2);
+									JSONArray resultsArray2 = dObject2.getJSONArray("results");
+									for (int i = 0; i < resultsArray2.length(); i++) {
+										String ZBD1T = null;
+										String ZBD2T = null;
+										String ZBD3T = null;
+										JSONObject resultObject2 = (JSONObject) resultsArray2.get(i);
+										if(resultObject2.has("BaseLineDateType")){
+											String BaseLineDateType = resultObject2.getString("BaseLineDateType");
+											if(BaseLineDateType==null || BaseLineDateType=="")
+												invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getBaselineDate());
+											else if("D".equalsIgnoreCase(BaseLineDateType))
+												invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getPostingDate());
+											else if("B".equalsIgnoreCase(BaseLineDateType))
+												invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getInvoiceDate());
+										}
+										if(resultObject2.has("CashDiscDays1")){
+											ZBD1T = resultObject2.getString("CashDiscDays1");
+										}
+										if(resultObject2.has("CashDiscDays2")){
+											ZBD2T = resultObject2.getString("CashDiscDays2");
+										}
+										if(resultObject2.has("NetPmntTermPeriod")){
+											ZBD3T =  resultObject2.getString("NetPmntTermPeriod");
+										}
+										
+										
+									}
+								}
+							}
 						}
 					}
 
 					// b. Determine baseline date configuration and
 					// SetBaselineDate
 					//
+
 					// i. BaseLineDateConfig=Default
 					//
 					// 1. DO NOT DO anything, baseline date will be selected by
@@ -515,7 +562,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			d.setToItem(toItem);
 			ToTax toTax = new ToTax();
 
-		
 			List<ToTaxDto> results = new ArrayList<>();
 			if (!ServiceUtil.isEmpty(toTaxDtoMap)) {
 				for (Map.Entry<String, ToTaxDto> entry : toTaxDtoMap.entrySet()) {
@@ -577,14 +623,21 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				}
 				invoiceHeaderDto.setHeaderMessages(messageList);
 			}
-			return null;
+			return invoiceHeaderDto;
 		} catch (Exception e) {
-			// TODO: handle exception
+			List<HeaderMessageDto> messageList = new ArrayList<>();
+			e.printStackTrace();
+			HeaderMessageDto messageDto = new HeaderMessageDto();
+			// messageDto.setMessageId(toReturnDto.getId());
+			messageDto.setMessageText(e.getMessage());
+			messageDto.setMessageType("Exception");
+			messageDto.setMsgClass(e.getClass().toString());
+			messageList.add(messageDto);
+			invoiceHeaderDto.setHeaderMessages(messageList);
+			return invoiceHeaderDto;
 		}
-		return invoiceHeaderDto;
 
 	}
-	
 
 	@Override
 	public ThreeWayMatchOutputDto threeWayMatch(InvoiceHeaderDto invoiceHeaderDto) {
@@ -603,7 +656,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>"
 						+ "invoiceItemDto.getItemStatusCode().equals()"
 						+ !invoiceItemDto.getItemStatusCode().equals(ApplicationConstants.NO_GRN));
-				if (invoiceItemDto.getIsTwowayMatched() && !invoiceItemDto.getItemStatusCode().equals(ApplicationConstants.NO_GRN)) {
+				if (invoiceItemDto.getIsTwowayMatched()
+						&& !invoiceItemDto.getItemStatusCode().equals(ApplicationConstants.NO_GRN)) {
 
 					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>inside if block at line 555");
 					List<ItemThreeWayMatchPaylod> eachItemThreewayMatchPayload = new ArrayList<>();
@@ -653,18 +707,23 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			String payload = objectMapper.writeValueAsString(threeWayMatchOdataDto);
-			// calling the OData method for Post call to Odata , with two methods one for Dev and one for QA 
-						// based on the USERNAME of the DB Credential  to find if its dev or QA .
-						// ThreeWayMatchedOdataCall - supports only in Dev and not in QA 
-						ResponseEntity<?> responseFromOData = new ResponseEntity<>("Failed ",HttpStatus.CONFLICT);
-						if(ApplicationConstants.USERNAME.equals("MENABEVD")){
-						responseFromOData = threeWayMatchOdataCall(payload);
-						System.err.println("responseFromOData validateserviceimpl line 615 for Dev " + responseFromOData.getStatusCode());
-						}else {
-					      responseFromOData = threeWayMatchOdataCallForQa(payload);
-					      System.err.println("responseFromOData validateserviceimpl line 618 for QA " + responseFromOData.getStatusCode());
-						}
-						System.err.println("responseFromOData validateserviceimpl line 619 for " + responseFromOData.getStatusCode());
+			// calling the OData method for Post call to Odata , with two
+			// methods one for Dev and one for QA
+			// based on the USERNAME of the DB Credential to find if its dev or
+			// QA .
+			// ThreeWayMatchedOdataCall - supports only in Dev and not in QA
+			ResponseEntity<?> responseFromOData = new ResponseEntity<>("Failed ", HttpStatus.CONFLICT);
+			if (ApplicationConstants.USERNAME.equals("MENABEVD")) {
+				responseFromOData = threeWayMatchOdataCall(payload);
+				System.err.println(
+						"responseFromOData validateserviceimpl line 615 for Dev " + responseFromOData.getStatusCode());
+			} else {
+				responseFromOData = threeWayMatchOdataCallForQa(payload);
+				System.err.println(
+						"responseFromOData validateserviceimpl line 618 for QA " + responseFromOData.getStatusCode());
+			}
+			System.err
+					.println("responseFromOData validateserviceimpl line 619 for " + responseFromOData.getStatusCode());
 			String responseBody = responseFromOData.getBody().toString();
 			ThreeWayMatchOdataDto threeWayMatchOdataResponse = objectMapper.readValue(responseBody,
 					ThreeWayMatchOdataDto.class);
@@ -747,10 +806,10 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			// threeWayMatchOutputDto.setInvoiceStatus("17");
 			// threeWayMatchOutputDto.setInvoiceStatusText("Ready To Post");
 			// }
-			
-			InvoiceHeaderDto invoiceHeaderDtoUpdated =  ObjectMapperUtils.map(threeWayMatchOutputDto,
+
+			InvoiceHeaderDto invoiceHeaderDtoUpdated = ObjectMapperUtils.map(threeWayMatchOutputDto,
 					InvoiceHeaderDto.class);
-			System.err.println("THREE WAY MATCH :::::UPDATED"+invoiceHeaderDtoUpdated);
+			System.err.println("THREE WAY MATCH :::::UPDATED" + invoiceHeaderDtoUpdated);
 			String headerStatus = duplicateCheckService.determineHeaderStatus(invoiceHeaderDto).getInvoiceStatus();
 			String headerStatusText = duplicateCheckService.determineHeaderStatus(invoiceHeaderDto)
 					.getInvoiceStatusText();
@@ -777,7 +836,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		return messageDtoList;
 	}
 
-	
 	public static ResponseEntity<?> postToERPOdataCall(String entity) {
 
 		try {
@@ -787,32 +845,66 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			Map<String, Object> destinationInfo = OdataHelperClass.getDestination("SD4_DEST");
 
 			String endPointurl = "/sap/opu/odata/sap/ZP2P_API_POST_INVOICE_SRV/HeaderSet";
-			
-			System.err.println("destinationInfo "+destinationInfo);
-			
-if(ApplicationConstants.USERNAME.equals("MENABEVD")){
-	
-	ResponseEntity<?> responseFromOdata = OdataHelperClass.getOdataServiceToken(endPointurl, null, "GET",
-			destinationInfo);
-	
-	System.err.println(" Dev responseFromOdata getToken"+responseFromOdata);
-	
-	
-	if (responseFromOdata.getStatusCodeValue() == 200) {
-	Header[] header = (Header[]) responseFromOdata.getBody();
+			System.err.println("destinationInfo " + destinationInfo);
+			if (ApplicationConstants.USERNAME.equals("MENABEVD")) {
 
-	
-	responsePost = OdataHelperClass.postOdataServiceToken(endPointurl, entity, "POST", destinationInfo,
-			header);
-	System.err.println(" Dev responseFromOdata Post" +responsePost);     
-	}
-				
-			}
-			else {
-				//String entityInput=		"{ \"d\": { \"Vendor\": \"1000031\", \"ToMatchInput\": { \"results\": [{ \"Vendor\": \"1000031\", \"InvoiceItem\": \"000001\", \"PurchasingDocumentNumber\": \"4100000127\", \"PurchasingDocumentItem\": \"00010\", \"BaseUnit\": \"KG\", \"DntrConvOpuOu\": \"1\", \"NmtrConvOpuOu\": \"1\", \"QtyOrdPurReq\": \"100\", \"PostingDate\": \"20.05.2021\", \"CompanyCode\": \"1010\", \"ReferenceDocument\": \"5000000267\", \"Quantity\": \"200\", \"NetValDC\": \"400.00\", \"NoQuantityLogic\": \"\", \"ItemCategory\": \"0\", \"QtyInvoiced\": \"0\", \"ReturnsItem\": \"\", \"DrCrInd\": \"S\", \"SubDrCrInd\": \"\", \"CurrencyKey\": \"SAR\", \"GrBasedIvInd\": \"X\", \"QtyGoodsReceived\": \"100\", \"GoodsReceiptInd\": \"X\", \"TranslationDate\": \"20.05.2021\", \"UpdatePODelCosts\": \"\", \"PostInvInd\": \"X\", \"DelItemAllocInd\": \"X\", \"RetAllocInd\": \"X\", \"IvOrigin\": \"\", \"QtyOpu\": \"200\", \"InvValFC\": \"0.00\", \"EstPriceInd\": \"\", \"GrNonValInd\": \"\", \"NetValSrvFC\": \"0\", \"AmtDC\": \"400\", \"ValGrFC\": \"400\", \"NewInputVal\": \"\", \"RequestId\": \"APA-001\", \"ReferenceInvoiceItem\": \"01\" }, { \"Vendor\": \"1000031\", \"InvoiceItem\": \"000002\", \"PurchasingDocumentNumber\": \"4100000127\", \"PurchasingDocumentItem\": \"00010\", \"BaseUnit\": \"KG\", \"DntrConvOpuOu\": \"1\", \"NmtrConvOpuOu\": \"1\", \"QtyOrdPurReq\": \"100\", \"PostingDate\": \"20.05.2021\", \"CompanyCode\": \"1010\", \"ReferenceDocument\": \"5000000267\", \"Quantity\": \"10\", \"NetValDC\": \"400.00\", \"NoQuantityLogic\": \"\", \"ItemCategory\": \"0\", \"QtyInvoiced\": \"0\", \"ReturnsItem\": \"\", \"DrCrInd\": \"S\", \"SubDrCrInd\": \"\", \"CurrencyKey\": \"SAR\", \"GrBasedIvInd\": \"X\", \"QtyGoodsReceived\": \"100\", \"GoodsReceiptInd\": \"X\", \"TranslationDate\": \"20.05.2021\", \"UpdatePODelCosts\": \"\", \"PostInvInd\": \"X\", \"DelItemAllocInd\": \"X\", \"RetAllocInd\": \"X\", \"IvOrigin\": \"\", \"QtyOpu\": \"10\", \"InvValFC\": \"0.00\", \"EstPriceInd\": \"\", \"GrNonValInd\": \"\", \"NetValSrvFC\": \"0\", \"AmtDC\": \"400\", \"ValGrFC\": \"400\", \"NewInputVal\": \"\", \"RequestId\": \"APA-001\", \"ReferenceInvoiceItem\": \"02\" }] }, \"ToMatchOutput\": { \"results\": [] } } }";
-				responsePost = OdataHelperClass.postService(endPointurl, entity,destinationInfo);
-				
-				System.err.println(" Qa responseFromOdata Post" +responsePost); 
+				ResponseEntity<?> responseFromOdata = OdataHelperClass.getOdataServiceToken(endPointurl, null, "GET",
+						destinationInfo);
+
+				System.err.println(" Dev responseFromOdata getToken" + responseFromOdata);
+
+				if (responseFromOdata.getStatusCodeValue() == 200) {
+					Header[] header = (Header[]) responseFromOdata.getBody();
+
+					responsePost = OdataHelperClass.postOdataServiceToken(endPointurl, entity, "POST", destinationInfo,
+							header);
+					System.err.println(" Dev responseFromOdata Post" + responsePost);
+				}
+
+			} else {
+				// String entityInput= "{ \"d\": { \"Vendor\": \"1000031\",
+				// \"ToMatchInput\": { \"results\": [{ \"Vendor\": \"1000031\",
+				// \"InvoiceItem\": \"000001\", \"PurchasingDocumentNumber\":
+				// \"4100000127\", \"PurchasingDocumentItem\": \"00010\",
+				// \"BaseUnit\": \"KG\", \"DntrConvOpuOu\": \"1\",
+				// \"NmtrConvOpuOu\": \"1\", \"QtyOrdPurReq\": \"100\",
+				// \"PostingDate\": \"20.05.2021\", \"CompanyCode\": \"1010\",
+				// \"ReferenceDocument\": \"5000000267\", \"Quantity\": \"200\",
+				// \"NetValDC\": \"400.00\", \"NoQuantityLogic\": \"\",
+				// \"ItemCategory\": \"0\", \"QtyInvoiced\": \"0\",
+				// \"ReturnsItem\": \"\", \"DrCrInd\": \"S\", \"SubDrCrInd\":
+				// \"\", \"CurrencyKey\": \"SAR\", \"GrBasedIvInd\": \"X\",
+				// \"QtyGoodsReceived\": \"100\", \"GoodsReceiptInd\": \"X\",
+				// \"TranslationDate\": \"20.05.2021\", \"UpdatePODelCosts\":
+				// \"\", \"PostInvInd\": \"X\", \"DelItemAllocInd\": \"X\",
+				// \"RetAllocInd\": \"X\", \"IvOrigin\": \"\", \"QtyOpu\":
+				// \"200\", \"InvValFC\": \"0.00\", \"EstPriceInd\": \"\",
+				// \"GrNonValInd\": \"\", \"NetValSrvFC\": \"0\", \"AmtDC\":
+				// \"400\", \"ValGrFC\": \"400\", \"NewInputVal\": \"\",
+				// \"RequestId\": \"APA-001\", \"ReferenceInvoiceItem\": \"01\"
+				// }, { \"Vendor\": \"1000031\", \"InvoiceItem\": \"000002\",
+				// \"PurchasingDocumentNumber\": \"4100000127\",
+				// \"PurchasingDocumentItem\": \"00010\", \"BaseUnit\": \"KG\",
+				// \"DntrConvOpuOu\": \"1\", \"NmtrConvOpuOu\": \"1\",
+				// \"QtyOrdPurReq\": \"100\", \"PostingDate\": \"20.05.2021\",
+				// \"CompanyCode\": \"1010\", \"ReferenceDocument\":
+				// \"5000000267\", \"Quantity\": \"10\", \"NetValDC\":
+				// \"400.00\", \"NoQuantityLogic\": \"\", \"ItemCategory\":
+				// \"0\", \"QtyInvoiced\": \"0\", \"ReturnsItem\": \"\",
+				// \"DrCrInd\": \"S\", \"SubDrCrInd\": \"\", \"CurrencyKey\":
+				// \"SAR\", \"GrBasedIvInd\": \"X\", \"QtyGoodsReceived\":
+				// \"100\", \"GoodsReceiptInd\": \"X\", \"TranslationDate\":
+				// \"20.05.2021\", \"UpdatePODelCosts\": \"\", \"PostInvInd\":
+				// \"X\", \"DelItemAllocInd\": \"X\", \"RetAllocInd\": \"X\",
+				// \"IvOrigin\": \"\", \"QtyOpu\": \"10\", \"InvValFC\":
+				// \"0.00\", \"EstPriceInd\": \"\", \"GrNonValInd\": \"\",
+				// \"NetValSrvFC\": \"0\", \"AmtDC\": \"400\", \"ValGrFC\":
+				// \"400\", \"NewInputVal\": \"\", \"RequestId\": \"APA-001\",
+				// \"ReferenceInvoiceItem\": \"02\" }] }, \"ToMatchOutput\": {
+				// \"results\": [] } } }";
+				responsePost = OdataHelperClass.postService(endPointurl, entity, destinationInfo);
+
+				System.err.println(" Qa responseFromOdata Post" + responsePost);
 			}
 			return responsePost;
 			// return header;
@@ -824,7 +916,6 @@ if(ApplicationConstants.USERNAME.equals("MENABEVD")){
 		}
 
 	}
-
 
 	public static ResponseEntity<?> threeWayMatchOdataCall(String entity) {
 		try {
@@ -857,9 +948,9 @@ if(ApplicationConstants.USERNAME.equals("MENABEVD")){
 		}
 
 	}
-	
-	 // OData Call for QA 
-		public static ResponseEntity<?> threeWayMatchOdataCallForQa(String entity) {
+
+	// OData Call for QA
+	public static ResponseEntity<?> threeWayMatchOdataCallForQa(String entity) {
 		try {
 
 			ResponseEntity<?> responsePost = new ResponseEntity<>("Failed", HttpStatus.BAD_REQUEST);
@@ -867,7 +958,7 @@ if(ApplicationConstants.USERNAME.equals("MENABEVD")){
 			Map<String, Object> destinationInfo = OdataHelperClass.getDestination("SD4_DEST");
 
 			String endPointurl = "/sap/opu/odata/sap/ZP2P_API_THREEWAYMATCH_SRV/MatchHeaderSet";
-			responsePost = OdataHelperClass.postService(endPointurl, entity,destinationInfo);
+			responsePost = OdataHelperClass.postService(endPointurl, entity, destinationInfo);
 			logger.error("before return line 774" + responsePost);
 			return responsePost;
 			// return header;
