@@ -1504,7 +1504,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 	public static boolean   checkForFilterPrameter(FilterMultipleHeaderSearchDto filterDto){
 		System.err.println("filterInputDto "+filterDto);
 				if(ServiceUtil.isEmpty(filterDto.getValidationStatus())&&
-						// ServiceUtil.isEmpty(filterDto.getInvoiceType())&&
+						 ServiceUtil.isEmpty(filterDto.getInvoiceType())&&
 				          ServiceUtil.isEmpty(filterDto.getVendorId())&&
 				           ServiceUtil.isEmpty(filterDto.getDueDateFrom())&&
 				                  ServiceUtil.isEmpty(filterDto.getDueDateTo())&&
@@ -2815,7 +2815,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 						claim.setInbox(inboxDto);
 						claim.getInbox().setProcessor(dto.getUserId());
 						claim.getInbox().setStatus("RESERVED");
-						claim.setMessage("Task is been claimed by user "+dto.getUserId());
+						claim.setMessage("You "+dto.getUserId() +" have claimed the task.");
 						return new ResponseEntity<ClaimResponseDto>(claim,HttpStatus.CREATED);
 					} else {
 						ClaimResponseDto claim = new ClaimResponseDto();
@@ -2823,7 +2823,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 						claim.setInbox(inboxDto);
 						claim.getInbox().setProcessor(dto.getUserId());
 						claim.getInbox().setStatus("READY");
-						claim.setMessage("Task is been Released");
+						claim.setMessage("You have released the task.");
 						return new ResponseEntity<ClaimResponseDto>(claim,HttpStatus.CREATED);
 					}
 				} else {
