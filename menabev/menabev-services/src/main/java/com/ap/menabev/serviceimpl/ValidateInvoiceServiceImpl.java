@@ -115,6 +115,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					if (duplicateCheckDto.getIsDuplicate()) {
 						messagesList.add(duplicateCheckDto.getMessages());
 						invoiceHeaderCheckDto.setMessages(messagesList);
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 						return invoiceHeaderCheckDto;
 					}
 
