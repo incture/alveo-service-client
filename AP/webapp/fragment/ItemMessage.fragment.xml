@@ -2,15 +2,15 @@
 	<Dialog class="sapUiSizeCompact" showHeader="false">
 		<Bar>
 			<contentMiddle>
-				<Label text="{i18n>ASSIGNEDGROUPS}"></Label>
+				<Label text="{i18n>itemMessages}"></Label>
 			</contentMiddle>
 			<contentRight>
-				<Button icon="sap-icon://decline" type="Emphasized" press="onCloseGroupFragment"></Button>
+				<Button icon="sap-icon://decline" type="Emphasized" press="onCloseFragment"></Button>
 			</contentRight>
 		</Bar>
-		<List items="{oUserDetailModel>/groups}">
+		<List items="{oPOModel>/invoiceItemMessages}">
 			<items>
-				<StandardListItem title="{oUserDetailModel>value}"/>
+				<StandardListItem title="{oPOModel>messageText}"/>
 			</items>
 		</List>
 	</Dialog>

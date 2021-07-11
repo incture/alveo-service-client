@@ -47,6 +47,32 @@
     -webkit-focus-ring-color: none;
 }
 
+.threewayMatchedNS .sapMLIB {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    position: relative;
+    background: #cfcef7;
+    border-bottom: 1px solid #e4e4e4;
+    padding: 0 1rem 0 1rem;
+}
+
+.threewayMatchedS .sapMLIB.sapMLIBSelected {
+    background: #e5faf1;
+}
+
+.twoWaymatchedNS .sapMLIB {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    position: relative;
+    background: #f7f2ce;
+    border-bottom: 1px solid #e4e4e4;
+    padding: 0 1rem 0 1rem;
+}
+
 /*Inbox classes*/
 .sapUiSizeCompact .sapMBtn {
     height: 2.000rem;
@@ -80,6 +106,13 @@
     margin-left: unset !important;
     margin-right: unset !important;
     position: relative;
+}
+
+
+/* pagination*/
+
+.selectedPage {
+    color: #fb0c0c;
 }
 
 
@@ -609,7 +642,7 @@
     border: 1.5px solid #fab027;
     border-radius: 6px;
     padding: 10px;
-     width: 20rem;
+    width: 20rem;
 }
 
 .poSearchactivitylogVboxRejected {
@@ -630,7 +663,7 @@
     border: 1.5px solid #c2beb8;
     border-radius: 6px;
     padding: 10px;
-     width: 20rem;
+    width: 20rem;
 }
 
 .poSearchactivitylogVboxOnGoing.sapUiSmallMarginBottom {
@@ -650,22 +683,23 @@
 }
 
 .dashLineOnGoing {
-   margin-left: -0.72rem;
+    margin-left: -0.72rem;
     margin-top: 2rem;
     border-left: 2px solid #fab027;
 }
 
 .dashLineDone {
-   margin-left: -0.72rem;
+    margin-left: -0.72rem;
     margin-top: 2rem;
     border-left: 2px solid #2cc70e;
 }
+
 .paymentBoxMargin {
-      margin-left: 1rem;
+    margin-left: 1rem;
 }
 
 .dashLineToBeDone {
-   margin-left: -0.72rem;
+    margin-left: -0.72rem;
     margin-top: 2rem;
     border-left: 2px solid #c2beb8;
 }
@@ -673,13 +707,13 @@
 .doneProcessCircle {
     color: #2cc70e;
     font-size: 1.9rem;
-        margin-left: 0.5rem;
+    margin-left: 0.5rem;
 }
 
 .rejectedProcessCircle {
     color: red;
-     font-size: 1.9rem;
-      margin-left: 0.5rem;
+    font-size: 1.9rem;
+    margin-left: 0.5rem;
 }
 
 .onGoingProcessCircle {
@@ -690,30 +724,36 @@
 
 .toBeDoneProcessCircle {
     color: #c2beb8;
-     font-size: 1.9rem;
-         margin-left: 0.5rem;
+    font-size: 1.9rem;
+    margin-left: 0.5rem;
 }
-.statusHeaderDone.sapMLabel{
-         color: #2cc70e;
+
+.statusHeaderDone.sapMLabel {
+    color: #2cc70e;
 }
-.statusHeaderToBeDone.sapMLabel{
-         color: #c2beb8;
+
+.statusHeaderToBeDone.sapMLabel {
+    color: #c2beb8;
 }
-.statusHeaderRejected.sapMLabel{
-         color: red;
+
+.statusHeaderRejected.sapMLabel {
+    color: red;
 }
-.statusHeaderOnGoing.sapMLabel{
-         color: #fab027;
+
+.statusHeaderOnGoing.sapMLabel {
+    color: #fab027;
 }
+
 .btnBox {
-	margin-left: 7rem !important;
+    margin-left: 7rem !important;
 }
 
 .dateError .sapMInputBaseContentWrapperError {
-     border: .0625rem solid red;
+    border: .0625rem solid red;
     background: #F2F2F2;
     border-radius: .425rem;
 }
+
 /*End of Track Invoice Activity Log CSS*/
 
 /*Start of Dashboard CSS*/
@@ -747,4 +787,5 @@
     background: #F2F2F2;
     border-radius: .425rem;
 }
+
 /*End of Dashboard CSS*/

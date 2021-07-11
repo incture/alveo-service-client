@@ -11,7 +11,8 @@
 							<core:ListItem key="{oDropDownModel>TxCode}" text="{oDropDownModel>TxCode}"/>
 						</items>
 					</Select>
-					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
+					<Button text="{i18n>ThreeWayMatch}" press="onClickThreeWayMatch" type="Emphasized"
+						enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
 					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
 					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddInvoiceItem" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>
@@ -30,97 +31,111 @@
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
 								<Label design="Bold" text="{i18n>CUSTOMERITEMID}" tooltip="{i18n>DESCRIPTION}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>QUANTITY}" tooltip="{i18n>QUANTITY}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>UOM}" tooltip="{i18n>UOM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>UNITPRICE}" tooltip="{i18n>UNITPRICE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>PRICINGUNIT}" tooltip="{i18n>PRICINGUNIT}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>GROSSPRICE}" tooltip="{i18n>GROSSPRICE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>TAXCODE}" tooltip="{i18n>TAXCODE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>TAXVALUE}" tooltip="{i18n>TAXVALUE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>NETPRICE}" tooltip="{i18n>NETPRICE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>AVLQTY}" tooltip="{i18n>AVLQTY}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>POUnitPrice}" tooltip="{i18n>POUnitPrice}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
+								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>ACCASSGN}" tooltip="{i18n>ACCASSGN}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>MATCHDOCNUM}" tooltip="{i18n>MATCHDOCNUM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible' }">
 								<Label design="Bold" text="{i18n>MATCHDOCITEM}" tooltip="{i18n>MATCHDOCITEM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>REQNUM}" tooltip="{i18n>REQNUM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>REQITM}" tooltip="{i18n>REQITM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>CONTRACTNUM}" tooltip="{i18n>CONTRACTNUM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>CONTRACTITM}" tooltip="{i18n>CONTRACTITM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>ITEMCATEGORY}" tooltip="{i18n>ITEMCATEGORY}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
 								<Label design="Bold" text="{i18n>PRODUCTTYPE}" tooltip="{i18n>PRODUCTTYPE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem" visible="false">
 								<Label design="Bold" text="{i18n>POMATNUM}" tooltip="{i18n>POITEMTEXT}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem" visible="false">
 								<Label design="Bold" text="{i18n>POITEMTEXT}" tooltip="{i18n>POITEMTEXT}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem" visible="false">
 								<Label design="Bold" text="{i18n>POQTYOU}" tooltip="{i18n>POQTYOU}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem" visible="false">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem" visible="false">
 								<Label design="Bold" text="{i18n>POTAXCODE}" tooltip="{i18n>POTAXCODE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle','oPOModel>itemCategory'],formatter:'com.menabev.AP.formatter.formatter.formatPOItemCatVisible'}">
 								<Label design="Bold" text="{i18n>MATCHSERVICENUM}" tooltip="{i18n>MATCHSERVICENUM}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="10rem"
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle','oPOModel>itemCategory'],formatter:'com.menabev.AP.formatter.formatter.formatPOItemCatVisible'}">
 								<Label design="Bold" text="{i18n>MATCHPACKAGENUMBER}" tooltip="{i18n>MATCHPACKAGENUMBER}"/>
 							</Column>
 						</columns>
 						<items>
-							<ColumnListItem highlight="{path: 'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
+							<ColumnListItem highlight="{path:'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
 								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode','oPOModel>isSelected'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
 								<cells>
-									<Text text="{oPOModel>itemText}"/>
+									<HBox>
+										<Button icon="sap-icon://message-popup" press="onViewMessages"/>
+										<Text text="{oPOModel>itemText}"/>
+									</HBox>
 									<Text text="{oPOModel>customerItemId}"/>
 									<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 									<HBox>
@@ -139,14 +154,14 @@
 									<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>taxCode}" items="{oDropDownModel>/taxCodeResult}"
 										change="onItemTaxCodeChange" enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
-											<core:ListItem key="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TxCode}" text="{oDropDownModel>TaxCodeName}"/>
+											<core:ListItem key="{oDropDownModel>TxCode}" additionalText="{oDropDownModel>TaxCodeName}" text="{oDropDownModel>TxCode}"/>
 										</items>
 									</Select>
 									<Text text="{oPOModel>taxValue}"/>
 									<Text text="{oPOModel>netWorth}"/>
 									<Text text="{oPOModel>alvQtyUOM}"/>
 									<Text text="{oPOModel>poUnitPriceUOM}"/>
-									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment" visible="{oPOModel>accountAssignmentCat}"/>
+									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment" visible ="{path:'oPOModel>accountAssignmentCat',formatter:'com.menabev.AP.formatter.formatter.AccAsssVisible'}"/>
 									<Text text="{oPOModel>matchDocNum}"/>
 									<Text text="{oPOModel>matchDocItem}"/>
 									<Text text="{oPOModel>requisationNum}"/>
@@ -176,7 +191,7 @@
 						</Input>
 						<ToolbarSpacer/>
 						<Label text="{i18n>Tax}"/>
-						<Input width="4rem" value="{oPOModel>/taxValue}" type="Number" valueState="{oPOModel>/taxValue}" change="calculateGross"
+						<Input width="4rem" value="{oPOModel>/taxValue}" type="Number" valueState="{oPOModel>/taxValueState}" change="calculateGross"
 							enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 							<layoutData>
 								<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
@@ -274,28 +289,28 @@
 							</OverflowToolbar>
 						</headerToolbar>
 						<content>
-							<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L3 M6 S12">
+							<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L1 M3 S3">
 								<l:content>
-									<VBox>
+									<!--<HBox>-->
 										<Label text="{i18n>VendorId}:"/>
 										<Text text="{oPOModel>vendorId}"/>
-									</VBox>
-									<VBox>
+									<!--</HBox>-->
+									<!--<HBox>-->
 										<Label text="{i18n>Company}:"/>
 										<Text text=" {oPOModel>compCode}"/>
-									</VBox>
-									<VBox>
+									<!--</HBox>-->
+									<!--<HBox>-->
 										<Label text="{i18n>ExchangeRate}:"/>
 										<Text text="{oPOModel>exchangeRate}"/>
-									</VBox>
-									<VBox>
+									<!--</HBox>-->
+									<!--<HBox>-->
 										<Label text="{i18n>Currency}:"/>
 										<Text text="{oPOModel>currency}"/>
-									</VBox>
-									<VBox>
+									<!--</HBox>-->
+									<!--<HBox>-->
 										<Label text="{i18n>PaymentTerms}:"/>
 										<Text text="{oPOModel>paymentTerms}"/>
-									</VBox>
+									<!--</HBox>-->
 								</l:content>
 							</l:Grid>
 							<Table items="{oPOModel>poItem}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20">

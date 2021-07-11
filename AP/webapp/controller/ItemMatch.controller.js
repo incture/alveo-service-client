@@ -1,7 +1,8 @@
 sap.ui.define([
 	"com/menabev/AP/controller/BaseController",
+	"com/menabev/AP/formatter/formatter",
 	"com/menabev/AP/util/POServices"
-], function (BaseController, POServices) {
+], function (BaseController, formatter, POServices) {
 	"use strict";
 
 	return BaseController.extend("com.menabev.AP.controller.ItemMatch", {
@@ -66,13 +67,14 @@ sap.ui.define([
 		onNavback: function () {
 			var reqId = this.oPOModel.getProperty("/requestId");
 			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
-			if(changeIndicators) {
-				this.onClickThreeWayMatch("");
+			if (changeIndicators && changeIndicators.itemChange) {
+				this.onClickThreeWayMatch("", true);
 			}
 			this.oRouter.navTo("PO", {
 				id: reqId,
 				status: this.status,
-				taskId: this.taskId
+				taskId: this.taskId,
+				source: "itemMatch"
 			});
 		},
 
@@ -142,12 +144,12 @@ sap.ui.define([
 						}
 					}
 					oPOModel.setProperty("/invoiceItems", invoiceItems);
-					oPOModel.setProperty("/changeIndicators", true);
 					oPOModel.refresh();
 					this.fnHideMatchedPO();
 					this.oSelectedInvoiceItem = "";
 					this.getView().byId("ItemMatchInvoiceTableId").removeSelections();
-					POServices.onNonPoSave("", that);
+					POServices.setChangeInd("", that, "itemChange");
+					// POServices.onNonPoSave("", that);
 				}.bind(this),
 				error: function (err) {
 					busy.close();

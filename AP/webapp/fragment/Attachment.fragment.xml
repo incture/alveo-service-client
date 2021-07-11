@@ -1,7 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified">
-	<Table id="SupplierQualDoc" fixedLayout="false" class="openRequestTable custBox" inset="false"
-		items="{oPOModel>/attachment}" alternateRowColors="true" growing="true" growingThreshold="20"
-		updateFinished="onUpdateFinishedDocTable">
+	<Table id="SupplierQualDoc" fixedLayout="false" class="openRequestTable custBox" inset="false" items="{oPOModel>/attachment}"
+		alternateRowColors="true" growing="true" growingThreshold="20" updateFinished="onUpdateFinishedDocTable">
 		<headerToolbar >
 			<Toolbar visible="{oDropdownModel>/isEditable}">
 				<ToolbarSpacer/>
@@ -30,8 +29,9 @@
 					<Text text="{path:'oPOModel>createdAt',formatter:'com.menabev.AP.formatter.formatter.formatDate'}"/>
 					<Text text="{oPOModel>createdBy}"/>
 					<HBox>
-						<Button type="Emphasized" icon="sap-icon://download" press="onDocumentDownload"/>
-						<Button type="Reject" icon="sap-icon://delete" press="onDocumentDelete" class="deleteBtn"/>
+						<Button type="Emphasized" icon="sap-icon://download" press="onDocumentDownload" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
+						<Button type="Reject" icon="sap-icon://delete" press="onDocumentDelete" class="deleteBtn"
+							enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
 					</HBox>
 				</cells>
 			</ColumnListItem>

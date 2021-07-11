@@ -701,8 +701,11 @@ sap.ui.define([
 
 		//Called when the save button is clicked.
 		onNonPoSave: function (oEvent) {
-			// var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onNonPoSave(oEvent, this);
+			if (!this.oPOModel.getProperty("/invoiceType"))
+			{
+				this.oPOModel.setProperty("/invoiceType","NON-PO")
+			}
+				POServices.onNonPoSave(oEvent, this);
 		},
 
 		onNonPoSubmit: function (oEvent) {
@@ -842,7 +845,7 @@ sap.ui.define([
 			this.oRouter.navTo("Inbox");
 		},
 
-		onChangeUserInputTaxAmount: function (oEvent) {
+		calculateGross: function (oEvent) {
 			var oPOModel = this.oPOModel,
 				userInputTaxAmount = oEvent.getParameter("value");
 			if (!userInputTaxAmount) {

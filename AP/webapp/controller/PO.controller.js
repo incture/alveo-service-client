@@ -48,8 +48,11 @@ sap.ui.define([
 					that.requestId = oArgs.id;
 					that.status = oArgs.status;
 					that.taskId = oArgs.taskId;
+					that.source = oArgs.source;
 					var invoiceType = oEvent.getParameter("name");
-					POServices.getPONonPOData("", that, that.requestId);
+					if (that.source != "itemMatch") {
+						POServices.getPONonPOData("", that, that.requestId);
+					}
 					that.getBtnVisibility(that.status, that.requestId, invoiceType);
 					oVisibilityModel.setProperty("/selectedInvKey", "Invoice");
 					oVisibilityModel.setProperty("/selectedtabKey", "invoiceheaderdetails");
@@ -86,9 +89,13 @@ sap.ui.define([
 		getPONonPOData: function (oEvent) {
 			POServices.getPONonPOData(oEvent, this);
 		},
-		
-		onChangeUserInputTaxAmount:  function (oEvent) {
+
+		onChangeUserInputTaxAmount: function (oEvent) {
 			POServices.onChangeUserInputTaxAmount(oEvent, this);
+		},
+
+		calculateGross: function (oEvent) {
+			POServices.calculateGross(oEvent, this);
 		},
 
 		// VendorIdSuggest: function (oEvent) {
@@ -157,10 +164,13 @@ sap.ui.define([
 		},
 
 		onSubmitForRemediationFrag: function (userList) {
+			var oPOModel = this.getModel("oPOModel");
 			if (userList) {
 				this.fetchUserList(userList);
+			} else {
+				oPOModel.setProperty("/selectedRemidiationGroup", "BUYER");
+				oPOModel.setProperty("/remidiationSwitchVisible", true);
 			}
-			var oPOModel = this.getModel("oPOModel");
 			this.SubmitDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.SubmitDialog", this);
 			this.getView().addDependent(this.SubmitDialog, this);
 			this.SubmitDialog.setModel(oPOModel, "oPOModel");
@@ -187,12 +197,13 @@ sap.ui.define([
 			if (userList) {
 				this.fetchUserList(userList);
 			}
+			this.getReasonOfRejection();
 			var oPOModel = this.getModel("oPOModel");
 			oPOModel.setProperty("/selectedRemidiationGroup", "ProcessLead");
 			oPOModel.setProperty("/remidiationSwitchVisible", false);
 			oPOModel.setProperty("/userList", oPOModel.getProperty("/ProcessLeadUser"));
 			this.RejectDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.RejectDialog", this);
-			this.getView().addDependent(this.SubmitDialog, this);
+			this.getView().addDependent(this.RejectDialog, this);
 			this.RejectDialog.setModel(oPOModel, "oPOModel");
 			oPOModel.setProperty("/submitTypeTitle", "Reject Task");
 			this.RejectDialog.open();
@@ -280,6 +291,9 @@ sap.ui.define([
 			var oPOModel = this.oPOModel;
 			var userList = oPOModel.getProperty("/userList");
 			var user, count = 0;
+			if (!userList) {
+				userList = [];
+			}
 			var length = userList.length;
 			if (!length) {
 				sap.m.MessageToast.show("Please enter one remidiation user");
@@ -327,21 +341,36 @@ sap.ui.define([
 				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 				actionCode = "PA";
 			}
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
-		onNonPoRejectConfirm: function (oEvent) {
-			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
-			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			var sUrl, actionCode;
-			var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
-			if (userGroup === "Accountant") {
-				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
-				actionCode = "AR";
-			}
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
-			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+		// onNonPoRejectConfirm: function (oEvent) {
+		// 	var oPOModel = this.oPOModel;
+		// 	var oMandatoryModel = this.oMandatoryModel;
+		// 	var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+		// 	var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
+		// 	var sUrl, actionCode;
+		// 	var actioncode = oPOModel.getProperty("/actionCode");
+		// 	if (actioncode === "AR") {
+		// 		var reasonForRejection = this.oPOModel.getProperty("/reasonForRejection");
+		// 		if (!reasonForRejection) {
+		// 			oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "Error");
+		// 			sap.m.MessageToast.show("Please select reason for rejection");
+		// 			return;
+		// 		}
+		// 	}
+		// 	var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
+		// 	if (userGroup === "Accountant") {
+		// 		sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+		// 		actionCode = "AR";
+		// 	}
+		// 	POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, userList, "ok");
+
+		// 	// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
+		// },
+		onNonPoRejectCancel: function () {
+			this.RejectDialog.close();
 		},
 
 		onNonPoReSend: function (oEvent) {
@@ -359,7 +388,7 @@ sap.ui.define([
 				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 				actionCode = "PRS";
 			}
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
@@ -378,7 +407,7 @@ sap.ui.define([
 			// 	sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 			// 	actionCode = "";
 			// }
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			POServices.onPoSubmit(oEvent, this, "", actionCode, sUrl, "Saving....");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
@@ -396,28 +425,29 @@ sap.ui.define([
 				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 				actionCode = "PR";
 			}
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
 		},
 
 		onPressOK: function (oEvent) {
 			var oPOModel = this.oPOModel;
 			var oData = oPOModel.getProperty("/");
+			var oMandatoryModel = this.oMandatoryModel;
 			var sMethod = "POST";
-			var sUrl;
+			var sUrl, actionCode = oPOModel.getProperty("/actionCode");
 			var userList = this.formUserListPayload();
 			if (userList) {
 				var oPayload = {
 					"invoice": oData,
 					"requestId": oData.requestId,
 					"taskId": this.taskId,
-					"actionCode": oPOModel.getProperty("/actionCode"),
+					"actionCode": actionCode,
 					"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders),
 					"userList": userList.userList
 				};
 				oPayload.invoice.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
 				this.SubmitDialog.close();
-				POServices.onAccSubmit(this, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmitOk", "ASA", userList, "ok");
+				POServices.onAccSubmit(this, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmitOk", actionCode, userList, "ok");
 			}
 
 		},
@@ -504,10 +534,12 @@ sap.ui.define([
 		},
 
 		onClickItemMatch: function () {
+			var oPOModel = this.oPOModel;
+			var that = this;
 			this.oRouter.navTo("ItemMatch", {
-				id: this.oPOModel.getProperty("/requestId"),
-				status: this.status,
-				taskId: this.taskId
+				id: oPOModel.getProperty("/requestId"),
+				status: that.status,
+				taskId: that.taskId
 			});
 		},
 
@@ -582,6 +614,26 @@ sap.ui.define([
 
 		onClosePODetailsDialog: function () {
 			this.POItemDetails.close();
+		},
+
+		onViewMessages: function (oEvent) {
+			var that = this;
+			var oPOModel = this.oPOModel;
+			var oContextObj = oEvent.getSource().getBindingContext("oPOModel").getObject();
+			if (oContextObj.invoiceItemMessages) {
+				oPOModel.setProperty("/invoiceItemMessages", oContextObj.invoiceItemMessages);
+				oPOModel.refresh();
+				this.userGroup = sap.ui.xmlfragment("com.menabev.AP.fragment.ItemMessage", this);
+				this.getView().addDependent(this.userGroup);
+				this.userGroup.open();
+			} else {
+				var msg = "No messages available";
+				sap.m.MessageToast.show(msg);
+			}
+		},
+
+		onCloseFragment: function (oEvent) {
+			this.userGroup.close();
 		},
 
 		onClickAddInvoiceItem: function () {

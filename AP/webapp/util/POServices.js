@@ -47,8 +47,14 @@ com.menabev.AP.util.POServices = {
 				}
 				oPOModel.setProperty("/", oData);
 				var invoiceItems = oPOModel.getProperty("/invoiceItems");
-				var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
-				oController.getReferencePo(arrUniqueInvoiceItems);
+				// var arrUniqueInvoiceItems = oController.fnFindUniqueInvoiceItems(invoiceItems);
+				var arr = [];
+				var obj = {
+					"documentCategory": oData.refpurchaseDocCat,
+					"documentNumber": oData.refpurchaseDoc
+				};
+				arr.push(obj);
+				oController.getReferencePo(arr);
 				that.formatUOMList(oData.invoiceItems, oController);
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
 				var message = "Session Lost. Press OK to refresh the page";
@@ -370,10 +376,24 @@ com.menabev.AP.util.POServices = {
 	onNonPoSave: function (oEvent, oController, status) {
 		var oPOModel = oController.oPOModel;
 		var oSaveData = oPOModel.getData();
-		// oSaveData.request_created_by = 
-		var sUrl = "/menabevdev/invoiceHeader/saveAPI",
-			sMethod = "POST";
-		this.saveSubmitServiceCall(oController, oSaveData, sMethod, sUrl, "SAVE", "Draft");
+		var oPayload;
+		if (oSaveData.invoiceType === "NON-PO") {
+			var sUrl = "/menabevdev/invoiceHeader/accountantSave",
+				sMethod = "POST";
+			oSaveData.invoiceStatus = "1";
+			oSaveData.invoiceStatusText = "DRAFT";
+			oSaveData.request_created_by = oController.oUserDetailModel.getProperty("/loggedInUserMail");
+			oPayload = {
+				"invoiceHeaderDto": oSaveData
+			};
+			this.saveSubmitServiceCall(oController, oPayload, sMethod, sUrl, "", "Saving...");
+		} else if (oSaveData.invoiceType === "PO") {
+			var sUrl = "/menabevdev/invoiceHeader/saveAPI",
+				sMethod = "POST";
+			oPayload = oSaveData;
+			this.saveSubmitServiceCall(oController, oPayload, sMethod, sUrl, "SAVE", "Saving...");
+		}
+
 	},
 
 	//Called on click of Submit Button.
@@ -470,40 +490,47 @@ com.menabev.AP.util.POServices = {
 				if (oSubmitData.invoiceType == "PO") {
 					sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
 					oPayload.invoiceHeaderDto.purchaseOrder = jQuery.extend(true, [], oData.purchaseOrder);
-					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode);
+					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "", "", "", "Saving...");
 				} else {
 					var sUrl = "/menabevdev/invoiceHeader/accountantSubmit";
-					this.saveSubmitServiceCall(oController, oPayload, sMethod, sUrl);
+					this.saveSubmitServiceCall(oController, oPayload, sMethod, sUrl, "", "Saving...");
 				}
 
 			}
 		}
 
 	},
-	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode, sUrl) {
+	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode, sUrl, busyText, ItemMatch) {
 		var oPOModel = oController.oPOModel;
 		var oMandatoryModel = oController.oMandatoryModel;
 		var oData = oPOModel.getData();
 		var bCostAllocation = false;
 		//Header Mandatory feilds validation
-
-		var manLength = MandatoryFileds.length;
-		var data, count = 0;
-		for (var i = 0; i < manLength; i++) {
-			data = oPOModel.getProperty("/" + MandatoryFileds[i]);
-			if (data) {
-				oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
-			} else {
-				count += 1;
-				oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
+		if (MandatoryFileds) {
+			var manLength = MandatoryFileds.length;
+			var data, count = 0;
+			for (var i = 0; i < manLength; i++) {
+				data = oPOModel.getProperty("/" + MandatoryFileds[i]);
+				if (data) {
+					oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "None");
+				} else {
+					count += 1;
+					oMandatoryModel.setProperty("/NonPO/" + MandatoryFileds[i] + "State", "Error");
+				}
 			}
-		}
-		oMandatoryModel.refresh();
-		if (count) {
-			// message = resourceBundle.getText("MANDATORYFIELDERROR");
-			var message = "Please fill all Mandatory fields";
-			sap.m.MessageToast.show(message);
-			return;
+			oMandatoryModel.refresh();
+			// if (!) {
+			if (count && !ItemMatch) {
+				// message = resourceBundle.getText("MANDATORYFIELDERROR");
+				var message = "Please fill all Mandatory fields";
+				sap.m.MessageToast.show(message);
+				return;
+			} else if (count) {
+				var sUrl = "/menabevdev/invoiceHeader/saveAPI",
+					sMethod = "POST";
+				this.saveSubmitServiceCall(oController, oData, sMethod, sUrl, "SAVE", "Saving...");
+				return;
+			}
 		}
 		if (!oData.invoiceTotal) {
 			oData.invoiceTotal = 0;
@@ -526,20 +553,25 @@ com.menabev.AP.util.POServices = {
 				"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders)
 			};
 			oPayload.invoice.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
-			this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode);
+			this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "", "", "", busyText);
 		} else {
 			var sMethod = "POST";
-			this.onAccSubmit(oController, oData, sMethod, sUrl);
+			this.onAccSubmit(oController, oData, sMethod, sUrl, "", "", "", ItemMatch, busyText);
 		}
 
 	},
 
 	//function saveSubmitServiceCall is triggered on SUBMIT or SAVE
-	saveSubmitServiceCall: function (oController, oData, sMethod, sUrl, save) {
+	saveSubmitServiceCall: function (oController, oData, sMethod, sUrl, save, busyText) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
-		var busy = new sap.m.BusyDialog();
+		if (!busyText) {
+			busyText = "Saving...";
+		}
+		var busy = new sap.m.BusyDialog({
+			text: busyText
+		});
 		var oHeader = {
 			"Content-Type": "application/scim+json"
 		};
@@ -550,7 +582,7 @@ com.menabev.AP.util.POServices = {
 		// if (draft) {
 		// 	oPayload.invoiceHeaderDto.docStatus = "Draft";
 		// }
-		var PO = jQuery.extend(true, [], oData.purchaseOrder);
+		var PO = jQuery.extend(true, [], oData.purchaseOrders);
 		busy.open();
 		oServiceModel.loadData(sUrl, JSON.stringify(oData), true, sMethod, false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
@@ -560,10 +592,12 @@ com.menabev.AP.util.POServices = {
 			if (oEvent.getParameters().success) {
 				if (!save) {
 					oPOModel.setProperty("/", oData.invoiceHeaderDto);
+					message = oData.responseStatus;
 				} else {
 					oPOModel.setProperty("/", oData);
+					message = "Data saved successfully";
 				}
-				oPOModel.purchaseOrder("/", PO);
+				oPOModel.setProperty("/purchaseOrders", PO);
 				sap.m.MessageBox.success(message, {
 					actions: [sap.m.MessageBox.Action.OK],
 					onClose: function (sAction) {
@@ -627,24 +661,38 @@ com.menabev.AP.util.POServices = {
 		});
 	},
 
-	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, userList, ok) {
+	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, userList, ok, ItemMatch, busyText) {
 		var that = this;
 		var oPOModel = oController.oPOModel;
 		var oServiceModel = new sap.ui.model.json.JSONModel();
-		var busy = new sap.m.BusyDialog();
 		var oHeader = {
 			"Content-Type": "application/scim+json"
 		};
-		busy.open();
+		if (!busyText) {
+			busyText = "Saving...";
+		}
+		var busy = new sap.m.BusyDialog({
+			text: busyText
+		});
+		if (!ItemMatch) {
+			busy.open();
+		}
+		var PO = jQuery.extend(true, [], oData.purchaseOrders);
 		oServiceModel.loadData(sUrl, JSON.stringify(oData), true, sMethod, false, false, oHeader);
 		oServiceModel.attachRequestCompleted(function (oEvent) {
-			busy.close();
+			if (!ItemMatch) {
+				busy.close();
+			}
 			var oData = oEvent.getSource().getData();
 			var message = oData.responseStatus;
 			if (oEvent.getParameters().success) {
-				var ReqId = oData.invoice.requestId;
-				oPOModel.setProperty("/", oData.invoice);
-				oPOModel.setProperty("/purchaseOrders", oData.purchaseOrders);
+				if (actionCode) {
+					oPOModel.setProperty("/", oData.invoice);
+					oPOModel.setProperty("/purchaseOrders", PO);
+				} else {
+					oPOModel.setProperty("/", oData);
+					oPOModel.setProperty("/purchaseOrders", PO);
+				}
 				if (!ok && actionCode === "ASR") {
 					oController.onSubmitForRemediationFrag(oData.userList);
 					oPOModel.setProperty("/actionCode", "ASR");
@@ -654,19 +702,20 @@ com.menabev.AP.util.POServices = {
 					oPOModel.setProperty("/actionCode", "ASA");
 					return;
 				} else if (!ok && actionCode === "AR") {
-					oController.onSubmitForApprovalFrag(oData.userList, "Reject Invoice");
+					oController.onSubmitForRejection(oData.userList, "Reject Invoice");
 					oPOModel.setProperty("/actionCode", "AR");
 					return;
-				}
-				var message = oData.message;
-				if (actionCode) {
-					sap.m.MessageBox.information(message, {
-						styleClass: "sapUiSizeCompact",
-						actions: [sap.m.MessageBox.Action.OK],
-						onClose: function (sAction) {
-							oController.oRouter.navTo("Inbox");
-						}
-					});
+				} else if (!ItemMatch) {
+					var message = oData.message;
+					if (actionCode) {
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK],
+							onClose: function (sAction) {
+								oController.oRouter.navTo("Inbox");
+							}
+						});
+					}
 				}
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
 				var message = "Session Lost. Press OK to refresh the page";

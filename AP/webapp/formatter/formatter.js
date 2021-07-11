@@ -226,11 +226,11 @@ com.menabev.AP.formatter.formatter = {
 	},
 	setPaginationClass: function (selectedPage, currentPage) {
 		if (selectedPage == currentPage) {
-			this.removeStyleClass("nonSelectedPage");
+			// this.removeStyleClass("nonSelectedPage");
 			this.addStyleClass("selectedPage");
 		} else {
 			this.removeStyleClass("selectedPage");
-			this.addStyleClass("nonSelectedPage");
+			// this.addStyleClass("nonSelectedPage");
 		}
 		return true;
 	},
@@ -359,13 +359,23 @@ com.menabev.AP.formatter.formatter = {
 		return true;
 	},
 
-	formatSelectionVisible: function (twowaymatch, statusCode, isSelected) {
+	formatSelectionVisible: function (twowaymatch, statusCode, isSelected, threewayMatched) {
+		this.removeStyleClass("disableSelect");
+		this.setSelected(false);
+		// this.removeStyleClass("threewayMatchedNS");
+		// this.removeStyleClass("threewayMatchedS");
+		// this.removeStyleClass("twoWaymatchedNS");
+		// if (threewayMatched && isSelected) {
+		// 	this.addStyleClass("threewayMatchedS");
+		// } else if (threewayMatched && !isSelected) {
+		// 	this.addStyleClass("threewayMatchedNS");
+		// } else if (twowaymatch && !isSelected) {
+		// 	this.addStyleClass("twoWaymatchedNS");
+		// }
+
 		if (!twowaymatch || statusCode == "5" || statusCode == "6") {
 			this.addStyleClass("disableSelect");
-		} else {
-			this.removeStyleClass("disableSelect");
-		}
-		if (isSelected) {
+		} else if (twowaymatch && isSelected) {
 			this.setSelected(true);
 		} else {
 			this.setSelected(false);
@@ -557,5 +567,12 @@ com.menabev.AP.formatter.formatter = {
 		}
 		return sValue;
 	},
+	AccAsssVisible: function (accass) {
+		if (accass) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 };

@@ -26,7 +26,7 @@
 									visible="{pdfModel>/fldVisble}" maxLength="10" liveChange="inputLiveChange"/>
 								<Label text="{i18n>deliveryNote}" required="true" visible="{pdfModel>/fldVisble}"/>
 								<Input value="{pdfModel>/deliveryNote}" width="15rem" valueState="{pdfModel>/vstate/deliveryNote}" change="onChangeDeliveryNote"
-									visible="{pdfModel>/fldVisble}" maxLength="16" liveChange="inputLiveChange"/>
+									visible="{pdfModel>/fldVisble}" maxLength="16" />
 								<Label text="{i18n>porder}" visible="{pdfModel>/crDbPOVisble}"/>
 								<Input value="{pdfModel>/crDbPO}" width="15rem" change="crDbPOChange" maxLength="10" liveChange="inputLiveChange"
 									visible="{pdfModel>/crDbPOVisble}"/>

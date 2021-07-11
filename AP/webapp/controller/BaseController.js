@@ -832,7 +832,7 @@ sap.ui.define([
 			}
 		},
 
-		onPostComment: function () {
+		onPostComment: function (oEvent) {
 			var nonPOInvoiceModel = this.oPOModel;
 			var oUserDetailModel = this.oUserDetailModel;
 			var comment = nonPOInvoiceModel.getProperty("/comment");
@@ -853,7 +853,9 @@ sap.ui.define([
 			};
 			comment.push(obj);
 			nonPOInvoiceModel.setProperty("/comment", comment);
-			nonPOInvoiceModel.setProperty("/commments", "");
+			if (oEvent.getId() != "change") {
+				nonPOInvoiceModel.setProperty("/commments", "");
+			}
 			POServices.setChangeInd("", this, "commentChange");
 		},
 		createReqid: function () {
@@ -1210,6 +1212,8 @@ sap.ui.define([
 						} else {
 							POItem[i].POMatched = false;
 						}
+					} else {
+						POItem[i].POMatched = false;
 					}
 				}
 			}
@@ -1246,12 +1250,12 @@ sap.ui.define([
 			});
 
 		},
-		
-		onClickThreeWayMatch: function (oEvent) {
+
+		onClickThreeWayMatch: function (oEvent, itemMatch) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			var sUrl, actionCode;
 			sUrl = "/menabevdev/validate/threeWayMatch";
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl);
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Performing 3 Way Match...", itemMatch);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 

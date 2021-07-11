@@ -4,8 +4,8 @@
 			<OverflowToolbar>
 				<Title text="{i18n>GLCoding}"/>
 				<ToolbarSpacer/>
-				<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" icon="sap-icon://add" class="SecondaryBtn" press="addGLCodingRow"
-					enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+				<!--<Button text="{i18n>AddRow}" tooltip="{i18n>AddItems}" icon="sap-icon://add" class="SecondaryBtn" press="addGLCodingRow"-->
+				<!--	enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>-->
 			</OverflowToolbar>
 		</customHeader>
 		<content>
@@ -43,18 +43,18 @@
 									</suggestionItems>
 								</Input>
 								<Text class="sapUiTinyMarginEnd" text="{oPOModel>materialDescription}"/>
-								<Select selectedKey="{oPOModel>debitOrCredit}" change="onInvoiceDetailsChangeCrDr" enabled="{oVisibilityModel>/NonPOInvoice/editable}" enabled="false">
+								<Select selectedKey="{oPOModel>debitOrCredit}" change="onInvoiceDetailsChangeCrDr"  enabled="false">
 									<core:Item text="Debit" key="H"/>
 									<core:Item text="Credit" key="S"/>
 								</Select>
 								<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
-									valueState="{oPOModel>costCenterError}" change="onChangeCostCenter" enabled="{oVisibilityModel>/NonPOInvoice/editable}" enabled="false">
+									valueState="{oPOModel>costCenterError}" change="onChangeCostCenter" enabled="false">
 									<items>
 										<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
 									</items>
 								</Select>
-								<Input value="{oPOModel>qty}" type="Number" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"  editable="false" />
-								<Input value="{oPOModel>amount}" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"  editable="false" />
+								<Input value="{oPOModel>qty}" type="Number" liveChange="inputNANCheck"  editable="false" />
+								<Input value="{oPOModel>amount}" liveChange="inputNANCheck"  editable="false" />
 								<Button type="Reject" icon="sap-icon://delete" tooltip="{i18n>Delete}" press="deleteNonPoItemData" class="sapUiTinyMarginEnd"
 									enabled="false"/>
 							</cells>
