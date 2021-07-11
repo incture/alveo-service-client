@@ -760,7 +760,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 				// }
 				item.setGr_non_val(obj.isGrNonVal());
 			}
-			if (!ServiceUtil.isEmpty(obj.getAcctasscat())) {
+			if (!ServiceUtil.isEmpty(obj.isIrInd())) {
 				// if("true".equals(Boolean.toString(obj.isIrInd()))){
 				// item.setIrInd("1");
 				// }else{
@@ -768,7 +768,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 				// }
 				item.setIrInd(obj.isIrInd());
 			}
-			if (!ServiceUtil.isEmpty(obj.getAcctasscat())) {
+			if (!ServiceUtil.isEmpty(obj.isGrBasediv())) {
 				// if("true".equals(Boolean.toString(obj.isGrBasediv()))){
 				// item.setSrvBsdIVInd("1");
 				// }else{
