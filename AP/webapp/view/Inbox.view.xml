@@ -42,7 +42,7 @@
 								value="{oTaskInboxModel>/filterParams/invoiceDateTo}" tooltip="Invoice To Date" change="onDateRangeChange"/>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="F" label="{i18n>AssignedTo}">
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="F" label="{i18n>Users}">
 						<fb:control>
 							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/assignedTo}" items="{oDropDownModel>/taskGroupUsers}" showSecondaryValues="true">
 								<core:ListItem key="{oDropDownModel>userId}" text="{oDropDownModel>userId}" additionalText="{oDropDownModel>role}"/>
@@ -71,7 +71,7 @@
 							<Input value="{oTaskInboxModel>/filterParams/invoiceValueTo}" type="Number" change="onChangeInvoiceValue"/>
 						</fb:control>
 					</fb:FilterGroupItem>
-					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="K" label="{i18n>ValidationStatus}">
+					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="K" label="{i18n>InvStatus}">
 						<fb:control>
 							<MultiComboBox selectedKeys="{oTaskInboxModel>/filterParams/validationStatus}" items="{oDropDownModel>/validationStatus}">
 								<core:Item key="{oDropDownModel>statusCode}" text="{oDropDownModel>shortText}"/>

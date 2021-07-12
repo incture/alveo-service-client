@@ -247,8 +247,7 @@ sap.ui.define([
 					oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 				}
-			}
-			else if(status == "1") {
+			} else if (status == "1") {
 				oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 				oVisibilityModel.setProperty("/NonPOInvoice/actionBtnEnable", true);
 				oVisibilityModel.setProperty("/NonPOInvoice/SaveBtnVisible", true);
@@ -1269,6 +1268,39 @@ sap.ui.define([
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
+		//DASHBOARD and TRACK INVOICE
+		//To get the default values for Dashboard and Track Invoice
+		getDefaultValues: function (view) {
+			var oVisibilityModel = this.oVisibilityModel,
+				oUserDetailModel = this.oUserDetailModel,
+				userDetail = oUserDetailModel.getProperty("/loggedinUserDetail"),
+				userGroup = oUserDetailModel.getProperty("/loggedinUserGroup"),
+				compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value,
+				vendorId = [];
+			oVisibilityModel.setProperty("/TrackInvoice/vendorId", true);
+			oVisibilityModel.setProperty("/TrackInvoice/companyCode", true);
+			if (userGroup === "IT_Admin") {
+				var compCode = compCode;
+			} else {
+				oVisibilityModel.setProperty("/TrackInvoice/vendorId", false);
+				oVisibilityModel.setProperty("/TrackInvoice/companyCode", false);
+				vendorId = [];
+				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+				vendorId.push(loggedinUserVendorId);
+			}
+			if (view === "TrackInvoice") {
+				var mFilterModel = this.mFilterModel;
+				mFilterModel.setProperty("/vendorId", vendorId);
+				mFilterModel.setProperty("/selectedCompanyCode", compCode);
+				mFilterModel.refresh();
+			} else {
+				var mDashboardModel = this.mDashboardModel;
+				mDashboardModel.setProperty("/vendorId", vendorId);
+				mDashboardModel.setProperty("/compCode", compCode);
+				mDashboardModel.refresh();
+			}
+
+		},
 	});
 
 });

@@ -11,7 +11,7 @@
 					<VBox>
 						<Label text="{i18n>VENDOR}" class="sapUiSizeCompact" design="Bold"/>
 						<MultiComboBox items="{oDropDownModel>/VendorIdSuggest}" selectedKeys="{mFilterModel>/vendorId}" showSecondaryValues="true" width="100%"
-							class="margintopinFld" placeholder="{i18n>enterVendor}">
+							class="margintopinFld" placeholder="{i18n>enterVendor}" enabled="{oVisibilityModel>/TrackInvoice/vendorId}">
 							<items>
 								<core:ListItem key="{oDropDownModel>Supplier}" text="{oDropDownModel>SupplierName} - {oDropDownModel>Supplier}"/>
 							</items>
@@ -19,7 +19,8 @@
 					</VBox>
 					<VBox>
 						<Label text="{i18n>compCode}" class="sapUiSizeCompact" design="Bold"/>
-						<Input value="{mFilterModel>/selectedCompanyCode}" placeholder="{i18n>EnterCompanyCode}" class="margintopinFld" width="100%"/>
+						<Input value="{mFilterModel>/selectedCompanyCode}" placeholder="{i18n>EnterCompanyCode}" class="margintopinFld" width="100%"
+							enabled="{oVisibilityModel>/TrackInvoice/companyCode}"/>
 					</VBox>
 					<VBox>
 						<Label text="{i18n>invoiceDateRange}" class="sapUiSizeCompact" design="Bold"/>
