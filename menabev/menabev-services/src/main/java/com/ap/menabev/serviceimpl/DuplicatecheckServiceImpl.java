@@ -275,13 +275,13 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 						checkStatus.setInvoiceStatusText("Balance Mismatch");
 					}
-					else 
+					else if(balanceAmount==checkStatus.getBalanceAmount().doubleValue()
+							&& ApplicationConstants.THREE_WAY_MATCH_SUCCESS.equals(checkStatus.getInvoiceStatus()))
 					{
 						System.err.println("READY_TO_POS_WAY_MATCH_SUCCESS"); 
 						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
 						checkStatus.setInvoiceStatusText("Ready To Post");
 					}
-
 					System.err.println("AFTER BALANCE AMOUNT CHECK "+  checkStatus );	
 				} else {
 					// iv. Else
