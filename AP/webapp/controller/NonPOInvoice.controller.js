@@ -282,6 +282,7 @@ sap.ui.define([
 			var documentId = oPOModel.getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId);
 		},
+		
 		//End of Header Filter function
 
 		//onChange CC item level tax
@@ -855,7 +856,7 @@ sap.ui.define([
 				userInputTaxAmount = (parseFloat(userInputTaxAmount)).toFixed(2);
 				oPOModel.setProperty("/taxValue", userInputTaxAmount);
 			}
-			POServices.calculateGrossAmount(oEvent, this);
+			POServices.calculateNonPOGrossAmount(oEvent, this);
 			POServices.calculateBalance(oEvent, this);
 		},
 

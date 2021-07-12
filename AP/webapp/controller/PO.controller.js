@@ -287,6 +287,15 @@ sap.ui.define([
 			oPOModel.setProperty("/userList", userList);
 			oPOModel.refresh();
 		},
+		onDeleteInvLineItem: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var userList = oPOModel.getProperty("/userList");
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			oPOModel.setProperty(sPath + "/isDeleted", true);
+			oPOModel.setProperty(sPath + "/isSelected", false);
+			oPOModel.refresh();
+			POServices.onFilterItemDetails();
+		},
 
 		formUserListPayload: function () {
 			var oPOModel = this.oPOModel;

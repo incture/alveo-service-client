@@ -217,11 +217,11 @@
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true" visible="false"/>
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true"  visible="false">
+									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true" visible="false"/>
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
+									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true" />
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
