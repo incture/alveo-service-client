@@ -92,6 +92,7 @@ public class InvoiceItemDto {
 	private String distributionInd;
 	private String partialInvInd;
 	private List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload;
+	private String crDbIndicator;
 	
 	
 

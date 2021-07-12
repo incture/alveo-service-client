@@ -177,4 +177,7 @@ public class InvoiceItemDo implements Serializable {
 	private String distributionInd;
 	@Column(name = "PARTIAL_INV_IND" , length = 1)
 	private String partialInvInd;
+	//CRDBINDICATOR
+	@Column (name = "CR_DB_INDICATOR", length = 1)
+	private String crDbIndicator;
 }

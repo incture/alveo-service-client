@@ -400,7 +400,15 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 					if (!twowayMatchUpdatedItem.getIsTwowayMatched()) {
 						twoWayMatch = true;
 					}
-
+					
+					//Gross Amount Calculation
+					if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
+						if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
+							Double grossAmount = dto.getInvoiceHeader().getGrossAmount() + twowayMatchUpdatedItem.getGrossPrice();
+							dto.getInvoiceHeader().setGrossAmount(grossAmount);
+						}
+						
+					}
 					updatedItems.add(twowayMatchUpdatedItem);
 
 				}

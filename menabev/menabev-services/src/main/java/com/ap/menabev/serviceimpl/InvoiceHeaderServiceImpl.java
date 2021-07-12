@@ -607,6 +607,13 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 						}else {
 							itemDo.setIsDeleted(false);
 						}
+					if(!ServiceUtil.isEmpty(dto.getTransactionType())){
+						if("Invoice".equals(dto.getTransactionType())){
+							itemDo.setCrDbIndicator("S");
+						}else if("Credit".equals(dto.getTransactionType())){
+							itemDo.setCrDbIndicator("H");
+						}
+					}
 					itemDo =	invoiceItemRepository.save(itemDo);
 					itemSave = mapper.map(itemDo, InvoiceItemDto.class);
 				} else {
@@ -625,6 +632,13 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 					}
 					}else {
 						itemDo.setIsDeleted(false);
+					}
+					if(!ServiceUtil.isEmpty(dto.getTransactionType())){
+						if("Invoice".equals(dto.getTransactionType())){
+							itemDo.setCrDbIndicator("S");
+						}else if("Credit".equals(dto.getTransactionType())){
+							itemDo.setCrDbIndicator("H");
+						}
 					}
 					System.err.println("saved do of item else"+itemDo);
 					

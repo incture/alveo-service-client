@@ -544,13 +544,13 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 				itemReturn.setSrvBsdIv((Boolean.valueOf(poItem.getSrvBsdIVInd())));
 			}
 			 if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) &&
-			 !ServiceUtil.isEmpty(itemReturn.getTaxValue())) {
+			 !ServiceUtil.isEmpty(itemReturn.getTaxPercentage())) {
 			 Double sysSugTax = (itemReturn.getGrossPrice() *
-			 Double.valueOf(itemReturn.getTaxValue())) / 100;
+			 Double.valueOf(itemReturn.getTaxPercentage())) / 100;
 			 itemReturn.setSysSuggTax(sysSugTax);
 			 }
-			if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) && !ServiceUtil.isEmpty(itemReturn.getTaxValue())) {
-				Double taxValue = (itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxValue())) / 100;
+			if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) && !ServiceUtil.isEmpty(itemReturn.getTaxPercentage())) {
+				Double taxValue = (itemReturn.getGrossPrice() * Double.valueOf(itemReturn.getTaxPercentage())) / 100;
 				itemReturn.setTaxValue(taxValue);
 			}
 			if (!ServiceUtil.isEmpty(poItem.getConvNum1())) {
@@ -618,7 +618,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						// For Single
 						if (ServiceUtil.isEmpty(poItem.getDistribution())) {
 							InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
-								
+							if(!ServiceUtil.isEmpty(itemReturn.getCrDbIndicator())){
+								accountAssignment.setCrDbIndicator(itemReturn.getCrDbIndicator());
+							}
 							if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
 								accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
 							}
@@ -707,7 +709,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									accountAssignment.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
 								}
 							}
-
+							accountAssignment.setIsDeleted(false);
 							accountAssignmentArray.add(accountAssignment);
 
 						}
@@ -719,6 +721,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
 									if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
 										accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
+									}
+									if(!ServiceUtil.isEmpty(itemReturn.getCrDbIndicator())){
+										accountAssignment.setCrDbIndicator(itemReturn.getCrDbIndicator());
 									}
 									if(!ServiceUtil.isEmpty(poAccAssignment.getSerialNo())){
 										accountAssignment.setSerialNo(poAccAssignment.getSerialNo());
@@ -830,6 +835,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 													.setOrderId(poAccAssignment.getOrderId());
 										}
 									}
+									accountAssignment.setIsDeleted(false);
 									System.out.println("ACCOUNT ASSIGNMENT MULTIPLE===="+ accountAssignment);
 									accountAssignmentArray.add(accountAssignment);
 									i++;
@@ -897,6 +903,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
 							if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
 								accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
+							}
+							if(!ServiceUtil.isEmpty(itemReturn.getCrDbIndicator())){
+								accountAssignment.setCrDbIndicator(itemReturn.getCrDbIndicator());
 							}
 							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getSerialNo())){
 								accountAssignment.setSerialNo(poItem.getPoAccountAssigment().get(0).getSerialNo());
@@ -977,7 +986,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									accountAssignment.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
 								}
 							}
-
+							accountAssignment.setIsDeleted(false);
 							accountAssignmentArray.add(accountAssignment);
 
 						}
@@ -993,7 +1002,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									if(!ServiceUtil.isEmpty(poAccAssignment.getSerialNo())){
 										accountAssignment.setSerialNo(poAccAssignment.getSerialNo());
 									}
-									
+									if(!ServiceUtil.isEmpty(itemReturn.getCrDbIndicator())){
+										accountAssignment.setCrDbIndicator(itemReturn.getCrDbIndicator());
+									}
 									if(!ServiceUtil.isEmpty(itemReturn.getRequestId())){
 										accountAssignment.setRequestId(itemReturn.getRequestId());
 									}
@@ -1100,6 +1111,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 													.setOrderId(poAccAssignment.getOrderId());
 										}
 									}
+									accountAssignment.setIsDeleted(false);
 									System.out.println("ACCOUNT ASSIGNMENT MULTIPLE ELSE===="+ accountAssignment);
 									accountAssignmentArray.add(accountAssignment);
 									i++;
