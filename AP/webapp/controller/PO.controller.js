@@ -76,7 +76,7 @@ sap.ui.define([
 		},
 
 		hdrInvAmtCalu: function (oEvent) {
-			POServices.hdrInvAmtCalu(oEvent, this);
+			POServices.calculateGross(oEvent, this);
 		},
 		onVendorIdChange: function (oEvent) {
 
@@ -95,6 +95,7 @@ sap.ui.define([
 		},
 
 		calculateGross: function (oEvent) {
+			POServices.setChangeInd(oEvent, this, "headerChange");
 			POServices.calculateGross(oEvent, this);
 		},
 
@@ -329,8 +330,9 @@ sap.ui.define([
 		onNonPoSubmit: function (oEvent) {
 			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			var sUrl, actionCode;
+			var sUrl, actionCode, threewayMatch;
 			var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
+			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
 			if (userGroup === "Accountant") {
 				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
 				actionCode = "ASA";
@@ -341,7 +343,10 @@ sap.ui.define([
 				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 				actionCode = "PA";
 			}
-			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
+			if (changeIndicators && changeIndicators.itemChange) {
+				threewayMatch = true;
+			}
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....", "", threewayMatch);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
@@ -395,7 +400,11 @@ sap.ui.define([
 		SubmitForRemidiation: function (oEvent) {
 			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			var sUrl, actionCode;
+			var sUrl, actionCode, threewayMatch;
+			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
+			// if (changeIndicators && changeIndicators.itemChange) {
+			// 	this.onClickThreeWayMatch("", true);
+			// }
 			if (userGroup === "Accountant") {
 				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
 				actionCode = "ASR";
@@ -407,7 +416,10 @@ sap.ui.define([
 			// 	sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 			// 	actionCode = "";
 			// }
-			POServices.onPoSubmit(oEvent, this, "", actionCode, sUrl, "Saving....");
+			if (changeIndicators && changeIndicators.itemChange) {
+				threewayMatch = true;
+			}
+			POServices.onPoSubmit(oEvent, this, "", actionCode, sUrl, "Saving....", "", threewayMatch);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
@@ -454,7 +466,12 @@ sap.ui.define([
 
 		onNonPoSave: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
-			POServices.onNonPoSave(oEvent, this);
+			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
+			var threewayMatch;
+			if (changeIndicators && changeIndicators.itemChange) {
+				threewayMatch = true;
+			}
+			POServices.onNonPoSave(oEvent, this, threewayMatch);
 		},
 
 		onPostingDateChange: function (oEvent) {
