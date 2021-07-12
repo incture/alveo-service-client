@@ -10,17 +10,23 @@ sap.ui.define([
 			this.mDashboardModel = mDashboardModel;
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			this.oVisibilityModel = oVisibilityModel;
+			this.oVisibilityModel.setProperty("/TrackInvoice", {});
 			this.fnChartsDataDefault();
 		},
 
 		fnChartsDataDefault: function () {
-			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
-				loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value,
-				vendorId = [];
-			vendorId.push(loggedinUserVendorId);
-			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
-			
 			var mDashboardModel = this.mDashboardModel;
+			// var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
+			// 	loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value,
+			// 	vendorId = [];
+			// vendorId.push(loggedinUserVendorId);
+			// var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
+
+			this.getDefaultValues("Dashboard");
+			var vendorId = mDashboardModel.getProperty("/vendorId");
+			var compCode = mDashboardModel.getProperty("/compCode");
 			var today = new Date();
 			var rcvdOnFrom = new Date();
 			rcvdOnFrom.setMonth(rcvdOnFrom.getMonth() - 3);

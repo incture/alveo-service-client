@@ -1270,25 +1270,23 @@ sap.ui.define([
 
 		//DASHBOARD and TRACK INVOICE
 		//To get the default values for Dashboard and Track Invoice
-		getDefaultValues: function (vendorId, companyCode, view) {
+		getDefaultValues: function (view) {
 			var oVisibilityModel = this.oVisibilityModel,
 				oUserDetailModel = this.oUserDetailModel,
 				userDetail = oUserDetailModel.getProperty("/loggedinUserDetail"),
 				userGroup = oUserDetailModel.getProperty("/loggedinUserGroup"),
-				compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
+				compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value,
+				vendorId = [];
 			oVisibilityModel.setProperty("/TrackInvoice/vendorId", true);
 			oVisibilityModel.setProperty("/TrackInvoice/companyCode", true);
 			if (userGroup === "IT_Admin") {
-				vendorId = [];
-				companyCode = companyCode;
+				var compCode = compCode;
 			} else {
 				oVisibilityModel.setProperty("/TrackInvoice/vendorId", false);
 				oVisibilityModel.setProperty("/TrackInvoice/companyCode", false);
-				if (!vendorId) {
-					vendorId = [];
-					var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
-					vendorId.push(loggedinUserVendorId);
-				}
+				vendorId = [];
+				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+				vendorId.push(loggedinUserVendorId);
 			}
 			if (view === "TrackInvoice") {
 				var mFilterModel = this.mFilterModel;

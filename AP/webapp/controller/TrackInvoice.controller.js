@@ -305,12 +305,14 @@ sap.ui.define([
 
 		fnDefaultFilter: function () {
 			var that = this;
-			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
-			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
-			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
+			// var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
+			// var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			// var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
 			var mFilterModel = this.mFilterModel;
+			
+			this.getDefaultValues("TrackInvoice");
 			var vendorId = mFilterModel.getProperty("/vendorId");
-			this.getDefaultValues(vendorId, compCode, "TrackInvoice");
+			var compCode = mFilterModel.getProperty("/selectedCompanyCode");
 			// if (!vendorId) {
 			// 	vendorId = [];
 			// 	var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
@@ -593,7 +595,7 @@ sap.ui.define([
 			// 	vendorId = [],
 			// 	loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 			// vendorId.push(loggedinUserVendorId);
-			this.getDefaultValues("", "", "TrackInvoice");
+			this.getDefaultValues("TrackInvoice");
 			var mFilterModel = this.mFilterModel;
 			var oTrackInvoiceModel = this.oTrackInvoiceModel;
 			mFilterModel.setProperty("/invReference", "");
