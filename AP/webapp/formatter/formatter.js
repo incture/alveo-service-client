@@ -576,10 +576,10 @@ com.menabev.AP.formatter.formatter = {
 	},
 	
 	getInvStatusColorScheme: function(invStatus){
-		if(invStatus === "17"){
-			return "7";
+		if(invStatus != 17){
+			return 3;
 		} else {
-			return "3";
+			return 7;
 		}
 	}
 

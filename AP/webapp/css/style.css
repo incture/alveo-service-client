@@ -119,6 +119,11 @@
 .mTableCss .sapMTableTH {
     background-color: #e6edf5;
 }
+
+.toggleColumnHeader{
+    color: brown;
+}
+
 /*Comments*/
 
 .sapSuiteUiCommonsTimeline {

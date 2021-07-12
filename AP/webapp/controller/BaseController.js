@@ -248,6 +248,13 @@ sap.ui.define([
 					oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 				}
 			}
+			else if(status == "1") {
+				oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/actionBtnEnable", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/SaveBtnVisible", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", true);
+				oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
+			}
 		},
 
 		//Open PDF Area details

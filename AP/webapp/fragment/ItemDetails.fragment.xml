@@ -78,35 +78,35 @@
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>MATCHDOCNUM}" tooltip="{i18n>MATCHDOCNUM}"/>
+								<Label design="Bold" text="{i18n>MATCHDOCNUM}" tooltip="{i18n>MATCHDOCNUM}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible' }">
-								<Label design="Bold" text="{i18n>MATCHDOCITEM}" tooltip="{i18n>MATCHDOCITEM}"/>
+								<Label design="Bold" text="{i18n>MATCHDOCITEM}" tooltip="{i18n>MATCHDOCITEM}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>REQNUM}" tooltip="{i18n>REQNUM}"/>
+								<Label design="Bold" text="{i18n>REQNUM}" tooltip="{i18n>REQNUM}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>REQITM}" tooltip="{i18n>REQITM}"/>
+								<Label design="Bold" text="{i18n>REQITM}" tooltip="{i18n>REQITM}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>CONTRACTNUM}" tooltip="{i18n>CONTRACTNUM}"/>
+								<Label design="Bold" text="{i18n>CONTRACTNUM}" tooltip="{i18n>CONTRACTNUM}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>CONTRACTITM}" tooltip="{i18n>CONTRACTITM}"/>
+								<Label design="Bold" text="{i18n>CONTRACTITM}" tooltip="{i18n>CONTRACTITM}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>ITEMCATEGORY}" tooltip="{i18n>ITEMCATEGORY}"/>
+								<Label design="Bold" text="{i18n>ITEMCATEGORY}" tooltip="{i18n>ITEMCATEGORY}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOVisible'}">
-								<Label design="Bold" text="{i18n>PRODUCTTYPE}" tooltip="{i18n>PRODUCTTYPE}"/>
+								<Label design="Bold" text="{i18n>PRODUCTTYPE}" tooltip="{i18n>PRODUCTTYPE}" class="toggleColumnHeader"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem" visible="false">
 								<Label design="Bold" text="{i18n>POMATNUM}" tooltip="{i18n>POITEMTEXT}"/>

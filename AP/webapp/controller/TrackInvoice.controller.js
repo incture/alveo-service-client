@@ -26,7 +26,9 @@ sap.ui.define([
 			this.getView().setModel(mFilterModel, "mFilterModel");
 			var oUserDetailModel = this.getOwnerComponent().getModel("oUserDetailModel");
 			this.oUserDetailModel = oUserDetailModel;
-			// this.oVisibilityModel = oVisibilityModel;
+			var oVisibilityModel = this.getOwnerComponent().getModel("oVisibilityModel");
+			this.oVisibilityModel = oVisibilityModel;
+			this.oVisibilityModel.setProperty("/TrackInvoice", {});
 			this.oTrackInvoiceModel = oTrackInvoiceModel;
 			this.mFilterModel = mFilterModel;
 			this.oDataAPIModel = oDataAPIModel;
@@ -303,18 +305,20 @@ sap.ui.define([
 		fnDefaultFilter: function () {
 			var that = this;
 			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
 			var compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value;
 			var mFilterModel = this.mFilterModel;
 			var vendorId = mFilterModel.getProperty("/vendorId");
-			if (!vendorId) {
-				vendorId = [];
-				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
-				vendorId.push(loggedinUserVendorId);
-			}
-			mFilterModel.refresh(true);
-			// var compCode = "1010";
-			mFilterModel.setProperty("/vendorId", vendorId);
-			mFilterModel.setProperty("/selectedCompanyCode", compCode);
+			this.getDefaultValues(vendorId, compCode);
+			// if (!vendorId) {
+			// 	vendorId = [];
+			// 	var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+			// 	vendorId.push(loggedinUserVendorId);
+			// }
+
+			// mFilterModel.refresh(true);
+			// mFilterModel.setProperty("/vendorId", vendorId);
+			// mFilterModel.setProperty("/selectedCompanyCode", compCode);
 			var obj = {
 				"companyCode": compCode,
 				"vendorId": vendorId
@@ -382,6 +386,33 @@ sap.ui.define([
 				});
 		},
 
+		getDefaultValues: function (vendorId, companyCode) {
+			var oVisibilityModel = this.oVisibilityModel,
+				oUserDetailModel = this.oUserDetailModel,
+				userDetail = oUserDetailModel.getProperty("/loggedinUserDetail"),
+				userGroup = oUserDetailModel.getProperty("/loggedinUserGroup"),
+				compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value,
+				mFilterModel = this.mFilterModel;
+			oVisibilityModel.setProperty("/TrackInvoice/vendorId", true);
+			oVisibilityModel.setProperty("/TrackInvoice/companyCode", true);
+
+			if (userGroup === "IT_Admin") {
+				vendorId = [];
+				companyCode = companyCode;
+			} else {
+				oVisibilityModel.setProperty("/TrackInvoice/vendorId", false);
+				oVisibilityModel.setProperty("/TrackInvoice/companyCode", false);
+				if (!vendorId) {
+					vendorId = [];
+					var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+					vendorId.push(loggedinUserVendorId);
+				}
+			}
+			mFilterModel.setProperty("/vendorId", vendorId);
+			mFilterModel.setProperty("/selectedCompanyCode", compCode);
+			mFilterModel.refresh();
+		},
+
 		fnGetFilter: function () {
 			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail");
 			var mFilterModel = this.mFilterModel;
@@ -391,12 +422,12 @@ sap.ui.define([
 			var invReference = mFilterModel.getProperty("/invReference"),
 				selectedCompany = mFilterModel.getProperty("/selectedCompanyCode");
 			vendorId = mFilterModel.getProperty("/vendorId");
-			if (!vendorId) {
-				vendorId = [];
-				var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
-				vendorId.push(loggedinUserVendorId);
-			}
-			
+			// if (!vendorId) {
+			// 	vendorId = [];
+			// 	var loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+			// 	vendorId.push(loggedinUserVendorId);
+			// }
+
 			var statusCode = mFilterModel.getProperty("/statusCode");
 			var invDateFrom = mFilterModel.getProperty("/invDateFrom");
 			if (invDateFrom !== undefined) {
@@ -583,17 +614,17 @@ sap.ui.define([
 		},
 
 		onPressReset: function () {
-			var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
-				compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value,
-				vendorId = [],
-				loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
-			vendorId.push(loggedinUserVendorId);
-			
+			// var userDetail = this.oUserDetailModel.getProperty("/loggedinUserDetail"),
+			// 	compCode = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[1].value,
+			// 	vendorId = [],
+			// 	loggedinUserVendorId = userDetail["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
+			// vendorId.push(loggedinUserVendorId);
+			this.getDefaultValues("", "");
 			var mFilterModel = this.mFilterModel;
 			var oTrackInvoiceModel = this.oTrackInvoiceModel;
 			mFilterModel.setProperty("/invReference", "");
-			mFilterModel.setProperty("/vendorId", vendorId);
-			mFilterModel.setProperty("/selectedCompanyCode", compCode);
+			// mFilterModel.setProperty("/vendorId", vendorId);
+			// mFilterModel.setProperty("/selectedCompanyCode", compCode);
 			mFilterModel.setProperty("/invDateFrom", null);
 			mFilterModel.setProperty("/invDateTo", null);
 			mFilterModel.setProperty("/receivedDateFrom", null);
