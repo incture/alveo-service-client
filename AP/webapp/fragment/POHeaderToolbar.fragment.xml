@@ -1,7 +1,9 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons">
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons" xmlns:tnt="sap.tnt">
 	<Button icon="sap-icon://nav-back" press="onCancelChanges"/>
 	<Title text="{oPOModel>/requestId}"></Title>
-	<Title text="{oPOModel>/invoiceStatusText}"></Title>
+	<tnt:InfoLabel text="{oPOModel>/invoiceStatusText}" displayOnly= "true"
+		colorScheme="{path :'oPOModel>/invoiceStatus', formatter:'com.menabev.AP.formatter.formatter.getInvStatusColorScheme'}"/>
+	<!--<Title text="{oPOModel>/invoiceStatusText}"></Title>-->
 	<ToolbarSpacer/>
 	<Label text="{i18n>InvoiceAmount}" design="Bold" required="true" class="sapUiLargeMarginBegin "/>
 	<Text text="{path:'oPOModel>/currency',formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"/>

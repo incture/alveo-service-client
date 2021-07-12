@@ -573,6 +573,14 @@ com.menabev.AP.formatter.formatter = {
 		} else {
 			return false;
 		}
+	},
+	
+	getInvStatusColorScheme: function(invStatus){
+		if(invStatus != 17){
+			return 3;
+		} else {
+			return 7;
+		}
 	}
 
 };

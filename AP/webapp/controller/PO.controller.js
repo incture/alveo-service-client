@@ -71,7 +71,7 @@ sap.ui.define([
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
-			this.getTaxCode(oHeader, countryKey);
+			this.getTaxCode(oHeader, oLanguage, countryKey);
 			this.getCostCenter("1010", oLanguage);
 		},
 

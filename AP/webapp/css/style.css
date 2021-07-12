@@ -99,6 +99,31 @@
     vertical-align: middle;
 }
 
+
+.filterBarCss {
+    border-radius: 0.5rem;
+    background-color: #e6edf5;
+}
+
+.filterBarCss .sapUiCompFilterBar{
+	border-radius: 0.5rem;
+    background-color: #e6edf5;
+}
+
+.primaryBtnCss span.sapMBtnInner.sapMBtnEmphasized{
+    background-color:#00499c;
+    border-color: #00499c;
+    color: #fff;
+}
+
+.mTableCss .sapMTableTH {
+    background-color: #e6edf5;
+}
+
+.toggleColumnHeader{
+    color: brown;
+}
+
 /*Comments*/
 
 .sapSuiteUiCommonsTimeline {
