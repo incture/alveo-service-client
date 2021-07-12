@@ -268,6 +268,7 @@ com.menabev.AP.util.POServices = {
 	onTaxCodeChange: function (oEvent, oController) {
 		oController.errorHandlerselect(oEvent);
 		this.changeItemTax(oEvent, oController);
+		this.setChangeInd(oEvent, this, "itemChange");
 		this.onHeaderChange(oEvent, oController, "isTaxCodeChanged");
 	},
 
@@ -373,10 +374,13 @@ com.menabev.AP.util.POServices = {
 		});
 	},
 
-	onNonPoSave: function (oEvent, oController, status) {
+	onNonPoSave: function (oEvent, oController, threewayMatch) {
 		var oPOModel = oController.oPOModel;
 		var oSaveData = oPOModel.getData();
-		var oPayload;
+		var oPayload, sMethod = "POST";
+		if (threewayMatch) {
+			this.performThreewayMatch(oController, oSaveData);
+		}
 		if (oSaveData.invoiceType === "NON-PO") {
 			var sUrl = "/menabevdev/invoiceHeader/accountantSave",
 				sMethod = "POST";
@@ -500,7 +504,7 @@ com.menabev.AP.util.POServices = {
 		}
 
 	},
-	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode, sUrl, busyText, ItemMatch) {
+	onPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode, sUrl, busyText, ItemMatch, threewayMatch) {
 		var oPOModel = oController.oPOModel;
 		var oMandatoryModel = oController.oMandatoryModel;
 		var oData = oPOModel.getData();
@@ -534,6 +538,9 @@ com.menabev.AP.util.POServices = {
 		}
 		if (!oData.invoiceTotal) {
 			oData.invoiceTotal = 0;
+		}
+		if (threewayMatch) {
+			this.performThreewayMatch(oController, oSaveData);
 		}
 		var status = oData.invoiceStatus;
 		if (actionCode) {
@@ -659,6 +666,25 @@ com.menabev.AP.util.POServices = {
 				});
 			}
 		});
+	},
+
+	performThreewayMatch: function (oController, oData) {
+		var that = this;
+		var oPOModel = oController.oPOModel;
+		var oServiceModel = new sap.ui.model.json.JSONModel();
+		var oHeader = {
+			"Content-Type": "application/scim+json"
+		};
+		var busy = new sap.m.BusyDialog({
+			text: "Performing threeway match..."
+		});
+		busy.open();
+		var PO = jQuery.extend(true, [], oData.purchaseOrders);
+		oServiceModel.loadData("/menabevdev/validate/threeWayMatch", JSON.stringify(oData), false, "POST", false, false, oHeader);
+		busy.close();
+		var oData = oServiceModel.getData();
+		oPOModel.setProperty("/", oData);
+		oPOModel.setProperty("/purchaseOrders", PO);
 	},
 
 	onAccSubmit: function (oController, oData, sMethod, sUrl, actionCode, userList, ok, ItemMatch, busyText) {

@@ -1252,6 +1252,7 @@ sap.ui.define([
 		},
 
 		onClickThreeWayMatch: function (oEvent, itemMatch) {
+			POServices.setChangeInd(oEvent, this, "itemChange");
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/PO");
 			var sUrl, actionCode;
 			sUrl = "/menabevdev/validate/threeWayMatch";
