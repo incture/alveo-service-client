@@ -69,6 +69,8 @@ public @Data class InvoiceItemAcctAssignmentDo implements Serializable{
     private String crDbIndicator;
     @Column(name="CO_AREA",length = 4)
 	private String coArea;
+    @Column(name = "PRICING_UNIT")
+    private Integer pricingUnit;
 
 }
 

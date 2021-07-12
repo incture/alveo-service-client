@@ -18,6 +18,7 @@ import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.MatchingHistoryDto;
 import com.ap.menabev.dto.PoHistoryDto;
+import com.ap.menabev.dto.PoItemAccountAssignDto;
 import com.ap.menabev.dto.PurchaseDocumentItemDto;
 import com.ap.menabev.dto.TwoWayMatchInputDto;
 import com.ap.menabev.invoice.InvoiceItemRepository;
@@ -615,8 +616,32 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					if ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())) {
 						List<InvoiceItemAcctAssignmentDto> accountAssignmentArray = new ArrayList<>();
 						// For Single
-						if ("".equals(poItem.getDistribution())) {
+						if (ServiceUtil.isEmpty(poItem.getDistribution())) {
 							InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
+								
+							if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
+								accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
+							}
+							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getSerialNo())){
+								accountAssignment.setSerialNo(poItem.getPoAccountAssigment().get(0).getSerialNo());
+							}
+							
+							if(!ServiceUtil.isEmpty(itemReturn.getRequestId())){
+								accountAssignment.setRequestId(itemReturn.getRequestId());
+							}
+							if(!ServiceUtil.isEmpty(itemReturn.getItemCode())){
+								accountAssignment.setItemId(itemReturn.getItemCode());
+							}
+							if(!ServiceUtil.isEmpty(itemReturn.getPoUnitPriceOPU())){
+								accountAssignment.setPoUnitPriceOPU(itemReturn.getPoUnitPriceOU());
+							}
+							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getSerialNo())){
+								accountAssignment.setPoUnitPriceOU(itemReturn.getPoUnitPriceOU());
+							}
+							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getDistPer())){
+								accountAssignment.setDistPerc(poItem.getPoAccountAssigment().get(0).getDistPer());
+							}
+							
 							if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
 								accountAssignment.setNetValue(itemReturn.getGrossPrice());
 							}
@@ -652,7 +677,6 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// fn(invItem-grossPrice)
 							// Only Net value is there TODO
 							// ix. InvItem-ItemAccountAssignment-OrderPriceUnit
-							accountAssignment.setPoUnitPriceOPU(Double.valueOf(poItem.getOrderPriceUnit()));
 							// TODO
 							// poItem-OrderPriceUnit
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
@@ -690,18 +714,40 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						// For multiple with % distribution
 						else if ("2".equals(poItem.getDistribution())) {
 							int i = 0;
-							if (!ServiceUtil.isEmpty(itemReturn.getInvItemAcctDtoList())) {
-								for (InvoiceItemAcctAssignmentDto accountAssignment : itemReturn
-										.getInvItemAcctDtoList()) {
-									if (!ServiceUtil.isEmpty(itemReturn.getInvItemAcctDtoList().get(i).getDistPerc())
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								for (PoItemAccountAssignDto poAccAssignment : poItem.getPoAccountAssigment()) {
+									InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
+									if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
+										accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
+									}
+									if(!ServiceUtil.isEmpty(poAccAssignment.getSerialNo())){
+										accountAssignment.setSerialNo(poAccAssignment.getSerialNo());
+									}
+									
+									if(!ServiceUtil.isEmpty(itemReturn.getRequestId())){
+										accountAssignment.setRequestId(itemReturn.getRequestId());
+									}
+									if(!ServiceUtil.isEmpty(itemReturn.getItemCode())){
+										accountAssignment.setItemId(itemReturn.getItemCode());
+									}
+									if(!ServiceUtil.isEmpty(itemReturn.getPoUnitPriceOPU())){
+										accountAssignment.setPoUnitPriceOPU(itemReturn.getPoUnitPriceOU());
+									}
+									if(!ServiceUtil.isEmpty(poAccAssignment.getSerialNo())){
+										accountAssignment.setPoUnitPriceOU(itemReturn.getPoUnitPriceOU());
+									}
+									if (!ServiceUtil.isEmpty(poAccAssignment.getDistPer())
 											&& !ServiceUtil.isEmpty(itemReturn.getInvQty())
 											&& !ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
-										Double qty = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc()
+										Double qty = (poAccAssignment.getDistPer()
 												* itemReturn.getInvQty()) / 100;
-										Double netValue = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc()
+										Double netValue = (poAccAssignment.getDistPer()
 												* itemReturn.getGrossPrice()) / 100;
 										accountAssignment.setNetValue(netValue);
 										accountAssignment.setQty(qty);
+									}
+									if(!ServiceUtil.isEmpty(poAccAssignment.getDistPer())){
+										accountAssignment.setDistPerc(poAccAssignment.getDistPer());
 									}
 
 									// if
@@ -752,39 +798,39 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									// poItem-OrderPriceUnit
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 										if (!ServiceUtil
-												.isEmpty(poItem.getPoAccountAssigment().get(i).getCostCenter())) {
-											accountAssignment.setCostCenter(
-													poItem.getPoAccountAssigment().get(i).getCostCenter());
+												.isEmpty(poAccAssignment.getCostCenter())) {
+											accountAssignment.setCostCenter(poAccAssignment.getCostCenter());
 										}
 
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 										if (!ServiceUtil
-												.isEmpty(poItem.getPoAccountAssigment().get(i).getGlAccount())) {
+												.isEmpty(poAccAssignment.getGlAccount())) {
 											accountAssignment
-													.setGlAccount(poItem.getPoAccountAssigment().get(i).getGlAccount());
+													.setGlAccount(poAccAssignment.getGlAccount());
 										}
 
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCoArea())) {
+										if (!ServiceUtil.isEmpty(poAccAssignment.getCoArea())) {
 											accountAssignment
-													.setCoArea(poItem.getPoAccountAssigment().get(0).getCoArea());
+													.setCoArea(poAccAssignment.getCoArea());
 										}
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 										if (!ServiceUtil
-												.isEmpty(poItem.getPoAccountAssigment().get(0).getProfitCtr())) {
+												.isEmpty(poAccAssignment.getProfitCtr())) {
 											accountAssignment
-													.setProfitCtr(poItem.getPoAccountAssigment().get(0).getProfitCtr());
+													.setProfitCtr(poAccAssignment.getProfitCtr());
 										}
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getOrderId())) {
+										if (!ServiceUtil.isEmpty(poAccAssignment.getOrderId())) {
 											accountAssignment
-													.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
+													.setOrderId(poAccAssignment.getOrderId());
 										}
 									}
+									System.out.println("ACCOUNT ASSIGNMENT MULTIPLE===="+ accountAssignment);
 									accountAssignmentArray.add(accountAssignment);
 									i++;
 								}
@@ -847,8 +893,30 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					if ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())) {
 						List<InvoiceItemAcctAssignmentDto> accountAssignmentArray = new ArrayList<>();
 						// For Single
-						if ("".equals(poItem.getDistribution())) {
+						if (ServiceUtil.isEmpty(poItem.getDistribution())) {
 							InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
+							if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
+								accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
+							}
+							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getSerialNo())){
+								accountAssignment.setSerialNo(poItem.getPoAccountAssigment().get(0).getSerialNo());
+							}
+							
+							if(!ServiceUtil.isEmpty(itemReturn.getRequestId())){
+								accountAssignment.setRequestId(itemReturn.getRequestId());
+							}
+							if(!ServiceUtil.isEmpty(itemReturn.getItemCode())){
+								accountAssignment.setItemId(itemReturn.getItemCode());
+							}
+							if(!ServiceUtil.isEmpty(itemReturn.getPoUnitPriceOPU())){
+								accountAssignment.setPoUnitPriceOPU(itemReturn.getPoUnitPriceOU());
+							}
+							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getSerialNo())){
+								accountAssignment.setPoUnitPriceOU(itemReturn.getPoUnitPriceOU());
+							}
+							if(!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getDistPer())){
+								accountAssignment.setDistPerc(poItem.getPoAccountAssigment().get(0).getDistPer());
+							}
 							if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
 								accountAssignment.setNetValue(itemReturn.getGrossPrice());
 							}
@@ -884,7 +952,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// fn(invItem-grossPrice)
 							// Only Net value is there TODO
 							// ix. InvItem-ItemAccountAssignment-OrderPriceUnit
-							accountAssignment.setPoUnitPriceOPU(Double.valueOf(poItem.getOrderPriceUnit()));
+//							accountAssignment.setPoUnitPriceOPU(Double.valueOf(poItem.getOrderPriceUnit()));
 							// TODO
 							// poItem-OrderPriceUnit
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCostCenter())) {
@@ -916,17 +984,40 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						// For multiple with % distribution
 						else if ("2".equals(poItem.getDistribution())) {
 							int i = 0;
-							if(!ServiceUtil.isEmpty(itemReturn.getInvItemAcctDtoList())){
-								for (InvoiceItemAcctAssignmentDto accountAssignment : itemReturn.getInvItemAcctDtoList()) {
-									if (!ServiceUtil.isEmpty(itemReturn.getInvItemAcctDtoList().get(i).getDistPerc())
+							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
+								for (PoItemAccountAssignDto poAccAssignment : poItem.getPoAccountAssigment()) {
+									InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
+									if(!ServiceUtil.isEmpty(itemReturn.getPricingUnit())){
+										accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
+									}
+									if(!ServiceUtil.isEmpty(poAccAssignment.getSerialNo())){
+										accountAssignment.setSerialNo(poAccAssignment.getSerialNo());
+									}
+									
+									if(!ServiceUtil.isEmpty(itemReturn.getRequestId())){
+										accountAssignment.setRequestId(itemReturn.getRequestId());
+									}
+									if(!ServiceUtil.isEmpty(itemReturn.getItemCode())){
+										accountAssignment.setItemId(itemReturn.getItemCode());
+									}
+									if(!ServiceUtil.isEmpty(itemReturn.getPoUnitPriceOPU())){
+										accountAssignment.setPoUnitPriceOPU(itemReturn.getPoUnitPriceOU());
+									}
+									if(!ServiceUtil.isEmpty(poAccAssignment.getSerialNo())){
+										accountAssignment.setPoUnitPriceOU(itemReturn.getPoUnitPriceOU());
+									}
+									if (!ServiceUtil.isEmpty(poAccAssignment.getDistPer())
 											&& !ServiceUtil.isEmpty(itemReturn.getInvQty())
 											&& !ServiceUtil.isEmpty(itemReturn.getGrossPrice())) {
-										Double qty = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc()
+										Double qty = (poAccAssignment.getDistPer()
 												* itemReturn.getInvQty()) / 100;
-										Double netValue = (itemReturn.getInvItemAcctDtoList().get(i).getDistPerc()
+										Double netValue = (poAccAssignment.getDistPer()
 												* itemReturn.getGrossPrice()) / 100;
 										accountAssignment.setNetValue(netValue);
 										accountAssignment.setQty(qty);
+									}
+									if(!ServiceUtil.isEmpty(poAccAssignment.getDistPer())){
+										accountAssignment.setDistPerc(poAccAssignment.getDistPer());
 									}
 
 									// if
@@ -942,7 +1033,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									if (!ServiceUtil.isEmpty(itemReturn.getUom())) {
 										accountAssignment.setQtyUnit(itemReturn.getUom());
 									}
-									// v. InvItem-ItemAccountAssignment-netValueOu =
+									// v.
+									// InvItem-ItemAccountAssignment-netValueOu
+									// =
 									// fn(invItem-grossPrice)
 									// TODO same field
 									// vi. InvItem-ItemAccountAssignment-qtyOu =
@@ -952,7 +1045,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 										accountAssignment.setAvlQtyOU(qtyOpuToOu(itemReturn.getConvNum1(),
 												itemReturn.getConvDen1(), itemReturn.getAlvQtyOPU()));
 									}
-									// vii. InvItem-ItemAccountAssignment-OrderUnit/
+									// vii.
+									// InvItem-ItemAccountAssignment-OrderUnit/
 									// =
 									// poItem-OrderUnit//TODO
 									if (!ServiceUtil.isEmpty(poItem.getPoUnit())) {
@@ -964,7 +1058,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 										accountAssignment.setAlvQtyOPU(qtyOuToOpu(itemReturn.getConvNum1(),
 												itemReturn.getConvDen1(), itemReturn.getAlvQtyOU()));
 									}
-									// ix. InvItem-ItemAccountAssignment-netValueOpu
+									// ix.
+									// InvItem-ItemAccountAssignment-netValueOpu
 									// =
 									// fn(invItem-grossPrice)
 									//
@@ -972,41 +1067,44 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 									// InvItem-ItemAccountAssignment-OrderPriceUnit
 									// poItem-OrderPriceUnit
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getCostCenter())) {
-											accountAssignment
-													.setCostCenter(poItem.getPoAccountAssigment().get(i).getCostCenter());
+										if (!ServiceUtil
+												.isEmpty(poAccAssignment.getCostCenter())) {
+											accountAssignment.setCostCenter(poAccAssignment.getCostCenter());
 										}
 
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(i).getGlAccount())) {
+										if (!ServiceUtil
+												.isEmpty(poAccAssignment.getGlAccount())) {
 											accountAssignment
-													.setGlAccount(poItem.getPoAccountAssigment().get(i).getGlAccount());
+													.setGlAccount(poAccAssignment.getGlAccount());
 										}
 
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getCoArea())) {
-											accountAssignment.setCoArea(poItem.getPoAccountAssigment().get(0).getCoArea());
+										if (!ServiceUtil.isEmpty(poAccAssignment.getCoArea())) {
+											accountAssignment
+													.setCoArea(poAccAssignment.getCoArea());
 										}
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getProfitCtr())) {
+										if (!ServiceUtil
+												.isEmpty(poAccAssignment.getProfitCtr())) {
 											accountAssignment
-													.setProfitCtr(poItem.getPoAccountAssigment().get(0).getProfitCtr());
+													.setProfitCtr(poAccAssignment.getProfitCtr());
 										}
 									}
 									if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
-										if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment().get(0).getOrderId())) {
+										if (!ServiceUtil.isEmpty(poAccAssignment.getOrderId())) {
 											accountAssignment
-													.setOrderId(poItem.getPoAccountAssigment().get(0).getOrderId());
+													.setOrderId(poAccAssignment.getOrderId());
 										}
 									}
+									System.out.println("ACCOUNT ASSIGNMENT MULTIPLE ELSE===="+ accountAssignment);
 									accountAssignmentArray.add(accountAssignment);
 									i++;
 								}
 							}
-							
 						}
 						itemReturn.setInvItemAcctDtoList(accountAssignmentArray);
 						itemReturn.setIsAccAssigned(true);
