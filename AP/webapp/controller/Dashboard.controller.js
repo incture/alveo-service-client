@@ -22,8 +22,10 @@ sap.ui.define([
 			
 			var mDashboardModel = this.mDashboardModel;
 			var today = new Date();
-			var past = new Date();
-			var rcvdOnFrom = past.setDate(past.getDate() - 3650);
+			var rcvdOnFrom = new Date();
+			rcvdOnFrom.setMonth(rcvdOnFrom.getMonth() - 3);
+			// var past = new Date();
+			// var rcvdOnFrom = past.setDate(past.getDate() - 3650);
 			var rcvdOnTo = today.getTime();
 			var pastDate = new Date(rcvdOnFrom);
 			mDashboardModel.setProperty("/toDate", today);

@@ -20,7 +20,7 @@
 					<VBox>
 						<Label text="{i18n>vendor}:" design="Bold"></Label>
 						<MultiComboBox items="{oDropDownModel>/VendorIdSuggest}" selectedKeys="{mDashboardModel>/vendorId}" showSecondaryValues="true" width="100%"
-							class="sapUiTinyMarginEnd margintopinFld" placeholder="{i18n>searchVendor}">
+							class="sapUiTinyMarginEnd margintopinFld" placeholder="{i18n>searchVendor}" enabled="{oVisibilityModel>/TrackInvoice/vendorId}">
 							<items>
 								<core:ListItem key="{oDropDownModel>Supplier}" text="{oDropDownModel>SupplierName} - {oDropDownModel>Supplier}"/>
 							</items>
@@ -28,15 +28,18 @@
 					</VBox>
 					<VBox>
 						<Label design="Bold" text="{i18n>compCode}:"></Label>
-						<Input value="{mDashboardModel>/compCode}" width="100%" placeholder="{i18n>searchComp}" class="sapUiTinyMarginEnd margintopinFld"/>
+						<Input value="{mDashboardModel>/compCode}" width="100%" placeholder="{i18n>searchComp}" class="sapUiTinyMarginEnd margintopinFld"
+							enabled="{oVisibilityModel>/TrackInvoice/companyCode}"/>
 					</VBox>
 					<VBox>
 						<Label design="Bold" text="{i18n>receivedFrom}:"></Label>
-						<DatePicker dateValue="{mDashboardModel>/fromDate}" placeholder="{i18n>fromDate}" width="100%" class="margintopinFld sapUiTinyMarginEnd"/>
+						<DatePicker dateValue="{mDashboardModel>/fromDate}" placeholder="{i18n>fromDate}" width="100%" displayFormat="MM/dd/YYYY"
+							class="margintopinFld sapUiTinyMarginEnd"/>
 					</VBox>
 					<VBox>
 						<Label design="Bold" text="{i18n>receivedTo}:"></Label>
-						<DatePicker dateValue="{mDashboardModel>/toDate}" placeholder="{i18n>toDate}" width="100%" class=" margintopinFld"/>
+						<DatePicker dateValue="{mDashboardModel>/toDate}" placeholder="{i18n>toDate}" width="100%" displayFormat="MM/dd/YYYY"
+							class=" margintopinFld"/>
 					</VBox>
 				</l:Grid>
 			</f:DynamicPageHeader>
