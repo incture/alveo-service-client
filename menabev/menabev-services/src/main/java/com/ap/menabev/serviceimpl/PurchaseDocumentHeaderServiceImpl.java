@@ -440,6 +440,9 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 				for (ThreeWayInvoiceItemDto threeWayItems : headerChangeThreeWayMatch.getInvoiceItems()) {
 					InvoiceItemDto item = new InvoiceItemDto();
 					item = mapper.map(threeWayItems, InvoiceItemDto.class);
+					// Ui should send either true or false 
+					item.setIsDeleted(threeWayItems.isDeleted());
+					
 					// Item Messages
 					List<ItemMessageDto> itemMessagesList = new ArrayList<>();
 					if (!ServiceUtil.isEmpty(threeWayItems.getInvoiceItemMessages())) {
@@ -490,8 +493,9 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			changeIndicators.setCommentChange(true);
 			changeIndicators.setCostAllocationChange(true);
 			changeIndicators.setHeaderChange(true);
-			dto.getInvoiceHeader().setChangeIndicators(changeIndicators);
-			invoiceHeaderServiceImpl.saveAPI(afterThreeWayMatch);
+			afterThreeWayMatch.setChangeIndicators(changeIndicators);
+			
+			      invoiceHeaderServiceImpl.saveAPI(afterThreeWayMatch);
 			addPoReturn.setInvoiceObject(afterThreeWayMatch);
 		}
 

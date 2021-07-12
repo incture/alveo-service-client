@@ -135,6 +135,7 @@ public interface ApplicationConstants {
     String AUTO_MATCH = "AUTO";
     String THREE_WAY_MATCH_SUCCESS = "18";
     String PENDING_APPROVAL = "16";
+    String DUPLICATE_CHECK_PASSED = "21";
     String QUANTITY_HIGH_MSG_NUMBER = "504";
 	String QUANTITY_LOW_MSG_NUMBER="";
 	String PRICE_HIGH_MSG_NUMBER = "082";
@@ -169,6 +170,7 @@ public interface ApplicationConstants {
     String FOLDER = "HR1vVfGxI3pTs1EpsMV2YjgVe0OujD9fX2se8ENYtj8";
 	String LIFE_CYCLE_STATUS_OPEN = "Open";
 	String CHANEL_TYPE_EMAIL = "Email";
+	
 	
 
 	// QA FOLDER

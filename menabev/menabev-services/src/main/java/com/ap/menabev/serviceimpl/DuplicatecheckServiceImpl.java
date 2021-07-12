@@ -93,22 +93,22 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 	private String createStringForQuery(InvoiceHeaderObjectDto dto) {
 		String query = "";
 		if (!ServiceUtil.isEmpty(dto.getVendorId())) {
-			query = query + "vendorId =" + dto.getVendorId() + " and ";
+			query = query + "vendorId =" + "'"+dto.getVendorId()+"'" + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceStatus())) {
-			query = query + "invoiceStatus =" + dto.getInvoiceStatus() + " and ";
+			query = query + "invoiceStatus =" +"'"+ dto.getInvoiceStatus() +"'"+ " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceReference())) {
-			query = query + "extInvNum =" + dto.getInvoiceReference() + " and ";
+			query = query + "extInvNum =" +"'"+ dto.getInvoiceReference()+"'" + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceDate())) {
-			query = query + "invoiceDate =" + dto.getInvoiceDate() + " and ";
+			query = query + "invoiceDate =" + "'"+dto.getInvoiceDate() +"'"+ " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getInvoiceAmount())) {
-			query = query + "grossAmount =" + dto.getInvoiceAmount() + " and ";
+			query = query + "grossAmount =" +"'"+ dto.getInvoiceAmount()+"'" + " and ";
 		}
 		if (!ServiceUtil.isEmpty(dto.getCompanyCode())) {
-			query = query + "compCode =" + dto.getCompanyCode() + " and ";
+			query = query + "compCode =" +"'"+ dto.getCompanyCode() +"'"+ " and ";
 		}
 		return query;
 	}
@@ -176,6 +176,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						if (ApplicationConstants.NO_GRN.equals(item.getItemStatusCode())) {
 							// a. If itemStatus=No-GRN-04
 							//
+							System.err.println("NO_GRN FOR ITEM IF CASE");
+		
 							// i. SetHeaderStatus=No-GRN
 							checkStatus.setInvoiceStatus(ApplicationConstants.NO_GRN);
 							checkStatus.setInvoiceStatusText("No GRN");
@@ -188,6 +190,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// b. If itemStatus=ItemMismatch AND HeaderStatus NE
 							// NO-GRN
 							//
+							System.err.println("ITEM_MISMATCH  FOR ITEM IF CASE");
 							// i. Set HeaderStatus = ItemMismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.ITEM_MISMATCH);
 							checkStatus.setInvoiceStatusText("Item Mismatch");
@@ -196,11 +199,12 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 						}
 						if (ApplicationConstants.PRICE_MISMATCH.equals(item.getItemStatusCode())
 								&& (!ApplicationConstants.NO_GRN.equals(checkStatus.getInvoiceStatus())
-										|| !ApplicationConstants.PRICE_MISMATCH
+										|| !ApplicationConstants.ITEM_MISMATCH
 												.equals(checkStatus.getInvoiceStatus()))) {
 							// c. If itemStatus=Price Mismtach and (HeaderStatus
 							// NE NO-GRN or HeaderStatus NE ItemMismatch)
 							//
+							System.err.println("PRICE_MISMATCH  FOR ITEM IF CASE");
 							// i. HeaderStatus=PriceMismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.PRICE_MISMATCH);
 							checkStatus.setInvoiceStatusText("Price Mismatch");
@@ -215,6 +219,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// HeaderStatus NE ItemMismatch or headerStatus NE
 							// Price Mismatch)
 							//
+							System.err.println("PRICE_OR_QTY_MISMATCH  FOR ITEM IF CASE");
 							// i. Header status=Price/Qty Mismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
 							checkStatus.setInvoiceStatusText("Qty Mismatch");
@@ -230,6 +235,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// ItemMismatch or headerStatus NE Price Mismatch or
 							// headerStatus NE Price/Qty Mismatch)
 							//
+							System.err.println("QTY_MISMATCH  FOR ITEM IF CASE");
 							// i. HeaderStatus=QtyMismatch
 							checkStatus.setInvoiceStatus(ApplicationConstants.QTY_MISMATCH);
 							checkStatus.setInvoiceStatusText("Qty Mismatch");
@@ -247,6 +253,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 							// Mismatch AND headerStatus NE Price/Qty Mismatch
 							// AND HeaderStatus NE QtyMismatch)
 							// i. Set HeaderStatus = “3Way Success”
+							
+							System.err.println("READY TO POST  FOR ITEM IF CASE");
 							checkStatus.setInvoiceStatus(ApplicationConstants.THREE_WAY_MATCH_SUCCESS);
 							checkStatus.setInvoiceStatusText("3Way Success");
 						}
@@ -257,27 +265,36 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					//
 					// b. If HeaderStatus = “3way success” AND Balance = 0.00
 					// then set headerStatus=”Ready to Post”
-
-					if (!"0.00".equals(checkStatus.getBalanceAmount())
+ 
+					  double  balanceAmount = 0.0;
+					System.err.println("BEFORE BALANCE AMOUNT CHECK "+  checkStatus );
+					
+					if (balanceAmount!=checkStatus.getBalanceAmount().doubleValue()
 							&& ApplicationConstants.THREE_WAY_MATCH_SUCCESS.equals(checkStatus.getInvoiceStatus())) {
+					System.err.println("INSIDE BALANCE MISMATCH THREE_WAY_MATCH_SUCCESS"); 
 						checkStatus.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
 						checkStatus.setInvoiceStatusText("Balance Mismatch");
 					}
-					if ("0.00".equals(checkStatus.getBalanceAmount())
-							&& ApplicationConstants.THREE_WAY_MATCH_SUCCESS.equals(checkStatus.getInvoiceStatus())) {
+					else 
+					{
+						System.err.println("READY_TO_POS_WAY_MATCH_SUCCESS"); 
 						checkStatus.setInvoiceStatus(ApplicationConstants.READY_TO_POST);
 						checkStatus.setInvoiceStatusText("Ready To Post");
 					}
 
+					System.err.println("AFTER BALANCE AMOUNT CHECK "+  checkStatus );	
 				} else {
 					// iv. Else
 					//
+					System.err.println("ESLE IF DUPLICATE INVOICE "+checkStatus); 
 					// 1. Do nothing
 					return checkStatus;
 				}
 			}
 
 		}
+		
+		System.err.println("IF DTO IS EMPTY  "+checkStatus); 
 		return checkStatus;
 	}
 

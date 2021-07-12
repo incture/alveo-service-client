@@ -71,11 +71,13 @@ public class MailConfig {
     }
 
     public String getMailUser() {
-        return mailUser;
+        return "arun.gauda@incture.com";
+      //  return "lakhu.das@incture.com";
     }
 
     public String getMailPassword() {
-        return mailPassword;
+       return "3Pg13ec022@";
+       // return "#Newlife123#";
     }
 
 }

@@ -212,6 +212,7 @@ public class ABBYYJSONConverter {
 			headerDto.setInvoiceGross(0.0);
 			headerDto.setUnplannedCost(0.0);
 			headerDto.setPlannedCost(0.0);
+			headerDto.setBalanceAmount(0.0);
 			headerDto.setInvoiceStatus(ApplicationConstants.NEW_INVOICE);
 			headerDto.setInvoiceStatusText("NEW");
 		}

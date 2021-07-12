@@ -115,6 +115,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					if (duplicateCheckDto.getIsDuplicate()) {
 						messagesList.add(duplicateCheckDto.getMessages());
 						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					}
+					if(!duplicateCheckDto.getIsDuplicate()){
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 						return invoiceHeaderCheckDto;
 					}
@@ -849,11 +852,11 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			InvoiceHeaderDto invoiceHeaderDtoUpdated = ObjectMapperUtils.map(threeWayMatchOutputDto,
 					InvoiceHeaderDto.class);
 			System.err.println("THREE WAY MATCH :::::UPDATED" + invoiceHeaderDtoUpdated);
-			String headerStatus = duplicateCheckService.determineHeaderStatus(invoiceHeaderDto).getInvoiceStatus();
-			String headerStatusText = duplicateCheckService.determineHeaderStatus(invoiceHeaderDto)
-					.getInvoiceStatusText();
-			threeWayMatchOutputDto.setInvoiceStatus(headerStatus);
-			threeWayMatchOutputDto.setInvoiceStatusText(headerStatusText);
+			InvoiceHeaderDto updatedHeaderStatusAfterThreeWayMatch = duplicateCheckService.determineHeaderStatus(invoiceHeaderDtoUpdated);
+			
+			System.err.println("THREE WAY MATCH :::::UPDATED HEADER STATUS DETERMINATION" + updatedHeaderStatusAfterThreeWayMatch);
+			threeWayMatchOutputDto.setInvoiceStatus(updatedHeaderStatusAfterThreeWayMatch.getInvoiceStatus());
+			threeWayMatchOutputDto.setInvoiceStatusText(updatedHeaderStatusAfterThreeWayMatch.getInvoiceStatusText());
 			// threeWayMatchOutputDto.setHeaderMessages(headerMessages);
 
 		} catch (Exception e) {
