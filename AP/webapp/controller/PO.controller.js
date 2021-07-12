@@ -165,6 +165,9 @@ sap.ui.define([
 		},
 
 		onSubmitForRemediationFrag: function (userList) {
+			var oMandatoryModel = this.oMandatoryModel;
+			oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "None");
+			oMandatoryModel.setProperty("/NonPO/commmentsState", "None");
 			var oPOModel = this.getModel("oPOModel");
 			if (userList) {
 				this.fetchUserList(userList);
@@ -180,6 +183,9 @@ sap.ui.define([
 		},
 
 		onSubmitForApprovalFrag: function (userList) {
+			var oMandatoryModel = this.oMandatoryModel;
+			oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "None");
+			oMandatoryModel.setProperty("/NonPO/commmentsState", "None");
 			if (userList) {
 				this.fetchUserList(userList);
 			}
@@ -192,6 +198,15 @@ sap.ui.define([
 			this.SubmitDialog.setModel(oPOModel, "oPOModel");
 			oPOModel.setProperty("/submitTypeTitle", "Submit For Approval");
 			this.SubmitDialog.open();
+		},
+
+		openCommentsFrag: function (userList) {
+			var oMandatoryModel = this.oMandatoryModel;
+			if (!this.commentsDialog) {
+				this.commentsDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.Submitcomments", this);
+				this.getView().addDependent(this.commentsDialog, this);
+			}
+			this.commentsDialog.open();
 		},
 
 		onSubmitForRejection: function (userList, title) {
@@ -402,6 +417,7 @@ sap.ui.define([
 				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
 				actionCode = "PRS";
 			}
+
 			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
@@ -428,7 +444,7 @@ sap.ui.define([
 			if (changeIndicators && changeIndicators.itemChange) {
 				threewayMatch = true;
 			}
-			POServices.onPoSubmit(oEvent, this, "", actionCode, sUrl, "Saving....", "", threewayMatch);
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....", "", threewayMatch);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
@@ -453,9 +469,31 @@ sap.ui.define([
 			var oPOModel = this.oPOModel;
 			var oData = oPOModel.getProperty("/");
 			var oMandatoryModel = this.oMandatoryModel;
+			if (!oMandatoryModel.getProperty("/NonPO")) {
+				oMandatoryModel.setProperty("/NonPO", {});
+			}
 			var sMethod = "POST";
 			var sUrl, actionCode = oPOModel.getProperty("/actionCode");
 			var userList = this.formUserListPayload();
+			var reasonforReject = oPOModel.getProperty("/reasonForRejection");
+			var comments = oPOModel.getProperty("/commments");
+			var count = 0;
+			if (actionCode === "AR") {
+				if (!reasonforReject) {
+					count += 1;
+					oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "Error");
+				}
+			}
+			if (!comments) {
+				count += 1;
+				oMandatoryModel.setProperty("/NonPO/commmentsState", "Error");
+			}
+			if (count) {
+				sap.m.MessageToast.show("Please fill all Mandatory Fields");
+			} else {
+				oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "None");
+				oMandatoryModel.setProperty("/NonPO/commmentsState", "None");
+			}
 			if (userList) {
 				var oPayload = {
 					"invoice": oData,
@@ -495,6 +533,23 @@ sap.ui.define([
 
 		onItemSelect: function (oEvent) {
 			POServices.onItemSelect(oEvent, this);
+		},
+
+		onItemSelectAll: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var selItems = oPOModel.getProperty("/invoiceItems");
+			var length = selItems.length;
+			for (var i = 0; i < length; i++) {
+				if (!selItems[i].isDeleted && selItems[i].isTwowayMatched) {
+					selItems[i].isSelected = true;
+				}
+			}
+			oPOModel.setProperty("/invoiceItems", selItems);
+			var tax = POServices.calculateTax(oEvent, this);
+			oPOModel.setProperty("/sysSusgestedTaxAmount", POServices.nanValCheck(tax.totalVax));
+			oPOModel.setProperty("/totalBaseRate", POServices.nanValCheck(tax.gross));
+			oPOModel.setProperty("/grossAmount", POServices.nanValCheck(tax.headerGross));
+			oPOModel.setProperty("/balanceAmount", POServices.nanValCheck(tax.bal));
 		},
 
 		onInvQtyChange: function (oEvent) {

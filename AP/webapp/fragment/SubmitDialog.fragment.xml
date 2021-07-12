@@ -61,7 +61,8 @@
 			</Table>
 			<l:Grid hSpacing="1" vSpacing="0" defaultSpan="XL12 L12 M12 S12" class="sapUiSmallMarginTopBottom">
 				<Label design="Bold" text="{i18n>COMMENTS}" required="true"/>
-				<TextArea value="{oPOModel>/commments}" maxLength="255" cols="150" placeholder="Enter your comments" change="onPostComment"></TextArea>
+				<TextArea value="{oPOModel>/commments}" maxLength="255" cols="150" placeholder="Enter your comments" change="onPostComment"
+				valueStateText="{oMandatoryModel>/NonPO/commmentsState}"></TextArea>
 			</l:Grid>
 		</content>
 		<beginButton>

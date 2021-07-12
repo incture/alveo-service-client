@@ -25,7 +25,7 @@
 				<ScrollContainer width="100%" focusable="true" horizontal="true">
 					<Table items="{oPOModel>/invoiceItems}" alternateRowColors="false" growing="true" growingThreshold="20" id="itemdetails">
 						<columns>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="1rem">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="2rem">
 								<CheckBox selected="false" select="onItemSelectAll"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="15rem">

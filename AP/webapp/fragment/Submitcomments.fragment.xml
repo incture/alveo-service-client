@@ -1,0 +1,75 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:tnt="sap.tnt" xmlns:l="sap.ui.layout">
+	<Dialog title="{oPOModel>/submitTypeTitle}" class="sapUiSizeCompact" contentWidth="50%">
+		<content>
+			<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L6 M6 S12">
+				<l:content>
+					<VBox class="sapUiTinyMargin">
+						<HBox>
+							<Label text="{i18n>InvoiceNumber}" design="Bold" class="sapUiTinyMarginEnd"/>
+							<Text text="{oPOModel>/extInvNum}"/>
+						</HBox>
+						<HBox>
+							<Label text="{i18n>InvoiceStatus}" design="Bold" class="sapUiTinyMarginEnd"/>
+							<Text text="{oPOModel>/invoiceStatusText}"/>
+						</HBox>
+						<layoutData>
+							<l:GridData span="XL8 L8 M8 S6"/>
+						</layoutData>
+					</VBox>
+					<HBox class="sapUiTinyMargin">
+						<Label text="{i18n>TotalValue}" design="Bold" class="sapUiTinyMarginEnd"/>
+						<Text text="{oPOModel>/invoiceTotal}"/>
+						<layoutData>
+							<l:GridData span="XL4 L4 M4 S6"/>
+						</layoutData>
+					</HBox>
+				</l:content>
+			</l:Grid>
+			<!--<tnt:InfoLabel text="{i18n>submitInfoLabelMsg}" colorScheme="7" displayOnly="true"/>-->
+			<!--<Switch customTextOn="GRN" customTextOff="BUY"-->
+			<!--	state="{path:'oPOModel>/selectedRemidiationGroup',formatter:'com.menabev.AP.formatter.formatter.formatRemidiationUser'}"-->
+			<!--	visible="{oPOModel>/remidiationSwitchVisible}" change="onRemidiationSwitchToggle"></Switch>-->
+			<!--<Table alternateRowColors="true" items="{oPOModel>/userList}">-->
+			<!--	<headerToolbar>-->
+			<!--		<OverflowToolbar>-->
+			<!--			<Text text="{oPOModel>/selectedRemidiationGroup}"/>-->
+			<!--			<ToolbarSpacer/>-->
+			<!--			<Button icon="sap-icon://sys-add" press="onAddRemidiationUser"/>-->
+			<!--<Button icon="sap-icon://sys-minus"/>-->
+			<!--		</OverflowToolbar>-->
+			<!--	</headerToolbar>-->
+			<!--	<columns>-->
+			<!--		<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">-->
+			<!--			<Label design="Bold" text="{i18n>UserId}"/>-->
+			<!--		</Column>-->
+			<!--<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline">-->
+			<!--	<Label design="Bold" text="{i18n>Group}"/>-->
+			<!--</Column>-->
+			<!--		<Column demandPopin="true" minScreenWidth="Small" popinDisplay="Inline" width="10%">-->
+			<!--			<Label design="Bold" text="{i18n>Actions}"/>-->
+			<!--		</Column>-->
+			<!--	</columns>-->
+			<!--	<items>-->
+			<!--		<ColumnListItem>-->
+			<!--			<cells>-->
+			<!--				<Input value="{oPOModel>user}" valueState="{oPOModel>userState}"/>-->
+			<!--<Text text="{oPOModel>group}"/>-->
+			<!--				<Button icon="sap-icon://delete" press="onDeleteRemidiationUser" type="Reject"></Button>-->
+			<!--			</cells>-->
+			<!--		</ColumnListItem>-->
+			<!--	</items>-->
+			<!--</Table>-->
+			<l:Grid hSpacing="1" vSpacing="0" defaultSpan="XL12 L12 M12 S12" class="sapUiSmallMarginTopBottom">
+				<Label design="Bold" text="{i18n>COMMENTS}" required="true"/>
+				<TextArea value="{oPOModel>/commments}" maxLength="255" cols="150" placeholder="Enter your comments" change="onPostComment"
+					valueStateText="{oMandatoryModel>/NonPO/commmentsState}"></TextArea>
+			</l:Grid>
+		</content>
+		<beginButton>
+			<Button text="{i18n>Submit}" press="onPressOK" type="Emphasized"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>Cancel}" press="onCancelSubmitDialog"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
