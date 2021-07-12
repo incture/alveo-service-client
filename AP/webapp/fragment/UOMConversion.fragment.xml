@@ -1,5 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
-	<ResponsivePopover title="Notification" class="sapUiPopupWithPadding" placement="Bottom" showHeader="True">
+	<ResponsivePopover title="Notification" class="sapUiPopupWithPadding" placement="Bottom" showHeader="True"
+		contentWidth="50%" showCloseButton="true">
 		<content>
 			<Table items="{oPOModel>/UOMList}" alternateRowColors="true"  growing="true" growingThreshold="20">
 				<columns>

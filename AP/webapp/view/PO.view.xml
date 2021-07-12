@@ -9,26 +9,26 @@
 		<content>
 			<l:Splitter id="idPOMainSplitter" width="100%">
 				<VBox>
-					<Toolbar height="3rem">
+					<Toolbar height="2rem">
 						<!--<Title level="H2" text="{i18n>InvoiceHeaderDetails}" class="headerTitle sapUiTinyMarginBegin"/>-->
 						<ToolbarSpacer/>
-						<Button text="{i18n>VendorBalances}" press="onClickVendorBalances" class="sapUiSizeCompact SecondaryBtn"/>
+						<Button icon="sap-icon://monitor-payments" text="{i18n>Balance}" press="onClickVendorBalances" class="sapUiSizeCompact SecondaryBtn"/>
 						<Button icon="sap-icon://activity-individual" tooltip="{i18n>ActivityLog}" press="onClickActivityLog" class="SecondaryBtn" enabled="false"/>
 						<!--<Button icon="sap-icon://notification-2" tooltip="{i18n>ErrorMessages}" press="onClickErrorMessages" class="SecondaryBtn" enabled="false"/>-->
-						<Button text="{i18n>OpenPdf}" type="Emphasized" id="idOpenPDFBtn" tooltip="Open Pdf" press="onPressOpenpdf"
+						<Button icon="sap-icon://pdf-attachment" text="{i18n>Open}" type="Emphasized" id="idOpenPDFBtn" tooltip="Open Pdf" press="onPressOpenpdf"
 							visible="{oVisibilityModel>/openPdfBtnVisible}">
 							<customData>
 								<core:CustomData key="PO" value="PO"/>
 							</customData>
 						</Button>
-						<Button icon="sap-icon://refresh" press="onPressPORefresh" class="SecondaryBtn"/>
+						<Button icon="sap-icon://synchronize" press="onPressPORefresh" class="SecondaryBtn"/>
 					</Toolbar>
 					<IconTabBar selectedKey="{oVisibilityModel>/selectedtabKey}">
 						<items>
-							<IconTabFilter text="{i18n>INVOICEHEADERDETAILS}" key="invoiceheaderdetails">
+							<IconTabFilter text="{i18n>INVOICEHEADER}" key="invoiceheaderdetails">
 								<core:Fragment fragmentName="com.menabev.AP.fragment.POHeader" type="XML"/>
 							</IconTabFilter>
-							<IconTabFilter text="{i18n>ITEMDETAILS}" key="itemdetails">
+							<IconTabFilter text="{i18n>INVOICEITEMS}" key="itemdetails">
 								<core:Fragment fragmentName="com.menabev.AP.fragment.ItemDetails" type="XML"/>
 							</IconTabFilter>
 							<IconTabFilter text="{i18n>COSTALLOCATION}" key="costallocation">

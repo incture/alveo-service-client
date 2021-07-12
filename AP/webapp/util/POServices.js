@@ -540,7 +540,7 @@ com.menabev.AP.util.POServices = {
 			if (actionCode == "ASR" && (status < 4 || status > 12)) {
 				sap.m.MessageToast.show("Please check invoice status before sending for remidiation");
 				return;
-			} else if (actionCode === "ASA" && status != 16) {
+			} else if (actionCode === "ASA" && status != 17) {
 				sap.m.MessageToast.show("Invoice status should be ready to post to send it for approval");
 				return;
 			}

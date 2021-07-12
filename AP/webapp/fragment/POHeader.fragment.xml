@@ -2,14 +2,6 @@
 	<l:Grid id="POgrid" defaultSpan="L3 M6 S12" class="gridMargin">
 		<l:content>
 			<VBox>
-				<Label text="{i18n>TRANSACTION}" required="true"></Label>
-				<Select forceSelection="false" width="80%" items="{StaticDataModel>/transactionType}" selectedKey="{oPOModel>/transactionType}"
-					valueStateText=" " valueState="{oMandatoryModel>/NonPO/transactionTypeState}" change="onTransactionChange"
-					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
-					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
-				</Select>
-			</VBox>
-			<VBox>
 				<Label text="{i18n>VendorId}" required="true"/>
 				<Input filterSuggests="false" value="{oPOModel>/vendorId}" width="80%" showSuggestion="true" suggest="VendorIdSuggest" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/vendorIdState}" tooltip="{oPOModel>/vendorId}" suggestionItemSelected="vendorIdSelected"
@@ -27,30 +19,29 @@
 				<Label text="{i18n>VendorName}"/>
 				<Input filterSuggests="false" value="{oPOModel>/vendorName}" width="80%" type="Text" showSuggestion="true" suggest="VendorIdSuggest"
 					change="onVendorNameChange" valueState="{oMandatoryModel>/NonPO/vendorNameState}" tooltip="{oPOModel>/vendorName}"
-					suggestionItemSelected="vendorNameSelected" valueStateText=" " suggestionItems="{oDropDownModel>/VendorIdSuggest}"
-					editable="false">
+					suggestionItemSelected="vendorNameSelected" valueStateText=" " suggestionItems="{oDropDownModel>/VendorIdSuggest}" editable="false">
 					<suggestionItems>
 						<core:ListItem text="{oDropDownModel>SupplierName}" additionalText="{oDropDownModel>Supplier}"/>
 					</suggestionItems>
 				</Input>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>COMPANYCODE}" required="true"/>
-				<Input value="{oPOModel>/compCode}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/compCodeState}" width="80%"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCompanyCodeChange" maxLength="4"/>
+				<Label text="{i18n>TRANSACTION}" required="true"></Label>
+				<Select forceSelection="false" width="80%" items="{StaticDataModel>/transactionType}" selectedKey="{oPOModel>/transactionType}"
+					valueStateText=" " valueState="{oMandatoryModel>/NonPO/transactionTypeState}" change="onTransactionChange"
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}">
+					<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
+				</Select>
 			</VBox>
 			<VBox>
-				<Label text="{i18n>CURRENCY}" required="true"/>
-				<Input value="{oPOModel>/currency}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/currencyState}" width="80%" maxLength="3"
-					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCurrencyChange"/>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
-			</VBox>
-			<VBox>
-				<Label required="true" text="{i18n>InvoiceNo}"/>
-				<Input value="{oPOModel>/extInvNum}" width="80%" change="onInvRefChange" maxLength="16" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/extInvNumState}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+				<Label text="{i18n>PaymentTerms}"/>
+				<Select forceSelection="false" selectedKey="{oPOModel>/paymentTerms}" items="{oDropDownModel>/paymentTermResult}" valueStateText=" "
+					valueState="{oMandatoryModel>/NonPO/paymentTermsState}" width="80%" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
+					change="onPaymentTermsChange">
+					<items>
+						<core:ListItem key="{oDropDownModel>PmntTerm}" text="{oDropDownModel>PmntTermDesc}"/>
+					</items>
+				</Select>
 			</VBox>
 			<VBox id="idDate">
 				<Label text="{i18n>InvoiceDate}" required="true"/>
@@ -64,53 +55,33 @@
 					value="{ path:'oPOModel>/baseLineDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/baseLineDateState}" change="onBaseLineDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 			</VBox>
-			<VBox>
-				<Label text="{i18n>PostingDate}" required="true"/>
-				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
-					value="{ path:'oPOModel>/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/postingDateState}" change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
-			</VBox>
 			<VBox >
 				<Label text="{i18n>DueDate}"/>
 				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%" valueState="{oMandatoryModel>/NonPO/dueDateState}"
 					value="{path:'oPOModel>/dueDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
 					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onDueDateChange"/>
 			</VBox>
-			<VBox >
-				<Label text="{i18n>PaymentTerms}"/>
-				<Select forceSelection="false" selectedKey="{oPOModel>/paymentTerms}" items="{oDropDownModel>/paymentTermResult}" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/paymentTermsState}" width="80%" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
-					change="onPaymentTermsChange">
-					<items>
-						<core:ListItem key="{oDropDownModel>PmntTerm}" text="{oDropDownModel>PmntTermDesc}"/>
-					</items>
-				</Select>
-			</VBox>
-			<VBox >
-				<Label text="{i18n>PaymentMethod}"/>
-				<Select forceSelection="false" selectedKey="{oPOModel>/paymentMethod}" valueStateText=" "
-					valueState="{oMandatoryModel>/NonPO/paymentMethodState}" items="{oDropDownModel>/paymentMethodResult}" width="80%"
-					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentMethodChange">
-					<items>
-						<core:ListItem key="{oDropDownModel>PmntMeth}" text="{oDropDownModel>PmntMethName}"/>
-					</items>
-				</Select>
+			<VBox>
+				<Label text="{i18n>PostingDate}" required="true"/>
+				<DatePicker displayFormat="MM/dd/YYYY" valueFormat="yyyy-MM-dd" width="80%"
+					value="{ path:'oPOModel>/postingDate',formatter: 'com.menabev.AP.formatter.formatter.getDate'}" valueStateText=" "
+					valueState="{oMandatoryModel>/NonPO/postingDateState}" change="onPostingDateChange" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+				<!--<layoutData>-->
+				<!--	<l:GridData linebreak="true"/>-->
+				<!--</layoutData>-->
 			</VBox>
 			<VBox>
-				<Label text="{i18n>PaymentBlock}"/>
-				<Select forceSelection="false" valueState="{oMandatoryModel>/NonPO/paymentBlockState}" valueStateText=" "
-					selectedKey="{oPOModel>/paymentBlock}" items="{oDropDownModel>/paymentBlockResult}" width="80%"
-					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentBlockChange">
-					<items>
-						<core:ListItem key="{oDropDownModel>PmntBlk}" text="{oDropDownModel>PmntBlkDesc}"/>
-					</items>
-				</Select>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
+				<Label required="true" text="{i18n>InvoiceNo}"/>
+				<Input value="{oPOModel>/extInvNum}" width="80%" change="onInvRefChange" maxLength="16" valueStateText=" "
+					valueState="{oMandatoryModel>/NonPO/extInvNumState}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
+			</VBox>
+			<VBox>
+				<Label text="{i18n>CURRENCY}" required="true"/>
+				<Input value="{oPOModel>/currency}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/currencyState}" width="80%" maxLength="3"
+					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCurrencyChange"/>
+				<!--<layoutData>-->
+				<!--	<l:GridData linebreak="true"/>-->
+				<!--</layoutData>-->
 			</VBox>
 			<VBox>
 				<Label text="{i18n>TaxCode}" required="true"/>
@@ -137,13 +108,41 @@
 					</items>
 				</Select>
 			</VBox>
+			<VBox>
+				<Label text="{i18n>PaymentMethod}"/>
+				<Select forceSelection="false" selectedKey="{oPOModel>/paymentMethod}" valueStateText=" "
+					valueState="{oMandatoryModel>/NonPO/paymentMethodState}" items="{oDropDownModel>/paymentMethodResult}" width="80%"
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentMethodChange">
+					<items>
+						<core:ListItem key="{oDropDownModel>PmntMeth}" text="{oDropDownModel>PmntMethName}"/>
+					</items>
+				</Select>
+			</VBox>
+			<VBox>
+				<Label text="{i18n>PaymentBlock}"/>
+				<Select forceSelection="false" valueState="{oMandatoryModel>/NonPO/paymentBlockState}" valueStateText=" "
+					selectedKey="{oPOModel>/paymentBlock}" items="{oDropDownModel>/paymentBlockResult}" width="80%"
+					enabled="{oVisibilityModel>/NonPOInvoice/editable}" change="onPaymentBlockChange">
+					<items>
+						<core:ListItem key="{oDropDownModel>PmntBlk}" text="{oDropDownModel>PmntBlkDesc}"/>
+					</items>
+				</Select>
+				<!--<layoutData>-->
+				<!--	<l:GridData linebreak="true"/>-->
+				<!--</layoutData>-->
+			</VBox>
+			<VBox>
+				<Label text="{i18n>COMPANYCODE}" required="true"/>
+				<Input value="{oPOModel>/compCode}" valueStateText=" " valueState="{oMandatoryModel>/NonPO/compCodeState}" width="80%"
+					editable="{oVisibilityModel>/NonPOInvoice/editable}" change="onCompanyCodeChange" maxLength="4"/>
+			</VBox>
 			<VBox visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}">
 				<Label text="{i18n>BatchId}"/>
 				<Input value="{oPOModel>/ocrBatchId}" width="80%" editable="{oVisibilityModel>/NonPOInvoice/editable}" valueStateText=" "
 					valueState="{oMandatoryModel>/NonPO/ocrBatchIdState}"/>
-				<layoutData>
-					<l:GridData linebreak="true"/>
-				</layoutData>
+				<!--<layoutData>-->
+				<!--	<l:GridData linebreak="true"/>-->
+				<!--</layoutData>-->
 			</VBox>
 		</l:content>
 	</l:Grid>

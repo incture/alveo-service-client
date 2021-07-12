@@ -3,7 +3,7 @@
 	<Page showHeader="false" class="sapUiSizeCompact">
 		<content>
 			<fb:FilterBar id="filterBarId" search="onSearch" clear="clearFilter" showClearButton="true" vSpacing="0" hSpacing="1" position="Right"
-				visible="{baseModel>/SearchVisiblity}">
+				visible="{baseModel>/SearchVisiblity}" class="filterBarCss sapUiTinyMargin">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem groupName="FILTER" partOfCurrentVariant="true" visibleInFilterBar="true" name="A" label="{i18n>VendorId}">
 						<fb:control>
@@ -97,13 +97,13 @@
 			<IconTabBar expanded="true" headerMode="Inline" select="onTabSelectPagination" selectedKey="{oTaskInboxModel>/selectedFilterTab}">
 				<items>
 					<IconTabFilter text="{i18n>TASK}" key="openTask" count="{oTaskInboxModel>/openTaskCount}">
-						<Table items="{oTaskInboxModel>/openTask}" mode="None" class="labelwrapTable" sticky="ColumnHeaders">
+						<Table items="{oTaskInboxModel>/openTask}" mode="None" class="labelwrapTable mTableCss" sticky="ColumnHeaders">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
-									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"
+									<Button text="{i18n>CreateNonPOInvoice}" type="Emphasized" press="onCreateInvoice" class="primaryBtnCss"
 										visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>
-									<Button icon="sap-icon://action-settings" type="Emphasized"/>
+									<Button icon="sap-icon://action-settings" type="Emphasized" class="primaryBtnCss"/>
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
@@ -114,22 +114,22 @@
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceNo}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvRef}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceDate}" design="Bold"/>
+									<Label text="{i18n>InvDate}" design="Bold"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceType}" design="Bold"/>
+									<Label text="{i18n>InvType}" design="Bold"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>InvoiceValue}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvValue}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>DueDate}" design="Bold"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvStatus}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
@@ -138,7 +138,7 @@
 									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>User}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true"/>
@@ -164,9 +164,9 @@
 										tooltip="{path:'oTaskInboxModel>recipientUsers', formatter:'com.menabev.AP.formatter.formatter.arraytoString'}" wrapping="true"/>
 									<Label text="{oTaskInboxModel>status}" wrapping="true"/>
 									<HBox>
-										<Button text="{i18n>Claim}" type="Emphasized" tooltip="claim" press="onClaimRelease"
+										<Button text="{i18n>Claim}" type="Emphasized" tooltip="claim" press="onClaimRelease" class="primaryBtnCss"
 											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setClaimVisible'}"/>
-										<Button text="{i18n>Release}" type="Emphasized" tooltip="release" press="onClaimRelease"
+										<Button text="{i18n>Release}" type="Emphasized" tooltip="release" press="onClaimRelease" class="primaryBtnCss"
 											visible="{path:'oTaskInboxModel>status', formatter:'com.menabev.AP.formatter.formatter.setReleaseVisible'}"/>
 									</HBox>
 								</ColumnListItem>
@@ -175,14 +175,15 @@
 					</IconTabFilter>
 					<IconTabFilter text="{i18n>Draft}" key="draft" count="{oTaskInboxModel>/draftCount}"
 						visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}">
-						<Table items="{oTaskInboxModel>/draftTask}" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" id="DRAFTTABLE">
+						<Table items="{oTaskInboxModel>/draftTask}" mode="MultiSelect" sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" id="DRAFTTABLE"
+							class="mTableCss">
 							<headerToolbar>
 								<OverflowToolbar>
 									<ToolbarSpacer></ToolbarSpacer>
-									<Button text="{i18n>CreateInvoice}" type="Emphasized" press="onCreateInvoice"
+									<Button text="{i18n>CreateNonPOInvoice}" type="Emphasized" press="onCreateInvoice" class="primaryBtnCss"
 										visible="{path:'oUserDetailModel>/loggedinUserGroup',formatter:'com.menabev.AP.formatter.formatter.createInvoiceVisible'}"/>
 									<Button text="{i18n>DeleteDraft}" type="Reject" press="onDeleteDraft"/>
-									<Button icon="sap-icon://action-settings" type="Emphasized"/>
+									<Button icon="sap-icon://action-settings" type="Emphasized" class="primaryBtnCss"/>
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
@@ -193,22 +194,22 @@
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceNo}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvRef}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceDate}" design="Bold"/>
+									<Label text="{i18n>InvDate}" design="Bold"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
-									<Label text="{i18n>InvoiceType}" design="Bold"/>
+									<Label text="{i18n>InvType}" design="Bold"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>InvoiceValue}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvValue}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>DueDate}" design="Bold"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>validationStatus}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>InvStatus}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>taskStatus}" design="Bold" wrapping="true"/>
@@ -217,10 +218,10 @@
 									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true" visible="false"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
-									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true"/>
+									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true" visible="false"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>

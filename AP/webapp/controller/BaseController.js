@@ -464,12 +464,13 @@ sap.ui.define([
 		},
 
 		//Tax Code Data
-		getTaxCode: function (oHeader, CountryKey) {
+		getTaxCode: function (oHeader, language, countryKey) {
 			var oDropDownModel = this.getOwnerComponent().getModel("oDropDownModel");
 			var oFilter = [];
-			if (CountryKey) {
-				oFilter.push(new sap.ui.model.Filter("CountryKey", sap.ui.model.FilterOperator.EQ, CountryKey));
+			if (countryKey) {
+				oFilter.push(new sap.ui.model.Filter("CountryKey", sap.ui.model.FilterOperator.EQ, countryKey));
 			}
+			oFilter.push(new sap.ui.model.Filter("LanguageKey", sap.ui.model.FilterOperator.EQ, language));
 			var oDataModel = this.getOwnerComponent().getModel("ZP2P_API_EC_GL_SRV");
 			oDataModel.read("/TaxCodeSet", {
 				filters: oFilter,
@@ -1209,6 +1210,7 @@ sap.ui.define([
 					if (invoiceItems[j].isTwowayMatched && !invoiceItems[j].isDeleted) {
 						if (Number(PODocNum) === invoiceItems[j].matchDocNum && PODocItem === invoiceItems[j].matchDocItem) {
 							POItem[i].POMatched = true;
+							break;
 						} else {
 							POItem[i].POMatched = false;
 						}
