@@ -95,7 +95,7 @@ sap.ui.define([
 		},
 
 		calculateGross: function (oEvent) {
-			this.setChangeInd(oEvent, this, "headerChange");
+			POServices.setChangeInd(oEvent, this, "headerChange");
 			POServices.calculateGross(oEvent, this);
 		},
 

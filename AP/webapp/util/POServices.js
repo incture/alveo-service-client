@@ -381,6 +381,7 @@ com.menabev.AP.util.POServices = {
 		if (threewayMatch) {
 			this.performThreewayMatch(oController, oSaveData);
 		}
+		oSaveData = oPOModel.getData();
 		if (oSaveData.invoiceType === "NON-PO") {
 			var sUrl = "/menabevdev/invoiceHeader/accountantSave",
 				sMethod = "POST";
@@ -540,14 +541,15 @@ com.menabev.AP.util.POServices = {
 			oData.invoiceTotal = 0;
 		}
 		if (threewayMatch) {
-			this.performThreewayMatch(oController, oSaveData);
+			this.performThreewayMatch(oController, oData);
 		}
+		oData = oPOModel.getData();
 		var status = oData.invoiceStatus;
 		if (actionCode) {
 			if (actionCode == "ASR" && (status < 4 || status > 12)) {
 				sap.m.MessageToast.show("Please check invoice status before sending for remidiation");
 				return;
-			} else if (actionCode === "ASA" && status != 17) {
+			} else if (actionCode === "ASA" && status != 16) {
 				sap.m.MessageToast.show("Invoice status should be ready to post to send it for approval");
 				return;
 			}

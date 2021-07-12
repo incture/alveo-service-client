@@ -66,7 +66,7 @@
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
-								<Label design="Bold" text="{i18n>NETPRICE}" tooltip="{i18n>NETPRICE}" visible="false"/>
+								<Label design="Bold" text="{i18n>NETPRICE}" tooltip="{i18n>NETPRICE}" />
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
