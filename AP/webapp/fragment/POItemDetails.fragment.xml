@@ -48,7 +48,7 @@
 							<Text text="{oPOModel>goodsMvmtType}" textAlign="Center"/>
 							<Text text="{oPOModel>historyDocument}" textAlign="Center"/>
 							<Text text="{oPOModel>historyDocumentItem}" textAlign="Center"/>
-							<Text text="{oPOModel>postingDate}" textAlign="Center"/>
+							<Text text="{path:'oPOModel>postingDate',formatter:'com.menabev.AP.formatter.formatter.formatDate'}" textAlign="Center"/>
 							<Text text="{oPOModel>quantity}" textAlign="Center"/>
 							<Text text="{oPOModel>amountLocCurr}" textAlign="Center"/>
 							<Text text="{oPOModel>companyCodeCurr}" textAlign="Center"/>

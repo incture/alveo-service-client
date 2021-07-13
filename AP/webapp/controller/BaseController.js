@@ -1148,30 +1148,35 @@ sap.ui.define([
 		},
 
 		onPressPORefresh: function () {
-			if (!this.oRefreshDialog) {
-				this.oRefreshDialog = new sap.m.Dialog({
-					type: sap.m.DialogType.Message,
-					title: "Confirm",
-					content: new sap.m.Text({
-						text: "Do you want to refresh this invoice?"
-					}),
-					beginButton: new sap.m.Button({
-						type: sap.m.ButtonType.Emphasized,
-						text: "Submit",
-						press: function () {
-							this.oRefreshDialog.close();
-							this.fnRefreshPOServiceCall(this.requestId);
-						}.bind(this)
-					}),
-					endButton: new sap.m.Button({
-						text: "Cancel",
-						press: function () {
-							this.oRefreshDialog.close();
-						}.bind(this)
-					})
-				});
+			var purchaseOrders = this.oPOModel.getProperty("/purchaseOrders");
+			if (purchaseOrders) {
+				if (!this.oRefreshDialog) {
+					this.oRefreshDialog = new sap.m.Dialog({
+						type: sap.m.DialogType.Message,
+						title: "Confirm",
+						content: new sap.m.Text({
+							text: "Do you want to refresh this invoice?"
+						}),
+						beginButton: new sap.m.Button({
+							type: sap.m.ButtonType.Emphasized,
+							text: "Submit",
+							press: function () {
+								this.oRefreshDialog.close();
+								this.fnRefreshPOServiceCall(this.requestId);
+							}.bind(this)
+						}),
+						endButton: new sap.m.Button({
+							text: "Cancel",
+							press: function () {
+								this.oRefreshDialog.close();
+							}.bind(this)
+						})
+					});
+				}
+				this.oRefreshDialog.open();
+			} else {
+				sap.m.MessageToast.show("No PO is available");
 			}
-			this.oRefreshDialog.open();
 		},
 
 		fnRefreshPOServiceCall: function (requestId) {
