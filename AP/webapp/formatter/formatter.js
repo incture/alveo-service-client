@@ -581,6 +581,11 @@ com.menabev.AP.formatter.formatter = {
 		} else {
 			return 7;
 		}
+	},
+	
+	removeBlankSpace: function(costCenter){
+		var costCtr= costCenter.trim();
+		return costCtr;
 	}
 
 };
