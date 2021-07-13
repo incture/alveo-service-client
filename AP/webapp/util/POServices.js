@@ -91,7 +91,7 @@ com.menabev.AP.util.POServices = {
 	onFilterItemDetails: function (onFilterItemDetails) {
 		var that = this;
 		var filters = [];
-		var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("id", sap.ui.model.FilterOperator.EQ, true)]);
+		var oFilter = new sap.ui.model.Filter([new sap.ui.model.Filter("isDeleted", sap.ui.model.FilterOperator.EQ, false)]);
 		filters.push(oFilter);
 		var oBinding = onFilterItemDetails.getView().byId("itemdetails").getBinding("items");
 		oBinding.filter(filters);
@@ -947,18 +947,11 @@ com.menabev.AP.util.POServices = {
 	onItemSelect: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var selItem = oEvent.getSource();
-		var selected = oEvent.getSource().getSlected();
+		var selected = oEvent.getSource().getSelected();
 		var sPath = selItem.getBindingContext("oPOModel").getPath();
-		if (selected) {
-			var selObj = selItem.getBindingContext("oPOModel").getObject();
-
-			if (!selObj.isTwowayMatched || selObj.itemStatusCode === "5" || selObj.itemStatusCode === "6") {
-				oEvent.getSource().isSelected(false);
-				oPOModel.setProperty(sPath + "/isSelected", false);
-			} else {
-				oPOModel.setProperty(sPath + "/isSelected", true);
-			}
-		} else {
+		oPOModel.setProperty(sPath + "/isSelected", selected);
+		var selObj = selItem.getBindingContext("oPOModel").getObject();
+		if (!selObj.isTwowayMatched || selObj.itemStatusCode === "5" || selObj.itemStatusCode === "6") {
 			oPOModel.setProperty(sPath + "/isSelected", false);
 		}
 		// var selectedItems = oEvent.getSource().getSelectedItems();
@@ -980,7 +973,10 @@ com.menabev.AP.util.POServices = {
 	formatUOMList: function (itemDetails, oController) {
 		var len = itemDetails.length;
 		var data, obj1, obj2, UOMList, UOM1, UOM2;
-		var tax, totalVax, gross, grossTotal;
+		var tax = 0,
+			totalVax = 0,
+			gross = 0,
+			grossTotal = 0;
 		for (var i = 0; i < len; i++) {
 			data = [];
 			UOMList = [];
@@ -1023,9 +1019,9 @@ com.menabev.AP.util.POServices = {
 			}
 			itemDetails[i].UOMList = UOMList;
 
-			tax = itemDetails[i].taxValue;
+			tax = this.nanValCheck(itemDetails[i].taxValue);
 			totalVax += this.nanValCheck(tax);
-			gross = itemDetails[i].grossPrice;
+			gross = this.nanValCheck(itemDetails[i].grossPrice);
 			grossTotal += this.nanValCheck(gross);
 		}
 		var unplannedCost = oController.oPOModel.getProperty("/unplannedCost");
@@ -1075,6 +1071,7 @@ com.menabev.AP.util.POServices = {
 		var tax, gross, totalVax = 0,
 			grossTotal = 0,
 			isSelected;
+		var length = selItems.length;
 		for (var i = 0; i < length; i++) {
 			isSelected = selItems[i].isSelected;
 			if (isSelected) {

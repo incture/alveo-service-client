@@ -373,6 +373,8 @@ sap.ui.define([
 			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....", "", threewayMatch);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
+		
+		
 
 		// onNonPoRejectConfirm: function (oEvent) {
 		// 	var oPOModel = this.oPOModel;
@@ -490,6 +492,7 @@ sap.ui.define([
 			}
 			if (count) {
 				sap.m.MessageToast.show("Please fill all Mandatory Fields");
+				return;
 			} else {
 				oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "None");
 				oMandatoryModel.setProperty("/NonPO/commmentsState", "None");

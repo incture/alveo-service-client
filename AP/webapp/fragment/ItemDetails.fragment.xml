@@ -132,9 +132,8 @@
 							</Column>
 						</columns>
 						<items>
-							
 							<ColumnListItem highlight="{path:'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
-								visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode','oPOModel>isSelected'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
+								visible="{parts:['oPOModel>isTwowayMatched'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
 								<cells>
 									<CheckBox selected="{oPOModel>isSelected}" select="onItemSelect"/>
 									<HBox>
@@ -142,7 +141,8 @@
 										<Text text="{oPOModel>itemText}"/>
 									</HBox>
 									<Text text="{oPOModel>customerItemId}"/>
-									<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
+										valueState="{parts:['oPOModel>accountAssignmentCat'],formatter:'com.menabev.AP.formatter.formatter.formatQtyState'}"/>
 									<HBox>
 										<Button icon="sap-icon://message-information" press="onViewUOMDetails"/>
 										<Select forceSelection="false" selectedKey="{oPOModel>uom}" items="{oPOModel>UOMList}" change="onChangeInvoiceQtyUom"
@@ -152,7 +152,8 @@
 											</items>
 										</Select>
 									</HBox>
-									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
+									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
+									valueState="{path:'oPOModel>accountAssignmentCat',formatter:'com.menabev.AP.formatter.formatter.formatPriceState'}"/>
 									<Input value="{oPOModel>pricingUnit}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 									<Input value="{oPOModel>grossPrice}" change="onGrossPriceChange" liveChange="inputNANCheck"
 										enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>

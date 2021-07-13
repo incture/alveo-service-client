@@ -360,8 +360,8 @@ com.menabev.AP.formatter.formatter = {
 	},
 
 	formatSelectionVisible: function (twowaymatch, statusCode, isSelected, threewayMatched) {
-		this.removeStyleClass("disableSelect");
-		this.setSelected(false);
+		// this.removeStyleClass("disableSelect");
+		// this.setSelected(false);
 		// this.removeStyleClass("threewayMatchedNS");
 		// this.removeStyleClass("threewayMatchedS");
 		// this.removeStyleClass("twoWaymatchedNS");
@@ -373,14 +373,14 @@ com.menabev.AP.formatter.formatter = {
 		// 	this.addStyleClass("twoWaymatchedNS");
 		// }
 
-		if (!twowaymatch || statusCode == "5" || statusCode == "6") {
-			this.addStyleClass("disableSelect");
-		} else if (twowaymatch && isSelected) {
-			this.setSelected(true);
-		} else {
-			this.setSelected(false);
-		}
-		return true;
+		// if (!twowaymatch || statusCode == "5" || statusCode == "6") {
+		// 	this.addStyleClass("disableSelect");
+		// } else if (twowaymatch && isSelected) {
+		// 	this.setSelected(true);
+		// } else {
+		// 	this.setSelected(false);
+		// }
+		// return true;
 	},
 
 	formatRemidiationUser: function (remidiationUser) {
@@ -580,6 +580,20 @@ com.menabev.AP.formatter.formatter = {
 			return 3;
 		} else {
 			return 7;
+		}
+	},
+	formatQtyState:function(itemstatus){
+		if(itemstatus == "9" || itemstatus == "11"){
+			return "Error";
+		} else {
+			return "None";
+		}
+	},
+	formatPriceState:function(itemstatus){
+		if(itemstatus == "10" || itemstatus == "11"){
+			return "Error";
+		} else {
+			return "None";
 		}
 	}
 
