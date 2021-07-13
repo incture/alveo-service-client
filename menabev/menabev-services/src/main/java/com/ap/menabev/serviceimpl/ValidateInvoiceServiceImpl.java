@@ -798,7 +798,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					logger.error("inside messageResponse not empty");
 					List<ItemMessageDto> messageItemList = invoiceItemDto.getInvoiceItemMessages();
 					String reqId = invoiceItemDto.getRequestId();
-					String itemCode = invoiceItemDto.getMatchDocItem();
+					String itemCode = invoiceItemDto.getItemCode();
 					for (ToMatchOutputDto toMatchOutputDto : messageResponse) {
 						if (toMatchOutputDto.getRequestId().equalsIgnoreCase(reqId)
 								&& toMatchOutputDto.getReferenceInvoiceItem().equalsIgnoreCase(itemCode)) {
@@ -1216,7 +1216,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						// default values
 						// set reqID and item id for ref
 						inputPayload.setRequestId(invoiceHeaderDto.getRequestId());
-						inputPayload.setReferenceInvoiceItem(invoiceItemDto.getMatchDocItem());
+						inputPayload.setReferenceInvoiceItem(invoiceItemDto.getItemCode());
 						inputPayload.setVendor(invoiceHeaderDto.getVendorId());
 						inputPayload.setPurchasingDocumentNumber(String.valueOf(invoiceItemDto.getMatchDocNum()));
 						inputPayload.setPurchasingDocumentItem(invoiceItemDto.getMatchDocItem());
