@@ -536,12 +536,13 @@ sap.ui.define([
 		},
 
 		onItemSelectAll: function (oEvent) {
+			var selected = oEvent.getSource().getSlected();
 			var oPOModel = this.oPOModel;
 			var selItems = oPOModel.getProperty("/invoiceItems");
 			var length = selItems.length;
 			for (var i = 0; i < length; i++) {
 				if (!selItems[i].isDeleted && selItems[i].isTwowayMatched) {
-					selItems[i].isSelected = true;
+					selItems[i].isSelected = selected;
 				}
 			}
 			oPOModel.setProperty("/invoiceItems", selItems);

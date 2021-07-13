@@ -1,8 +1,8 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:comm="sap.suite.ui.commons">
 	<Button text="{i18n>Approve}" type="Default" tooltip="{i18n>Approve}" press="onNonPoApprove" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/ApproveBtnVisible}" enabled="false"/>
+		visible="{oVisibilityModel>/NonPOInvoice/ApproveBtnVisible}"/>
 	<Button text="{i18n>ReSend}" type="Default" tooltip="{i18n>ReSend}" press="onNonPoReSend" class="sapUiTinyMarginEnd"
-		visible="{oVisibilityModel>/NonPOInvoice/ReSendBtnVisible}" enabled="false"/>
+		visible="{oVisibilityModel>/NonPOInvoice/ReSendBtnVisible}"/>
 	<Button text="{i18n>Save}" type="Default" tooltip="{i18n>Save}" press="onNonPoSave" class="sapUiTinyMarginEnd"
 		visible="{oVisibilityModel>/NonPOInvoice/SaveBtnVisible}"/>
 	<Button text="{i18n>Submit}" type="Emphasized" tooltip="{i18n>Submit}" press="onNonPoSubmit" class="btnEmphasized sapUiTinyMarginEnd"

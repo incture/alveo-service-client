@@ -56,10 +56,10 @@ com.menabev.AP.util.POServices = {
 				arr.push(obj);
 				oController.getReferencePo(arr);
 				var tax = that.formatUOMList(oData.invoiceItems, oController);
-				oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
-				oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
-				oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
-				oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
+				oPOModel.setProperty("/sysSusgestedTaxAmount", that.nanValCheck(tax.totalVax));
+				oPOModel.setProperty("/totalBaseRate", that.nanValCheck(tax.gross));
+				oPOModel.setProperty("/grossAmount", that.nanValCheck(tax.headerGross));
+				oPOModel.setProperty("/balanceAmount", that.nanValCheck(tax.bal));
 				that.onFilterItemDetails(oController);
 				oPOModel.refresh();
 			} else if (oEvent.getParameters().errorobject.statusCode == 401) {
@@ -564,7 +564,7 @@ com.menabev.AP.util.POServices = {
 			if (actionCode == "ASR" && (status < 4 || status > 12)) {
 				sap.m.MessageToast.show("Please check invoice status before sending for remidiation");
 				return;
-			} else if (actionCode === "ASA" && status != 16) {
+			} else if (actionCode === "ASA" && status != 17) {
 				sap.m.MessageToast.show("Invoice status should be ready to post to send it for approval");
 				return;
 			}
@@ -947,15 +947,19 @@ com.menabev.AP.util.POServices = {
 	onItemSelect: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
 		var selItem = oEvent.getSource();
-		if (oEvent.getParameters().selected && !oEvent.getParameters().selectAll) {
+		var selected = oEvent.getSource().getSlected();
+		var sPath = selItem.getBindingContext("oPOModel").getPath();
+		if (selected) {
 			var selObj = selItem.getBindingContext("oPOModel").getObject();
-			var sPath = selItem.getBindingContext("oPOModel").getPath();
+
 			if (!selObj.isTwowayMatched || selObj.itemStatusCode === "5" || selObj.itemStatusCode === "6") {
 				oEvent.getSource().isSelected(false);
 				oPOModel.setProperty(sPath + "/isSelected", false);
 			} else {
 				oPOModel.setProperty(sPath + "/isSelected", true);
 			}
+		} else {
+			oPOModel.setProperty(sPath + "/isSelected", false);
 		}
 		// var selectedItems = oEvent.getSource().getSelectedItems();
 		var tax = this.calculateTax("", oController);
