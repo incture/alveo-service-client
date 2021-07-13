@@ -117,9 +117,10 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
 					}
-					if(!duplicateCheckDto.getIsDuplicate()){
+					//if Not Duplicate added by Lakhu
+					else{
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
-						return invoiceHeaderCheckDto;
+						
 					}
 
 					// a. If success, and move on
@@ -217,6 +218,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
 					} else {
+						//Added By Lakhu
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 						ChangeIndicator resetChangeIndicator = resetChangeIndicator(
 								invoiceHeaderCheckDto.getChangeIndicator());
 						invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
@@ -238,6 +241,10 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						messagesList.add(duplicateCheckDto.getMessages());
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
+					}
+					//Added By Lakhu
+					else{
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 					}
 					// b. If error, stop processing and send response to UI
 					//
@@ -280,6 +287,11 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					if (duplicateCheckDto.getIsDuplicate()) {
 						messagesList.add(duplicateCheckDto.getMessages());
 						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					}
+					//Added By Lakhu
+					if(!duplicateCheckDto.getIsDuplicate()){
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 						return invoiceHeaderCheckDto;
 					}
 					return invoiceHeaderCheckDto;

@@ -18,6 +18,7 @@ import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.MatchingHistoryDto;
 import com.ap.menabev.dto.PoHistoryDto;
+import com.ap.menabev.dto.PoHistoryTotalsDto;
 import com.ap.menabev.dto.PoItemAccountAssignDto;
 import com.ap.menabev.dto.PurchaseDocumentItemDto;
 import com.ap.menabev.dto.TwoWayMatchInputDto;
@@ -579,15 +580,11 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			Double deliv_qty = null;
 			Double invoiced_qty = null;
 			if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals())) {
-				if (!ServiceUtil
-						.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getDelivQty())) {
-					deliv_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getDelivQty();
-				}
-			}
-			if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals())) {
-				if (!ServiceUtil
-						.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getIvQty())) {
-					invoiced_qty = dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals().get(0).getIvQty();
+				for(PoHistoryTotalsDto history :  dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals()){
+					if(poItem.getDocumentItem().equals(history.getDocumentItem())){
+						deliv_qty = history.getDelivQty();
+						invoiced_qty = history.getIvQty();
+					}
 				}
 			} // TODO
 
