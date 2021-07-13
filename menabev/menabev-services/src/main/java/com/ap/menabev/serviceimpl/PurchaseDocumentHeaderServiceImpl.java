@@ -458,9 +458,9 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 					InvoiceItemDto item = new InvoiceItemDto();
 					item = mapper.map(threeWayItems, InvoiceItemDto.class);
 					// Ui should send either true or false 
-					item.setIsDeleted(threeWayItems.isDeleted());
-					if(!ServiceUtil.isEmpty(threeWayItems.isAccAssigned())){
-						item.setIsAccAssigned(threeWayItems.isAccAssigned());
+					item.setIsDeleted(threeWayItems.getIsDeleted());
+					if(!ServiceUtil.isEmpty(threeWayItems.getIsAccAssigned())){
+						item.setIsAccAssigned(threeWayItems.getIsAccAssigned());
 					}
 					
 					
