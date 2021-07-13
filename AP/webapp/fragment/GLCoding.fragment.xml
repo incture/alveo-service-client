@@ -43,18 +43,19 @@
 									</suggestionItems>
 								</Input>
 								<Text class="sapUiTinyMarginEnd" text="{oPOModel>materialDescription}"/>
-								<Select selectedKey="{oPOModel>debitOrCredit}" change="onInvoiceDetailsChangeCrDr"  enabled="false">
+								<Select selectedKey="{oPOModel>crDbIndicator}" change="onInvoiceDetailsChangeCrDr"  enabled="false">
 									<core:Item text="Debit" key="H"/>
 									<core:Item text="Credit" key="S"/>
 								</Select>
 								<Select forceSelection="false" showSecondaryValues="true" selectedKey="{oPOModel>costCenter}" items="{oDropDownModel>/costCenterResult}"
 									valueState="{oPOModel>costCenterError}" change="onChangeCostCenter" enabled="false">
 									<items>
-										<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
+										<core:ListItem key="{oDropDownModel>CstCenter}" text="{path:'oDropDownModel>CstCenter', formatter:'com.menabev.AP.formatter.formatter.removeBlankSpace'}" 
+										additionalText="{oDropDownModel>CostCenterName}"/>
 									</items>
 								</Select>
 								<Input value="{oPOModel>qty}" type="Number" liveChange="inputNANCheck"  editable="false" />
-								<Input value="{oPOModel>amount}" liveChange="inputNANCheck"  editable="false" />
+								<Input value="{oPOModel>netValue}" liveChange="inputNANCheck"  editable="false" />
 								<Button type="Reject" icon="sap-icon://delete" tooltip="{i18n>Delete}" press="deleteNonPoItemData" class="sapUiTinyMarginEnd"
 									enabled="false"/>
 							</cells>

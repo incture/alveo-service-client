@@ -574,27 +574,31 @@ com.menabev.AP.formatter.formatter = {
 			return false;
 		}
 	},
-	
-	getInvStatusColorScheme: function(invStatus){
-		if(invStatus != 17){
+
+	getInvStatusColorScheme: function (invStatus) {
+		if (invStatus != 17) {
 			return 3;
 		} else {
 			return 7;
 		}
 	},
-	formatQtyState:function(itemstatus){
-		if(itemstatus == "9" || itemstatus == "11"){
+	formatQtyState: function (itemstatus) {
+		if (itemstatus == "9" || itemstatus == "11") {
 			return "Error";
 		} else {
 			return "None";
 		}
 	},
-	formatPriceState:function(itemstatus){
-		if(itemstatus == "10" || itemstatus == "11"){
+	formatPriceState: function (itemstatus) {
+		if (itemstatus == "10" || itemstatus == "11") {
 			return "Error";
 		} else {
 			return "None";
 		}
+	},
+	removeBlankSpace: function (costCenter) {
+		var costCtr = costCenter.trim();
+		return costCtr;
 	}
 
 };
