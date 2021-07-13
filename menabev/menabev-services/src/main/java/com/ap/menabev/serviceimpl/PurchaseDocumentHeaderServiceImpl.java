@@ -401,12 +401,21 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 						twoWayMatch = true;
 					}
 					
-					//Gross Amount Calculation
+					//Gross Amount Calculation and SysSugg Tax Amount
 					if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
 						if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
-							Double grossAmount = dto.getInvoiceHeader().getGrossAmount() + twowayMatchUpdatedItem.getGrossPrice();
-							dto.getInvoiceHeader().setGrossAmount(grossAmount);
+							if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
+								Double grossAmount = dto.getInvoiceHeader().getGrossAmount() + twowayMatchUpdatedItem.getGrossPrice();
+								dto.getInvoiceHeader().setGrossAmount(grossAmount);
+							}
+							
+							if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getTaxValue())){
+								Double sysSuggTaxAmt =  dto.getInvoiceHeader().getSysSusgestedTaxAmount() + twowayMatchUpdatedItem.getTaxValue();
+								dto.getInvoiceHeader().setSysSusgestedTaxAmount(sysSuggTaxAmt);
+							}
+							
 						}
+						
 						
 					}
 					updatedItems.add(twowayMatchUpdatedItem);
