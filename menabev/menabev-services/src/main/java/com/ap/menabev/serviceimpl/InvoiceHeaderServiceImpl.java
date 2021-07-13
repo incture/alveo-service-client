@@ -102,6 +102,7 @@ import com.ap.menabev.service.InvoiceHeaderService;
 import com.ap.menabev.service.InvoiceItemService;
 import com.ap.menabev.service.RuleConstants;
 import com.ap.menabev.service.SequenceGeneratorService;
+import com.ap.menabev.service.ValidateInvoiceService;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.DestinationReaderUtil;
 import com.ap.menabev.util.HelperClass;
@@ -170,6 +171,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	@Autowired
 	private SequenceGeneratorService seqService;
+	
+	@Autowired
+	ValidateInvoiceService validateInvoiceService;
 	@Autowired
 	CostAllocationServiceImpl costAllocationServiceImpl;
 
@@ -2228,69 +2232,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		return map;
 	}
 
-	// getInvoiceDetails based on requestId
-	@Override
-	public ResponseEntity<?> getInvoiceDetail(String requestId) {
-		try {
-			InvoiceHeaderDto invoiceHeaderDto = new InvoiceHeaderDto();
-			// get InvoiceHeader
-			InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
-			if(!ServiceUtil.isEmpty(invoiceHeaderDo)){
-			invoiceHeaderDto = ObjectMapperUtils.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-			// get InvoiceItem
-			List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
-			List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
-			for (int i = 0; i < invoiceItemDtoList.size(); i++) {
-				// get AccountAssignment
-				List<InvoiceItemAcctAssignmentDo> invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository
-						.get(requestId, invoiceItemDtoList.get(0).getItemCode());
-				List<InvoiceItemAcctAssignmentDto> invoiceItemAcctAssignmentdtoList = ObjectMapperUtils
-						.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
-				invoiceItemDtoList.get(i).setInvItemAcctDtoList(invoiceItemAcctAssignmentdtoList);
-				// get InvoiceItem Message
-				List<ItemMessageDto> itemMessage = new ArrayList<ItemMessageDto>();
-				invoiceItemDtoList.get(i).setInvoiceItemMessages(itemMessage);
-			}
-			// get CostAllocation
-			List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
-			List<CostAllocationDto> costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo,
-					CostAllocationDto.class);
-			// get Attachements
-			List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
-			List<AttachmentDto> AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);
-			// get Comments
-			List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId);
-			List<CommentDto> commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);
-			//get Activity Log 
-			List<ActivityLogDo> activityLogDo =  activityLogRepo.getAllActivityForRequestId(requestId);
-			List<ActivityLogDto> activityDto = ObjectMapperUtils.mapAll(activityLogDo, ActivityLogDto.class);
-			// get Message
-			List<HeaderMessageDto> messageLists = new ArrayList<HeaderMessageDto>();
-			// get Header check api 
-			
-			
-			// set validation status  code 
-		
-			
-			invoiceHeaderDto.setInvoiceItems(invoiceItemDtoList);
-			invoiceHeaderDto.setCostAllocation(costAllocationDto);
-			invoiceHeaderDto.setAttachment(AttachementDto);
-			invoiceHeaderDto.setComment(commentDto);
-			invoiceHeaderDto.setHeaderMessages(messageLists);
-			invoiceHeaderDto.setActivityLog(activityDto);
-			return new ResponseEntity<InvoiceHeaderDto>(invoiceHeaderDto, HttpStatus.OK);
-			}
-			else {
-				ResponseDto response = new  ResponseDto();
-				response.setMessage("No Invocie Found for the RequestID ");
-				return new ResponseEntity<>(response,HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			ResponseDto response = new  ResponseDto();
-			response.setMessage("Failed due to " + e);
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+	
 	@Override
 	public ResponseEntity<?> getInvoiceItemDetail(String requestId) {
 		InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
@@ -3427,95 +3369,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 		}
 
 		
-	     //process Lead Action Submit 
-		@Override
-		public ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit){
-                  
-                    	String payload = null;
-                    	 // Process Lead Submit for Approval 				
-				if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_APPROVAL)){
-					// Post invoice to SAP API 
-					
-					payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
-					// complete task 
-					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_LEAD_APPROVAL");
-				      invoiceSubmit.getInvoice().setActivityLog(activity);
-				ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
-					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
-						  // success 
-						    // save all the things - activity log and comments
-						  // set all change indiactos
-						  if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
-								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
-								 changesIndicators.setActivityLog(true);
-								 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
-							}else{
-							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
-							  changesIndicators.setActivityLog(true);
-							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
-						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
-				              invoiceSubmit.setInvoice(invoiceHeader); 
-						  invoiceSubmit.setMessage("Task Completed.");
-					  }else {
-						  // failed 
-						  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
-					  }
-					return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);
-				} else if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)){
-					// Process lead submit for rejection 
-					payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
-					ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
-					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
-						  // success 
-						      // save all the things - activity log and comments
-						  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_LEAD_REJECTION");
-					      invoiceSubmit.getInvoice().setActivityLog(activity);
-					      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
-								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
-								 changesIndicators.setActivityLog(true);
-								 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
-							}else{
-							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
-							  changesIndicators.setActivityLog(true);
-							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
-						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
-				              invoiceSubmit.setInvoice(invoiceHeader); 
-			              invoiceSubmit.setInvoice(invoiceHeader);
-						      invoiceSubmit.setMessage("Task Completed.");
-				
-					  }else {
-						  // failed 
-						  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
-					  }
-						return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);			
-				   }else {
-					   // process Lead Resend 
-						payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
-					   ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
-						  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
-							  // success 
-							  // save all things - activity log and comments
-							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_REJECTION");
-						      invoiceSubmit.getInvoice().setActivityLog(activity);
-						      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
-									 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
-									 changesIndicators.setActivityLog(true);
-									 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
-								}else{
-								 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
-								  changesIndicators.setActivityLog(true);
-								  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
-							    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
-					              invoiceSubmit.setInvoice(invoiceHeader); 
-							  invoiceSubmit.setMessage("Task Completed.");
-						  }else {
-							  // failed 
-							  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
-						  }
-					   // Account Submit For Reject    
-				return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);	
-			          } 
-		}
+	 
 		
 		
 		
@@ -3678,5 +3532,173 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 			// TODO Auto-generated method stub
 			return null;
 		}
+		
+		@Override
+		public ResponseEntity<?> getInvoiceDetail(String requestId) {
+			try {
+				InvoiceHeaderDto invoiceHeaderDto = new InvoiceHeaderDto();
+				// get InvoiceHeader
+				InvoiceHeaderDo invoiceHeaderDo = invoiceHeaderRepository.fetchInvoiceHeader(requestId);
+				if(!ServiceUtil.isEmpty(invoiceHeaderDo)){
+				invoiceHeaderDto = ObjectMapperUtils.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+				// get InvoiceItem
+				List<InvoiceItemDo> invoiceItemDo = invoiceItemRepository.getInvoiceItemDos(requestId);
+				List<InvoiceItemDto> invoiceItemDtoList = ObjectMapperUtils.mapAll(invoiceItemDo, InvoiceItemDto.class);
+				for (int i = 0; i < invoiceItemDtoList.size(); i++) {
+					// get AccountAssignment
+					List<InvoiceItemAcctAssignmentDo> invoiceItemAcctAssignmentdoList = invoiceItemAcctAssignmentRepository
+							.get(requestId, invoiceItemDtoList.get(i).getItemCode());
+					List<InvoiceItemAcctAssignmentDto> invoiceItemAcctAssignmentdtoList = ObjectMapperUtils
+							.mapAll(invoiceItemAcctAssignmentdoList, InvoiceItemAcctAssignmentDto.class);
+					invoiceItemDtoList.get(i).setInvItemAcctDtoList(invoiceItemAcctAssignmentdtoList);
+					// get InvoiceItem Message
+					List<ItemMessageDto> itemMessage = new ArrayList<ItemMessageDto>();
+					invoiceItemDtoList.get(i).setInvoiceItemMessages(itemMessage);
+				}
+				// get CostAllocation
+				List<CostAllocationDo> costAllocationDo = costAllocationRepository.getAllOnRequestId(requestId);
+				List<CostAllocationDto> costAllocationDto = ObjectMapperUtils.mapAll(costAllocationDo,
+						CostAllocationDto.class);
+				// get Attachements
+				List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
+				List<AttachmentDto> AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);
+				// get Comments
+				List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId);
+				List<CommentDto> commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);
+				//get Activity Log 
+				List<ActivityLogDo> activityLogDo =  activityLogRepo.getAllActivityForRequestId(requestId);
+				List<ActivityLogDto> activityDto = ObjectMapperUtils.mapAll(activityLogDo, ActivityLogDto.class);
+				// get Message
+				List<HeaderMessageDto> messageLists = new ArrayList<HeaderMessageDto>();
+				// get Header check api 
+				
+				
+				// set validation status  code 
+			
+				
+				invoiceHeaderDto.setInvoiceItems(invoiceItemDtoList);
+				invoiceHeaderDto.setCostAllocation(costAllocationDto);
+				invoiceHeaderDto.setAttachment(AttachementDto);
+				invoiceHeaderDto.setComment(commentDto);
+				invoiceHeaderDto.setHeaderMessages(messageLists);
+				invoiceHeaderDto.setActivityLog(activityDto);
+				return new ResponseEntity<InvoiceHeaderDto>(invoiceHeaderDto, HttpStatus.OK);
+				}
+				else {
+					ResponseDto response = new  ResponseDto();
+					response.setMessage("No Invocie Found for the RequestID ");
+					return new ResponseEntity<>(response,HttpStatus.OK);
+				}
+			} catch (Exception e) {
+				ResponseDto response = new  ResponseDto();
+				response.setMessage("Failed due to " + e);
+				return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		
+		// process Lead Submit 
+		
+
+        @Override
+		public ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit){
+                  
+			System.err.println("Process Lead Submit InputDto Ui "+ invoiceSubmit);
+                    	String payload = null;
+                    	 // Process Lead Submit for Approval 				
+				if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_APPROVAL)){
+					// Post invoice to SAP API 
+					  // if its a PO type invoice 
+					if(invoiceSubmit.getInvoice().getInvoiceType().equals("PO")){
+					InvoiceHeaderDto invoicePostErpResponse =	validateInvoiceService.postToERP(invoiceSubmit.getInvoice());
+					invoiceSubmit.setInvoice(invoicePostErpResponse);	
+					System.err.println("Process Lead Submit =InvoicePostErpResponse "+ invoicePostErpResponse);
+					
+					}else {
+					// else itsa  non po type invoice 
+					 // call SOAP api post of NON- PO 
+					}
+					payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
+					// complete task 
+					  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_LEAD_APPROVAL");
+				      invoiceSubmit.getInvoice().setActivityLog(activity);
+				ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
+					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+						  // success 
+						    // save all the things - activity log and comments
+						  // set all change indiactos
+						  if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
+								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+								 changesIndicators.setActivityLog(true);
+								 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+							}else{
+							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+							  changesIndicators.setActivityLog(true);
+							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
+						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+				              invoiceSubmit.setInvoice(invoiceHeader); 
+						  invoiceSubmit.setMessage("Task Completed.");
+					  }else {
+						  // failed 
+						  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+					  }
+					return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);
+				} else if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)){
+					// Process lead submit for rejection 
+					payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
+					ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
+					  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+						  // success 
+						      // save all the things - activity log and comments
+						  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_LEAD_REJECTION");
+					      invoiceSubmit.getInvoice().setActivityLog(activity);
+					      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
+								 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+								 changesIndicators.setActivityLog(true);
+								 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+							}else{
+							 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+							  changesIndicators.setActivityLog(true);
+							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
+						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+				              invoiceSubmit.setInvoice(invoiceHeader); 
+			              invoiceSubmit.setInvoice(invoiceHeader);
+						      invoiceSubmit.setMessage("Task Completed.");
+				
+					  }else {
+						  // failed 
+						  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+					  }
+						return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);			
+				   }else {
+					   // process Lead Resend 
+						payload = formUpdateTaskContextForProcessLead(invoiceSubmit);
+					   ResponseEntity<?>	response =  HelperClass.completeTask(invoiceSubmit.getTaskId(),payload);
+						  if(response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()){
+							  // success 
+							  // save all things - activity log and comments
+							  List<ActivityLogDto>  activity = createActivityLogForSubmit(invoiceSubmit,invoiceSubmit.getActionCode(),"PROCESS_REJECTION");
+						      invoiceSubmit.getInvoice().setActivityLog(activity);
+						      if(invoiceSubmit.getInvoice().getChangeIndicators()!=null){
+									 InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+									 changesIndicators.setActivityLog(true);
+									 invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+								}else{
+								 InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+								  changesIndicators.setActivityLog(true);
+								  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
+							    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+					              invoiceSubmit.setInvoice(invoiceHeader); 
+							  invoiceSubmit.setMessage("Task Completed.");
+						  }else {
+							  // failed 
+							  invoiceSubmit.setMessage("Task Failed To Complete due to ="+response.getBody().toString());
+						  }
+					   // Account Submit For Reject    
+				return new ResponseEntity<InvoiceSubmitDto> (invoiceSubmit,HttpStatus.OK);	
+			          } 
+		}
+
+
 
 }

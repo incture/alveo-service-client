@@ -3,8 +3,6 @@ package com.ap.menabev;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,28 +47,21 @@ public class TaskChangeListenerJob {
     // https://outlook.office.com/connectors/oam/publish
     @Value("${originator.id}")
     private String originatorId;
-
     @Autowired
     private VcapConfig vcapConfig;
-
     @Autowired
     private TaskRetriever taskRetriever;
-
     @Autowired
     private CardBuilder cardBuilder;
-
     @Autowired
     private CardMailer cardMailer;
-
     // TODO: Properly persist this value so it survives application restarts
     // TODO: Properly deal with duplicate e-mails being sent when running multiple instances of this application
     // TODO: Properly deal with lost updates between subsequent runs, e.g. through a confidence interval and de-duping
-   // private static String lastSync = LocalDateTime.parse(LocalDateTime.now(ZoneId.of("GMT+05:30")).toString()).toString()+"Z";
-                  
-        
+    // private static String lastSync = LocalDateTime.parse(LocalDateTime.now(ZoneId.of("GMT+05:30")).toString()).toString()+"Z";
     private static long lastSync = new Date().getTime();
-   @Scheduled(fixedDelay = 5000)
-    public void pullMessages() {
+   @Scheduled(fixedDelay = 30000)
+   public void pullMessages() {
         LOG.info("Checking for new task updates..."+ lastSync);
 
         long lastChangedFrom = lastSync;
@@ -78,17 +69,12 @@ public class TaskChangeListenerJob {
     
   /*  @Scheduled(fixedDelay = 30000)
     public void pullMessages() {
-    	
     	LOG.info("LocalDateTime =" +LocalDateTime.now());
-        
-        
          String lolcalDateTime = LocalDateTime.now().toString();
         LOG.info("LocalDateTime nowString  = " +lolcalDateTime);
         LOG.info("Checking for new task updates..." + lastSync);
         String  lastChangedFrom = lastSync;
        lastSync = LocalDateTime.parse(LocalDateTime.now(ZoneId.of("GMT+05:30")).toString()).toString()+"Z";*/
-       
-
         try {
             String accessToken = UaaUtils.getWorkflowAccessToken(vcapConfig);
 
@@ -99,7 +85,6 @@ public class TaskChangeListenerJob {
             LOG.error(e.getMessage(), e);
         }
     }
-
     /*
      * Retrieves tasks updated since a certain point in time.
      */
@@ -131,21 +116,16 @@ public class TaskChangeListenerJob {
     private void processUpdatedTasks(String taskInstancesChanged) throws RemoteAccessException {
         try {
             cardMailer.updateCredentialsFromDestination();
-
             ArrayNode tasksChanged = (ArrayNode) new ObjectMapper().readTree(taskInstancesChanged);
-
             List<String> taskIds = new ArrayList<>();
             for (JsonNode node : tasksChanged) {
                 ObjectNode taskNode = (ObjectNode) node;
                 taskIds.add(taskNode.path("id").asText());
             }
             LOG.info("New Tasks: {}", taskIds.size() > 0 ? String.join(", ", taskIds) : "(none)");
-
             for (JsonNode node : tasksChanged) {
                 ObjectNode taskNode = (ObjectNode) node;
-
                 Task task = taskRetriever.retrieveTask(taskNode);
-
                 List<String> recipients = new ObjectMapper().convertValue(taskNode.path("recipientUsers"), new TypeReference<List<String>>() {});
                 String card = cardBuilder.buildCard(task, originatorId, "transform.jslt");
                 cardMailer.sendMail(recipients, task.getInfo().get("subject").asText(), card);
@@ -154,5 +134,4 @@ public class TaskChangeListenerJob {
             throw new RemoteAccessException("Error while processing task updates", e);
         }
     }
-
 }

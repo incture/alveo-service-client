@@ -76,7 +76,7 @@ public class CardMailer {
         });
 
         LOG.info("Sending e-mail {} session...",session);
-      /*  Transport transport = null;
+       Transport transport = null;
         try {
             transport = session.getTransport("smtp");
             System.err.println("transPost "+transport);
@@ -85,14 +85,14 @@ public class CardMailer {
         }
         if (transport == null) {
             throw new IllegalStateException("Could not get SMTP transport.");
-        }*/
+        }
 
-       // try {
-        	/*System.err.println("Before transPost connect ");
+       try {
+        	System.err.println("Sending e-mail {} Before transPost connect ");
             transport.connect();
                          System.err.println("after TransPost connect ");;
             Message message = new MimeMessage(session);
-            System.err.println("mailConfig get Mail User"+mailConfig.getMailUser());
+            System.err.println("Sending e-mail {} mailConfig get Mail User"+mailConfig.getMailUser());
             message.setFrom(new InternetAddress(mailConfig.getMailUser()));
             InternetAddress[] addresses = new InternetAddress[recipients.size()];
             for (int i = 0; i < recipients.size(); i++) {
@@ -101,11 +101,11 @@ public class CardMailer {
             message.setRecipients(Message.RecipientType.TO, addresses);
             message.setSubject(subject);
             message.setContent(header + card + footer, "text/html; charset=utf-8");
-
-            transport.sendMessage(message, message.getAllRecipients());*/
-            
+            System.err.println("Sending e-mail {} Message Contenet "+message);
+            transport.sendMessage(message, message.getAllRecipients());
+            LOG.info("E-mail to {} successfully sent.", recipientsAsString);
             // fix in email 
-    		MimeMessage mimeMesg = new MimeMessage(session);
+    		/*MimeMessage mimeMesg = new MimeMessage(session);
     		try {
     			 System.err.println("mailConfig get Mail User"+mailConfig.getMailUser());
     			 mimeMesg.setFrom(new InternetAddress(mailConfig.getMailUser()));
@@ -117,7 +117,7 @@ public class CardMailer {
     	            mimeMesg.setSubject(subject);
     	            mimeMesg.setContent(header + card + footer, "text/html; charset=utf-8");
     			Transport.send(mimeMesg);
-            LOG.info("E-mail to {} successfully sent.", recipientsAsString);
+            LOG.info("E-mail to {} successfully sent.", recipientsAsString);*/
         } catch (Exception e) {
             throw new RemoteAccessException("Error while sending e-mail", e);
         } 

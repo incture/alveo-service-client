@@ -778,7 +778,11 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			for (ThreeWayInvoiceItemDto invoiceItemDto : itemList) {
 				int priceMismatchCount = 0;
 				int qtyMismatchCount = 0;
-				if (!ServiceUtil.isEmpty(messageResponse)) {
+				// if the item is two way match is false and was been not set for Three way match consumption logic 
+				// ignore the item , and let the item status be same as the input item status 
+				if(invoiceItemDto.getIsTwowayMatched()
+						&& !invoiceItemDto.getItemStatusCode().equals(ApplicationConstants.NO_GRN)){
+				if (!ServiceUtil.isEmpty(messageResponse) ) {
 					logger.error("inside messageResponse not empty");
 					List<ItemMessageDto> messageItemList = invoiceItemDto.getInvoiceItemMessages();
 					String reqId = invoiceItemDto.getRequestId();
@@ -836,13 +840,13 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					}
 					invoiceItemDto.setInvoiceItemMessages(messageItemList);
 
-				} else {
+				}else {
 					flag = true;
 					invoiceItemDto.setIsThreewayMatched(true);
 					invoiceItemDto.setItemStatusCode(ApplicationConstants.READY_TO_POST);
 					invoiceItemDto.setItemStatusText("Ready To Post");
 				}
-
+				}
 			}
 			// if(flag){
 			// threeWayMatchOutputDto.setInvoiceStatus("17");
