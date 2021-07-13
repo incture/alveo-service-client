@@ -627,7 +627,7 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 					itemDo.setItemCode(invoiceItemServiceImpl.getItemId(requestId));
 					//itemDo.setItem(invoiceItemServiceImpl.getItemId());
 					logger.error("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()");
-					logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()"+itemDo.getItemCode());
+					logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()  requestId "+ requestId +itemDo.getItemCode());
 					if(!ServiceUtil.isEmpty(invoiceItemDto.getIsDeleted())){
 					if(invoiceItemDto.getIsDeleted()==true){
 						itemDo.setIsDeleted(true);
@@ -3605,12 +3605,13 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
                   
 			System.err.println("Process Lead Submit InputDto Ui "+ invoiceSubmit);
                     	String payload = null;
+                    	InvoiceHeaderDto invoicePostErpResponse  = null;
                     	 // Process Lead Submit for Approval 				
 				if(invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_APPROVAL)){
 					// Post invoice to SAP API 
 					  // if its a PO type invoice 
 					if(invoiceSubmit.getInvoice().getInvoiceType().equals("PO")){
-					InvoiceHeaderDto invoicePostErpResponse =	validateInvoiceService.postToERP(invoiceSubmit.getInvoice());
+					 invoicePostErpResponse =	validateInvoiceService.postToERP(invoiceSubmit.getInvoice());
 					invoiceSubmit.setInvoice(invoicePostErpResponse);	
 					System.err.println("Process Lead Submit =InvoicePostErpResponse "+ invoicePostErpResponse);
 					
@@ -3636,7 +3637,8 @@ public ResponseDto saveOrUpdate(InvoiceHeaderDto dto) {
 							  changesIndicators.setActivityLog(true);
 							  invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);}
 						    InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
-				              invoiceSubmit.setInvoice(invoiceHeader); 
+						    System.err.println("invoiceHeader Update in process lead Submit "+invoiceHeader);
+				              invoiceSubmit.setInvoice(invoicePostErpResponse); 
 						  invoiceSubmit.setMessage("Task Completed.");
 					  }else {
 						  // failed 

@@ -26,7 +26,7 @@ import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 
 
-
+@Transactional
 @Service
 public class InvoiceItemServiceImpl implements InvoiceItemService {
 
@@ -124,7 +124,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+   
 	public String getItemId(String requestId) {
 		try {
 			String itemId = invoiceItemRepository.getItemId(requestId);

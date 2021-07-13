@@ -1,6 +1,7 @@
 package com.ap.menabev.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,10 +118,10 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
 					}
-					//if Not Duplicate added by Lakhu
-					else{
+					// if Not Duplicate added by Lakhu
+					else {
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
-						
+
 					}
 
 					// a. If success, and move on
@@ -132,8 +133,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// a. Call determinePaymentTermsOdata service and
 					// setPaymentTerms
 
-					
-					//copy from here -----
+					// copy from here -----
 					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
@@ -162,19 +162,16 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 								}
 
 							}
-							//get payment terms details
+							// get payment terms details
 							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
-							
-							
-							
-							
+
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
-								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2,invoiceHeaderCheckDto);
+								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2, invoiceHeaderCheckDto);
 							}
 						}
 					}
-					//---to this line
+					// ---to this line
 					// b. Determine baseline date configuration and
 					// SetBaselineDate
 					//
@@ -218,7 +215,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
 					} else {
-						//Added By Lakhu
+						// Added By Lakhu
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 						ChangeIndicator resetChangeIndicator = resetChangeIndicator(
 								invoiceHeaderCheckDto.getChangeIndicator());
@@ -242,8 +239,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
 					}
-					//Added By Lakhu
-					else{
+					// Added By Lakhu
+					else {
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 					}
 					// b. If error, stop processing and send response to UI
@@ -289,8 +286,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						invoiceHeaderCheckDto.setMessages(messagesList);
 						return invoiceHeaderCheckDto;
 					}
-					//Added By Lakhu
-					if(!duplicateCheckDto.getIsDuplicate()){
+					// Added By Lakhu
+					if (!duplicateCheckDto.getIsDuplicate()) {
 						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
 						return invoiceHeaderCheckDto;
 					}
@@ -415,7 +412,6 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 	private InvoiceHeaderCheckDto calculateBaseDueDates(String string, InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
 
-		
 		JSONObject json2 = new JSONObject(string);
 		logger.error("JSON:::" + json2);
 		if (json2.has("d")) {
@@ -428,53 +424,54 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				String ZBD2T = null;
 				String ZBD3T = null;
 				JSONObject resultObject2 = (JSONObject) resultsArray2.get(i);
-				if(resultObject2.has("BaseLineDateType")){
+				if (resultObject2.has("BaseLineDateType")) {
 					String BaseLineDateType = resultObject2.getString("BaseLineDateType");
-					if(BaseLineDateType==null || BaseLineDateType=="")
+					if (BaseLineDateType == null || BaseLineDateType == "")
 						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getBaselineDate());
-					else if("D".equalsIgnoreCase(BaseLineDateType))
+					else if ("D".equalsIgnoreCase(BaseLineDateType))
 						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getPostingDate());
-					else if("B".equalsIgnoreCase(BaseLineDateType))
+					else if ("B".equalsIgnoreCase(BaseLineDateType))
 						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getInvoiceDate());
 				}
-				if(resultObject2.has("CashDiscDays1")){
+				if (resultObject2.has("CashDiscDays1")) {
 					ZBD1T = resultObject2.getString("CashDiscDays1");
 				}
-				if(resultObject2.has("CashDiscDays2")){
+				if (resultObject2.has("CashDiscDays2")) {
 					ZBD2T = resultObject2.getString("CashDiscDays2");
 				}
-				if(resultObject2.has("NetPmntTermPeriod")){
-					ZBD3T =  resultObject2.getString("NetPmntTermPeriod");
+				if (resultObject2.has("NetPmntTermPeriod")) {
+					ZBD3T = resultObject2.getString("NetPmntTermPeriod");
 				}
 				Long period = 0L;
 				// 1st condition
-				if(!ZBD3T.equalsIgnoreCase("0"))
+				if (!ZBD3T.equalsIgnoreCase("0"))
 					period = Long.valueOf(ZBD3T);
-				else{
-					if(!ZBD2T.equalsIgnoreCase("0"))
+				else {
+					if (!ZBD2T.equalsIgnoreCase("0"))
 						period = Long.valueOf(ZBD2T);
 					else
 						period = Long.valueOf(ZBD1T);
 				}
-				
-					invoiceHeaderCheckDto.setDueDate(invoiceHeaderCheckDto.getBaselineDate()+period);
-				//2nd cond
-				
-				if(!ZBD2T.equalsIgnoreCase("0")){
-					invoiceHeaderCheckDto.setDiscountedDueDate2(invoiceHeaderCheckDto.getBaselineDate()+Long.valueOf(ZBD2T));
-				}
-				else{
+
+				invoiceHeaderCheckDto.setDueDate(invoiceHeaderCheckDto.getBaselineDate() + period);
+				// 2nd cond
+
+				if (!ZBD2T.equalsIgnoreCase("0")) {
+					invoiceHeaderCheckDto
+							.setDiscountedDueDate2(invoiceHeaderCheckDto.getBaselineDate() + Long.valueOf(ZBD2T));
+				} else {
 					invoiceHeaderCheckDto.setDiscountedDueDate2(invoiceHeaderCheckDto.getDueDate());
 				}
-				if(!ZBD1T.equalsIgnoreCase("0") || !ZBD2T.equalsIgnoreCase("0")){
-					invoiceHeaderCheckDto.setDiscountedDueDate1(invoiceHeaderCheckDto.getBaselineDate()+Long.valueOf(ZBD1T));
-					
-				}else{
+				if (!ZBD1T.equalsIgnoreCase("0") || !ZBD2T.equalsIgnoreCase("0")) {
+					invoiceHeaderCheckDto
+							.setDiscountedDueDate1(invoiceHeaderCheckDto.getBaselineDate() + Long.valueOf(ZBD1T));
+
+				} else {
 					invoiceHeaderCheckDto.setDiscountedDueDate1(invoiceHeaderCheckDto.getDueDate());
 				}
 			}
 		}
-	
+
 		return invoiceHeaderCheckDto;
 	}
 
@@ -705,6 +702,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			List<ThreeWayInvoiceItemDto> itemList = threeWayMatchOutputDto.getInvoiceItems();
 			logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "" + itemList.size());
 			for (ThreeWayInvoiceItemDto invoiceItemDto : itemList) {
+				invoiceItemDto.setInvoiceItemMessages(Collections.emptyList());
 				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "invoiceItemDto.getIsTwowayMatched()"
 						+ invoiceItemDto.getIsTwowayMatched());
 				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>"
@@ -788,77 +786,99 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 			Boolean flag = false;
 			for (ThreeWayInvoiceItemDto invoiceItemDto : itemList) {
+				int threewayMatched = 0;
 				int priceMismatchCount = 0;
 				int qtyMismatchCount = 0;
-				// if the item is two way match is false and was been not set for Three way match consumption logic 
-				// ignore the item , and let the item status be same as the input item status 
-				if(invoiceItemDto.getIsTwowayMatched()
-						&& !invoiceItemDto.getItemStatusCode().equals(ApplicationConstants.NO_GRN)){
-				if (!ServiceUtil.isEmpty(messageResponse) ) {
-					logger.error("inside messageResponse not empty");
-					List<ItemMessageDto> messageItemList = invoiceItemDto.getInvoiceItemMessages();
-					String reqId = invoiceItemDto.getRequestId();
-					String itemCode = invoiceItemDto.getItemCode();
-					for (ToMatchOutputDto toMatchOutputDto : messageResponse) {
-						if (toMatchOutputDto.getRequestId().equalsIgnoreCase(reqId)
-								&& toMatchOutputDto.getReferenceInvoiceItem().equalsIgnoreCase(itemCode)) {
+				// if the item is two way match is false and was been not set
+				// for Three way match consumption logic
+				// ignore the item , and let the item status be same as the
+				// input item status
+				if (invoiceItemDto.getIsTwowayMatched()
+						&& !invoiceItemDto.getItemStatusCode().equals(ApplicationConstants.NO_GRN)) {
+					if (!ServiceUtil.isEmpty(messageResponse)) {
+						logger.error("inside messageResponse not empty");
+						List<ItemMessageDto> messageItemList = invoiceItemDto.getInvoiceItemMessages();
+						String reqId = invoiceItemDto.getRequestId();
+						String itemCode = invoiceItemDto.getItemCode();
+						
+						for (ToMatchOutputDto toMatchOutputDto : messageResponse) {
 
-							logger.error("inside matched item " + toMatchOutputDto.getInvoiceItem() + " and req id "
-									+ toMatchOutputDto.getRequestId());
-							int msgNo = 1;
-							ItemMessageDto dto = new ItemMessageDto();
-							dto.setItemId(toMatchOutputDto.getInvoiceItem());
-							dto.setMessageClass(toMatchOutputDto.getMessageClass());
-							dto.setMessageId(String.valueOf(msgNo));
-							dto.setMessageNo(toMatchOutputDto.getMessageNumber());
-							dto.setMessageType(toMatchOutputDto.getMessageType());
-							dto.setMessageText(toMatchOutputDto.getMessageText());
-							boolean added = messageItemList.add(dto);
-							System.err.println(added);
-							msgNo++;
+							logger.error("804 " + toMatchOutputDto.getRequestId().equalsIgnoreCase(reqId)
+									+ "toMatchOutputDto " + toMatchOutputDto.getRequestId() + " input reqid " + reqId
+									+ toMatchOutputDto.getReferenceInvoiceItem().equalsIgnoreCase(itemCode)
+									+ "toMatchOutputDto " + toMatchOutputDto.getReferenceInvoiceItem() + "itemCode "
+									+ itemCode);
+							if (toMatchOutputDto.getRequestId().equalsIgnoreCase(reqId)
+									&& toMatchOutputDto.getReferenceInvoiceItem().equalsIgnoreCase(itemCode)) {
+								threewayMatched++;
+								logger.error("inside matched item " + toMatchOutputDto.getInvoiceItem() + " and req id "
+										+ toMatchOutputDto.getRequestId());
+								int msgNo = 1;
+								ItemMessageDto dto = new ItemMessageDto();
+								dto.setItemId(toMatchOutputDto.getInvoiceItem());
+								dto.setMessageClass(toMatchOutputDto.getMessageClass());
+								dto.setMessageId(String.valueOf(msgNo));
+								dto.setMessageNo(toMatchOutputDto.getMessageNumber());
+								dto.setMessageType(toMatchOutputDto.getMessageType());
+								dto.setMessageText(toMatchOutputDto.getMessageText());
+								boolean added = messageItemList.add(dto);
+								System.err.println(added);
+								msgNo++;
 
-							if (ApplicationConstants.QUANTITY_HIGH_MSG_NUMBER
-									.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())) {
-								qtyMismatchCount++;
-							} else if (ApplicationConstants.PRICE_HIGH_MSG_NUMBER
-									.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())
-									|| ApplicationConstants.PRICE_LOW_MSG_NUMBER
-											.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())) {
-								priceMismatchCount++;
-							}
+								if (ApplicationConstants.QUANTITY_HIGH_MSG_NUMBER
+										.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())) {
+									qtyMismatchCount++;
+								} else if (ApplicationConstants.PRICE_HIGH_MSG_NUMBER
+										.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())
+										|| ApplicationConstants.PRICE_LOW_MSG_NUMBER
+												.equalsIgnoreCase(toMatchOutputDto.getMessageNumber())) {
+									priceMismatchCount++;
+								}
 
-							if (priceMismatchCount > 0 && qtyMismatchCount > 0) {
-								invoiceItemDto.setItemStatusCode(ApplicationConstants.PRICE_OR_QTY_MISMATCH);
-								invoiceItemDto.setItemStatusText("Price/Qty");
+								if (priceMismatchCount > 0 && qtyMismatchCount > 0) {
+									invoiceItemDto.setItemStatusCode(ApplicationConstants.PRICE_OR_QTY_MISMATCH);
+									invoiceItemDto.setItemStatusText("Price/Qty");
 
+								} else {
+									if (priceMismatchCount > 0) {
+										invoiceItemDto.setItemStatusCode(ApplicationConstants.PRICE_MISMATCH);
+										invoiceItemDto.setItemStatusText("Price Mismatch");
+									}
+									if (qtyMismatchCount > 0) {
+										invoiceItemDto.setItemStatusCode(ApplicationConstants.QTY_MISMATCH);
+										invoiceItemDto.setItemStatusText("Qty Mismatch");
+									}
+
+								}
+								// invoiceItemDto.setIsThreewayMatched(false);
 							} else {
-								if (priceMismatchCount > 0) {
-									invoiceItemDto.setItemStatusCode(ApplicationConstants.PRICE_MISMATCH);
-									invoiceItemDto.setItemStatusText("Price Mismatch");
-								}
-								if (qtyMismatchCount > 0) {
-									invoiceItemDto.setItemStatusCode(ApplicationConstants.QTY_MISMATCH);
-									invoiceItemDto.setItemStatusText("Qty Mismatch");
-								}
-
+								//
+								logger.error("804  else at line 851");
+								// invoiceItemDto.setItemStatusCode(ApplicationConstants.THREE_WAY_MATCH_SUCCESS);
+								// invoiceItemDto.setItemStatusText("Three Way
+								// Success");
+								// invoiceItemDto.setIsThreewayMatched(true);
 							}
-							invoiceItemDto.setIsThreewayMatched(false);
-						} else {
-
-							invoiceItemDto.setItemStatusCode(ApplicationConstants.THREE_WAY_MATCH_SUCCESS);
-							invoiceItemDto.setItemStatusText("Ready to Post");
-							invoiceItemDto.setIsThreewayMatched(true);
 						}
-					}
-					invoiceItemDto.setInvoiceItemMessages(messageItemList);
+						invoiceItemDto.setInvoiceItemMessages(messageItemList);
 
-				}else {
-					flag = true;
-					invoiceItemDto.setIsThreewayMatched(true);
-					invoiceItemDto.setItemStatusCode(ApplicationConstants.READY_TO_POST);
-					invoiceItemDto.setItemStatusText("Ready To Post");
+					} else {
+						logger.error("804  else at line 860");
+						flag = true;
+						invoiceItemDto.setIsThreewayMatched(true);
+						invoiceItemDto.setItemStatusCode(ApplicationConstants.READY_TO_POST);
+						invoiceItemDto.setItemStatusText("Ready To Post");
+					}
+					if (threewayMatched == 0) {
+						invoiceItemDto.setItemStatusCode(ApplicationConstants.READY_TO_POST);
+						invoiceItemDto.setItemStatusText("Ready To Post");
+						invoiceItemDto.setIsThreewayMatched(true);
+					} else {
+						invoiceItemDto.setIsThreewayMatched(false);
+					}
+
 				}
-				}
+
 			}
 			// if(flag){
 			// threeWayMatchOutputDto.setInvoiceStatus("17");
@@ -868,9 +888,11 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			InvoiceHeaderDto invoiceHeaderDtoUpdated = ObjectMapperUtils.map(threeWayMatchOutputDto,
 					InvoiceHeaderDto.class);
 			System.err.println("THREE WAY MATCH :::::UPDATED" + invoiceHeaderDtoUpdated);
-			InvoiceHeaderDto updatedHeaderStatusAfterThreeWayMatch = duplicateCheckService.determineHeaderStatus(invoiceHeaderDtoUpdated);
-			
-			System.err.println("THREE WAY MATCH :::::UPDATED HEADER STATUS DETERMINATION" + updatedHeaderStatusAfterThreeWayMatch);
+			InvoiceHeaderDto updatedHeaderStatusAfterThreeWayMatch = duplicateCheckService
+					.determineHeaderStatus(invoiceHeaderDtoUpdated);
+
+			System.err.println(
+					"THREE WAY MATCH :::::UPDATED HEADER STATUS DETERMINATION" + updatedHeaderStatusAfterThreeWayMatch);
 			threeWayMatchOutputDto.setInvoiceStatus(updatedHeaderStatusAfterThreeWayMatch.getInvoiceStatus());
 			threeWayMatchOutputDto.setInvoiceStatusText(updatedHeaderStatusAfterThreeWayMatch.getInvoiceStatusText());
 			// threeWayMatchOutputDto.setHeaderMessages(headerMessages);
