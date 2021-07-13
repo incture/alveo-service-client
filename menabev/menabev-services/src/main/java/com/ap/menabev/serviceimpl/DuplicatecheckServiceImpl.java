@@ -461,9 +461,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 		if (!ServiceUtil.isEmpty(poItem.getOrderPriceUnit())) {
 			itemReturn.setUom(poItem.getOrderPriceUnit());
 		}
-		if (!ServiceUtil.isEmpty(poItem.getTaxCode())) {
-			itemReturn.setTaxCode(poItem.getTaxCode());
-		}
+//		if (!ServiceUtil.isEmpty(poItem.getTaxCode())) {
+//			itemReturn.setTaxCode(poItem.getTaxCode());
+//		}
 		if (!ServiceUtil.isEmpty(poItem.getPreqItem())) {
 			itemReturn.setItemRequisationNum(poItem.getPreqItem());
 		}
