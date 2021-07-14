@@ -52,7 +52,7 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}"/>
+							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}" change="onRemidiationUserChange"/>
 							<!--<Text text="{oPOModel>group}"/>-->
 							<Button icon="sap-icon://delete" press="onDeleteRemidiationUser" type="Reject"></Button>
 						</cells>

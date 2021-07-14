@@ -1322,6 +1322,16 @@ sap.ui.define([
 
 		},
 
+		validateEmail: function (value) {
+			var oRegex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
+			var sText = value;
+			if (oRegex.test(sText)) {
+				return "S";
+			} else {
+				return "E";
+			}
+		},
+		
 		onLiveChangeHdrInvValue: function (oEvent) {
 			var oValue = oEvent.getSource().getValue();
 			// if(isNaN(oValue)){

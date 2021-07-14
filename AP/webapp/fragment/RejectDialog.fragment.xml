@@ -48,7 +48,7 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}"/>
+							<Input value="{oPOModel>user}" valueState="{oPOModel>userState}" change="onRemidiationUserChange"/>
 							<!--<Text text="{oPOModel>group}"/>-->
 							<Button icon="sap-icon://delete" press="onDeleteRemidiationUser" type="Reject"></Button>
 						</cells>
@@ -57,7 +57,7 @@
 			</Table>
 			<!--<tnt:InfoLabel text="{i18n>rejectInfoLabelMsg}" renderMode="Narrow" colorScheme="1" displayOnly="true"/>-->
 			<HBox>
-				<Label text="{i18n>ReasonForRejection}" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
+				<Label text="{i18n>ReasonForRejection}" class="sapUiTinyMarginTop sapUiTinyMarginEnd" required="true"/>
 				<Select items="{oDropDownModel>/rejectReasonCodes}" selectedKey="{oPOModel>/reasonForRejection}" change="errorHandlerselect"
 					forceSelection="false" valueStateText="{oMandatoryModel>/NonPO/reasonForRejectionState}" width="10rem">
 					<core:Item text="{oDropDownModel>shortText}" key="{oDropDownModel>statusCode}"/>

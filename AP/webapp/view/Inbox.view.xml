@@ -187,13 +187,13 @@
 								</OverflowToolbar>
 							</headerToolbar>
 							<columns>
-								<Column width="10%">
+								<Column>
 									<Label text="{i18n>inboxRequestID}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="10%">
+								<Column>
 									<Label text="{i18n>Vendor}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
+								<Column width="10%" minScreenWidth="Tablet" demandPopin="true">
 									<Label text="{i18n>InvRef}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Tablet" demandPopin="true">
@@ -217,11 +217,11 @@
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>RecipientGroup}" design="Bold" wrapping="true"/>
 								</Column>
-								<Column width="8%" minScreenWidth="Desktop" demandPopin="true"  visible="false">
+								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
 									<Label text="{i18n>RecipientUser}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true" visible="false">
-									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true" />
+									<Label text="{i18n>TaskStatus}" design="Bold" wrapping="true"/>
 								</Column>
 								<Column width="8%" minScreenWidth="Desktop" demandPopin="true">
 									<Label text="{i18n>ACTION}" design="Bold" wrapping="true"/>
