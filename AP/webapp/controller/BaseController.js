@@ -683,17 +683,23 @@ sap.ui.define([
 		},
 		
 		onSelectionChangeAddPO: function (oEvent) {
-			var changedItem = oEvent.getParameter("changedItem");
-			var isSelected = oEvent.getParameter("selected");
-
-			var state = "Selected";
-			if (!isSelected) {
-				state = "Deselected";
+			var addPOModel = this.getModel("addPOModel");
+			var currentSelectedItem = oEvent.getParameter("listItem").getBindingContext("addPOModel").getObject();
+			
+			var selectedFilters = oEvent.getSource().getSelectedContextPaths();
+			for(var i=0; i<= selectedFilters; i++) {
+				var list = addPOModel.getProperty(selectedFilters);
+				if(currentSelectedItem.documentCategory != list.documentCategory){
+					oEvent.getParameter("listItem").setSelected(false);
+					sap.m.MessageToast.show("Different Document Category Items cannot be selected");
+				}
 			}
-
-			sap.m.MessageToast.show("Event 'selectionChange': " + state + " '" + changedItem.getText() + "'", {
-				width: "auto"
-			});
+			addPOModel.setProperty("/selectedFilters", selectedFilters);
+			if (selectedFilters.length) {
+				this.oVisibilityModel.setProperty("/PO/enabled", true);
+			} else {
+				this.oVisibilityModel.setProperty("/PO/enabled", false);
+			}
 		},
 
 		onClickAddPOOk: function () {
