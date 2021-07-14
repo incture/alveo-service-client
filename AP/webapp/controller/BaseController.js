@@ -681,6 +681,26 @@ sap.ui.define([
 				this.oVisibilityModel.setProperty("/PO/enabled", false);
 			}
 		},
+		
+		onSelectionChangeAddPO: function (oEvent) {
+			var addPOModel = this.getModel("addPOModel");
+			var currentSelectedItem = oEvent.getParameter("listItem").getBindingContext("addPOModel").getObject();
+			
+			var selectedFilters = oEvent.getSource().getSelectedContextPaths();
+			for(var i=0; i<= selectedFilters; i++) {
+				var list = addPOModel.getProperty(selectedFilters);
+				if(currentSelectedItem.documentCategory != list.documentCategory){
+					oEvent.getParameter("listItem").setSelected(false);
+					sap.m.MessageToast.show("Different Document Category Items cannot be selected");
+				}
+			}
+			addPOModel.setProperty("/selectedFilters", selectedFilters);
+			if (selectedFilters.length) {
+				this.oVisibilityModel.setProperty("/PO/enabled", true);
+			} else {
+				this.oVisibilityModel.setProperty("/PO/enabled", false);
+			}
+		},
 
 		onClickAddPOOk: function () {
 			var addPOModel = this.getModel("addPOModel");
@@ -1316,6 +1336,20 @@ sap.ui.define([
 			} else {
 				return "E";
 			}
+		},
+		
+		onLiveChangeHdrInvValue: function (oEvent) {
+			var oValue = oEvent.getSource().getValue();
+			// if(isNaN(oValue)){
+			// 	oValue = oValue.replace(/[^\d]/g, '');
+			// 	oEvent.getSource().setValue(oValue);
+
+			// }
+			if (!(oValue.indexOf(".") >= 0) && oValue.length > 8) {
+				oValue = oValue.slice(0, 8);
+			}
+			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
+			oEvent.getSource().setValue(oValue);
 		},
 	});
 

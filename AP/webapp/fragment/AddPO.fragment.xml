@@ -56,7 +56,8 @@
 				</fb:filterItems>
 			</fb:FilterBar>
 			<Table items="{addPOModel>/result}" class="sapUiSizeCompact" growing="true" growingThreshold="100"
-				sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" alternateRowColors="true" mode="MultiSelect" select="onSelectAddPO">
+				sticky="HeaderToolbar,InfoToolbar,ColumnHeaders" alternateRowColors="true" mode="MultiSelect" select="onSelectAddPO"
+				selectionChange="onSelectionChangeAddPO">
 				<columns>
 					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
 						<Label text="{i18n>DocNumber}" design="Bold"/>

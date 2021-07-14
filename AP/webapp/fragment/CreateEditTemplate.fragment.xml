@@ -46,19 +46,21 @@
 								<Input value="{postDataModel>accountNo}" valueState="{postDataModel>accountNoError}" change="onChangeAccountNo"/>
 								<Input value="{postDataModel>glAccount}" filterSuggests="false" class="glaccount" suggestionItems="{oDropDownModel>/GLAccountResult}"
 									tooltip="{postDataModel>glCode}" suggestionItemSelected="glAccountSelected" showSuggestion="true" suggest="glAccountSuggest"
-									change="errorHandler" valueState="{postDataModel>glError}">
+									change="errorHandlerInput" valueState="{postDataModel>glError}">
 									<suggestionItems>
 										<core:ListItem text="{oDropDownModel>GlAccnt}" additionalText="{oDropDownModel>GlAccountName}"/>
 									</suggestionItems>
 								</Input>
 								<Text class="sapUiTinyMarginEnd" text="{postDataModel>materialDescription}"/>
 								<Select forceSelection="false" showSecondaryValues="true" selectedKey="{postDataModel>costCenter}"
-									items="{oDropDownModel>/costCenterResult}" valueState="{postDataModel>costCenterError}" change="errorHandler">
+									items="{oDropDownModel>/costCenterResult}" valueState="{postDataModel>costCenterError}" change="errorHandlerselect">
 									<items>
-										<core:ListItem key="{oDropDownModel>CstCenter}" text="{oDropDownModel>CstCenter}" additionalText="{oDropDownModel>CostCenterName}"/>
+										<core:ListItem key="{path:'oDropDownModel>CstCenter', formatter:'com.menabev.AP.formatter.formatter.removeBlankSpace'}" 
+											text="{path:'oDropDownModel>CstCenter', formatter:'com.menabev.AP.formatter.formatter.removeBlankSpace'}" 
+											additionalText="{oDropDownModel>CostCenterName}"/>
 									</items>
 								</Select>
-								<Input value="{postDataModel>allocationPercent}" valueState="{postDataModel>allocationPercentError}" type="Number" change="errorHandler"/>
+								<Input value="{postDataModel>allocationPercent}" valueState="{postDataModel>allocationPercentError}" type="Number" change="errorHandlerInput"/>
 								<Input class="sapUiTinyMarginEnd" width="100%" value="{postDataModel>itemText}" tooltip="{postDataModel>text}" change="onChangeText"/>
 								<Button type="Reject" icon="sap-icon://delete" tooltip="{i18n>Delete}" press="deleteNonPoItemData"
 									class="tableBtnAlignMent tableSelectionChkBox dynamicCls sapUiTinyMarginEnd"/>
