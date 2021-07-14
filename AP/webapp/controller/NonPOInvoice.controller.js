@@ -74,15 +74,15 @@ sap.ui.define([
 
 		onRouteMatched: function (oEvent) {
 			//reading the Arguments from url
-			var oArgs = oEvent.getParameter("arguments"),
-				requestId = oArgs.id,
-				status = oArgs.status,
-				taskId = oArgs.taskId;
+			var oArgs = oEvent.getParameter("arguments");
+			this.requestId = oArgs.id;
+			this.status = oArgs.status;
+			this.taskId = oArgs.taskId;
 			var invoiceType = oEvent.getParameter("name");
-			this.getBtnVisibility(status, requestId, invoiceType);
+			this.getBtnVisibility(this.status, this.requestId, invoiceType);
 			this.oMandatoryModel.setProperty("/NonPO", {});
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
-			if (requestId === "NEW") {
+			if (this.requestId === "NEW") {
 				var initializeModelData = {
 					"requestId": "",
 					"request_created_at": 0,
@@ -167,8 +167,8 @@ sap.ui.define([
 
 			}
 			//handle if route has NonPO request Id 
-			else if (requestId) {
-				POServices.getPONonPOData("", this, requestId);
+			else if (this.requestId) {
+				POServices.getPONonPOData("", this, this.requestId);
 			}
 
 		},
@@ -282,7 +282,7 @@ sap.ui.define([
 			var documentId = oPOModel.getProperty("/invoicePdfId");
 			this.fnOpenPDF(documentId);
 		},
-		
+
 		//End of Header Filter function
 
 		//onChange CC item level tax
@@ -297,7 +297,11 @@ sap.ui.define([
 
 		//This function will route to TemplateManagement view
 		onClickManageTemplate: function () {
-			this.oRouter.navTo("TemplateManagement");
+			this.oRouter.navTo("TemplateManagement", {
+				id: this.requestId,
+				status: this.status,
+				taskId: this.taskId
+			});
 		},
 
 		//function onSelectTemplate is triggered on click of Select template
@@ -702,11 +706,10 @@ sap.ui.define([
 
 		//Called when the save button is clicked.
 		onNonPoSave: function (oEvent) {
-			if (!this.oPOModel.getProperty("/invoiceType"))
-			{
-				this.oPOModel.setProperty("/invoiceType","NON-PO")
+			if (!this.oPOModel.getProperty("/invoiceType")) {
+				this.oPOModel.setProperty("/invoiceType", "NON-PO")
 			}
-				POServices.onNonPoSave(oEvent, this);
+			POServices.onNonPoSave(oEvent, this);
 		},
 
 		onNonPoSubmit: function (oEvent) {

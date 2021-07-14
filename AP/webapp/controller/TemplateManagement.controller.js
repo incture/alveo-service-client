@@ -466,7 +466,9 @@ sap.ui.define([
 		},
 
 		onNavBack: function () {
-			this.oRouter.navTo("NonPOInvoice");
+			this.oRouter.navTo("NonPOInvoice", {
+				id: "NonPOEdited"
+			});
 		},
 
 		onClickSearchTemplate: function () {

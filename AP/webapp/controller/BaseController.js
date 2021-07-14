@@ -247,6 +247,7 @@ sap.ui.define([
 					oVisibilityModel.setProperty("/NonPOInvoice/SubmitBtnVisible", true);
 					oVisibilityModel.setProperty("/NonPOInvoice/CancelBtnVisible", true);
 				}
+				//status 1 means It is draft tasks and for which requestId is already available
 			} else if (status == "1") {
 				oVisibilityModel.setProperty("/NonPOInvoice/editable", true);
 				oVisibilityModel.setProperty("/NonPOInvoice/actionBtnEnable", true);
