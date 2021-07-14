@@ -681,6 +681,20 @@ sap.ui.define([
 				this.oVisibilityModel.setProperty("/PO/enabled", false);
 			}
 		},
+		
+		onSelectionChangeAddPO: function (oEvent) {
+			var changedItem = oEvent.getParameter("changedItem");
+			var isSelected = oEvent.getParameter("selected");
+
+			var state = "Selected";
+			if (!isSelected) {
+				state = "Deselected";
+			}
+
+			sap.m.MessageToast.show("Event 'selectionChange': " + state + " '" + changedItem.getText() + "'", {
+				width: "auto"
+			});
+		},
 
 		onClickAddPOOk: function () {
 			var addPOModel = this.getModel("addPOModel");
@@ -1306,6 +1320,20 @@ sap.ui.define([
 				mDashboardModel.refresh();
 			}
 
+		},
+
+		onLiveChangeHdrInvValue: function (oEvent) {
+			var oValue = oEvent.getSource().getValue();
+			// if(isNaN(oValue)){
+			// 	oValue = oValue.replace(/[^\d]/g, '');
+			// 	oEvent.getSource().setValue(oValue);
+
+			// }
+			if (!(oValue.indexOf(".") >= 0) && oValue.length > 8) {
+				oValue = oValue.slice(0, 8);
+			}
+			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
+			oEvent.getSource().setValue(oValue);
 		},
 	});
 

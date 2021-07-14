@@ -293,19 +293,19 @@ sap.ui.define([
 				for (var i = 0; i < alistNonPoData.length; i++) {
 					//To handle validations
 					var bValidate = false;
-					if (!alistNonPoData[i].accountNo || alistNonPoData[i].accountNoError === "Error") {
+					if (!alistNonPoData[i].accountNo) {
 						bValidate = true;
 						alistNonPoData[i].accountNoError = "Error";
 					}
-					if (!alistNonPoData[i].glAccount || alistNonPoData[i].glError === "Error") {
+					if (!alistNonPoData[i].glAccount) {
 						bValidate = true;
 						alistNonPoData[i].glError = "Error";
 					}
-					if (!alistNonPoData[i].costCenter || alistNonPoData[i].costCenterError === "Error") {
+					if (!alistNonPoData[i].costCenter) {
 						bValidate = true;
 						alistNonPoData[i].costCenterError = "Error";
 					}
-					if (!alistNonPoData[i].allocationPercent || alistNonPoData[i].allocationPercentError === "Error") {
+					if (!alistNonPoData[i].allocationPercent) {
 						bValidate = true;
 						alistNonPoData[i].allocationPercentError = "Error";
 					}

@@ -7,7 +7,7 @@
 	<ToolbarSpacer/>
 	<Label text="{i18n>InvoiceAmount}" design="Bold" required="true" class="sapUiLargeMarginBegin "/>
 	<Text text="{path:'oPOModel>/currency',formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"/>
-	<Input change="hdrInvAmtCalu" width="120px" type="Number" maxLength="11" value="{oPOModel>/invoiceTotal}"
+	<Input change="hdrInvAmtCalu" width="120px" type="Number" maxLength="11" value="{oPOModel>/invoiceTotal}" liveChange="onLiveChangeHdrInvValue"
 		valueState="{oMandatoryModel>/NonPO/invoiceTotalState}" editable="{oVisibilityModel>/NonPOInvoice/editable}"/>
 	<Label text="{i18n>GrossAmt}" design="Bold"/>
 	<Text text="{path :'oPOModel>/currency', formatter:'com.menabev.AP.formatter.formatter.currencySymbolWithValue'}"
