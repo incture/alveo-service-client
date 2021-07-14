@@ -16,7 +16,7 @@
 					<Button text="{i18n>ItemMatch}" press="onClickItemMatch" type="Emphasized" enabled="{oVisibilityModel>/NonPOInvoice/actionBtnEnable}"/>
 					<Button icon="sap-icon://add" text="{i18n>AddItem}" press="onClickAddInvoiceItem" type="Emphasized"
 						enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
-					<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>
+					<!--<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>-->
 					<ToolbarSeparator/>
 					<Switch state="{oVisibilityModel>/POINVToggle}" customTextOn="PO" customTextOff="INV"
 						visible="{parts:['oPOModel>/invoiceType'],formatter:'com.menabev.AP.formatter.formatter.batchIDVisible'}"></Switch>
@@ -66,8 +66,7 @@
 								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 								<Label design="Bold" text="{i18n>TAXVALUE}" tooltip="{i18n>TAXVALUE}"/>
 							</Column>
-							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
-								visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem" visible="false">
 								<Label design="Bold" text="{i18n>NETPRICE}" tooltip="{i18n>NETPRICE}"/>
 							</Column>
 							<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="6rem"
@@ -135,14 +134,15 @@
 							<ColumnListItem highlight="{path:'oPOModel>isThreewayMatched',formatter:'com.menabev.AP.formatter.formatter.ThreeWayMatchHighlight'}"
 								visible="{parts:['oPOModel>isTwowayMatched'],formatter:'com.menabev.AP.formatter.formatter.formatSelectionVisible'}">
 								<cells>
-									<CheckBox selected="{oPOModel>isSelected}" select="onItemSelect"/>
+									<CheckBox selected="{oPOModel>isSelected}" select="onItemSelect"
+										visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode'],formatter:'com.menabev.AP.formatter.formatter.formatCheckBoxxVisible'}"/>
 									<HBox>
 										<Button icon="sap-icon://message-popup" press="onViewMessages"/>
 										<Text text="{oPOModel>itemText}"/>
 									</HBox>
 									<Text text="{oPOModel>customerItemId}"/>
 									<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
-										valueState="{parts:['oPOModel>accountAssignmentCat'],formatter:'com.menabev.AP.formatter.formatter.formatQtyState'}"/>
+										valueState="{parts:['oPOModel>itemStatusCode'],formatter:'com.menabev.AP.formatter.formatter.formatQtyState'}"/>
 									<HBox>
 										<Button icon="sap-icon://message-information" press="onViewUOMDetails"/>
 										<Select forceSelection="false" selectedKey="{oPOModel>uom}" items="{oPOModel>UOMList}" change="onChangeInvoiceQtyUom"
@@ -153,7 +153,7 @@
 										</Select>
 									</HBox>
 									<Input value="{oPOModel>unitPrice}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
-									valueState="{path:'oPOModel>accountAssignmentCat',formatter:'com.menabev.AP.formatter.formatter.formatPriceState'}"/>
+										valueState="{path:'oPOModel>itemStatusCode',formatter:'com.menabev.AP.formatter.formatter.formatPriceState'}"/>
 									<Input value="{oPOModel>pricingUnit}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>
 									<Input value="{oPOModel>grossPrice}" change="onGrossPriceChange" liveChange="inputNANCheck"
 										enabled="{oVisibilityModel>/NonPOInvoice/editable}"/>

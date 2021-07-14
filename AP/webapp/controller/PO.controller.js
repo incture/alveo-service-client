@@ -52,7 +52,7 @@ sap.ui.define([
 					var invoiceType = oEvent.getParameter("name");
 					if (that.source != "itemMatch") {
 						POServices.getPONonPOData("", that, that.requestId);
-					}
+					} 
 					that.getBtnVisibility(that.status, that.requestId, invoiceType);
 					oVisibilityModel.setProperty("/selectedInvKey", "Invoice");
 					oVisibilityModel.setProperty("/selectedtabKey", "invoiceheaderdetails");
@@ -200,13 +200,17 @@ sap.ui.define([
 			this.SubmitDialog.open();
 		},
 
-		openCommentsFrag: function (userList) {
+		openCommentsFrag: function () {
 			var oMandatoryModel = this.oMandatoryModel;
 			if (!this.commentsDialog) {
 				this.commentsDialog = sap.ui.xmlfragment("com.menabev.AP.fragment.Submitcomments", this);
 				this.getView().addDependent(this.commentsDialog, this);
 			}
 			this.commentsDialog.open();
+		},
+
+		onCancelCommentsDialog: function () {
+			this.commentsDialog.close();
 		},
 
 		onSubmitForRejection: function (userList, title) {
@@ -373,8 +377,36 @@ sap.ui.define([
 			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....", "", threewayMatch);
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
-		
-		
+
+		onSubmitBuyerTask: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var oMandatoryModel = this.oMandatoryModel;
+			var oData = oPOModel.getData();
+			var sMethod = "POST";
+			var actionCode = "A";
+			var comments = oPOModel.getProperty("/commments");
+			var count = 0;
+			if (!comments) {
+				count += 1;
+				oMandatoryModel.setProperty("/NonPO/commmentsState", "Error");
+			}
+			if (count) {
+				sap.m.MessageToast.show("Please fill all Mandatory Fields");
+				return;
+			} else {
+				oMandatoryModel.setProperty("/NonPO/commmentsState", "None");
+			}
+			var sUrl = "/menabevdev/invoiceHeader/buyer/buyerSubmit";
+			var oPayload = {
+				"invoice": oData,
+				"requestId": oData.requestId,
+				"taskId": this.taskId,
+				"actionCode": actionCode,
+				"purchaseOrders": jQuery.extend(true, [], oData.purchaseOrders)
+			};
+			oPayload.invoice.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
+			POServices.onAccSubmit(this, oPayload, sMethod, sUrl, actionCode, "", "", "", "Saving...");
+		},
 
 		// onNonPoRejectConfirm: function (oEvent) {
 		// 	var oPOModel = this.oPOModel;
@@ -465,6 +497,18 @@ sap.ui.define([
 				actionCode = "PR";
 			}
 			POServices.onPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
+		},
+
+		onRemidiationUserChange: function (oEvent) {
+			var email = oEvent.getSource().getvalue();
+			var validEmail = this.validateEmail(email);
+			if (validEmail === "E") {
+				var message = "Please enter valid Email ID";
+				sap.m.MessageToast.show(message);
+				oEvent.getSource().setValueState("Error");
+			} else {
+				oEvent.getSource().setValueState("Error");
+			}
 		},
 
 		onPressOK: function (oEvent) {

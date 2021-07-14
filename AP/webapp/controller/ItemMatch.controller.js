@@ -67,6 +67,7 @@ sap.ui.define([
 		onNavback: function () {
 			var reqId = this.oPOModel.getProperty("/requestId");
 			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
+				POServices.formatUOMList(this.oPOModel.getProperty("/invoiceItems"), this);
 			if (changeIndicators && changeIndicators.itemChange) {
 				this.onClickThreeWayMatch("", true);
 			}

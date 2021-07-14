@@ -599,6 +599,13 @@ com.menabev.AP.formatter.formatter = {
 	removeBlankSpace: function (costCenter) {
 		var costCtr = costCenter.trim();
 		return costCtr;
-	}
+	},
+	formatCheckBoxxVisible: function (isTwowayMatched, itemStatusCode) {
+		if (!isTwowayMatched || itemStatusCode == "5") {
+			return false;
+		} else {
+			return true;
+		}
+	},
 
 };
