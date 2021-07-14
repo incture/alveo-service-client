@@ -608,4 +608,20 @@ com.menabev.AP.formatter.formatter = {
 		}
 	},
 
+	itemDesNonEditable: function (guid) {
+		if (guid) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	itemDesEditable: function (guid) {
+		if (guid) {
+			return false;
+		} else {
+			return true;
+		}
+	},
+
 };

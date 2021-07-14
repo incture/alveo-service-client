@@ -52,7 +52,7 @@ sap.ui.define([
 					var invoiceType = oEvent.getParameter("name");
 					if (that.source != "itemMatch") {
 						POServices.getPONonPOData("", that, that.requestId);
-					} 
+					}
 					that.getBtnVisibility(that.status, that.requestId, invoiceType);
 					oVisibilityModel.setProperty("/selectedInvKey", "Invoice");
 					oVisibilityModel.setProperty("/selectedtabKey", "invoiceheaderdetails");
@@ -68,6 +68,19 @@ sap.ui.define([
 			var oLanguage = "E";
 			var countryKey = "SA";
 			//To load all OData lookups
+			// this.getPaymentTerm(oHeader, oLanguage);
+			// this.getPaymentMethod(oHeader, oLanguage);
+			// this.getPaymentBlock(oHeader, oLanguage);
+			// this.getTaxCode(oHeader, oLanguage, countryKey);
+			// this.getCostCenter("1010", oLanguage);
+		},
+
+		onAfterRendering: function () {
+			var oHeader = {
+				"Content-Type": "application/json; charset=utf-8"
+			};
+			var oLanguage = "E";
+			var countryKey = "SA";
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
