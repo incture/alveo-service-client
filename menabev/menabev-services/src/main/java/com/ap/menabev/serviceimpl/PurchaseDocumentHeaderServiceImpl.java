@@ -42,6 +42,7 @@ import com.ap.menabev.dto.InvoiceItemAcctAssignmentDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.ItemMessageDto;
 import com.ap.menabev.dto.ItemThreeWayMatchPaylod;
+import com.ap.menabev.dto.MessageDto;
 import com.ap.menabev.dto.PoDeliveryCostHistoryDto;
 import com.ap.menabev.dto.PoHeaderOdata;
 import com.ap.menabev.dto.PoHistoryDto;
@@ -331,8 +332,11 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 							RootOdata obj = new Gson().fromJson(response.getBody().toString(), RootOdata.class);
 							System.out.println("JSON OBJ::::::::::::" + obj.toString());
 							PurchaseDocumentHeaderDto header = new PurchaseDocumentHeaderDto();
-							header = getExtractedHeader(obj);
-							headerDto.add(header);
+							if(!ServiceUtil.isEmpty(obj.getD().getResults())){
+								header = getExtractedHeader(obj);
+								headerDto.add(header);
+							}
+							
 						}
 
 					}
@@ -354,8 +358,11 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 							RootOdata obj = new Gson().fromJson(response.getBody().toString(), RootOdata.class);
 							System.out.println("JSON OBJ::::::::::::" + obj.toString());
 							PurchaseDocumentHeaderDto header = new PurchaseDocumentHeaderDto();
-							header = getExtractedHeader(obj);
-							headerDto.add(header);
+							if(!ServiceUtil.isEmpty(obj.getD().getResults())){
+								header = getExtractedHeader(obj);
+								headerDto.add(header);
+							}
+							
 						}
 
 					}
@@ -364,6 +371,10 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			}
 		}
 		// save in HANA DB
+		if(!ServiceUtil.isEmpty(headerDto)){
+			addPoReturn.setInvoiceObject(dto.getInvoiceHeader());
+		    return addPoReturn;
+		}
 		List<ResponseDto> response = saveOrUpdate(headerDto);
 		// Saving the PO In Invoice Header
 		if (!ServiceUtil.isEmpty(dto.getPurchaseOrder()) && !ServiceUtil.isEmpty(dto.getInvoiceHeader())) {
@@ -391,6 +402,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 					twoWayMatchDto.setInvoiceItem(item);
 					twoWayMatchDto.setManualVsAuto(ApplicationConstants.AUTO_MATCH);
 					twoWayMatchDto.setPurchaseDocumentHeader(headerDto);
+					twoWayMatchDto.setMatchOrUnmatchFlag("M");
 					if (!ServiceUtil.isEmpty(dto.getInvoiceHeader().getVendorId())) {
 						twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
 					}
@@ -1871,6 +1883,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 
 	@Override
 	public AddPoOutputDto refreshPoApi(AddPoInputDto dto) throws URISyntaxException, IOException, ParseException {
+		
 		AddPoOutputDto poApiResponse = new AddPoOutputDto();
 		if (!ServiceUtil.isEmpty(dto.getRequestId())) {
 			ResponseEntity<?> response = invoiceHeaderServiceImpl.getInvoiceDetail(dto.getRequestId());
@@ -1907,6 +1920,83 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 		}
 
 		return poApiResponse;
+	}
+
+	//DeletePO service
+	@Override
+	public AddPoOutputDto deletePo(AddPoInputDto dto) throws URISyntaxException, IOException, ParseException {
+		AddPoOutputDto response = new AddPoOutputDto();
+		List<InvoiceItemDto> updatedItems = new ArrayList<>();
+		if (!ServiceUtil.isEmpty(dto.getInvoiceHeader())) {
+			if (!ServiceUtil.isEmpty(dto.getInvoiceHeader().getInvoiceItems())) {
+				for (InvoiceItemDto item : dto.getInvoiceHeader().getInvoiceItems()) {
+
+					System.out.println("I am here Auto Match");
+					TwoWayMatchInputDto twoWayMatchDto = new TwoWayMatchInputDto();
+					twoWayMatchDto.setInvoiceItem(item);
+					twoWayMatchDto.setManualVsAuto(ApplicationConstants.AUTO_MATCH);
+					twoWayMatchDto.setPurchaseDocumentHeader(dto.getPurchaseDocumentHeader());
+					twoWayMatchDto.setMatchOrUnmatchFlag("U");
+					if (!ServiceUtil.isEmpty(dto.getInvoiceHeader().getVendorId())) {
+						twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
+					}
+
+					InvoiceItemDto twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
+					System.out.println("MATCH :::: " + twowayMatchUpdatedItem.getIsTwowayMatched());
+					
+					//Gross Amount Calculation and SysSugg Tax Amount
+					if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
+						if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
+							if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
+								Double grossAmount = dto.getInvoiceHeader().getGrossAmount() + twowayMatchUpdatedItem.getGrossPrice();
+								dto.getInvoiceHeader().setGrossAmount(grossAmount);
+							}
+							
+							if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getTaxValue())){
+								Double sysSuggTaxAmt =  dto.getInvoiceHeader().getSysSusgestedTaxAmount() + twowayMatchUpdatedItem.getTaxValue();
+								dto.getInvoiceHeader().setSysSusgestedTaxAmount(sysSuggTaxAmt);
+							}
+							
+						}
+						
+						
+					}
+					twowayMatchUpdatedItem.setIsThreewayMatched(false);
+					updatedItems .add(twowayMatchUpdatedItem);
+
+				}
+
+			}
+
+		}
+		System.out.println("Unmatched Items:::::::::" + updatedItems);
+		if (!ServiceUtil.isEmpty(updatedItems)) {
+
+			System.out.println("Item Update");
+			dto.getInvoiceHeader().setInvoiceItems(updatedItems);
+
+		}
+		InvoiceHeaderDto headerStatusUpdate = new InvoiceHeaderDto();
+		// Determine header Status
+		if (!ServiceUtil.isEmpty(dto.getInvoiceHeader())) {
+			headerStatusUpdate = duplicatecheckServiceImpl.determineHeaderStatus(dto.getInvoiceHeader());
+			System.out.println("Header Status Update:::::::" + headerStatusUpdate);
+		}
+		//Save Api call
+		if (!ServiceUtil.isEmpty(headerStatusUpdate)) {
+			InvoiceChangeIndicator changeIndicators = new InvoiceChangeIndicator();
+			changeIndicators.setItemChange(true);
+			changeIndicators.setActivityLog(true);
+			changeIndicators.setAttachementsChange(true);
+			changeIndicators.setCommentChange(true);
+			changeIndicators.setCostAllocationChange(true);
+			changeIndicators.setHeaderChange(true);
+			headerStatusUpdate.setChangeIndicators(changeIndicators);
+			headerStatusUpdate.setRefpurchaseDoc("");
+			invoiceHeaderServiceImpl.saveAPI(headerStatusUpdate);
+			response.setInvoiceObject(headerStatusUpdate);
+		}
+		return response;
 	}
 	
 

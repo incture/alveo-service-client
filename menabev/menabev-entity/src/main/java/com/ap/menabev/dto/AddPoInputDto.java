@@ -35,5 +35,6 @@ public class AddPoInputDto {
 	private String requestId;
 	private InvoiceHeaderDto invoiceHeader;
 	List<PurchaseOrder> purchaseOrder;
+	private List<PurchaseDocumentHeaderDto> purchaseDocumentHeader;
 	
 }

@@ -67,5 +67,9 @@ public class PurchaseDocumentHeaderController {
 	public AddPoOutputDto refreshPoApi(@RequestBody AddPoInputDto dto) throws URISyntaxException, IOException, ParseException{
 		return documentHeaderService.refreshPoApi(dto);
 	}
+	@PostMapping("/deletePo")
+	public AddPoOutputDto deletePo(@RequestBody AddPoInputDto dto) throws URISyntaxException, IOException, ParseException{
+		return documentHeaderService.deletePo(dto);
+	}
 	
 }

@@ -309,11 +309,18 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			// Manual Matching
 			if (!ServiceUtil.isEmpty(dto.getManualVsAuto())) {
 				if (ApplicationConstants.MANUAL_MATCH.equals(dto.getManualVsAuto())) {
-					System.out.println(dto.getPurchaseDocumentHeader().get(0).getPoItem().get(0));
-					InvoiceItemDto invItemPoManual = matchPoToInvItem(dto, dto.getInvoiceItem(),
-							dto.getPurchaseDocumentHeader().get(0).getPoItem().get(0),
-							ApplicationConstants.MANUAL_MATCH);
-					return invItemPoManual;
+					if("M".equals(dto.getMatchOrUnmatchFlag())){
+						InvoiceItemDto invItemPoManual = matchPoToInvItem(dto, dto.getInvoiceItem(),
+								dto.getPurchaseDocumentHeader().get(0).getPoItem().get(0),
+								ApplicationConstants.MANUAL_MATCH);
+						return invItemPoManual;
+					}else if("U".equals(dto.getMatchOrUnmatchFlag())){
+						InvoiceItemDto invItemPoManualUnmatch = unmatchPoToInvItem(dto, dto.getInvoiceItem(),
+								dto.getPurchaseDocumentHeader().get(0).getPoItem().get(0),
+								ApplicationConstants.MANUAL_MATCH);
+						return invItemPoManualUnmatch;
+					}
+					
 
 				}
 
@@ -322,128 +329,314 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					InvoiceItemDto itemReturn = dto.getInvoiceItem();
 					System.out.println("Auto Match Starts");
 					Boolean matchFound = false;
-					int i = 0;
-					for (i = 0; i < dto.getPurchaseDocumentHeader().size(); i++) {
+					if("M".equals(dto.getMatchOrUnmatchFlag())){
+						int i = 0;
+						for (i = 0; i < dto.getPurchaseDocumentHeader().size(); i++) {
 
-						Integer matchValue = Integer.MIN_VALUE;
-						for (PurchaseDocumentItemDto poItem : dto.getPurchaseDocumentHeader().get(i).getPoItem()) {
-							if (!ServiceUtil.isEmpty(poItem.getVendMat())
-									&& !ServiceUtil.isEmpty(itemReturn.getCustomerItemId())) {
-								Integer fuzzySearchVMN = FuzzySearch.weightedRatio(poItem.getVendMat(),
-										itemReturn.getCustomerItemId().toString());
-								System.out.println("FUZZY_ MEAN::: A " + fuzzySearchVMN);
-								if (fuzzySearchVMN == 100) {
-									itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
-											ApplicationConstants.AUTO_MATCH);
-									matchFound = true;
-									return itemReturn;
-								} else {
-									if (matchValue < fuzzySearchVMN) {
-										matchValue = fuzzySearchVMN;
-									}
-								}
-							}
-							if (!ServiceUtil.isEmpty(poItem.getMaterial())
-									&& !ServiceUtil.isEmpty(itemReturn.getArticleNum())) {
-								Integer fuzzySearchSapMatNo = FuzzySearch.weightedRatio(poItem.getMaterial(),
-										itemReturn.getArticleNum());
-								System.out.println("FUZZY_ MEAN::: B " + fuzzySearchSapMatNo);
-								if (fuzzySearchSapMatNo == 100) {
-									itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
-											ApplicationConstants.AUTO_MATCH);
-									matchFound = true;
-									return itemReturn;
-								} else {
-									if (matchValue < fuzzySearchSapMatNo) {
-										matchValue = fuzzySearchSapMatNo;
-									}
-								}
-							}
-							if (!ServiceUtil.isEmpty(poItem.getInterArticleNum())
-									&& !ServiceUtil.isEmpty(itemReturn.getUpcCode())) {
-								Integer fuzzySearchUpcCode = FuzzySearch.weightedRatio(poItem.getInterArticleNum(),
-										itemReturn.getUpcCode());
-								System.out.println("FUZZY_ MEAN::: C " + fuzzySearchUpcCode);
-								if (fuzzySearchUpcCode == 100) {
-									itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
-											ApplicationConstants.AUTO_MATCH);
-									invoiceItem = itemReturn;
-									matchFound = true;
-									return itemReturn;
-								} else {
-									if (matchValue < fuzzySearchUpcCode) {
-										matchValue = fuzzySearchUpcCode;
-									}
-								}
-							}
-							if (!ServiceUtil.isEmpty(poItem.getShortText())
-									&& !ServiceUtil.isEmpty(itemReturn.getItemText())) {
-								Integer fuzzySearchDescription = FuzzySearch.weightedRatio(poItem.getShortText(),
-										itemReturn.getItemText());
-								System.out.println("FUZZY_ MEAN::: D " + fuzzySearchDescription);
-								if (fuzzySearchDescription == 100) {
-									itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
-											ApplicationConstants.AUTO_MATCH);
-									System.out.println("351 2WM ::::" + itemReturn);
-									invoiceItem = itemReturn;
-									System.out.println("353 2WM ::::" + invoiceItem);
-									matchFound = true;
-									return itemReturn;
-								} else {
-									if (matchValue < fuzzySearchDescription) {
-										matchValue = fuzzySearchDescription;
-									}
-								}
-							}
-							if (matchFound) {
-								break;
-							} else if (matchValue > 70) {
-								if (itemReturn.getInvQty() == poItem.getQuantity()
-										&& itemReturn.getPoUnitPriceOPU() == poItem.getNetPrice()) {
-									itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
-											ApplicationConstants.AUTO_MATCH);
-									matchFound = true;
-									return itemReturn;
-
-								}
-
-							}
-
-						}
-					}
-					if (!matchFound) {
-						MatchingHistoryDto match = new MatchingHistoryDto();
-						match.setVendorId(dto.getVendorId());// VendorId
-						match.setCustomerItemIdVmn(String.valueOf(itemReturn.getCustomerItemId()));
-						match.setIUpcCode(itemReturn.getUpcCode());
-						match.setIText(itemReturn.getItemText());
-
-						List<MatchingHistoryDto> matchResult = matchingHistoryServiceImpl.get(match);
-
-						System.out.println("HERE ::: 384" + matchResult.size());
-						if (matchResult.size() == 1) {
-
-							for (i = 0; i < dto.getPurchaseDocumentHeader().size(); i++) {
-								for (PurchaseDocumentItemDto poItemMatch : dto.getPurchaseDocumentHeader().get(i)
-										.getPoItem()) {
-									if (poItemMatch.getMaterial().equals(matchResult.get(0).getPMatNo())) {
-										invoiceItem = matchPoToInvItem(dto, dto.getInvoiceItem(), poItemMatch,
+							Integer matchValue = Integer.MIN_VALUE;
+							for (PurchaseDocumentItemDto poItem : dto.getPurchaseDocumentHeader().get(i).getPoItem()) {
+								if (!ServiceUtil.isEmpty(poItem.getVendMat())
+										&& !ServiceUtil.isEmpty(itemReturn.getCustomerItemId())) {
+									Integer fuzzySearchVMN = FuzzySearch.weightedRatio(poItem.getVendMat(),
+											itemReturn.getCustomerItemId().toString());
+									System.out.println("FUZZY_ MEAN::: A " + fuzzySearchVMN);
+									if (fuzzySearchVMN == 100) {
+										itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
 												ApplicationConstants.AUTO_MATCH);
-										return invoiceItem;
+										matchFound = true;
+										return itemReturn;
+									} else {
+										if (matchValue < fuzzySearchVMN) {
+											matchValue = fuzzySearchVMN;
+										}
 									}
 								}
-							}
+								if (!ServiceUtil.isEmpty(poItem.getMaterial())
+										&& !ServiceUtil.isEmpty(itemReturn.getArticleNum())) {
+									Integer fuzzySearchSapMatNo = FuzzySearch.weightedRatio(poItem.getMaterial(),
+											itemReturn.getArticleNum());
+									System.out.println("FUZZY_ MEAN::: B " + fuzzySearchSapMatNo);
+									if (fuzzySearchSapMatNo == 100) {
+										itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
+												ApplicationConstants.AUTO_MATCH);
+										matchFound = true;
+										return itemReturn;
+									} else {
+										if (matchValue < fuzzySearchSapMatNo) {
+											matchValue = fuzzySearchSapMatNo;
+										}
+									}
+								}
+								if (!ServiceUtil.isEmpty(poItem.getInterArticleNum())
+										&& !ServiceUtil.isEmpty(itemReturn.getUpcCode())) {
+									Integer fuzzySearchUpcCode = FuzzySearch.weightedRatio(poItem.getInterArticleNum(),
+											itemReturn.getUpcCode());
+									System.out.println("FUZZY_ MEAN::: C " + fuzzySearchUpcCode);
+									if (fuzzySearchUpcCode == 100) {
+										itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
+												ApplicationConstants.AUTO_MATCH);
+										invoiceItem = itemReturn;
+										matchFound = true;
+										return itemReturn;
+									} else {
+										if (matchValue < fuzzySearchUpcCode) {
+											matchValue = fuzzySearchUpcCode;
+										}
+									}
+								}
+								if (!ServiceUtil.isEmpty(poItem.getShortText())
+										&& !ServiceUtil.isEmpty(itemReturn.getItemText())) {
+									Integer fuzzySearchDescription = FuzzySearch.weightedRatio(poItem.getShortText(),
+											itemReturn.getItemText());
+									System.out.println("FUZZY_ MEAN::: D " + fuzzySearchDescription);
+									if (fuzzySearchDescription == 100) {
+										itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
+												ApplicationConstants.AUTO_MATCH);
+										System.out.println("351 2WM ::::" + itemReturn);
+										invoiceItem = itemReturn;
+										System.out.println("353 2WM ::::" + invoiceItem);
+										matchFound = true;
+										return itemReturn;
+									} else {
+										if (matchValue < fuzzySearchDescription) {
+											matchValue = fuzzySearchDescription;
+										}
+									}
+								}
+								if (matchFound) {
+									break;
+								} else if (matchValue > 70) {
+									if (itemReturn.getInvQty() == poItem.getQuantity()
+											&& itemReturn.getPoUnitPriceOPU() == poItem.getNetPrice()) {
+										itemReturn = matchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
+												ApplicationConstants.AUTO_MATCH);
+										matchFound = true;
+										return itemReturn;
 
-						} else {
-							return itemReturn;
+									}
+
+								}
+
+							}
+						}
+						if (!matchFound) {
+							MatchingHistoryDto match = new MatchingHistoryDto();
+							match.setVendorId(dto.getVendorId());// VendorId
+							match.setCustomerItemIdVmn(String.valueOf(itemReturn.getCustomerItemId()));
+							match.setIUpcCode(itemReturn.getUpcCode());
+							match.setIText(itemReturn.getItemText());
+
+							List<MatchingHistoryDto> matchResult = matchingHistoryServiceImpl.get(match);
+
+							System.out.println("HERE ::: 384" + matchResult.size());
+							if (matchResult.size() == 1) {
+
+								for (i = 0; i < dto.getPurchaseDocumentHeader().size(); i++) {
+									for (PurchaseDocumentItemDto poItemMatch : dto.getPurchaseDocumentHeader().get(i)
+											.getPoItem()) {
+										if (poItemMatch.getMaterial().equals(matchResult.get(0).getPMatNo())) {
+											invoiceItem = matchPoToInvItem(dto, dto.getInvoiceItem(), poItemMatch,
+													ApplicationConstants.AUTO_MATCH);
+											return invoiceItem;
+										}
+									}
+								}
+
+							} else {
+								return itemReturn;
+							}
 						}
 					}
+					else if("U".equals(dto.getMatchOrUnmatchFlag())){
+						int i = 0;
+						for(i = 0; i < dto.getPurchaseDocumentHeader().size(); i++){
+							for (PurchaseDocumentItemDto poItem : dto.getPurchaseDocumentHeader().get(i).getPoItem()) {
+								if(dto.getInvoiceItem().getMatchDocItem().equals(poItem.getDocumentItem())){
+									invoiceItem = unmatchPoToInvItem(dto, dto.getInvoiceItem(), poItem,
+											ApplicationConstants.AUTO_MATCH);
+									return invoiceItem;
+								}
+							}
+						
+						}
+					}
+					
 
 				}
 			}
 		}
 
 		return invoiceItem;
+	}
+
+	//Unmatch
+	private InvoiceItemDto unmatchPoToInvItem(TwoWayMatchInputDto dto, InvoiceItemDto itemReturn,
+			PurchaseDocumentItemDto poItem, String matchType) {
+
+
+		itemReturn.setIsTwowayMatched(false);
+		itemReturn.setMatchType("");
+		itemReturn.setIsSelected(false);
+		if (!ServiceUtil.isEmpty(poItem.getPriceUnit())) {
+			itemReturn.setPricingUnit(0);
+		}
+		if (!ServiceUtil.isEmpty(poItem.getOrderPriceUnit())) {
+			itemReturn.setUom("0.00");
+		}
+		if (!ServiceUtil.isEmpty(poItem.getPreqItem())) {
+			itemReturn.setItemRequisationNum("");
+		}
+		if (!ServiceUtil.isEmpty(poItem.getPreqNum())) {
+			itemReturn.setRequisationNum("");
+		}
+		if (!ServiceUtil.isEmpty(poItem.getContractNum())) {
+			itemReturn.setContractNum("");
+		}
+		if (!ServiceUtil.isEmpty(poItem.getContractItm())) {
+			itemReturn.setContractItem("");
+		}
+		if ((("0".equals(poItem.getItemCategory())) && ServiceUtil.isEmpty(poItem.getAccountAssCat())
+				&& "1".equals(poItem.getProductType()))
+				|| ("0".equals(poItem.getItemCategory())
+						&& ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()))
+						&& "2".equals(poItem.getProductType()))
+				|| ("0".equals(poItem.getItemCategory())
+						&& ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat()))
+						&& "1".equals(poItem.getProductType()))) {
+
+			System.out.println("448");
+			if (!ServiceUtil.isEmpty(poItem.getShortText())) {
+				itemReturn.setPoItemText("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getInterArticleNum())) {
+				itemReturn.setArticleNum("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getDocumentItem())) {
+				itemReturn.setMatchDocItem("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getDocumentNumber())) {
+				itemReturn.setMatchDocNum(0L);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getItemCategory())) {
+				itemReturn.setItemCategory("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getProductType())) {
+				itemReturn.setProductType("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getMaterial())) {
+				itemReturn.setSetPoMaterialNum("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getQuantity())) {
+				itemReturn.setPoQtyOU(0.00);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getPoUnit())) {
+				itemReturn.setOrderUnit("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getOrderPriceUnit())) {
+				itemReturn.setOrderPriceUnit("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getNetPrice())) {
+				itemReturn.setPoUnitPriceOPU(0.00);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getGrBsdIVInd())) {
+				itemReturn.setGrBsdIv(null);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getGrInd())) {
+				itemReturn.setGrFlag(null);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getIrInd())) {
+				itemReturn.setIvFlag(null);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getSrvBsdIVInd())) {
+				itemReturn.setSrvBsdIv(null);
+			}
+			 if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) &&
+			 !ServiceUtil.isEmpty(itemReturn.getTaxPercentage())) {
+			 itemReturn.setSysSuggTax(0.00);
+			 }
+			if (!ServiceUtil.isEmpty(itemReturn.getGrossPrice()) && !ServiceUtil.isEmpty(itemReturn.getTaxPercentage())) {
+				itemReturn.setTaxValue(itemReturn.getTaxValue());
+			}
+			if (!ServiceUtil.isEmpty(poItem.getConvNum1())) {
+				itemReturn.setConvNum1(0);
+			}
+			if (!ServiceUtil.isEmpty((poItem.getConvDen1()))) {
+				itemReturn.setConvDen1(0);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
+				itemReturn.setAccountAssignmentCat("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getGr_non_val())) {
+				itemReturn.setGrNonValInd(null);
+			}
+			if (!ServiceUtil.isEmpty(poItem.getDistribution())) {
+				itemReturn.setDistributionInd("");
+			}
+			if (!ServiceUtil.isEmpty(poItem.getPartInv())) {
+				itemReturn.setPartialInvInd("");
+			}
+
+			if (poItem.getOrderPriceUnit().equals(poItem.getPoUnit())) {
+				itemReturn.setAlvQtyUOM(null);
+				if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyUOM())) {
+					itemReturn.setAlvQtyOU(itemReturn.getAlvQtyUOM());
+				}
+				if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyUOM())) {
+					itemReturn.setAlvQtyOPU(itemReturn.getAlvQtyUOM());
+				}
+				if (!ServiceUtil.isEmpty(poItem.getNetPrice())) {
+					itemReturn.setPoUnitPriceUOM(0.00);
+				}
+				if (!ServiceUtil.isEmpty(poItem.getNetPrice())) {
+					itemReturn.setPoUnitPriceOPU(0.00);
+				}
+				if (!ServiceUtil.isEmpty(poItem.getNetPrice())) {
+					itemReturn.setPoUnitPriceOU(0.00);
+				}
+
+				// Account Assignment
+				if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
+					List<InvoiceItemAcctAssignmentDto> invItemAcctDtoList = new ArrayList<>();
+					itemReturn.setIsAccAssigned(false);
+					itemReturn.setInvItemAcctDtoList(invItemAcctDtoList );
+				}
+
+			} else {
+				if(!ServiceUtil.isEmpty(poItem.getOrderPriceUnit())){
+					itemReturn.setUom("");
+				}
+				itemReturn.setAlvQtyOU(null);
+				if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyOPU())) {
+					itemReturn.setAlvQtyUOM(0.00);
+					//TODO
+				}
+				if(!ServiceUtil.isEmpty(itemReturn.getAlvQtyUOM())){
+					itemReturn.setAlvQtyOPU(itemReturn.getAlvQtyUOM());
+				}
+				if(!ServiceUtil.isEmpty(poItem.getNetPrice())){
+					itemReturn.setPoUnitPriceUOM(0.00);
+				}
+				if(!ServiceUtil.isEmpty(poItem.getNetPrice())){
+					itemReturn.setPoUnitPriceOPU(0.00);
+				}
+				if (!ServiceUtil.isEmpty(itemReturn.getAlvQtyOPU())) {
+					itemReturn.setPoUnitPriceOU(0.00);
+					//TODO
+				}
+				itemReturn.setPoUnitPriceOPU(null);
+				if (!ServiceUtil.isEmpty(poItem.getAccountAssCat())) {
+					List<InvoiceItemAcctAssignmentDto> invItemAcctDtoList = new ArrayList<>();
+					itemReturn.setIsAccAssigned(false);
+					itemReturn.setInvItemAcctDtoList(invItemAcctDtoList );
+				}
+			}
+		}
+		System.out.println("No GRN TEST Outside" + dto.getPurchaseDocumentHeader());
+		itemReturn.setItemStatusCode(ApplicationConstants.ITEM_MISMATCH);
+		itemReturn.setItemStatusText("Item Mismatch");
+		return itemReturn;
+
+	
 	}
 
 	// Matching
@@ -1148,14 +1341,6 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			itemReturn.setItemStatusText("No GRN");
 			itemReturn.setIsSelected(false);
 		}
-		// Calculate sysSuggTaxAmount
-		//
-		// 1. SysSuggTaxAmount = )tax% of InvAmountBeforeTax.) +
-		// InvAmountBeforeTax.
-		// Double sysSuggTax = ((itemReturn.getGrossPrice() *
-		// Double.valueOf(itemReturn.getTaxCode())) / 100)
-		// + itemReturn.getGrossPrice();
-		// itemReturn.setSysSuggTax(sysSuggTax);
 		return itemReturn;
 
 	}
