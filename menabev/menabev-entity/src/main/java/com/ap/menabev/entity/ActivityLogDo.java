@@ -58,7 +58,7 @@ private String processor;//255
 @Column(name = "ACTIVITY_ID",length=20)
 private String activityId;//20
 
-@Column(name = "ACTION_CODE",length=2)
+@Column(name = "ACTION_CODE",length=20)
 private String actionCode;//2
 
 @Column(name = "INVOICE_STATUS_CODE",length=2)

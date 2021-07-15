@@ -3391,6 +3391,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		List<ActivityLogDto> activitLogs = invoiceSubmitOk.getInvoice().getActivityLog();
 		if (!activitLogs.isEmpty()) {
 			// update activity log of the previous values
+			// get the activty log of particular user and request id of current task and update the current activity log 
+			
 			activitLogs.stream().forEach(activity -> {
 				activity.setActionCode(actionCode);
 				activity.setActionCodeText(actionCodeText);
@@ -3436,7 +3438,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		activity.setTaskCreatedAt(invoiceHeader.getRequest_created_at());
 		activity.setTaskId(invoiceHeader.getTaskId());
 		activity.setTaskOwner(invoiceHeader.getTaskOwner());
-		activity.setTaskStatus("IN-PROGRESS");
+		activity.setTaskStatus("READY");
 		activity.setWorkflowCreateBy(invoiceHeader.getRequest_created_by());
 		activity.setWorkflowCreatedAt(invoiceHeader.getRequest_created_at());
 		activity.setWorkflowId(invoiceHeader.getWorkflowId());
@@ -3754,7 +3756,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			} else {
 				// else itsa non po type invoice
 				// call SOAP api post of NON- PO
+				         // NonPoProcessLeadSubmit(invoiceSubmit);
 			}
+			
+			// get MessageList 
+			  List<HeaderMessageDto> messageList = invoicePostErpResponse.getHeaderMessages();
+			
+			if(!ServiceUtil.isEmpty(messageList) && "SU".equalsIgnoreCase(messageList.get(0).getMessageType())){ 
 			payload = formUpdateTaskContextForProcessLeadOnApprove(invoiceSubmit);
 			// complete task
 			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
@@ -3777,11 +3785,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
 				System.err.println("invoiceHeader Update in process lead Submit " + invoiceHeader);
 				invoiceSubmit.setInvoice(invoicePostErpResponse);
-				invoiceSubmit.setMessage("Task Completed.");
+				invoiceSubmit.setMessage("Task Completed ," + messageList.get(0).getMessageText());
+				
 			} else {
 				// failed
-				invoiceSubmit.setMessage("Task Failed To Complete due to =" + response.getBody().toString());
+				invoiceSubmit.setMessage(messageList.get(0).getMessageText() +" ,but Task Failed To Complete due to =" + response.getBody().toString());
 			}
+			} 
 			return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
 		} else if (invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)) {
 			// Process lead submit for rejection
@@ -3968,7 +3978,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	    	  productTaxItem.add(productTax);
 	    	}
 		
-		return requestMessage;
+		 // set all the object 
+		 requestMessage.
+		 
+		return requestMessage
+		
 		}
 		return null;
 	}

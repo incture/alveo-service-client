@@ -639,12 +639,15 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			logger.error("STRINGgggggggggggggggg" + payload);
 			ResponseEntity<?> responseFromOdta = postToERPOdataCall(payload);
 			logger.error("responseFromOdta responseFromOdta" + responseFromOdta);
+			List<HeaderMessageDto> messageList = new ArrayList<>();
+			// if not 200 ok ,than header message will have response of the odata call 
+			if( responseFromOdta.getStatusCodeValue()==200 || responseFromOdta.getStatusCodeValue() == 201 ){
 			rootDto = objectMapper.readValue(responseFromOdta.getBody().toString(), PostToERPRootDto.class);
 			logger.error("rootDto rootDto" + rootDto);
 
 			ToResult resultObject = rootDto.getD().getToResult();
 
-			List<HeaderMessageDto> messageList = new ArrayList<>();
+			
 			if (!ServiceUtil.isEmpty(resultObject)) {
 				String sapInvoiceNumber = resultObject.getInvDocNo();
 				String fiscalYear = resultObject.getFiscYear();
@@ -655,7 +658,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					System.err.println("inside is updated");
 					HeaderMessageDto messageDto = new HeaderMessageDto();
 					messageDto.setMessageText("Posted to SAP " + resultObject.getInvDocNo());
-					messageDto.setMessageType("S");
+					messageDto.setMessageType("SU");
 					messageDto.setMsgClass("Success");
 					messageList.add(messageDto);
 				}
@@ -674,6 +677,21 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				}
 				invoiceHeaderDto.setHeaderMessages(messageList);
 			}
+			} else {
+				// if not 200  
+				
+				HeaderMessageDto messageDto = new HeaderMessageDto();
+				// messageDto.setMessageId(toReturnDto.getId());
+			
+				messageDto.setMessageNumber("0");
+				messageDto.setMessageText("POST TO ERP FAILED");
+				//messageDto.setMessageType(String.valueOf(responseFromOdta.getStatusCodeValue()));
+				messageDto.setMessageType("FL");
+				messageDto.setMsgClass(responseFromOdta.getClass().toString());
+				messageList.add(messageDto);
+				invoiceHeaderDto.setHeaderMessages(messageList);
+			}
+			
 			return invoiceHeaderDto;
 		} catch (Exception e) {
 			List<HeaderMessageDto> messageList = new ArrayList<>();
@@ -681,7 +699,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			HeaderMessageDto messageDto = new HeaderMessageDto();
 			// messageDto.setMessageId(toReturnDto.getId());
 			messageDto.setMessageText(e.getMessage());
-			messageDto.setMessageType("Exception");
+			messageDto.setMessageType("EX");
 			messageDto.setMsgClass(e.getClass().toString());
 			messageList.add(messageDto);
 			invoiceHeaderDto.setHeaderMessages(messageList);

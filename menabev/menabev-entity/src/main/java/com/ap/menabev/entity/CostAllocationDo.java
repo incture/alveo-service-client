@@ -83,5 +83,9 @@ public @Data class CostAllocationDo implements Serializable {
 	private String baseRate;
 	@Column(name ="MATERIAL_DESC",length = 50)
 	private String materialDesc;
+	@Column(name ="CURRENCY",length = 50)
+	private String currency;
+	@Column(name ="CONDITION_TYPE",length = 50)
+	private String conditionType;
 	
 }
