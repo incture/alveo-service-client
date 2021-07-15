@@ -1350,18 +1350,57 @@ sap.ui.define([
 			var oPOModel = this.oPOModel,
 				sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
 				oSelectedPOItem = oPOModel.getProperty(sPath);
-
-			var url = "/menabevdev/purchaseDocumentHeader/deletePo";
 			var payload = {
 				"invoiceHeader": oPOModel.getProperty("/"),
 				"purchaseDocumentHeader": oPOModel.getProperty("/purchaseOrders"),
 				"purchaseOrder": [{
-						"documentCategory": oSelectedPOItem.documentCategory,
-						"documentNumber": oSelectedPOItem.documentNumber
-					}
-				],
+					"documentCategory": oSelectedPOItem.docCat,
+					"documentNumber": oSelectedPOItem.documentNumber
+				}],
 				"requestId": this.requestId
 			};
+			if (!this.oConfirmDeletePODialog) {
+				this.oConfirmDeletePODialog = new sap.m.Dialog({
+					type: sap.m.DialogType.Message,
+					title: "Confirm",
+					content: new sap.m.Text({
+						text: "Are you sure you want to Delete this PO?"
+					}),
+					beginButton: new sap.m.Button({
+						type: sap.m.ButtonType.Emphasized,
+						text: "Submit",
+						press: function () {
+							this.oConfirmDeletePODialog.close();
+							this.fnDeletePOServiceCall(payload);
+						}.bind(this)
+					}),
+					endButton: new sap.m.Button({
+						text: "Cancel",
+						press: function () {
+							this.oConfirmDeletePODialog.close();
+						}.bind(this)
+					})
+				});
+			}
+			this.oConfirmDeletePODialog.open();
+
+		},
+
+		fnDeletePOServiceCall: function (payload) {
+			var oPOModel = this.oPOModel;
+			// 	sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+			// 	oSelectedPOItem = oPOModel.getProperty(sPath);
+
+			var url = "/menabevdev/purchaseDocumentHeader/deletePo";
+			// var payload = {
+			// 	"invoiceHeader": oPOModel.getProperty("/"),
+			// 	"purchaseDocumentHeader": oPOModel.getProperty("/purchaseOrders"),
+			// 	"purchaseOrder": [{
+			// 		"documentCategory": oSelectedPOItem.docCat,
+			// 		"documentNumber": oSelectedPOItem.documentNumber
+			// 	}],
+			// 	"requestId": this.requestId
+			// };
 			var busy = new sap.m.BusyDialog();
 			busy.open();
 			jQuery.ajax({

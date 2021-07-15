@@ -98,7 +98,7 @@
 				</VBox>
 			</l:Grid>
 			<VBox class="sapUiSmallMargin">
-				<Table inset="false" items="{oPOModel>/invoiceItems}" mode="MultiSelect" alternateRowColors="true">
+				<Table inset="false" items="{oPOModel>/invoiceItems}" mode="None" alternateRowColors="true">
 					<headerToolbar>
 						<OverflowToolbar>
 							<Title text="{i18n>MatchedItems}" level="H2"/>

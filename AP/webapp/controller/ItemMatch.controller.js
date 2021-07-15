@@ -95,7 +95,7 @@ sap.ui.define([
 				//Get POHeader based on selected POItem 
 				var getReferencedByPO = $.extend(true, [], this.oPOModel.getProperty("/purchaseOrders"));
 				for (var i = 0; i < getReferencedByPO.length; i++) {
-					if (oSelectedPOItem.documentNumber === getReferencedByPO[i].documentNumber) {
+					if (Number(oSelectedPOItem.documentNumber) == Number(getReferencedByPO[i].documentNumber)) {
 						var poHeader = getReferencedByPO[i];
 					}
 				}
@@ -167,17 +167,19 @@ sap.ui.define([
 
 			var aItemMatchPO = oPOModel.getProperty("/aItemMatchPO");
 			for (var i = 0; i < aItemMatchPO.length; i++) {
-				if (oSelectedInvoiceItem.documentNumber === aItemMatchPO[i].documentNumber &&
-					oSelectedInvoiceItem.documentItem === aItemMatchPO[i].documentItem) {
+				if (oSelectedInvoiceItem.matchDocNum == Number(aItemMatchPO[i].documentNumber) &&
+					oSelectedInvoiceItem.matchDocItem == aItemMatchPO[i].documentItem) {
 					var matchedPOItem = aItemMatchPO[i];
+					break;
 				}
 			}
 			//Payload Logic //BackTracking to get purchaseDocumentHeader
 			//Get POHeader based on selected POItem 
 			var purchaseOrders = $.extend(true, [], this.oPOModel.getProperty("/purchaseOrders"));
 			for (var i = 0; i < purchaseOrders.length; i++) {
-				if (matchedPOItem.documentNumber === purchaseOrders[i].documentNumber) {
+				if (matchedPOItem.documentNumber == Number(purchaseOrders[i].documentNumber)) {
 					var poHeader = purchaseOrders[i];
+					break;
 				}
 			}
 
