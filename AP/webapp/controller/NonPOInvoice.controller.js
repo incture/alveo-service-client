@@ -64,12 +64,25 @@ sap.ui.define([
 			};
 			var oLanguage = "E";
 			var countryKey = "SA";
+			// this.getPaymentTerm(oHeader, oLanguage);
+			// this.getPaymentMethod(oHeader, oLanguage);
+			// this.getPaymentBlock(oHeader, oLanguage);
+			// this.getTaxCode(oHeader, oLanguage, countryKey);
+			// this.getCostCenter("1010", oLanguage);
+			//To load all OData lookups
+		},
+
+		onAfterRendering: function () {
+			var oHeader = {
+				"Content-Type": "application/json; charset=utf-8"
+			};
+			var oLanguage = "E";
+			var countryKey = "SA";
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
 			this.getTaxCode(oHeader, oLanguage, countryKey);
 			this.getCostCenter("1010", oLanguage);
-			//To load all OData lookups
 		},
 
 		onRouteMatched: function (oEvent) {
@@ -237,6 +250,7 @@ sap.ui.define([
 
 		onCurrencyChange: function (oEvent) {
 			POServices.onCurrencyChange(oEvent, this);
+			POServices.setItemCurrency(oEvent, this);
 		},
 
 		onInvDateChange: function (oEvent) {

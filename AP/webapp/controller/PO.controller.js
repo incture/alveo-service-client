@@ -52,7 +52,7 @@ sap.ui.define([
 					var invoiceType = oEvent.getParameter("name");
 					if (that.source != "itemMatch") {
 						POServices.getPONonPOData("", that, that.requestId);
-					} 
+					}
 					that.getBtnVisibility(that.status, that.requestId, invoiceType);
 					oVisibilityModel.setProperty("/selectedInvKey", "Invoice");
 					oVisibilityModel.setProperty("/selectedtabKey", "invoiceheaderdetails");
@@ -68,6 +68,19 @@ sap.ui.define([
 			var oLanguage = "E";
 			var countryKey = "SA";
 			//To load all OData lookups
+			// this.getPaymentTerm(oHeader, oLanguage);
+			// this.getPaymentMethod(oHeader, oLanguage);
+			// this.getPaymentBlock(oHeader, oLanguage);
+			// this.getTaxCode(oHeader, oLanguage, countryKey);
+			// this.getCostCenter("1010", oLanguage);
+		},
+
+		onAfterRendering: function () {
+			var oHeader = {
+				"Content-Type": "application/json; charset=utf-8"
+			};
+			var oLanguage = "E";
+			var countryKey = "SA";
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
@@ -307,6 +320,7 @@ sap.ui.define([
 			oPOModel.refresh();
 		},
 		onDeleteInvLineItem: function (oEvent) {
+			POServices.setChangeInd(oEvent, this, "itemChange");
 			var oPOModel = this.oPOModel;
 			var userList = oPOModel.getProperty("/userList");
 			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
@@ -314,6 +328,11 @@ sap.ui.define([
 			oPOModel.setProperty(sPath + "/isSelected", false);
 			oPOModel.refresh();
 			POServices.onFilterItemDetails();
+			var tax = POServices.calculateTax("", this);
+			oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
+			oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
+			oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
+			oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 		},
 
 		formUserListPayload: function () {
@@ -765,7 +784,8 @@ sap.ui.define([
 			this.userGroup.close();
 		},
 
-		onClickAddInvoiceItem: function () {
+		onClickAddInvoiceItem: function (oEvent) {
+			POServices.setChangeInd(oEvent, this, "itemChange");
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel"),
 				oPOModelData = oPOModel.getData();
 			if (!oPOModelData.invoiceItems) {
@@ -782,7 +802,7 @@ sap.ui.define([
 				"contractNum": null,
 				"convDen1": null,
 				"convNum1": null,
-				"currency": "",
+				"currency": oPOModelData.currency,
 				"customerItemId": "",
 				"disPerentage": 0,
 				"discountValue": 0,

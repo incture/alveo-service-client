@@ -828,7 +828,7 @@ com.menabev.AP.util.POServices = {
 			for (var i = 0; i < length; i++) {
 				oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
 				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPercentage);
-				oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxDetails.TaxConditionType);
+				oPOModel.setProperty("/costAllocation/" + i + "/conditionType", taxDetails.TaxConditionType);
 			}
 		}
 		if (taxDetails) {
@@ -838,6 +838,17 @@ com.menabev.AP.util.POServices = {
 		}
 		this.costAllocationTaxCalc(oEvent, oController);
 		sap.m.MessageToast.show("Tax Code\r" + taxCode + "\r is applied to all Cost Allocation line items");
+	},
+
+	setItemCurrency: function (oEvent, oController) {
+		var currency = oEvent.getSource().getValue();
+		var oPOModel = oController.oPOModel;
+		if (oPOModel.getProperty("/costAllocation")) {
+			var length = oPOModel.getProperty("/costAllocation").length;
+			for (var i = 0; i < length; i++) {
+				oPOModel.setProperty("/costAllocation/" + i + "/currency", currency);
+			}
+		}
 	},
 
 	changeItemTax: function (oEvent, oController) {
@@ -1111,10 +1122,10 @@ com.menabev.AP.util.POServices = {
 	},
 
 	nanValCheck: function (value) {
-		if (!value || isNaN(value)) {
-			return 0;
+		if (!value || value == Infinity || value == -Infinity || isNaN(value)) {
+			return 0.00;
 		} else if (Number(value) === 0 || parseFloat(value) === -0) {
-			return 0;
+			return 0.00;
 		} else if (!isNaN(value)) {
 			value = Number(value).toFixed(2);
 			value = parseFloat(value);
@@ -1167,7 +1178,7 @@ com.menabev.AP.util.POServices = {
 		var quantity = this.nanValCheck(oContextObj.invQty);
 		if (!distributionInd && GL.length) {
 			GL[0].qty = quantity;
-			GL[0].netValue = gross;
+			GL[0].netValue = this.nanValCheck(gross);
 			oContextObj.invItemAcctDtoList = GL;
 		} else if (distributionInd && GL.length) {
 			var GLAss = this.updateGL(GL, sPath, gross, quantity);
@@ -1191,8 +1202,8 @@ com.menabev.AP.util.POServices = {
 		gross = this.nanValCheck(gross);
 		for (var i = 0; i < len; i++) {
 			per = this.nanValCheck(GL[i].distPerc);
-			GL[i].qty = (per * quantity) / 100;
-			GL[i].netValue = (per * gross) / 100;
+			GL[i].qty = this.nanValCheck((per * quantity) / 100);
+			GL[i].netValue = this.nanValCheck((per * gross) / 100);
 		}
 		return GL;
 	},
@@ -1202,7 +1213,7 @@ com.menabev.AP.util.POServices = {
 		var quantity = this.nanValCheck(oContextObj.invQty);
 		var priceunit = this.nanValCheck(oContextObj.pricingUnit);
 		var grossAmount = (unitPrice * quantity) / priceunit;
-		grossAmount = grossAmount.toFixed(2);
+		grossAmount = this.nanValCheck(grossAmount);
 		return grossAmount;
 	},
 
@@ -1210,7 +1221,7 @@ com.menabev.AP.util.POServices = {
 		var taxPercentage = this.nanValCheck(oContextObj.taxPercentage);
 		var grossPrice = this.nanValCheck(oContextObj.grossPrice);
 		var taxAmount = (taxPercentage * grossPrice) / 100;
-		taxAmount = taxAmount.toFixed(2);
+		taxAmount = this.nanValCheck(taxAmount);
 		return taxAmount;
 	},
 
@@ -1242,6 +1253,7 @@ com.menabev.AP.util.POServices = {
 		var grossPrice = this.nanValCheck(oContextObj.grossPrice);
 		var quantity = this.nanValCheck(oContextObj.invQty);
 		var unitPrice = (grossPrice * priceunit) / quantity;
+		unitPrice = this.nanValCheck(unitPrice);
 		return unitPrice;
 	},
 
@@ -1250,7 +1262,7 @@ com.menabev.AP.util.POServices = {
 		var oPOModel = oController.oPOModel;
 		var oContextObj = oEvent.getSource().getBindingContext("oPOModel").getObject();
 		var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
-		var gross = oContextObj.grossPrice;
+		var gross = this.nanValCheck(oContextObj.grossPrice);
 		var unitPrice = this.calculateUnitPrice(oContextObj);
 		oContextObj.unitPrice = unitPrice;
 		var taxAmount = this.calculateLineItemTax(oContextObj);
