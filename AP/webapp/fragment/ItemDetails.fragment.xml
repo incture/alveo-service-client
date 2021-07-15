@@ -139,7 +139,7 @@
 								<HBox>
 									<!--<Button icon="sap-icon://message-popup" press="onViewMessages"/>-->
 									<!--<Text text="{oPOModel>itemText}" visible="{parts:['oPOModel>guid'],formatter:'com.menabev.AP.formatter.formatter.itemDesNonEditable'}"/>-->
-									<Input value="{oPOModel>itemText}" />
+									<Input value="{oPOModel>itemText}"/>
 								</HBox>
 								<Text text="{oPOModel>customerItemId}"/>
 								<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
@@ -184,7 +184,7 @@
 								<Text text="{oPOModel>matchserviceNumber}"/>
 								<Text text="{oPOModel>matchpackageNumber}"/>
 								<HBox>
-									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment"  class="sapUiTinyMarginTop"
+									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment" class="sapUiTinyMarginTop"
 										visible="{path:'oPOModel>accountAssignmentCat',formatter:'com.menabev.AP.formatter.formatter.AccAsssVisible'}"/>
 									<Button icon="sap-icon://delete" press="onDeleteInvLineItem" type="Reject"/>
 								</HBox>
@@ -326,7 +326,7 @@
 									<!--</HBox>-->
 								</l:content>
 							</l:Grid>
-							<Table items="{oPOModel>poItem}" alternateRowColors="true" mode="MultiSelect" growing="true" growingThreshold="20">
+							<Table items="{oPOModel>poItem}" alternateRowColors="true" growing="true" growingThreshold="20">
 								<headerToolbar>
 									<OverflowToolbar>
 										<Button text="{i18n>Copy}" press="copyPOToInvoiceTabRow" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}" enabled="false"/>
@@ -334,6 +334,9 @@
 									</OverflowToolbar>
 								</headerToolbar>
 								<columns>
+									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
+										<Label design="Bold" text=""/>
+									</Column>
 									<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline">
 										<Label design="Bold" text="{i18n>Item}" tooltip="{i18n>Item}"/>
 									</Column>
@@ -365,6 +368,7 @@
 								<items>
 									<ColumnListItem>
 										<cells>
+											<CheckBox select="onPOItemSelct" />
 											<Text text="{oPOModel>documentItem}"/>
 											<Text text="{oPOModel>shortText}"/>
 											<Text text="{oPOModel>quantity}"/>

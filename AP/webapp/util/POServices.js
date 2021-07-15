@@ -1002,6 +1002,7 @@ com.menabev.AP.util.POServices = {
 	formatUOMList: function (itemDetails, oController) {
 		var len = itemDetails.length;
 		var data, obj1, obj2, UOMList, UOM1, UOM2;
+		var matchDocNumber, matchDocNumberObject, oPOModel = oController.oPOModel;
 		var tax = 0,
 			totalVax = 0,
 			gross = 0,
@@ -1046,19 +1047,28 @@ com.menabev.AP.util.POServices = {
 				UOMList.push(UOM1);
 				UOMList.push(UOM2);
 			}
+			//Calculations
 			itemDetails[i].UOMList = UOMList;
-
 			tax = this.nanValCheck(itemDetails[i].taxValue);
 			totalVax += this.nanValCheck(tax);
 			gross = this.nanValCheck(itemDetails[i].grossPrice);
 			grossTotal += this.nanValCheck(gross);
+
+			//PO Match
+			matchDocNumber = itemDetails[i].matchDocNumber;
+			matchDocNumberObject = oPOModel.getProperty("/" + matchDocNumber);
+			if (!matchDocNumberObject) {
+				matchDocNumberObject = [];
+			}
+			matchDocNumberObject.push(itemDetails[i].matchDocItem);
+			oPOModel.setProperty("/" + matchDocNumber, matchDocNumberObject);
 		}
-		var unplannedCost = oController.oPOModel.getProperty("/unplannedCost");
-		var invoiceTotal = oController.oPOModel.getProperty("/invoiceTotal");
-		var taxValue = oController.oPOModel.getProperty("/taxValue");
+		var unplannedCost = oPOModel.getProperty("/unplannedCost");
+		var invoiceTotal = oPOModel.getProperty("/invoiceTotal");
+		var taxValue = oPOModel.getProperty("/taxValue");
 		var headerGross = this.nanValCheck(taxValue) + this.nanValCheck(grossTotal) + this.nanValCheck(unplannedCost);
 		var bal = this.nanValCheck(invoiceTotal) - this.nanValCheck(headerGross);
-		oController.oPOModel.setProperty("/invoiceItems", itemDetails);
+		oPOModel.setProperty("/invoiceItems", itemDetails);
 		var obj = {
 			"totalVax": totalVax,
 			"gross": grossTotal,

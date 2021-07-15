@@ -49,7 +49,7 @@
 							<ToolbarSpacer/>
 							<Label text="{i18n>Tax}"/>
 							<Input width="4rem" value="{oPOModel>/taxValue}" type="Number"
-								valueState="{oMandatoryModel>/NonPO/taxValueState}" change="onChangeUserInputTaxAmount"
+								valueState="{oMandatoryModel>/NonPO/taxValueState}" change="calculateGross"
 								editable="{oVisibilityModel>/NonPOInvoice/editable}">
 								<layoutData>
 									<OverflowToolbarLayoutData shrinkable="true" minWidth="100px"/>
