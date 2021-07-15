@@ -1345,6 +1345,86 @@ sap.ui.define([
 			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
 			oEvent.getSource().setValue(oValue);
 		},
+
+		onClickDeletePO: function (oEvent) {
+			var oPOModel = this.oPOModel,
+				sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+				oSelectedPOItem = oPOModel.getProperty(sPath);
+			var payload = {
+				"invoiceHeader": oPOModel.getProperty("/"),
+				"purchaseDocumentHeader": oPOModel.getProperty("/purchaseOrders"),
+				"purchaseOrder": [{
+					"documentCategory": oSelectedPOItem.docCat,
+					"documentNumber": oSelectedPOItem.documentNumber
+				}],
+				"requestId": this.requestId
+			};
+			if (!this.oConfirmDeletePODialog) {
+				this.oConfirmDeletePODialog = new sap.m.Dialog({
+					type: sap.m.DialogType.Message,
+					title: "Confirm",
+					content: new sap.m.Text({
+						text: "Are you sure you want to Delete this PO?"
+					}),
+					beginButton: new sap.m.Button({
+						type: sap.m.ButtonType.Emphasized,
+						text: "Submit",
+						press: function () {
+							this.oConfirmDeletePODialog.close();
+							this.fnDeletePOServiceCall(payload);
+						}.bind(this)
+					}),
+					endButton: new sap.m.Button({
+						text: "Cancel",
+						press: function () {
+							this.oConfirmDeletePODialog.close();
+						}.bind(this)
+					})
+				});
+			}
+			this.oConfirmDeletePODialog.open();
+
+		},
+
+		fnDeletePOServiceCall: function (payload) {
+			var oPOModel = this.oPOModel;
+			// 	sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+			// 	oSelectedPOItem = oPOModel.getProperty(sPath);
+
+			var url = "/menabevdev/purchaseDocumentHeader/deletePo";
+			// var payload = {
+			// 	"invoiceHeader": oPOModel.getProperty("/"),
+			// 	"purchaseDocumentHeader": oPOModel.getProperty("/purchaseOrders"),
+			// 	"purchaseOrder": [{
+			// 		"documentCategory": oSelectedPOItem.docCat,
+			// 		"documentNumber": oSelectedPOItem.documentNumber
+			// 	}],
+			// 	"requestId": this.requestId
+			// };
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					busy.close();
+					oPOModel.setProperty("/", data.invoiceObject);
+					oPOModel.setProperty("/purchaseOrders", data.referencePo);
+					oPOModel.refresh();
+					sap.m.MessageToast.show("PO Deleted!");
+				}.bind(this),
+				error: function (error) {
+					busy.close();
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
+			});
+		}
 	});
 
 });

@@ -98,12 +98,11 @@
 				</VBox>
 			</l:Grid>
 			<VBox class="sapUiSmallMargin">
-				<Table inset="false" items="{oPOModel>/invoiceItems}" mode="MultiSelect" alternateRowColors="true">
+				<Table inset="false" items="{oPOModel>/invoiceItems}" mode="None" alternateRowColors="true">
 					<headerToolbar>
 						<OverflowToolbar>
 							<Title text="{i18n>MatchedItems}" level="H2"/>
 							<ToolbarSpacer/>
-							<Button text="Unmatch" class="sapUiTinyMarginEnd" type="Emphasized" enabled="false"/>
 							<SearchField width="30%"/>
 						</OverflowToolbar>
 					</headerToolbar>
@@ -132,6 +131,9 @@
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Label text="{i18n>Item}"/>
 						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Label/>
+						</Column>
 					</columns>
 					<items>
 						<ColumnListItem
@@ -145,6 +147,7 @@
 								<Text text="{oPOModel>upcCode}"/>
 								<Text text="{oPOModel>matchDocNum}"/>
 								<Text text="{oPOModel>matchDocItem}"/>
+								<Button text="Unmatch" class="sapUiTinyMarginEnd" type="Emphasized" press="onClickUnMatch"/>
 							</cells>
 						</ColumnListItem>
 					</items>

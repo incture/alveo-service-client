@@ -67,7 +67,7 @@ sap.ui.define([
 		onNavback: function () {
 			var reqId = this.oPOModel.getProperty("/requestId");
 			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
-				POServices.formatUOMList(this.oPOModel.getProperty("/invoiceItems"), this);
+			POServices.formatUOMList(this.oPOModel.getProperty("/invoiceItems"), this);
 			if (changeIndicators && changeIndicators.itemChange) {
 				this.onClickThreeWayMatch("", true);
 			}
@@ -95,7 +95,7 @@ sap.ui.define([
 				//Get POHeader based on selected POItem 
 				var getReferencedByPO = $.extend(true, [], this.oPOModel.getProperty("/purchaseOrders"));
 				for (var i = 0; i < getReferencedByPO.length; i++) {
-					if (oSelectedPOItem.documentNumber === getReferencedByPO[i].documentNumber) {
+					if (Number(oSelectedPOItem.documentNumber) == Number(getReferencedByPO[i].documentNumber)) {
 						var poHeader = getReferencedByPO[i];
 					}
 				}
@@ -158,6 +158,51 @@ sap.ui.define([
 				}.bind(this)
 			});
 		},
+
+		onClickUnMatch: function (oEvent) {
+			POServices.setChangeInd(oEvent, this, "itemChange");
+			var oPOModel = this.oPOModel;
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+				oSelectedInvoiceItem = oPOModel.getProperty(sPath);
+
+			var aItemMatchPO = oPOModel.getProperty("/aItemMatchPO");
+			for (var i = 0; i < aItemMatchPO.length; i++) {
+				if (oSelectedInvoiceItem.matchDocNum == Number(aItemMatchPO[i].documentNumber) &&
+					oSelectedInvoiceItem.matchDocItem == aItemMatchPO[i].documentItem) {
+					var matchedPOItem = aItemMatchPO[i];
+					break;
+				}
+			}
+			//Payload Logic //BackTracking to get purchaseDocumentHeader
+			//Get POHeader based on selected POItem 
+			var purchaseOrders = $.extend(true, [], this.oPOModel.getProperty("/purchaseOrders"));
+			for (var i = 0; i < purchaseOrders.length; i++) {
+				if (matchedPOItem.documentNumber == Number(purchaseOrders[i].documentNumber)) {
+					var poHeader = purchaseOrders[i];
+					break;
+				}
+			}
+
+			//To find POHistory based on the selected PO Item 
+			var poHistory = this.findPOItemDetails(matchedPOItem.documentItem, matchedPOItem.documentNumber, poHeader.poHistory);
+
+			// Creation of purchaseDocumentHeader with POHistory
+			poHeader.poHistory = poHistory;
+			var poItem = [];
+			poItem.push(matchedPOItem);
+			poHeader.poItem = poItem;
+			var purchaseDocumentHeader = [];
+			purchaseDocumentHeader.push(poHeader);
+			var payload = {
+				"invoiceItem": oSelectedInvoiceItem,
+				"manualVsAuto": "MAN",
+				"matchOrUnmatchFlag": "U",
+				"purchaseDocumentHeader": purchaseDocumentHeader,
+				"vendorId": oPOModel.getProperty("/vendorId")
+			};
+			this.fnTwoWayMatch(payload);
+
+		}
 
 	});
 
