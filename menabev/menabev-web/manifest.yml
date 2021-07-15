@@ -1,5 +1,5 @@
 applications:
--  name: ap-menabev-qa
+-  name: ap-menabev-dev
    memory: 768M
    path: target/ap-menabev-dev.jar
    random-route: false
@@ -14,7 +14,7 @@ applications:
         -Dcom.sun.management.jmxremote.rmi.port=5000
         -Djava.rmi.server.hostname='127.0.0.1' "
    services:
-   - hana-schema-qa
+   - MenabevDB
    - wm_workflow
    - Destination
    
