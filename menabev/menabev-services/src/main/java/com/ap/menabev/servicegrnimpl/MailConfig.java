@@ -53,7 +53,7 @@ public class MailConfig {
         String destinationAPI = vcapConfig.getDestinationRestUrl();
         String destinationURL = destinationAPI + "/destination-configuration/v1/subaccountDestinations/" + mailDestination;
 
-        LOG.info("Destination endpoint for destination {}: {}",  mailDestination, destinationURL);
+       // LOG.info("Destination endpoint for destination {}: {}",  mailDestination, destinationURL);
 
         HttpGet httpGet = new HttpGet(destinationURL);
         httpGet.setHeader("Authorization", "Bearer " + accessToken);
@@ -66,7 +66,7 @@ public class MailConfig {
         } catch (IOException e) {
             throw new RemoteAccessException("Error while retrieving destination " + mailDestination, e);
         }
-        LOG.info("Destination endpoint for destination {}: {destination info :}", destination);
+       // LOG.info("Destination endpoint for destination {}: {destination info :}", destination);
         return destination;
     }
 

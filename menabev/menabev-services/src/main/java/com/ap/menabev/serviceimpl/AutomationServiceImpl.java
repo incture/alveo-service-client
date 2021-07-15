@@ -261,11 +261,22 @@ public class AutomationServiceImpl implements AutomationService {
 									JSONObject jsonObject = new JSONObject(jsonMap);
 									if (jsonObject.has("Documents")) {
 										InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
-										headerList.add(output);
+										if(!ServiceUtil.isEmpty(output)){
+											headerList.add(output);
+											is.close();
+											channelSftp.rm(entry.getFilename());
+										}else {
+											 // checking if json is thrwoing error 
+											// will move the json to UNPROCESSED folder 
+											// notify the sender with email to check the json 
+												
+											is.close();
+										}
+										
+										
 									}
-									is.close();
 								}
-								channelSftp.rm(entry.getFilename());
+								
 							} catch (Exception e) {
 								e.printStackTrace();
 								response.setMessage("Error while reading json" + e.getMessage());

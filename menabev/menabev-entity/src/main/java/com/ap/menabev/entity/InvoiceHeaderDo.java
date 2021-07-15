@@ -174,5 +174,8 @@ public class InvoiceHeaderDo implements Serializable {
 	@Column(name = "EMAIL_RECEIVED_AT")
 	private Long emailReceivedAt;
 	
+	@Column(name = "GLACCOUNT",length = 20)
+	private String glAccount;
+	
 	
 }

@@ -6,17 +6,16 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ap.menabev.dto.InvoiceHeaderDetailsDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.util.ApplicationConstants;
-import com.ap.menabev.util.ItemDto;
 import com.ap.menabev.util.ServiceUtil;
 
 public class ABBYYJSONConverter {
-	public static InvoiceHeaderDto abbyyJSONOutputToInvoiceObject(JSONObject jsonObject) throws Exception {
+	public static InvoiceHeaderDto abbyyJSONOutputToInvoiceObject(JSONObject jsonObject)  {
 		InvoiceHeaderDto headerDto = new InvoiceHeaderDto();
 		List<InvoiceItemDto> itemsDtoList = new ArrayList<InvoiceItemDto>();
+		try {
 		JSONArray documentsArray = jsonObject.getJSONArray("Documents");
 		JSONObject documents = documentsArray.getJSONObject(0);
 		JSONObject documentData = documents.getJSONObject("DocumentData");
@@ -218,6 +217,10 @@ public class ABBYYJSONConverter {
 		}
 		headerDto.setInvoiceItems(itemsDtoList);
 		return headerDto;
+		}catch (Exception e){
+			System.err.println("JSON PROCESSING FAILED Message ="+e.getMessage());
+			return null;
+		}
 
 	}
 

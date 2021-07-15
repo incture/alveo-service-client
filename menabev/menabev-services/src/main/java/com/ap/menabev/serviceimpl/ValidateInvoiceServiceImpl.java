@@ -696,13 +696,14 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		ThreeWayMatchOutputDto threeWayMatchOutputDto = ObjectMapperUtils.map(invoiceHeaderDto,
 				ThreeWayMatchOutputDto.class);
 		List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload = new ArrayList<>();
+		
 		List<String> purchaseOrder = new ArrayList<>();
 		try {
 			purchaseOrder.add(threeWayMatchOutputDto.getRefpurchaseDoc());
 			List<ThreeWayInvoiceItemDto> itemList = threeWayMatchOutputDto.getInvoiceItems();
 			logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "" + itemList.size());
 			for (ThreeWayInvoiceItemDto invoiceItemDto : itemList) {
-				invoiceItemDto.setInvoiceItemMessages(Collections.emptyList());
+				invoiceItemDto.setInvoiceItemMessages(new ArrayList<>());
 				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "invoiceItemDto.getIsTwowayMatched()"
 						+ invoiceItemDto.getIsTwowayMatched());
 				logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>"

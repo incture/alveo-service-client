@@ -29,12 +29,14 @@ public class CostAllocationDto {
 	private String taxCode;
 	private String accountNum;
 	private String lineText;
-	private String taxValue;
+	private String taxValue; // sum of all the items taxValue based on taxcode
 	private String taxPer;
-	private String baseRate;
+	private String baseRate;   
 	private String materialDesc;
 	private String subNum;
 	private String glAccountText;
 	private String costCenterText;
+	private String currency;
+	private String conditionType;
 	
 }

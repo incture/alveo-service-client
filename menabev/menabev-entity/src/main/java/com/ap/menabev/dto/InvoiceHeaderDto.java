@@ -78,6 +78,8 @@ public class InvoiceHeaderDto {
 	private String invoiceStatusText;
 	private String approvalStatus;
 	private String sapInvocieNumber;
+	private String glAccount;
+	private String conditionType;
 	
 	// not in DB
 	private String processor;

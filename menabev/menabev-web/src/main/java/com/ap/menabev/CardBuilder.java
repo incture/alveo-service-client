@@ -41,10 +41,10 @@ public class CardBuilder {
     private String cardSubmissionUrl;
 
     public String buildCard(Task task, String originator, String templateFileName) throws IllegalStateException {
-        LOG.info("Building card for task {}", task.getInfo().path("id").asText());
+       // LOG.info("Building card for task {}", task.getInfo().path("id").asText());
 
         ObjectNode taskFormNode = task.getForm();
-        LOG.info("Form: {}", taskFormNode.toString());
+       // LOG.info("Form: {}", taskFormNode.toString());
 
         JsonNode taskContextNode = task.getContext();
         taskFormNode.set("data", taskContextNode);

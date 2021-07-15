@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.soap.SOAPException;
+
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.http.ResponseEntity;
 
@@ -70,6 +74,7 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId);
 	ResponseEntity<?> postOdataCall() throws IOException, URISyntaxException;
 	ResponseEntity<?> buyerSubmit(InvoiceSubmitDto invoiceSubmit);
-	ResponseEntity<?> getSupplierEmailAddress(String vendorId) throws URISyntaxException, IOException;	
+	ResponseEntity<?> getSupplierEmailAddress(String vendorId) throws URISyntaxException, IOException;
+	ResponseEntity<?> NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException;	
 
 }

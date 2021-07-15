@@ -34,6 +34,11 @@ public class EmailScheduler implements Runnable {
 	@Autowired
 	SchedulerLogService schedulerLogService;
 
+	
+	public static void main(String[] args) {
+		System.err.println( " current time  = " + ServiceUtil.getFormattedDateinString("yyyy-MM-dd"));
+	}
+	
 	@Override
 	public void run() {
 		logger.error("Dynamic run :::" + System.currentTimeMillis());
@@ -50,6 +55,8 @@ public class EmailScheduler implements Runnable {
 			this.scheduledFuture.cancel(true);
 		}
 
+		
+		
 		// Date date1 = null;
 		// try {
 		// List<SchedulerConfigDo> config = schedulerConfigRepo.findAll();
