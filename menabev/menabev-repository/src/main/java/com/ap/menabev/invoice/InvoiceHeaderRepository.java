@@ -2,6 +2,7 @@ package com.ap.menabev.invoice;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
@@ -51,10 +52,11 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, 
 	@Query(value = "select rDo from InvoiceHeaderDo rDo where rDo.id =:id")
 	InvoiceHeaderDo getAllById(@Param("id") String id);
 
+
 	@Transactional(TxType.REQUIRES_NEW)
 	@Modifying(clearAutomatically = true)
-	@Query(value = "UPDATE InvoiceHeaderDo i SET i.fiscalYear=:fiscalYear,i.sapInvoiceNumber=:sapInvoiceNumber where i.requestId=:requestId")
+	@Query(value = "UPDATE InvoiceHeaderDo i SET i.fiscalYear=:fiscalYear,i.sapInvoiceNumber=:sapInvoiceNumber,i.invoiceStatus=:invst,i.invoiceStatusText=:invStext where i.requestId=:requestId")
 	int updateHeader(@Param("fiscalYear") String fiscalYear,
-			@Param("sapInvoiceNumber") String sapInvoiceNumber, @Param("requestId") String requestId);
+			@Param("sapInvoiceNumber") String sapInvoiceNumber, @Param("requestId") String requestId, @Param("invst") String invst, @Param("invStext") String invStext);
 
 }

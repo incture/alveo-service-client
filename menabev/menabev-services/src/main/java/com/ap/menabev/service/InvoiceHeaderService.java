@@ -4,6 +4,7 @@ package com.ap.menabev.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -68,13 +69,13 @@ public interface InvoiceHeaderService {
 	ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader);
 	List<ActivityLogDto> createActivityLogForSubmit(InvoiceSubmitDto invoiceSubmitOk, String actionCode,
 			String actionCodeText);
-	ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit);
+	ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException;
 	ResponseEntity<?> triggerRuleService(AcountOrProcessLeadDetermination determination)
 			throws ClientProtocolException, IOException, URISyntaxException;
 	ResponseEntity<?> triggerWorkflow(WorkflowContextDto dto, String definitionId);
 	ResponseEntity<?> postOdataCall() throws IOException, URISyntaxException;
 	ResponseEntity<?> buyerSubmit(InvoiceSubmitDto invoiceSubmit);
 	ResponseEntity<?> getSupplierEmailAddress(String vendorId) throws URISyntaxException, IOException;
-	ResponseEntity<?> NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException;	
+	InvoiceHeaderDto NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException;	
 
 }

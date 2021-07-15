@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -23,6 +24,7 @@ import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPEnvelope;
@@ -67,6 +69,7 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 import com.ap.menabev.soap.journalcreatebinding.ChartOfAccountsItemCode;
 import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmationBulkMessage;
+import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmationMessage;
 import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateRequestBulkMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -226,12 +229,6 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		
 		try {
 			String entity ="";
-			ChartOfAccountsItemCode chartVale1 =  new ChartOfAccountsItemCode();
-		    chartVale1.setValue("0005500046");
-		    requestMessage.getJournalEntryCreateRequest().get(0).getJournalEntry().getItem().get(0).setGLAccount(chartVale1);
-		    ChartOfAccountsItemCode chartVale2 =  new ChartOfAccountsItemCode();
-		    chartVale2.setValue("0006021003");
-		    requestMessage.getJournalEntryCreateRequest().get(0).getJournalEntry().getItem().get(1).setGLAccount(chartVale2);
 		    JAXBContext contextObj = JAXBContext.newInstance(JournalEntryCreateRequestBulkMessage.class); 
 		    Marshaller marshallerObj = contextObj.createMarshaller(); 
 		    marshallerObj.setProperty(Marshaller.JAXB_FRAGMENT, true);
@@ -255,7 +252,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		   
 			return entity;
 		}catch(Exception e){
-			
+			System.err.println("Exception in formXmlPayload "+ e);
 			return null;
 		}
 		
@@ -374,7 +371,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 					
 					String responseFromECC =getDataFromStream( httpResponse.getEntity().getContent());
 					System.err.println("responseFromEcc"+responseFromECC);
-					return new ResponseEntity<String>("Response from odata call "+httpResponse,HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>("Response from odata call "+httpResponse,HttpStatus.OK);
 				} else {
 					String responseFromECC =getDataFromStream( httpResponse.getEntity().getContent());
 					System.err.println("responseFromEcc"+responseFromECC);
@@ -392,42 +389,39 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 	}
 	
 	public static String getConectivityProxy() throws URISyntaxException, IOException {
-
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
-
 		HttpPost httpPost = new HttpPost("https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
 		/*HttpPost httpPost = new HttpPost("https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
 		httpPost.addHeader("Content-Type", "application/json");*/
-
 		// Encoding username and password
 		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
 				"cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=");
-		
 		/*String auth = encodeUsernameAndPassword("sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5",
 				"f761e7fd-0dac-4614-b5f5-752d3513b71a$Obl12NQPIxXrGa9-OZiB_wIjmQaB-bb7Dyfq_ccKWfM=");
 		*/
-		
 		httpPost.addHeader("Authorization", auth);
-
 		HttpResponse res = client.execute(httpPost);
-		
 		System.err.println( " 92 rest" + res);
-
 		String data = getDataFromStream(res.getEntity().getContent());
 		if (res.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 			String jwtToken = new JSONObject(data).getString("access_token");
 			
 			System.err.println("jwtProxyToken "+jwtToken);
-
-			
 				return jwtToken;
-
 			}
-		
-		
-
 		return null;
 	}
 	
+	public  JournalEntryCreateConfirmationBulkMessage outPutResponseFromOdataResponse(String responsePayload ) throws JAXBException{
+		 
+		 StringReader sr = new StringReader(responsePayload);
+		 JAXBContext jaxbContext = JAXBContext.newInstance(JournalEntryCreateConfirmationBulkMessage.class);
+		 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		 JournalEntryCreateConfirmationBulkMessage response = (JournalEntryCreateConfirmationBulkMessage) unmarshaller.unmarshal(sr);
+		    
+		    return response;
+		 
+		 
+	 }
 }

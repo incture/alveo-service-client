@@ -2,8 +2,13 @@ package com.ap.menabev.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.soap.SOAPException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -190,9 +195,16 @@ public class InvoiceHeaderController {
 	
 	@PostMapping("/processLead/processLeadSubmit")
 	public ResponseEntity<?> processleadInvoiceSubmitOk(@RequestBody InvoiceSubmitDto invoiceSubmit)
-			throws URISyntaxException, IOException {
+			throws URISyntaxException, IOException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
 		return headerService.processLeadSubmit(invoiceSubmit);
 	}
+	@PostMapping("/processLead/nonPoprocessLeadSubmit")
+	public InvoiceHeaderDto nonPoPrecoessLeadSubmit(@RequestBody InvoiceSubmitDto invoiceSubmit)
+			throws URISyntaxException, IOException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
+		return headerService.NonPoProcessLeadSubmit(invoiceSubmit);
+	}
+	
+	
 	@PostMapping("/buyer/buyerSubmit")
 	public ResponseEntity<?> buyerInvoiceSubmitOk(@RequestBody InvoiceSubmitDto invoiceSubmit)
 			throws URISyntaxException, IOException {

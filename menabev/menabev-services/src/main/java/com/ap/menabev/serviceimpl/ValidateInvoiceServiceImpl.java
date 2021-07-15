@@ -69,7 +69,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
-	static String itemId = null;
+	//static String itemId = null;
 	private static final Logger logger = LoggerFactory.getLogger(ValidateInvoiceServiceImpl.class);
 	@Autowired
 	DuplicateCheckService duplicateCheckService;
@@ -539,7 +539,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				PoHistoryTotalsDto poHistoryTotalsDto = ObjectMapperUtils.map(poHistoryTotalsDo,
 						PoHistoryTotalsDto.class);
 				ConsumtionLogicOutputDto consumtionLogicOutputDto = cosumptionLogic(invoiceHeaderDto,
-						threeWayInvoiceItemDto, poHistoryDtoList, poHistoryTotalsDto);
+						threeWayInvoiceItemDto, poHistoryDtoList, poHistoryTotalsDto,itemId);
 				itemAccAssgnDtoList.addAll(consumtionLogicOutputDto.getItemThreeWayAccAssgnPaylod());
 				// creating tax map
 				// Start - creating tax map
@@ -565,7 +565,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				}
 				// END - creating tax map
 			}
-
+          
+			itemId = null;
 			PostToERPRootDto rootDto = new PostToERPRootDto();
 			PostToERPDto d = new PostToERPDto();
 			ToResult toResult = new ToResult();
@@ -653,7 +654,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				String fiscalYear = resultObject.getFiscYear();
 				// update in database
 				int isUpated = invoiceHeaderRepository.updateHeader(fiscalYear, sapInvoiceNumber,
-						invoiceHeaderDto.getRequestId());
+						invoiceHeaderDto.getRequestId(),"Posted (Unpaid)","13");
 				if (isUpated > 0) {
 					System.err.println("inside is updated");
 					HeaderMessageDto messageDto = new HeaderMessageDto();
@@ -716,7 +717,8 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload = new ArrayList<>();
 		
 		List<String> purchaseOrder = new ArrayList<>();
-		try {
+		String itemId = null;
+ 		try {
 			purchaseOrder.add(threeWayMatchOutputDto.getRefpurchaseDoc());
 			List<ThreeWayInvoiceItemDto> itemList = threeWayMatchOutputDto.getInvoiceItems();
 			logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>" + "" + itemList.size());
@@ -751,7 +753,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							PoHistoryTotalsDto.class);
 					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					ConsumtionLogicOutputDto consumtionLogicOutput = cosumptionLogic(invoiceHeaderDto, invoiceItemDto,
-							poHistoryDtoList, poHistoryTotalsDto);
+							poHistoryDtoList, poHistoryTotalsDto,itemId);
 					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>consumtionLogicOutput"
 							+ consumtionLogicOutput);
 					eachItemThreewayMatchPayload.addAll(consumtionLogicOutput.getItemThreeWayMatchPaylod());
@@ -1072,7 +1074,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 	public static ConsumtionLogicOutputDto cosumptionLogic(InvoiceHeaderDto invoiceHeaderDto,
 			ThreeWayInvoiceItemDto invoiceItemDto, List<PoHistoryDto> poHistoryDtoList,
-			PoHistoryTotalsDto poHistoryTotalsDto) {
+			PoHistoryTotalsDto poHistoryTotalsDto,String itemId) {
 		ConsumtionLogicOutputDto consumtionLogicOutputDto = new ConsumtionLogicOutputDto();
 		List<ItemThreeWayMatchPaylod> threeWayInputPayloadList = new ArrayList<>();
 		List<ItemThreeWayAccAssgnPaylod> itemThreeWayAccAssgnPaylod = new ArrayList<>();
