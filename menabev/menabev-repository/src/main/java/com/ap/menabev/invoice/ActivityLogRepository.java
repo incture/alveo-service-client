@@ -15,4 +15,7 @@ public interface ActivityLogRepository  extends JpaRepository<ActivityLogDo, Str
 	@Query(value = "select i from ActivityLogDo i where i.requestId=:requestId")
 	List<ActivityLogDo> getAllActivityForRequestId(@Param("requestId") String requestId);
 
+	@Query(value = "select guid from ActivityLogDo i where i.requestId=?1 and taskOwner=?1")
+	String getUUID(String requestId, String taskOwner);
+
 }

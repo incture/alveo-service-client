@@ -1966,6 +1966,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 						twowayMatchUpdatedItem.setIsThreewayMatched(false);
 						updatedItems.add(twowayMatchUpdatedItem);
 					}else{
+						item.setIsTwowayMatched(false);
 						updatedItems.add(item);
 					}
 					
