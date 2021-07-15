@@ -353,7 +353,7 @@ com.menabev.AP.formatter.formatter = {
 	},
 
 	getMatchedBtnVisible: function (itemCategory) {
-		if (itemCategory === "D") {
+		if (itemCategory === "D" || itemCategory === "9") {
 			return false;
 		}
 		return true;

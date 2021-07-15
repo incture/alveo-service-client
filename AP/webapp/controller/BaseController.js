@@ -681,15 +681,15 @@ sap.ui.define([
 				this.oVisibilityModel.setProperty("/PO/enabled", false);
 			}
 		},
-		
+
 		onSelectionChangeAddPO: function (oEvent) {
 			var addPOModel = this.getModel("addPOModel");
 			var currentSelectedItem = oEvent.getParameter("listItem").getBindingContext("addPOModel").getObject();
-			
+
 			var selectedFilters = oEvent.getSource().getSelectedContextPaths();
-			for(var i=0; i<= selectedFilters; i++) {
+			for (var i = 0; i <= selectedFilters; i++) {
 				var list = addPOModel.getProperty(selectedFilters);
-				if(currentSelectedItem.documentCategory != list.documentCategory){
+				if (currentSelectedItem.documentCategory != list.documentCategory) {
 					oEvent.getParameter("listItem").setSelected(false);
 					sap.m.MessageToast.show("Different Document Category Items cannot be selected");
 				}
@@ -1337,7 +1337,7 @@ sap.ui.define([
 				return "E";
 			}
 		},
-		
+
 		onLiveChangeHdrInvValue: function (oEvent) {
 			var oValue = oEvent.getSource().getValue();
 			// if(isNaN(oValue)){
@@ -1351,6 +1351,47 @@ sap.ui.define([
 			oValue = (oValue.indexOf(".") >= 0) ? (oValue.substr(0, oValue.indexOf(".")) + oValue.substr(oValue.indexOf("."), 3)) : oValue;
 			oEvent.getSource().setValue(oValue);
 		},
+
+		onClickDeletePO: function (oEvent) {
+			var oPOModel = this.oPOModel,
+				sPath = oEvent.getSource().getBindingContext("oPOModel").getPath(),
+				oSelectedPOItem = oPOModel.getProperty(sPath);
+
+			var url = "/menabevdev/purchaseDocumentHeader/deletePo";
+			var payload = {
+				"invoiceHeader": oPOModel.getProperty("/"),
+				"purchaseDocumentHeader": oPOModel.getProperty("/purchaseOrders"),
+				"purchaseOrder": [{
+						"documentCategory": oSelectedPOItem.documentCategory,
+						"documentNumber": oSelectedPOItem.documentNumber
+					}
+				],
+				"requestId": this.requestId
+			};
+			var busy = new sap.m.BusyDialog();
+			busy.open();
+			jQuery.ajax({
+				type: "POST",
+				contentType: "application/json",
+				url: url,
+				dataType: "json",
+				data: JSON.stringify(payload),
+				async: true,
+				success: function (data, textStatus, jqXHR) {
+					busy.close();
+					oPOModel.setProperty("/", data.invoiceObject);
+					oPOModel.setProperty("/purchaseOrders", data.referencePo);
+					oPOModel.refresh();
+					sap.m.MessageToast.show("PO Deleted!");
+				}.bind(this),
+				error: function (error) {
+					busy.close();
+					var errorMsg = JSON.parse(error.responseText);
+					errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
+			});
+		}
 	});
 
 });

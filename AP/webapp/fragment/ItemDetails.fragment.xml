@@ -298,7 +298,7 @@
 							<OverflowToolbar>
 								<Title text="Purchase Order - {oPOModel>documentNumber}"/>
 								<ToolbarSpacer/>
-								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO" enabled="false"/>
+								<Button icon="sap-icon://delete" type="Reject" press="onClickDeletePO"/>
 							</OverflowToolbar>
 						</headerToolbar>
 						<content>
