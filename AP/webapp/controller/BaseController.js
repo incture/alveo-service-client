@@ -46,9 +46,11 @@ sap.ui.define([
 				success: function (data) {
 					rSuccess(data);
 				},
-				error: function (err) {
-					rError(err);
-				}
+				error: function (error) {
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
 
 			});
 
@@ -287,16 +289,11 @@ sap.ui.define([
 						sap.m.MessageToast.show("No PDF is available");
 					}
 				}.bind(this),
-				error: function (result, xhr, data) {
+				error: function (error) {
 					busy.close();
-					var errorMsg = "";
-					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please refresh your page";
-						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = data;
-						this.errorMsg(errorMsg);
-					}
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -384,8 +381,8 @@ sap.ui.define([
 				}.bind(this),
 				error: function (error) {
 					busy.close();
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
 					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
@@ -419,9 +416,9 @@ sap.ui.define([
 					oDropDownModel.setProperty("/paymentTermResult", oData.results);
 				}.bind(this),
 				error: function (error) {
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
-					sap.m.MessageToast.show(errorMsg);
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -441,9 +438,9 @@ sap.ui.define([
 					oDropDownModel.setProperty("/paymentMethodResult", oData.results);
 				}.bind(this),
 				error: function (error) {
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
-					sap.m.MessageToast.show(errorMsg);
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -463,9 +460,9 @@ sap.ui.define([
 					oDropDownModel.setProperty("/paymentBlockResult", oData.results);
 				}.bind(this),
 				error: function (error) {
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
-					sap.m.MessageToast.show(errorMsg);
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -486,9 +483,9 @@ sap.ui.define([
 					oDropDownModel.setProperty("/taxCodeResult", oData.results);
 				}.bind(this),
 				error: function (error) {
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
-					sap.m.MessageToast.show(errorMsg);
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -510,9 +507,9 @@ sap.ui.define([
 						oDropDownModel.setProperty("/GLAccountResult", oData.results);
 					}.bind(this),
 					error: function (error) {
-						var errorMsg = JSON.parse(error.responseText);
-						errorMsg = errorMsg.error.message.value;
-						sap.m.MessageToast.show(errorMsg);
+						var errorMsg = error.responseText;
+						// errorMsg = errorMsg.error.message.value;
+						this.errorMsg(errorMsg);
 					}.bind(this)
 				});
 			}
@@ -562,9 +559,9 @@ sap.ui.define([
 					oDropDownModel.setProperty("/costCenterResult", oData.results);
 				}.bind(this),
 				error: function (error) {
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
-					sap.m.MessageToast.show(errorMsg);
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -653,8 +650,8 @@ sap.ui.define([
 				}.bind(this),
 				error: function (error) {
 					busy.close();
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
 					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
@@ -681,15 +678,15 @@ sap.ui.define([
 				this.oVisibilityModel.setProperty("/PO/enabled", false);
 			}
 		},
-		
+
 		onSelectionChangeAddPO: function (oEvent) {
 			var addPOModel = this.getModel("addPOModel");
 			var currentSelectedItem = oEvent.getParameter("listItem").getBindingContext("addPOModel").getObject();
-			
+
 			var selectedFilters = oEvent.getSource().getSelectedContextPaths();
-			for(var i=0; i<= selectedFilters; i++) {
+			for (var i = 0; i <= selectedFilters; i++) {
 				var list = addPOModel.getProperty(selectedFilters);
-				if(currentSelectedItem.documentCategory != list.documentCategory){
+				if (currentSelectedItem.documentCategory != list.documentCategory) {
 					oEvent.getParameter("listItem").setSelected(false);
 					sap.m.MessageToast.show("Different Document Category Items cannot be selected");
 				}
@@ -741,16 +738,11 @@ sap.ui.define([
 					oPOModel.refresh();
 					this.addPOFragment.close();
 				}.bind(this),
-				error: function (result, xhr, data) {
+				error: function (error) {
 					busy.close();
-					var errorMsg = "";
-					if (result.status === 504) {
-						errorMsg = "Request timed-out. Please refresh your page";
-						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = data;
-						this.errorMsg(errorMsg);
-					}
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
 		},
@@ -769,9 +761,11 @@ sap.ui.define([
 				success: function (data, textStatus, jqXHR) {
 					oDropDownModel.setProperty("/rejectReasonCodes", data);
 				},
-				error: function (err) {
-					sap.m.MessageToast.show(err.statusText);
-				}
+				error: function (error) {
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
+					this.errorMsg(errorMsg);
+				}.bind(this)
 			});
 		},
 
@@ -1224,8 +1218,8 @@ sap.ui.define([
 				}.bind(this),
 				error: function (error) {
 					busy.close();
-					var errorMsg = JSON.parse(error.responseText);
-					errorMsg = errorMsg.error.message.value;
+					var errorMsg = error.responseText;
+					// errorMsg = errorMsg.error.message.value;
 					this.errorMsg(errorMsg);
 				}.bind(this)
 			});
@@ -1337,7 +1331,7 @@ sap.ui.define([
 				return "E";
 			}
 		},
-		
+
 		onLiveChangeHdrInvValue: function (oEvent) {
 			var oValue = oEvent.getSource().getValue();
 			// if(isNaN(oValue)){

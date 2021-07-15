@@ -46,7 +46,7 @@
 							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 							<Label design="Bold" text="{i18n>UNITPRICE}" tooltip="{i18n>UNITPRICE}"/>
 						</Column>
-						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline"
+						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="5%"
 							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 							<Label design="Bold" text="{i18n>PRICINGUNIT}" tooltip="{i18n>PRICINGUNIT}"/>
 						</Column>
@@ -54,7 +54,7 @@
 							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 							<Label design="Bold" text="{i18n>GROSSPRICE}" tooltip="{i18n>GROSSPRICE}"/>
 						</Column>
-						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline"
+						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="11%"
 							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 							<Label design="Bold" text="{i18n>TAXCODE}" tooltip="{i18n>TAXCODE}"/>
 						</Column>
@@ -125,7 +125,7 @@
 							visible="{parts:['oVisibilityModel>/POINVToggle','oPOModel>itemCategory'],formatter:'com.menabev.AP.formatter.formatter.formatPOItemCatVisible'}">
 							<Label design="Bold" text="{i18n>MATCHPACKAGENUMBER}" tooltip="{i18n>MATCHPACKAGENUMBER}"/>
 						</Column>
-						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline"
+						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7%"
 							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 							<Label design="Bold" text="{i18n>ACCASSGN}" tooltip="{i18n>ACCASSGN}"/>
 						</Column>
@@ -138,14 +138,14 @@
 									visible="{parts:['oPOModel>isTwowayMatched','oPOModel>itemStatusCode'],formatter:'com.menabev.AP.formatter.formatter.formatCheckBoxxVisible'}"/>
 								<HBox>
 									<!--<Button icon="sap-icon://message-popup" press="onViewMessages"/>-->
-									<Text text="{oPOModel>itemText}" visible="{parts:['oPOModel>guid'],formatter:'com.menabev.AP.formatter.formatter.itemDesNonEditable'}"/>
-									<Input value="{oPOModel>itemText}" visible="{parts:['oPOModel>guid'],formatter:'com.menabev.AP.formatter.formatter.itemDesEditable'}"/>
+									<!--<Text text="{oPOModel>itemText}" visible="{parts:['oPOModel>guid'],formatter:'com.menabev.AP.formatter.formatter.itemDesNonEditable'}"/>-->
+									<Input value="{oPOModel>itemText}" />
 								</HBox>
 								<Text text="{oPOModel>customerItemId}"/>
 								<Input value="{oPOModel>invQty}" change="onInvQtyChange" liveChange="inputNANCheck" enabled="{oVisibilityModel>/NonPOInvoice/editable}"
 									valueState="{parts:['oPOModel>itemStatusCode'],formatter:'com.menabev.AP.formatter.formatter.formatQtyState'}"/>
 								<HBox>
-									<core:Icon src="sap-icon://message-information" press="onViewUOMDetails"/>
+									<core:Icon src="sap-icon://message-information" press="onViewUOMDetails" class="sapUiTinyMarginTop"/>
 									<Select forceSelection="false" selectedKey="{oPOModel>uom}" items="{oPOModel>UOMList}" change="onChangeInvoiceQtyUom"
 										enabled="{oVisibilityModel>/NonPOInvoice/editable}">
 										<items>
@@ -184,7 +184,7 @@
 								<Text text="{oPOModel>matchserviceNumber}"/>
 								<Text text="{oPOModel>matchpackageNumber}"/>
 								<HBox>
-									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment"
+									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment"  class="sapUiTinyMarginTop"
 										visible="{path:'oPOModel>accountAssignmentCat',formatter:'com.menabev.AP.formatter.formatter.AccAsssVisible'}"/>
 									<Button icon="sap-icon://delete" press="onDeleteInvLineItem" type="Reject"/>
 								</HBox>

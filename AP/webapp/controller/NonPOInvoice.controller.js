@@ -250,6 +250,7 @@ sap.ui.define([
 
 		onCurrencyChange: function (oEvent) {
 			POServices.onCurrencyChange(oEvent, this);
+			POServices.setItemCurrency(oEvent, this);
 		},
 
 		onInvDateChange: function (oEvent) {
