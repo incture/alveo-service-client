@@ -128,9 +128,9 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 		// }
 		// List<String> matchedPurchaseOrder =
 		// purchaseDocumentheaderRepository.matchedPurchaseOrder(purchaseOrder);
-		String finalQuery = "select documentNumber from PurchaseDocumentHeaderDo where documentNumber in "
-				+ "(select distinct refDocNum from InvoiceItemDo th where requestId = '" + dto.getRequestId() + "') "
-				+ " and vendor <> '" + dto.getVendorId() + "'";
+		String finalQuery = "select pd.documentNumber from PurchaseDocumentHeaderDo as pd where pd.documentNumber in "
+				+ "(select distinct ii.refDocNum from InvoiceItemDo as ii th where ii.requestId = '" + dto.getRequestId() + "') "
+				+ " and pd.vendorId <> '" + dto.getVendorId() + "'";
 		Query queryForOutput = entityManager.createQuery(finalQuery);
 		List<String> matchedPurchaseOrder = queryForOutput.getResultList();
 		if (ServiceUtil.isEmpty(matchedPurchaseOrder)) {
