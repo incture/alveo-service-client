@@ -325,13 +325,13 @@ public class AutomationServiceImpl implements AutomationService {
 				// calling rule file and worklfow 
 				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
 				determination.setCompCode(invoiceHeaderAutoPost.getCompCode());
-				determination.setProcessLeadCheck("Accountant");
 				determination.setVednorId(invoiceHeaderAutoPost.getVendorId());
 				ResponseEntity<?> responseRules = invoiceHeaderService.triggerRuleService(determination);
 				System.err.println("responseRules Scheduler "+ responseRules);
 				@SuppressWarnings("unchecked")
 				List<ApproverDataOutputDto> lists = (List<ApproverDataOutputDto>) responseRules.getBody();
 				System.err.println("ApproverList scheduler"+lists);
+				if(!ServiceUtil.isEmpty(lists)){
 				// trigger workflow 
 				TriggerWorkflowContext context = new TriggerWorkflowContext();
 				context.setRequestId(invoiceHeaderAutoPost.getRequestId());
@@ -358,6 +358,10 @@ public class AutomationServiceImpl implements AutomationService {
 				responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
 				System.err.println("invoiceHeaderAutoPost responseAutoPosting ="+responseAutoPosting);
 				response.setObject(invoiceHeaderDto);
+			}else {
+				response = new ResponseDto("400", "0", "Error no default user maintained in url file."+lists.toString() ,invoiceHeaderDto);
+			}
+				
 			}
 			return response;
 		} catch (Exception e) {

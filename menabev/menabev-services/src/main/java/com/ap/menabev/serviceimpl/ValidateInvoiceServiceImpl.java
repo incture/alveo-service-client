@@ -654,7 +654,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				String fiscalYear = resultObject.getFiscYear();
 				// update in database
 				int isUpated = invoiceHeaderRepository.updateHeader(fiscalYear, sapInvoiceNumber,
-						invoiceHeaderDto.getRequestId(),"Posted (Unpaid)","13");
+						invoiceHeaderDto.getRequestId(),"13","Posted (Unpaid)");
 				if (isUpated > 0) {
 					System.err.println("inside is updated");
 					HeaderMessageDto messageDto = new HeaderMessageDto();

@@ -9,6 +9,5 @@ public class AcountOrProcessLeadDetermination {
 	
 	private String compCode;
 	
-	private String processLeadCheck;
 
 }

@@ -227,6 +227,7 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 	
 public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage){
 		
+	System.err.println("requestMessage for xml payload "+requestMessage);
 		try {
 			String entity ="";
 		    JAXBContext contextObj = JAXBContext.newInstance(JournalEntryCreateRequestBulkMessage.class); 
@@ -275,44 +276,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		return dataBuffer.toString();
 	}
 	
-	public static Map<String, Object> getDestination(String destinationName) throws URISyntaxException, IOException {
-
-		HttpClient client = HttpClientBuilder.create().build();
-
-		HttpPost httpPost = new HttpPost("https://sd4.menabev.com:443/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding");
-		httpPost.addHeader("Content-Type", "application/json");
-
-		// Encoding username and password
-		String auth = encodeUsernameAndPassword("Syuvraj",
-				"Incture@12345");
-		httpPost.addHeader("Authorization", auth);
-
-		HttpResponse res = client.execute(httpPost);
-		System.out.println("RESPONSE :::::::::::::" + res);
-
-		String data = getDataFromStream(res.getEntity().getContent());
-		if (res.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-			String jwtToken = new JSONObject(data).getString("access_token");
-
-			HttpGet httpGet = new HttpGet("/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding"
-					+ "destination-configuration/v1/destinations/" + destinationName);
-
-			httpGet.addHeader("Content-Type", "application/json");
-
-			httpGet.addHeader("Authorization", "Bearer " + jwtToken);
-
-			HttpResponse response = client.execute(httpGet);
-			String dataFromStream = getDataFromStream(response.getEntity().getContent());
-			if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-
-				JSONObject json = new JSONObject(dataFromStream);
-				return json.getJSONObject("destinationConfiguration").toMap();
-
-			}
-		}
-
-		return null;
-	}
+	
 	
 	public static ResponseEntity<?> consumingOdataService(String url, String entity, String method,
 			Map<String, Object> destinationInfo) throws IOException, URISyntaxException {
@@ -326,7 +290,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
-			    new UsernamePasswordCredentials( "Syuvraj", "Incture@12345")); 
+			    new UsernamePasswordCredentials( "Syuvraj", "Incture@123")); 
 		HttpClientBuilder clientBuilder =  HttpClientBuilder.create();
 		clientBuilder.setProxy(new HttpHost(proxyHost, proxyPort))
 		   .setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy())
@@ -354,7 +318,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 				httpRequestBase.addHeader("sap-client", "100");
 		        httpRequestBase.addHeader("Content-Type", "text/xml");
 		        httpRequestBase.addHeader("SOAPAction","http://sap.com/xi/SAPSCORE/SFIN/JournalEntryCreateRequestConfirmation_In/JournalEntryCreateRequestConfirmation_InRequest");
-				String encoded = encodeUsernameAndPassword("Syuvraj","Incture@12345");
+				String encoded = encodeUsernameAndPassword("Syuvraj","Incture@123");
 				httpRequestBase.addHeader("Authorization", encoded);
 				httpRequestBase.setHeader("Proxy-Authorization","Bearer " +jwToken);
 				httpRequestBase.addHeader("SAP-Connectivity-SCC-Location_ID","DEVHEC");
@@ -371,11 +335,11 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 					
 					String responseFromECC =getDataFromStream( httpResponse.getEntity().getContent());
 					System.err.println("responseFromEcc"+responseFromECC);
-					return new ResponseEntity<String>("Response from odata call "+httpResponse,HttpStatus.OK);
+					return new ResponseEntity<String>(responseFromECC,HttpStatus.OK);
 				} else {
 					String responseFromECC =getDataFromStream( httpResponse.getEntity().getContent());
 					System.err.println("responseFromEcc"+responseFromECC);
-					return new ResponseEntity<String>("Response from odata call "+httpResponse,HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<String>(responseFromECC,HttpStatus.BAD_REQUEST);
 				}
 			} catch (IOException e) {
 				System.err.print("IOException : " + e);
@@ -396,7 +360,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		httpPost.addHeader("Content-Type", "application/json");*/
 		// Encoding username and password
 		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
-				"cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=");
+				"d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=");
 		/*String auth = encodeUsernameAndPassword("sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5",
 				"f761e7fd-0dac-4614-b5f5-752d3513b71a$Obl12NQPIxXrGa9-OZiB_wIjmQaB-bb7Dyfq_ccKWfM=");
 		*/
@@ -413,13 +377,15 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		return null;
 	}
 	
-	public  JournalEntryCreateConfirmationBulkMessage outPutResponseFromOdataResponse(String responsePayload ) throws JAXBException{
+	public  JournalEntryCreateConfirmationBulkMessage outPutResponseFromOdataResponse(String responsePayload ) throws JAXBException, IOException, SOAPException{
 		 
-		 StringReader sr = new StringReader(responsePayload);
+		StringReader sr = new StringReader(responsePayload);
+		 System.err.println("responsePayload OdataSoap "+ sr);
+		 SOAPMessage message = MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(responsePayload.getBytes()));
+		System.err.println("soap message "+ message );
 		 JAXBContext jaxbContext = JAXBContext.newInstance(JournalEntryCreateConfirmationBulkMessage.class);
 		 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		 JournalEntryCreateConfirmationBulkMessage response = (JournalEntryCreateConfirmationBulkMessage) unmarshaller.unmarshal(sr);
-		    
+		 JournalEntryCreateConfirmationBulkMessage response = (JournalEntryCreateConfirmationBulkMessage) unmarshaller.unmarshal(message.getSOAPBody().extractContentAsDocument());
 		    return response;
 		 
 		 

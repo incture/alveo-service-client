@@ -6,5 +6,10 @@ import lombok.Data;
 public class ApproverDataOutputDto {
 
 	private String userOrGroup;
+	private String accountant;
+	private String processLead;
 	private String userType;
+	
+	
+	
 }
