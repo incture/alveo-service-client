@@ -199,7 +199,7 @@ public class InvoiceHeaderController {
 		return headerService.processLeadSubmit(invoiceSubmit);
 	}
 	@PostMapping("/processLead/nonPoprocessLeadSubmit")
-	public InvoiceHeaderDto nonPoPrecoessLeadSubmit(@RequestBody InvoiceSubmitDto invoiceSubmit)
+	public InvoiceSubmitDto nonPoPrecoessLeadSubmit(@RequestBody InvoiceSubmitDto invoiceSubmit)
 			throws URISyntaxException, IOException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
 		return headerService.NonPoProcessLeadSubmit(invoiceSubmit);
 	}

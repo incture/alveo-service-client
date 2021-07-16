@@ -56,6 +56,7 @@ import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.message.BasicHeader;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,58 +68,24 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
+import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.soap.journalcreatebinding.ChartOfAccountsItemCode;
+import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmation;
 import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmationBulkMessage;
 import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmationMessage;
 import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateRequestBulkMessage;
+import com.ap.menabev.soap.journalcreatebinding.N0JournalEntryBulkCreateConfirmation;
+import com.ap.menabev.soap.journalcreatebinding.Root;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
 
 
 @Service
 public class JournalEntryService extends WebServiceGatewaySupport {
 
-	/*@Autowired
-	private Jaxb2Marshaller marshaller;
 	
-	private JAXBContext jaxbContext;*/
-    
-	/*public void init() throws JAXBException {
-        jaxbContext = JAXBContext.newInstance("com.ap.menabev.soap.journalcreatebinding",JournalEntryCreateRequestBulkMessage.class.getClassLoader());
-   System.err.println("jaxbContext" + jaxbContext);
-	}*/
-	
-	public JournalEntryCreateConfirmationBulkMessage postJournalEntryToSap(JournalEntryCreateRequestBulkMessage requestMessage) throws IOException, URISyntaxException, JAXBException {
-		WebServiceTemplate template = getWebServiceTemplate();
-		//marshaller.setContextPath("com.ap.menabev.soap.journalcreatebinding");
-		String url = "https://sd4.menabev.com:443"
-				+"/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
-		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender(createHttpClient());
-		
-		//template.setMarshaller(marshaller);
-		template.setMessageSender(messageSender);
-		    System.err.println("soap template"+ template);
-		    final SoapActionCallback soapActionCallback = new SoapActionCallback("http://sap.com/xi/SAPSCORE/SFIN/JournalEntryCreateRequestConfirmation_In/JournalEntryCreateRequestConfirmation_InRequest");
-		JournalEntryCreateConfirmationBulkMessage journalEntryCreateConfirmationMessage = (JournalEntryCreateConfirmationBulkMessage) template
-				.marshalSendAndReceive(url,
-						requestMessage,soapActionCallback );
-		System.err.println("Soap "+journalEntryCreateConfirmationMessage.getLog());
-			return journalEntryCreateConfirmationMessage;
-	}
-	
-	
-	
-	
-/*	private String marshall(final Object jaxbObject) throws JAXBException {
-		  init();
-	     final Marshaller marshaller = jaxbContext.createMarshaller();
-	     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-	     final StringWriter stringWriter = new StringWriter();
-	     marshaller.marshal(jaxbObject, stringWriter);
-	     final String xmlString = stringWriter.toString();
-	     System.err.println("Serialised JAXB entity to XML:\n" + xmlString);
-	     return xmlString;
-	} */
 	
 	
 	public  HttpClient createHttpClient() throws URISyntaxException, IOException {
@@ -146,72 +113,7 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 	}
 	
 	public ResponseEntity<?> postNonPoItemsToSAP(JournalEntryCreateRequestBulkMessage requestMessage) throws IOException, URISyntaxException, JAXBException, SOAPException {
-		
-		/*String  entityTest  = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sfin=\"http://sap.com/xi/SAPSCORE/SFIN\"> "
-				+ "<soapenv:Header/> "
-				+ "   <soapenv:Body>    "
-				+ "<sfin:JournalEntryBulkCreateRequest>"
-				+ "<MessageHeader>"
-				+ "<CreationDateTime>2021-05-25T12:37:00.123Z</CreationDateTime>"
-				+ "</MessageHeader>"
-				+ "<JournalEntryCreateRequest>"
-				+ "<MessageHeader>"
-				+ "<CreationDateTime>2021-05-25T12:37:00.123Z</CreationDateTime>"
-				+ "</MessageHeader>"
-				+ "<JournalEntry>"
-				+ "<OriginalReferenceDocumentType>BKPFF</OriginalReferenceDocumentType>"
-				//+ "             <OriginalReferenceDocument/>       "
-				//+ "         <OriginalReferenceDocumentLogicalSystem/>      "
-				+ "<OriginalReferenceDocument></OriginalReferenceDocument>"
-				+ "<OriginalReferenceDocumentLogicalSystem></OriginalReferenceDocumentLogicalSystem>"
-				+ "<BusinessTransactionType>RFBU</BusinessTransactionType>"
-				+ "<AccountingDocumentType>KR</AccountingDocumentType>"
-				+ "<DocumentReferenceID>NONPOINV1</DocumentReferenceID>"
-				+ "<CreatedByUser>SYUVRAJ</CreatedByUser>"
-				+ "<CompanyCode>1010</CompanyCode>"
-				+ "<DocumentDate>2021-05-25Z</DocumentDate>"
-				+ "<PostingDate>2021-05-25Z</PostingDate>"
-				+ "<Item>"
-				+ "<CompanyCode>1010</CompanyCode>        "
-				+ "<GLAccount>0005500046</GLAccount>       "
-				+ "<AmountInTransactionCurrency currencyCode=\"SAR\">100.00</AmountInTransactionCurrency> 		"
-				+ "<Tax>             "
-				+ "<TaxCode>I1</TaxCode>        "
-				+ "</Tax>          "
-				+ "<AccountAssignment>        "
-				+ "<CostCenter>0000521001</CostCenter>       "
-				+ "</AccountAssignment>        "
-				+ "</Item>      "
-				+ "<Item>      "
-				+ "<CompanyCode>1010</CompanyCode>      "
-				+ "<GLAccount>0006021003</GLAccount>      "
-				+ "<AmountInTransactionCurrency currencyCode=\"SAR\">100.00</AmountInTransactionCurrency> 		"
-				+ "<Tax>"
-				
-				+ "<TaxCode>I1</TaxCode>    "
-				+ "</Tax>				   "
-				+ "<AccountAssignment>          "
-				+ "<CostCenter>0000111001</CostCenter>         "
-				+ "</AccountAssignment>      "
-				+ "</Item>			      "
-				
-				+ "<CreditorItem>      "
-				+ "<ReferenceDocumentItem>1</ReferenceDocumentItem>       "
-				+ "<Creditor>0001000030</Creditor>           "
-				+ "<AmountInTransactionCurrency currencyCode=\"SAR\">-230.00</AmountInTransactionCurrency>    "
-				+ "</CreditorItem> 		"
-				+ "<ProductTaxItem>         "
-				+ "<TaxCode>I1</TaxCode>          "
-				+ "<AmountInTransactionCurrency currencyCode=\"SAR\">30.00</AmountInTransactionCurrency>  "
-				
-				+ "<TaxBaseAmountInTransCrcy currencyCode=\"SAR\">200.00</TaxBaseAmountInTransCrcy> 	"
-				+ "<ConditionType>MWVS</ConditionType> 		"
-				+ "</ProductTaxItem>     		"
-				+ "</JournalEntry>       "
-				+ "</JournalEntryCreateRequest>   "
-				+ "    </sfin:JournalEntryBulkCreateRequest>  "
-				+ "  </soapenv:Body> </soapenv:Envelope>";
-		System.err.println("entityTest "+entityTest);*/
+	
 		String entity = formXmlPayload(requestMessage);
 		   
 		String url = "http://sd4.menabev.com:443"
@@ -356,13 +258,15 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost("https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
-		/*HttpPost httpPost = new HttpPost("https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
-		httpPost.addHeader("Content-Type", "application/json");*/
+		//HttpPost httpPost = new HttpPost("https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+		httpPost.addHeader("Content-Type", "application/json");
 		// Encoding username and password
+		//Dev
 		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
 				"d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=");
+		//qa
 		/*String auth = encodeUsernameAndPassword("sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5",
-				"f761e7fd-0dac-4614-b5f5-752d3513b71a$Obl12NQPIxXrGa9-OZiB_wIjmQaB-bb7Dyfq_ccKWfM=");
+				"9c5a2d59-abb3-4c8f-bdba-c3b0222ceb25$iBxUjgTsDHnBRBuByPBR7qfSnY77pLPYV-_QZkhzC5I=");
 		*/
 		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
@@ -377,17 +281,16 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 		return null;
 	}
 	
-	public  JournalEntryCreateConfirmationBulkMessage outPutResponseFromOdataResponse(String responsePayload ) throws JAXBException, IOException, SOAPException{
-		 
-		StringReader sr = new StringReader(responsePayload);
-		 System.err.println("responsePayload OdataSoap "+ sr);
-		 SOAPMessage message = MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(responsePayload.getBytes()));
-		System.err.println("soap message "+ message );
-		 JAXBContext jaxbContext = JAXBContext.newInstance(JournalEntryCreateConfirmationBulkMessage.class);
-		 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		 JournalEntryCreateConfirmationBulkMessage response = (JournalEntryCreateConfirmationBulkMessage) unmarshaller.unmarshal(message.getSOAPBody().extractContentAsDocument());
-		    return response;
-		 
-		 
+	public  Root outPutResponseFromOdataResponse(String responsePayload ) throws JAXBException, IOException, SOAPException{
+        JSONObject json      =   XML.toJSONObject(responsePayload); 
+        System.err.println("parsedJson "+json);
+		      ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+          Root  soapRootResponse = objectMapper.readValue(json.toString(), Root.class);
+        System.err.println("soapRootResponse "+soapRootResponse);
+        // convert it into a JounralEntry 
+       
+        return soapRootResponse;
 	 }
 }

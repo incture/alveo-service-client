@@ -60,12 +60,7 @@ public class JournalEntryController {
 	JournalEntryService journalEntryService;
 	
 	
-	@PostMapping("/postJournalEntry")
-	public JournalEntryCreateConfirmationBulkMessage postJournalEntryToSap(@RequestBody JournalEntryCreateRequestBulkMessage requestMessage) throws URISyntaxException, IOException, JAXBException{
-		System.out.println("ReQUEST PAyloaD sOAP::::::"+requestMessage.getMessageHeader().getCreationDateTime());
-		return journalEntryService.postJournalEntryToSap(requestMessage);
-	}
-	
+
 	@PostMapping("/postJournalEntryNonPo")
 	public ResponseEntity<?> postJournalEntryToSapHttpClient(@RequestBody JournalEntryCreateRequestBulkMessage requestMessage) throws URISyntaxException, IOException, JAXBException, SOAPException{
 		System.out.println("ReQUEST PAyloaD sOAP::::::"+requestMessage.getMessageHeader().getCreationDateTime());

@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "JournalEntryCreateConfirmationBulkMessage", propOrder = {
+//@XmlType(name = "JournalEntryBulkCreateConfirmation", propOrder = {
     "messageHeader",
     "journalEntryCreateConfirmation",
     "log"

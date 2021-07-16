@@ -76,6 +76,6 @@ public interface InvoiceHeaderService {
 	ResponseEntity<?> postOdataCall() throws IOException, URISyntaxException;
 	ResponseEntity<?> buyerSubmit(InvoiceSubmitDto invoiceSubmit);
 	ResponseEntity<?> getSupplierEmailAddress(String vendorId) throws URISyntaxException, IOException;
-	InvoiceHeaderDto NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException;	
+	InvoiceSubmitDto NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException;	
 
 }
