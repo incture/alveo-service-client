@@ -57,7 +57,6 @@ import com.ap.menabev.invoice.PoHistoryTotalsRepository;
 import com.ap.menabev.invoice.PurchaseDocumentHeaderRepository;
 import com.ap.menabev.service.DuplicateCheckService;
 import com.ap.menabev.service.ValidateInvoiceService;
-import com.ap.menabev.soap.service.Odata;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.OdataHelperClass;
@@ -132,7 +131,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// setPaymentTerms
 
 					// copy from here -----
-					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					ResponseEntity<?> qwe = OdataAPICall.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
 					if (qwe.getStatusCode() == HttpStatus.OK) {
@@ -161,7 +160,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 							}
 							// get payment terms details
-							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							ResponseEntity<?> response = OdataAPICall.getPaymentTermsDetails(invoiceHeaderCheckDto);
 
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
@@ -1521,7 +1520,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 					// copy from here -----
 
-					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					ResponseEntity<?> qwe = OdataAPICall.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
 					if (qwe.getStatusCode() == HttpStatus.OK) {
@@ -1551,7 +1550,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 							}
 							// get payment terms details
-							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							ResponseEntity<?> response = OdataAPICall.getPaymentTermsDetails(invoiceHeaderCheckDto);
 
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
@@ -1639,7 +1638,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					// a. Call CalculateDueDateOdata and set the due dates
 					//
 					// 3. ResetChangeIndicator
-					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					ResponseEntity<?> qwe = OdataAPICall.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
 					if (qwe.getStatusCode() == HttpStatus.OK) {
@@ -1669,7 +1668,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 							}
 							// get payment terms details
-							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							ResponseEntity<?> response = OdataAPICall.getPaymentTermsDetails(invoiceHeaderCheckDto);
 
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
@@ -1725,7 +1724,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						&& changeIndicator.getIsBaselineDateChanged()) {
 					// 1. Determine Due dates
 					//
-					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					ResponseEntity<?> qwe = OdataAPICall.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
 					if (qwe.getStatusCode() == HttpStatus.OK) {
@@ -1755,7 +1754,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 							}
 							// get payment terms details
-							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							ResponseEntity<?> response = OdataAPICall.getPaymentTermsDetails(invoiceHeaderCheckDto);
 
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
@@ -1775,7 +1774,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						&& changeIndicator.getIsPaymentTermsChanged()) {
 					// 1. Get the baseline date from the payment terms data.
 					//
-					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					ResponseEntity<?> qwe = OdataAPICall.getPaymentTerms(invoiceHeaderCheckDto);
 					logger.error("BODY:::" + qwe.getBody());
 					logger.error("BODY:::" + qwe.getStatusCode());
 					if (qwe.getStatusCode() == HttpStatus.OK) {
@@ -1805,7 +1804,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 							}
 							// get payment terms details
-							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+							ResponseEntity<?> response = OdataAPICall.getPaymentTermsDetails(invoiceHeaderCheckDto);
 
 							if (response.getStatusCode() == HttpStatus.OK) {
 								String jsonString2 = (String) response.getBody();
