@@ -16,5 +16,8 @@ public interface SchedulerCycleRepository extends JpaRepository<SchedulerCycleDo
 
 	@Query(value = "SELECT max(NO_OF_EMAIL_PICKED),max(NO_OF_EMAILS_READ_SUCCESSFULLY), max(NO_OF_ATTACHMENTS),max(NO_OF_PDFS),max(NO_OF_JSON_FILES),SCHEDULER_RUN_ID FROM SCHEDULER_CYCLE where  SCHEDULER_RUN_ID=?1 group by SCHEDULER_RUN_ID", nativeQuery = true)
 	List<Object[]> getMaxResultsBySchedulerRunId(String schedulerRunID);
+	
+	@Query("select th from SchedulerCycleDo th  where  th.schedulerRunID = ?1 and (startDateTime between ?2 and ?3) and (EndDatetime between ?2 and ?3)")
+	List<SchedulerCycleDo> getAllBySchedulerRunIdFromToDate(String schedulerRunID,String fromDate,String toDate);
 
 }

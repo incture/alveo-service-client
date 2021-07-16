@@ -10,8 +10,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SchedulerLogDto {
-
 	SchedulerRunDto schedulerRunDto;
 	List<SchedulerCycleDto> schedulerCycle;
-	
+
 }

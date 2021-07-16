@@ -158,8 +158,10 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 			for (SchedulerConfigurationDto schedulerConfigurationDto : schedulerConfigurationDtoList) {
 				boolean isEmailScheduler = !ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
 						&& "Email Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
-//				boolean isOcrScheduler = !ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
-//						&& "OCR Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
+				// boolean isOcrScheduler =
+				// !ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
+				// && "OCR Scheduler
+				// Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
 				boolean isGRNScheduler = !ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
 						&& "GRN Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType());
 				boolean conditionIsActive = !ServiceUtil.isEmpty(schedulerConfigurationDto.getIsActive())
@@ -185,6 +187,8 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 				// TODO
 
 				if (isEmailScheduler) {
+					// run ocr scheduker with same configuration.
+
 					Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
 					Long period = null;
 					if ("min".equalsIgnoreCase(entity.getFrequencyUnit())) {
@@ -193,97 +197,20 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 
 							period = Long.valueOf(milliSecond);
 						}
-					}else if("hrs".equalsIgnoreCase(entity.getFrequencyUnit())){
+					} else if ("hrs".equalsIgnoreCase(entity.getFrequencyUnit())) {
 						Integer milliSecond = entity.getFrequencyNumber() * 60000 * 60;
 						if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
 
 							period = Long.valueOf(milliSecond);
 						}
 					}
-					if (!ServiceUtil.isEmpty(startDate) && !ServiceUtil.isEmpty(period)){
+					if (!ServiceUtil.isEmpty(startDate) && !ServiceUtil.isEmpty(period)) {
 						emailScheduler.reSchedule(startDate, period, entity);
-						ocrScheduler.reSchedule(startDate, period, entity);
+						// ocrScheduler.reSchedule(startDate, period, entity);
 					}
+					startOcrScheduler(schedulerConfigurationDto, configId);
 
-				} 
-//				else if (isOcrScheduler) {
-//					logger.error("Inside isOcrScheduler Scheduler Configuration" + entity);
-//
-//					Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
-//					Long period = null;
-//					if ("min".equalsIgnoreCase(entity.getFrequencyUnit())) {
-//						Integer milliSecond = entity.getFrequencyNumber() * 60000;
-//						if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
-//
-//							period = Long.valueOf(milliSecond);
-//							logger.error("Inside Email Scheduler Configuration period:::" + period);
-//						}
-//					}else if("hrs".equalsIgnoreCase(entity.getFrequencyUnit())){
-//						Integer milliSecond = entity.getFrequencyNumber() * 60000 * 60;
-//						if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
-//
-//							period = Long.valueOf(milliSecond);
-//							logger.error("Inside Email Scheduler Configuration period:::" + period);
-//						}
-//					}
-//					logger.error("Inside Email Scheduler Configuration period:::is empty "
-//							+ ServiceUtil.isEmpty(startDate) + " is empty period" + ServiceUtil.isEmpty(period));
-//					if (!ServiceUtil.isEmpty(startDate) && !ServiceUtil.isEmpty(period))
-//						ocrScheduler.reSchedule(startDate, period, entity);
-//
-//				
-//					
-//					
-//				} 
-				else {
-					
 				}
-				
-				//
-				// schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
-				// schedulerConfigurationDto.setConfigurationId(configId);
-				// SchedulerConfigurationDo entity =
-				// schedulerconfigurationRepository
-				// .save(mapper.map(schedulerConfigurationDto,
-				// SchedulerConfigurationDo.class));
-				// logger.error("Befor Email Scheduler Configuration entity" +
-				// entity);
-				// if
-				// (!ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
-				// && "Email Scheduler Configuration"
-				// .equalsIgnoreCase(schedulerConfigurationDto.getActionType()))
-				// {
-				// // TODO
-				// logger.error("Inside Email Scheduler Configuration" +
-				// entity);
-				// Date startDate = new
-				// SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
-				// Long period = null;
-				// if ("min".equalsIgnoreCase(entity.getFrequencyUnit())) {
-				// Integer milliSecond = entity.getFrequencyNumber() * 60000;
-				// if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
-				//
-				// period = Long.valueOf(milliSecond);
-				// logger.error("Inside Email Scheduler Configuration period:::"
-				// + period);
-				// }
-				// }
-				// logger.error("Inside Email Scheduler Configuration
-				// period:::is empty "
-				// + ServiceUtil.isEmpty(startDate) + " is empty period" +
-				// ServiceUtil.isEmpty(period));
-				// if (!ServiceUtil.isEmpty(startDate) &&
-				// !ServiceUtil.isEmpty(period))
-				// emailScheduler.reSchedule(startDate, period, entity);
-				//
-				// }
-				// if
-				// (!ServiceUtil.isEmpty(schedulerConfigurationDto.getActionType())
-				// && "Email Scheduler Configuration"
-				// .equalsIgnoreCase(schedulerConfigurationDto.getActionType()))
-				// {
-				//
-				// }
 
 			}
 
@@ -299,6 +226,45 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 			response.setStatus(ApplicationConstants.FAILURE);
 			response.setMessage(ApplicationConstants.CREATE_FAILURE);
 			return response;
+		}
+
+	}
+
+	public void startOcrScheduler(SchedulerConfigurationDto schedulerConfigurationDto, String configId) {
+		try {
+			SchedulerConfigurationDo entity = null;
+			ModelMapper mapper = new ModelMapper();
+			// new sch rec
+			schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
+			schedulerConfigurationDto.setConfigurationId(configId);
+			schedulerConfigurationDto.setActionType("OCR Scheduler Configuration");
+			entity = schedulerconfigurationRepository
+					.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
+			logger.error("Inside isOcrScheduler Scheduler Configuration" + entity);
+
+			Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
+			Long period = null;
+			if ("min".equalsIgnoreCase(entity.getFrequencyUnit())) {
+				Integer milliSecond = entity.getFrequencyNumber() * 60000;
+				if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
+
+					period = Long.valueOf(milliSecond);
+					logger.error("Inside isOcrScheduler Scheduler Configuration period:::" + period);
+				}
+			} else if ("hrs".equalsIgnoreCase(entity.getFrequencyUnit())) {
+				Integer milliSecond = entity.getFrequencyNumber() * 60000 * 60;
+				if (!ServiceUtil.isEmpty(milliSecond) && milliSecond != 0) {
+
+					period = Long.valueOf(milliSecond);
+					logger.error("Inside Email Scheduler Configuration period:::" + period);
+				}
+			}
+			logger.error("Inside isOcrScheduler Scheduler Configuration:::is empty " + ServiceUtil.isEmpty(startDate)
+					+ " is empty period" + ServiceUtil.isEmpty(period));
+			if (!ServiceUtil.isEmpty(startDate) && !ServiceUtil.isEmpty(period))
+				ocrScheduler.reSchedule(startDate, period, entity);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}

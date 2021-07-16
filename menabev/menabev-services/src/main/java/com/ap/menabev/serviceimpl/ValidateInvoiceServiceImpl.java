@@ -1,10 +1,10 @@
 package com.ap.menabev.serviceimpl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -62,9 +62,7 @@ import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -76,7 +74,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 	@Autowired
 	InvoiceHeaderRepository invoiceHeaderRepository;
 
-	@Override
+	/*@Override
 	public InvoiceHeaderCheckDto invoiceHeaderCheck(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
 		// TODO Auto-generated method stub
 		ChangeIndicator changeIndicator = invoiceHeaderCheckDto.getChangeIndicator();
@@ -408,9 +406,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 			return invoiceHeaderCheckDto;
 		}
 		return invoiceHeaderCheckDto;
-	}
+	}*/
 
-	private InvoiceHeaderCheckDto calculateBaseDueDates(String string, InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
+	/*private InvoiceHeaderCheckDto calculateBaseDueDates(String string, InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
 
 		JSONObject json2 = new JSONObject(string);
 		logger.error("JSON:::" + json2);
@@ -473,7 +471,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		}
 
 		return invoiceHeaderCheckDto;
-	}
+	}*/
 
 	private ChangeIndicator resetChangeIndicator(ChangeIndicator changeIndicator) {
 
@@ -1463,6 +1461,536 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 		consumtionLogicOutputDto.setItemThreeWayAccAssgnPaylod(itemThreeWayAccAssgnPaylod);
 		System.err.println("INPUT PAYLOAD LIST:::::::" + consumtionLogicOutputDto);
 		return consumtionLogicOutputDto;
+	}
+	@Override
+	public InvoiceHeaderCheckDto invoiceHeaderCheck(InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
+		// TODO Auto-generated method stub
+		ChangeIndicator changeIndicator = invoiceHeaderCheckDto.getChangeIndicator();
+		List<HeaderMessageDto> messagesList = new ArrayList<>();
+		InvoiceHeaderObjectDto invoiceHeaderObjectDto = new InvoiceHeaderObjectDto();
+		invoiceHeaderObjectDto.setCompanyCode(invoiceHeaderCheckDto.getCompanyCode());
+		invoiceHeaderObjectDto.setInvoiceAmount(String.valueOf(invoiceHeaderCheckDto.getInvoiceAmount()));
+		invoiceHeaderObjectDto.setInvoiceDate(invoiceHeaderCheckDto.getInvoiceDate());
+		invoiceHeaderObjectDto.setInvoiceReference(invoiceHeaderCheckDto.getInvoiceReference());
+		invoiceHeaderObjectDto.setInvoiceStatus(invoiceHeaderCheckDto.getInvoiceStatus());
+		invoiceHeaderObjectDto.setRequestId(invoiceHeaderCheckDto.getRequestID());
+		invoiceHeaderObjectDto.setVendorId(invoiceHeaderCheckDto.getVendorID());
+
+		try {
+			if (!ServiceUtil.isEmpty(changeIndicator)) {
+				if (!ServiceUtil.isEmpty(changeIndicator.getIsVendoIdChanged())
+						&& changeIndicator.getIsVendoIdChanged()) {
+					logger.error("Inside getIsVendoIdChanged:::" + changeIndicator.getIsVendoIdChanged());
+					// 1. Call VendorCheckAPI
+					// -----------
+					InvoiceHeaderObjectDto vendorCheckDto = duplicateCheckService.vendorCheck(invoiceHeaderObjectDto);
+
+					if (!ServiceUtil.isEmpty(vendorCheckDto) && !ServiceUtil.isEmpty(vendorCheckDto.getMessages())) {
+						messagesList.add(vendorCheckDto.getMessages());
+						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					}
+					// a. If success, then move on
+					//
+
+					// b. If error, stop processing and send response to UI
+					//
+					// 2. Call duplicateCheckAPI
+
+					InvoiceHeaderObjectDto duplicateCheckDto = duplicateCheckService
+							.duplicateCheck(invoiceHeaderObjectDto);
+					if (duplicateCheckDto.getIsDuplicate()) {
+						messagesList.add(duplicateCheckDto.getMessages());
+						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					}
+					// if Not Duplicate added by Lakhu
+					else {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
+
+					}
+
+					// a. If success, and move on
+					//
+					// b. If error stop processing and send response to UI.
+					//
+					// 3. Determine Payment Term and dependent data
+					//
+					// a. Call determinePaymentTermsOdata service and
+					// setPaymentTerms
+
+					// copy from here -----
+
+					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					logger.error("BODY:::" + qwe.getBody());
+					logger.error("BODY:::" + qwe.getStatusCode());
+					if (qwe.getStatusCode() == HttpStatus.OK) {
+
+						String jsonString = (String) qwe.getBody();
+						JSONObject json = new JSONObject(jsonString);
+						logger.error("JSON:::" + json);
+						if (json.has("d")) {
+							logger.error("JSON:::" + json.has("d"));
+							JSONObject dObject = json.getJSONObject("d");
+							logger.error("dObject" + dObject);
+							JSONArray resultsArray = dObject.getJSONArray("results");
+							for (int i = 0; i < resultsArray.length(); i++) {
+								JSONObject resultObject = (JSONObject) resultsArray.get(i);
+								if (resultObject.has("PaymentTerms")) {
+									String paymentTerms = resultObject.getString("PaymentTerms");
+									invoiceHeaderCheckDto.setPaymentTerms(paymentTerms);
+								}
+								if (resultObject.has("PaymentMethodsList")) {
+									String paymentMethods = resultObject.getString("PaymentMethodsList");
+									invoiceHeaderCheckDto.setPaymentMethod(paymentMethods);
+								}
+								if (resultObject.has("PaymentBlockingReason")) {
+									String paymentReason = resultObject.getString("PaymentBlockingReason");
+									invoiceHeaderCheckDto.setPaymentBlock(paymentReason);
+								}
+
+							}
+							// get payment terms details
+							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+
+							if (response.getStatusCode() == HttpStatus.OK) {
+								String jsonString2 = (String) response.getBody();
+								logger.error("payment-terms" + response.getBody());
+								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2, invoiceHeaderCheckDto);
+							}
+						}
+					}
+					// ---to this line
+					// b. Determine baseline date configuration and
+					// SetBaselineDate
+					//
+
+					// i. BaseLineDateConfig=Default
+					//
+					// 1. DO NOT DO anything, baseline date will be selected by
+					// user on UI.
+					//
+					// ii. BaselineDateConfig=Postingdate
+					//
+					// 1. Then set baseline date = postingDate
+					//
+					// iii. BaselinDateConfig=DocumentDate
+					//
+					// 1. Set baselineDate=documentDate
+					//
+					// 4. Determine Due dates
+					//
+					// a. Call CalculateDueDateOdata and set the due dates in
+					// the invoiceHeader
+					//
+					// 5. ResetChangeIndicator
+					//
+					// a. ResetChagneIndicator-VendorId
+
+					ChangeIndicator resetChangeIndicator = resetChangeIndicator(
+							invoiceHeaderCheckDto.getChangeIndicator());
+					invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
+					return invoiceHeaderCheckDto;
+
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsInvoiceRefChanged())
+						&& changeIndicator.getIsInvoiceRefChanged()) {
+					// 1. Call duplicateCheckAPI
+					//
+
+					InvoiceHeaderObjectDto duplicateCheckDto = duplicateCheckService
+							.duplicateCheck(invoiceHeaderObjectDto);
+					if (duplicateCheckDto.getIsDuplicate()) {
+						messagesList.add(duplicateCheckDto.getMessages());
+						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					} else {
+						// Added By Lakhu
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
+						ChangeIndicator resetChangeIndicator = resetChangeIndicator(
+								invoiceHeaderCheckDto.getChangeIndicator());
+						invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
+						return invoiceHeaderCheckDto;
+					}
+					// a. If success, then move on
+					//
+					// b. If error, stop processing and send response to UI
+					//
+					// 2. ResetChangeIndicator
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsInvoiceDateChanged())
+						&& changeIndicator.getIsInvoiceDateChanged()) {
+					// 1. Call duplicateCheckAPI
+					//
+					// a. If success, then move on
+					InvoiceHeaderObjectDto duplicateCheckDto = duplicateCheckService
+							.duplicateCheck(invoiceHeaderObjectDto);
+					if (duplicateCheckDto.getIsDuplicate()) {
+						messagesList.add(duplicateCheckDto.getMessages());
+						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					}
+					// Added By Lakhu
+					else {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
+					}
+					// b. If error, stop processing and send response to UI
+					//
+					// 2. Determine Due dates
+					//
+					// a. Call CalculateDueDateOdata and set the due dates
+					//
+					// 3. ResetChangeIndicator
+					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					logger.error("BODY:::" + qwe.getBody());
+					logger.error("BODY:::" + qwe.getStatusCode());
+					if (qwe.getStatusCode() == HttpStatus.OK) {
+
+						String jsonString = (String) qwe.getBody();
+						JSONObject json = new JSONObject(jsonString);
+						logger.error("JSON:::" + json);
+						if (json.has("d")) {
+							logger.error("JSON:::" + json.has("d"));
+							JSONObject dObject = json.getJSONObject("d");
+							logger.error("dObject" + dObject);
+							JSONArray resultsArray = dObject.getJSONArray("results");
+							for (int i = 0; i < resultsArray.length(); i++) {
+								JSONObject resultObject = (JSONObject) resultsArray.get(i);
+								if (resultObject.has("PaymentTerms")) {
+									String paymentTerms = resultObject.getString("PaymentTerms");
+									invoiceHeaderCheckDto.setPaymentTerms(paymentTerms);
+								}
+								if (resultObject.has("PaymentMethodsList")) {
+									String paymentMethods = resultObject.getString("PaymentMethodsList");
+									invoiceHeaderCheckDto.setPaymentMethod(paymentMethods);
+								}
+								if (resultObject.has("PaymentBlockingReason")) {
+									String paymentReason = resultObject.getString("PaymentBlockingReason");
+									invoiceHeaderCheckDto.setPaymentBlock(paymentReason);
+								}
+
+							}
+							// get payment terms details
+							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+
+							if (response.getStatusCode() == HttpStatus.OK) {
+								String jsonString2 = (String) response.getBody();
+								logger.error("payment-terms" + response.getBody());
+								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2, invoiceHeaderCheckDto);
+							}
+						}
+					}
+
+					ChangeIndicator resetChangeIndicator = resetChangeIndicator(
+							invoiceHeaderCheckDto.getChangeIndicator());
+					invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
+					return invoiceHeaderCheckDto;
+
+					// a. ResetChagneIndicator-InvoiceDate
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsInvoiceAmountChanged())
+						&& changeIndicator.getIsInvoiceAmountChanged()) {
+					// SetBalanceAmount = InvoiceAmount - GrossAmount
+					Double balanceAmount = invoiceHeaderCheckDto.getInvoiceAmount()
+							- invoiceHeaderCheckDto.getGrossAmount();
+					invoiceHeaderCheckDto.setBalanceAmount(balanceAmount);
+					// If Balance>0.0 and If Header Status NE Duplicate or PO
+					// Missing or …. any other status till Ready to Post.
+					// then set status = Balance Mismatch
+					String statusCode = invoiceHeaderCheckDto.getInvoiceStatus();
+					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE)
+							|| statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
+							|| statusCode.equals(ApplicationConstants.NO_GRN)
+							|| statusCode.equals(ApplicationConstants.PARTIAL_GRN)
+							|| statusCode.equals(ApplicationConstants.UOM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.ITEM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.QTY_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
+					}
+
+					InvoiceHeaderObjectDto duplicateCheckDto = duplicateCheckService
+							.duplicateCheck(invoiceHeaderObjectDto);
+					if (duplicateCheckDto.getIsDuplicate()) {
+						messagesList.add(duplicateCheckDto.getMessages());
+						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					}
+					// Added By Lakhu
+					if (!duplicateCheckDto.getIsDuplicate()) {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.DUPLICATE_CHECK_PASSED);
+						return invoiceHeaderCheckDto;
+					}
+					return invoiceHeaderCheckDto;
+
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsBaselineDateChanged())
+						&& changeIndicator.getIsBaselineDateChanged()) {
+					// 1. Determine Due dates
+					//
+					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					logger.error("BODY:::" + qwe.getBody());
+					logger.error("BODY:::" + qwe.getStatusCode());
+					if (qwe.getStatusCode() == HttpStatus.OK) {
+
+						String jsonString = (String) qwe.getBody();
+						JSONObject json = new JSONObject(jsonString);
+						logger.error("JSON:::" + json);
+						if (json.has("d")) {
+							logger.error("JSON:::" + json.has("d"));
+							JSONObject dObject = json.getJSONObject("d");
+							logger.error("dObject" + dObject);
+							JSONArray resultsArray = dObject.getJSONArray("results");
+							for (int i = 0; i < resultsArray.length(); i++) {
+								JSONObject resultObject = (JSONObject) resultsArray.get(i);
+								if (resultObject.has("PaymentTerms")) {
+									String paymentTerms = resultObject.getString("PaymentTerms");
+									invoiceHeaderCheckDto.setPaymentTerms(paymentTerms);
+								}
+								if (resultObject.has("PaymentMethodsList")) {
+									String paymentMethods = resultObject.getString("PaymentMethodsList");
+									invoiceHeaderCheckDto.setPaymentMethod(paymentMethods);
+								}
+								if (resultObject.has("PaymentBlockingReason")) {
+									String paymentReason = resultObject.getString("PaymentBlockingReason");
+									invoiceHeaderCheckDto.setPaymentBlock(paymentReason);
+								}
+
+							}
+							// get payment terms details
+							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+
+							if (response.getStatusCode() == HttpStatus.OK) {
+								String jsonString2 = (String) response.getBody();
+								logger.error("payment-terms" + response.getBody());
+								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2, invoiceHeaderCheckDto);
+							}
+						}
+					}
+					// a. Call CalculateDueDateOdata and set all the due dates.
+					//
+					// 2. ResetChangeIndicator
+					ChangeIndicator resetChangeIndicator = resetChangeIndicator(
+							invoiceHeaderCheckDto.getChangeIndicator());
+					invoiceHeaderCheckDto.setChangeIndicator(resetChangeIndicator);
+					return invoiceHeaderCheckDto;
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsPaymentTermsChanged())
+						&& changeIndicator.getIsPaymentTermsChanged()) {
+					// 1. Get the baseline date from the payment terms data.
+					//
+					ResponseEntity<?> qwe = Odata.getPaymentTerms(invoiceHeaderCheckDto);
+					logger.error("BODY:::" + qwe.getBody());
+					logger.error("BODY:::" + qwe.getStatusCode());
+					if (qwe.getStatusCode() == HttpStatus.OK) {
+
+						String jsonString = (String) qwe.getBody();
+						JSONObject json = new JSONObject(jsonString);
+						logger.error("JSON:::" + json);
+						if (json.has("d")) {
+							logger.error("JSON:::" + json.has("d"));
+							JSONObject dObject = json.getJSONObject("d");
+							logger.error("dObject" + dObject);
+							JSONArray resultsArray = dObject.getJSONArray("results");
+							for (int i = 0; i < resultsArray.length(); i++) {
+								JSONObject resultObject = (JSONObject) resultsArray.get(i);
+								if (resultObject.has("PaymentTerms")) {
+									String paymentTerms = resultObject.getString("PaymentTerms");
+									invoiceHeaderCheckDto.setPaymentTerms(paymentTerms);
+								}
+								if (resultObject.has("PaymentMethodsList")) {
+									String paymentMethods = resultObject.getString("PaymentMethodsList");
+									invoiceHeaderCheckDto.setPaymentMethod(paymentMethods);
+								}
+								if (resultObject.has("PaymentBlockingReason")) {
+									String paymentReason = resultObject.getString("PaymentBlockingReason");
+									invoiceHeaderCheckDto.setPaymentBlock(paymentReason);
+								}
+
+							}
+							// get payment terms details
+							ResponseEntity<?> response = Odata.getPaymentTermsDetails(invoiceHeaderCheckDto);
+
+							if (response.getStatusCode() == HttpStatus.OK) {
+								String jsonString2 = (String) response.getBody();
+								logger.error("payment-terms" + response.getBody());
+								invoiceHeaderCheckDto = calculateBaseDueDates(jsonString2, invoiceHeaderCheckDto);
+							}
+						}
+					}
+					// 2. Call CalcaulateDueDateOdata
+					return invoiceHeaderCheckDto;
+				} else if (!ServiceUtil.isEmpty(changeIndicator.getIsTaxCodeChanged())
+						&& changeIndicator.getIsTaxCodeChanged()) {
+					// 1. Calculate systemSuggestedTaxAmount.
+					// 2. If InvTaxAmount > SystemSuggested tax amount
+					if (invoiceHeaderCheckDto.getTaxAmount() > invoiceHeaderCheckDto.getSystemSuggestedtaxAmount()) {
+						HeaderMessageDto messageDto = new HeaderMessageDto();
+						messageDto.setMsgClass("VendorCheck");
+						messageDto.setMessageId(21);
+						Double diff = invoiceHeaderCheckDto.getTaxAmount()
+								- invoiceHeaderCheckDto.getSystemSuggestedtaxAmount();
+						messageDto.setMessageNumber(invoiceHeaderCheckDto.getTaxAmount() + "-"
+								+ invoiceHeaderCheckDto.getSystemSuggestedtaxAmount() + "=" + diff
+								+ invoiceHeaderCheckDto.getCurrency());
+						messageDto.setMessageType("W");
+						messageDto.setMessageText("Tax entered is more than calculated Tax.");
+						messagesList.add(messageDto);
+						invoiceHeaderCheckDto.setMessages(messagesList);
+						return invoiceHeaderCheckDto;
+					} else {
+						return invoiceHeaderCheckDto;
+
+					}
+					//
+					// a. SetHeaderMessages
+					//
+					// i. MsgClass: VendorCheck
+
+					// ii. MessageID: 21
+					//
+					// iii. MessageNumber: <TaxAmount> - <suggestedTax> = 60 $
+					//
+					// iv. MessageType: W
+					//
+					// v. MessageText: Tax entered is more than calculated Tax.
+				} else if (changeIndicator.getIsTaxAmountChanged()) {
+					// 1. If InvTaxAmount > SystemSuggestedTaxAmount//it will
+					// come as UI input(never change) // what is
+					// SystemSuggestedTaxAmount???
+					if (invoiceHeaderCheckDto.getTaxAmount() > invoiceHeaderCheckDto.getSystemSuggestedtaxAmount()) {
+						HeaderMessageDto messageDto = new HeaderMessageDto();
+						messageDto.setMsgClass("VendorCheck");
+						messageDto.setMessageId(21);
+						Double diff = invoiceHeaderCheckDto.getTaxAmount()
+								- invoiceHeaderCheckDto.getSystemSuggestedtaxAmount();
+						messageDto.setMessageNumber(invoiceHeaderCheckDto.getTaxAmount() + "-"
+								+ invoiceHeaderCheckDto.getSystemSuggestedtaxAmount() + "=" + diff
+								+ invoiceHeaderCheckDto.getCurrency());
+						messageDto.setMessageType("W");
+						messageDto.setMessageText("Tax entered is more than calculated Tax.");
+						messagesList.add(messageDto);
+						invoiceHeaderCheckDto.setMessages(messagesList);
+					}
+
+					// a. SetHeaderMessages
+					//
+					// 2. Gross Amount = Gross Amount – currentTaxAmount from
+					// UI.
+					//
+
+					Double grossAmount = invoiceHeaderCheckDto.getGrossAmount() - invoiceHeaderCheckDto.getTaxAmount();
+					Double balanceAmount = invoiceHeaderCheckDto.getInvoiceAmount() - grossAmount;
+
+					// 3. Balance = Credit – Debits
+					//
+					// 4. If Header Status NE Duplicate or PO Missing or …. any
+					// other status then set status = Balance Mismatch
+					String statusCode = invoiceHeaderCheckDto.getInvoiceStatus();
+					if (balanceAmount > 0.0 && !(statusCode.equals(ApplicationConstants.DUPLICATE_INVOICE)
+							|| statusCode.equals(ApplicationConstants.PO_MISSING_OR_INVALID)
+							|| statusCode.equals(ApplicationConstants.NO_GRN)
+							|| statusCode.equals(ApplicationConstants.PARTIAL_GRN)
+							|| statusCode.equals(ApplicationConstants.UOM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.ITEM_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.QTY_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_MISMATCH)
+							|| statusCode.equals(ApplicationConstants.PRICE_OR_QTY_MISMATCH))) {
+						invoiceHeaderCheckDto.setInvoiceStatus(ApplicationConstants.BALANCE_MISMATCH);
+					}
+					return invoiceHeaderCheckDto;
+				}
+			} else {
+				HeaderMessageDto dto = new HeaderMessageDto();
+				dto.setMessageText("Change Indicator is empty , no changes have been made");
+				messagesList.add(dto);
+				invoiceHeaderCheckDto.setMessages(messagesList);
+				return invoiceHeaderCheckDto;
+
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			HeaderMessageDto hmdto = new HeaderMessageDto();
+			hmdto.setMessageId(0);
+			hmdto.setMessageNumber("0");
+			hmdto.setMessageText("Exception In HeaderCheckAPI:: " + e.getMessage());
+			hmdto.setMsgClass(e.getClass() + "");
+			messagesList.add(hmdto);
+			invoiceHeaderCheckDto.setMessages(messagesList);
+			return invoiceHeaderCheckDto;
+		}
+		return invoiceHeaderCheckDto;
+	}
+	
+	
+	
+	private static InvoiceHeaderCheckDto calculateBaseDueDates(String string,
+			InvoiceHeaderCheckDto invoiceHeaderCheckDto) {
+
+		JSONObject json2 = new JSONObject(string);
+		logger.error("JSON:::" + json2);
+		if (json2.has("d")) {
+			logger.error("JSON:::" + json2.has("d"));
+			JSONObject dObject2 = json2.getJSONObject("d");
+			logger.error("dObject" + dObject2);
+			JSONArray resultsArray2 = dObject2.getJSONArray("results");
+			for (int i = 0; i < resultsArray2.length(); i++) {
+				String ZBD1T = null;
+				String ZBD2T = null;
+				String ZBD3T = null;
+				JSONObject resultObject2 = (JSONObject) resultsArray2.get(i);
+				if (resultObject2.has("BaseLineDateType")) {
+					String BaseLineDateType = resultObject2.getString("BaseLineDateType");
+					if (BaseLineDateType == null || BaseLineDateType == "")
+						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getBaselineDate());
+					else if ("D".equalsIgnoreCase(BaseLineDateType))
+						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getPostingDate());
+					else if ("B".equalsIgnoreCase(BaseLineDateType))
+						invoiceHeaderCheckDto.setBaselineDate(invoiceHeaderCheckDto.getInvoiceDate());
+				}
+				if (resultObject2.has("CashDiscDays1")) {
+					ZBD1T = resultObject2.getString("CashDiscDays1");
+					logger.error("ZBD1T " + ZBD1T);
+				}
+				if (resultObject2.has("CashDiscDays2")) {
+					ZBD2T = resultObject2.getString("CashDiscDays2");
+					logger.error("ZBD2T " + ZBD2T);
+				}
+				if (resultObject2.has("NetPmntTermPeriod")) {
+					ZBD3T = resultObject2.getString("NetPmntTermPeriod");
+					logger.error("ZBD3T " + ZBD3T);
+				}
+				Long period = 0L;
+				// 1st condition
+				if (!ZBD3T.equalsIgnoreCase("000"))
+					period = Long.valueOf(ZBD3T);
+				else {
+					if (!ZBD2T.equalsIgnoreCase("000"))
+						period = Long.valueOf(ZBD2T);
+					else
+						period = Long.valueOf(ZBD1T);
+				}
+				logger.error("period" + period);
+				period = TimeUnit.DAYS.toMillis(period);
+				invoiceHeaderCheckDto.setDueDate(invoiceHeaderCheckDto.getBaselineDate() + period);
+				// 2nd cond
+
+				if (!ZBD2T.equalsIgnoreCase("000")) {
+
+					invoiceHeaderCheckDto.setDiscountedDueDate2(
+							invoiceHeaderCheckDto.getBaselineDate() + TimeUnit.DAYS.toMillis(Long.valueOf(ZBD2T)));
+				} else {
+					invoiceHeaderCheckDto.setDiscountedDueDate2(invoiceHeaderCheckDto.getDueDate());
+				}
+				if (!ZBD1T.equalsIgnoreCase("000") || !ZBD2T.equalsIgnoreCase("000")) {
+					invoiceHeaderCheckDto.setDiscountedDueDate1(
+							invoiceHeaderCheckDto.getBaselineDate() + TimeUnit.DAYS.toMillis(Long.valueOf(ZBD1T)));
+
+				} else {
+					invoiceHeaderCheckDto.setDiscountedDueDate1(invoiceHeaderCheckDto.getDueDate());
+				}
+			}
+		}
+
+		return invoiceHeaderCheckDto;
 	}
 
 }

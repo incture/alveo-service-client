@@ -34,15 +34,15 @@ public class OcrScheduler  implements Runnable {
 
 	@Override
 	public void run() {
-		logger.error("Dynamic run :::" + System.currentTimeMillis());
+		logger.error("Dynamic run ::: inside ocrrrrrrrrrrrrrrrrrrrrrr" + System.currentTimeMillis());
 		// after db call if the current time is more than end date stop the
 		// scheduler.
 
 		SchedulerConfigurationDo entity = schedulerConfigurationRepository.getSchedulerData(
-				"Email Scheduler Configuration", ServiceUtil.getFormattedDateinString("yyyy-MM-dd"));
-		logger.error("SchedulerConfigurationDo entity" + entity);
+				"OCR Scheduler Configuration", ServiceUtil.getFormattedDateinString("yyyy-MM-dd"));
+		logger.error("SchedulerConfigurationDo entity  inside ocrrrrrrrrrrrrrrrrrrrrrr" + entity);
 		if (!ServiceUtil.isEmpty(entity)) {
-//			automationService.extractInvoiceFromSharedEmailBoxInScheduler(entity);
+			logger.error("inside ocr scheduler");
 			automationService.downloadFilesFromSFTPABBYYServer();
 		} else {
 			// complete the sch run
@@ -103,12 +103,12 @@ public class OcrScheduler  implements Runnable {
 		if (entity.getIsActive()) {
 			schedulerRunDo.setDatetimeSwitchedON(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
 			schedulerRunDo.setSwichtedONby(entity.getCreatedBy());
-			logger.error("Scheduler Started at:::" + startTime);
+			logger.error("Scheduler Started at::: in OCR sceduler" + startTime);
 			this.scheduledFuture = this.taskScheduler.scheduleAtFixedRate(this, startTime, period);
 
 		}
 		schedulerRunDo.setSchedulerConfigID(entity.getScId());
-		schedulerRunDo.setSchedulerName("Email Reader");
+		schedulerRunDo.setSchedulerName("OCR Reader");
 		SchedulerRunDo schedulerRunEntity = schedulerRunRepository.save(schedulerRunDo);
 
 	}
