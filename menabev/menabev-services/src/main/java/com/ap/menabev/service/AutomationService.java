@@ -9,10 +9,12 @@ import com.ap.menabev.entity.SchedulerConfigurationDo;
 public interface AutomationService {
 	ResponseDto downloadFilesFromSFTPABBYYServer();
 
-	ResponseDto extractInvoiceFromEmail();
+//	ResponseDto extractInvoiceFromEmail();
 
 	ResponseDto extractInvoiceFromSharedEmailBox();
 	void extractInvoiceFromSharedEmailBoxInScheduler(SchedulerConfigurationDo entity);
 	List<String> getNames();
+
+	ResponseDto downloadFilesFromSFTPABBYYServer(SchedulerConfigurationDo entity);
 
 }

@@ -214,6 +214,14 @@ public interface ApplicationConstants {
         public static final String CONECTIVITY_TOKEN_URL = "https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
 	*/
 		
+		String IST_TIMEZONE ="GMT+5:30";
+		String KSA_TIMEZONE ="GMT+3";
+	//Connectivity Service Key Details For DEV-test app 
+//					public static final String CONECTIVITY_CLIENT_ID = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
+//					public static final String CONECTIVITY_CLIENT_SECRET = "d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=";
+//					public static final String CONECTIVITY_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
+			
+		
 //----------------------------------------------------------------------------------------->	
 	//Destination Service Key details for DEV
 		public static final String DESTINATION_CLIENT_ID = "sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2";

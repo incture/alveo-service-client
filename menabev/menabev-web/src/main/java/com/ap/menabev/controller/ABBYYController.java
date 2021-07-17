@@ -22,17 +22,17 @@ public class ABBYYController {
 	@Autowired
 	Email email;
 
-	@GetMapping("/inbox")
-	public ResponseDto putFileInSFTPServer() {
-		try {
-
-			return automationService.extractInvoiceFromEmail();
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO: handle exception
-			return new ResponseDto("Error","500", e.getMessage(),null);
-		}
-	}
+//	@GetMapping("/inbox")
+//	public ResponseDto putFileInSFTPServer() {
+//		try {
+//
+//			return automationService.extractInvoiceFromEmail();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			// TODO: handle exception
+//			return new ResponseDto("Error","500", e.getMessage(),null);
+//		}
+//	}
 	@GetMapping("/shared")
 	public ResponseDto putFileInSFTPServerFromSharedEmailBox() {
 		return automationService.extractInvoiceFromSharedEmailBox();

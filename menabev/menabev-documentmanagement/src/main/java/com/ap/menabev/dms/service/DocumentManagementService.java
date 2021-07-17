@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.ap.menabev.dms.dto.DmsGetResponseDto;
 import com.ap.menabev.dms.dto.DmsResponseDto;
-import com.ap.menabev.dto.ResponseDto;
+import com.ap.menabev.dms.dto.ResponseDto;
 
 public interface DocumentManagementService {
 	DmsResponseDto uploadDocument(File file,String requestId);

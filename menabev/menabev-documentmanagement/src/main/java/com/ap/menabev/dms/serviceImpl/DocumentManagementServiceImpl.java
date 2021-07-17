@@ -43,8 +43,8 @@ import org.springframework.stereotype.Service;
 
 import com.ap.menabev.dms.dto.DmsGetResponseDto;
 import com.ap.menabev.dms.dto.DmsResponseDto;
+import com.ap.menabev.dms.dto.ResponseDto;
 import com.ap.menabev.dms.service.DocumentManagementService;
-import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.ServiceUtil;
 

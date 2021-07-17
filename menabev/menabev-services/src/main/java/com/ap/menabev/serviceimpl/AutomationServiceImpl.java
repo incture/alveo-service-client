@@ -1,10 +1,9 @@
 package com.ap.menabev.serviceimpl;
 
 import java.io.File;
+
 import java.io.InputStream;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import java.util.Vector;
 import javax.mail.Message;
 import javax.mail.Multipart;
 
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import com.ap.menabev.abbyy.ABBYYIntegration;
 import com.ap.menabev.abbyy.ABBYYJSONConverter;
+import com.ap.menabev.dms.dto.DmsResponseDto;
+import com.ap.menabev.dms.service.DocumentManagementService;
 import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemDto;
@@ -31,7 +33,6 @@ import com.ap.menabev.dto.TriggerWorkflowContext;
 import com.ap.menabev.dto.WorkflowContextDto;
 import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.email.Email;
-import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.entity.SchedulerConfigurationDo;
 import com.ap.menabev.entity.SchedulerCycleDo;
 import com.ap.menabev.entity.SchedulerCycleLogDo;
@@ -54,7 +55,6 @@ import com.ap.menabev.service.PurchaseDocumentHeaderService;
 import com.ap.menabev.service.SequenceGeneratorService;
 import com.ap.menabev.sftp.SFTPChannelUtil;
 import com.ap.menabev.util.ApplicationConstants;
-import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.ServiceUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.ChannelSftp;
@@ -73,7 +73,8 @@ public class AutomationServiceImpl implements AutomationService {
 	InvoiceItemRepository invoiceItemRepository;
 	@Autowired
 	CostAllocationRepository costAllocationRepository;
-
+	@Autowired
+	DocumentManagementService documentManagementService;
 	@Autowired
 	EmailServiceImpl emailServiceImpl;
 
@@ -103,10 +104,10 @@ public class AutomationServiceImpl implements AutomationService {
 
 	@Autowired
 	InvoiceHeaderService invoiceHeaderService;
-	
-	@Autowired 
+
+	@Autowired
 	PurchaseDocumentHeaderService purchaseHeaderService;
-	
+
 	@Autowired
 	ReasonForRejectionRepository rejectionRepository;
 
@@ -125,113 +126,16 @@ public class AutomationServiceImpl implements AutomationService {
 	@Autowired
 	private SequenceGeneratorService seqService;
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AutomationServiceImpl.class);
-
-	public ResponseDto extractInvoiceFromEmail() {
-		ResponseDto response = null;
-		try {
-			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders",null);
-			// Step 1 : Get unread emails/messages from specific sender !
-			// input parameters email host,email id,password,email ids,flag,
-			Message[] emailMessages = email.readEmail(ApplicationConstants.OUTLOOK_HOST,
-					ApplicationConstants.ACCPAY_EMAIL_ID, ApplicationConstants.ACCPAY_EMAIL_PASSWORD,
-					ApplicationConstants.INBOX_FOLDER, ApplicationConstants.UNSEEN_FLAGTERM);
-
-			// Step 2 : Get the attachment pdf file from a message
-			List<File> files = new ArrayList<File>();
-			// map to move messages to processed/unprocessed folder
-			Map<Message, String> messageMap = new HashMap<>();
-
-			// setup channel connect channel pass the same channel for every put
-			// get session for SFTP
-			Session session = SFTPChannelUtil.getSession();
-
-			ChannelSftp channelSftp = null;
-			channelSftp = SFTPChannelUtil.getJschChannel(session);
-			if (!ServiceUtil.isEmpty(channelSftp)) {
-				channelSftp.connect();
-				for (Message message : emailMessages) {
-					String contentType = message.getContentType();
-					if (contentType.contains("multipart")) {
-						files = email.getAttachmentFromEmail(message);
-						if (!ServiceUtil.isEmpty(files)) {
-							// Step 3 : Put the files into abbyy.
-							try {
-								abbyyIntegration.putInvoiceInAbbyy(files,
-										ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
-								messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
-							} catch (Exception e) {
-								System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
-								logger.error(
-										"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
-												+ e.getMessage());
-								e.printStackTrace();
-								messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
-
-							}
-						} else {
-							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
-						}
-					} else {
-						response = new ResponseDto("Done", "200", "No Attacment found ",null);
-					}
-
-				}
-
-			} else {
-				channelSftp = SFTPChannelUtil.getJschChannel(session);
-				for (Message message : emailMessages) {
-					String contentType = message.getContentType();
-					if (contentType.contains("multipart")) {
-						files = email.getAttachmentFromEmail(message);
-						if (!ServiceUtil.isEmpty(files)) {
-							// Step 3 : Put the files into abbyy.
-							try {
-								abbyyIntegration.putInvoiceInAbbyy(files,
-										ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
-								messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
-							} catch (Exception e) {
-								System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
-								logger.error(
-										"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
-												+ e.getMessage());
-								e.printStackTrace();
-								messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
-
-							}
-						} else {
-							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
-						}
-					} else {
-						response = new ResponseDto("Done", "200", "No Attacment found ",null);
-					}
-
-				}
-
-			}
-			// disconnect the channel
-			SFTPChannelUtil.disconnect(session, channelSftp);
-			// NOW MOVE THE MESSAGES TO THE RESPECTIVE FOLDERS.
-			for (Map.Entry<Message, String> entry : messageMap.entrySet()) {
-				if (ApplicationConstants.PROCESSED_FOLDER.equalsIgnoreCase(entry.getValue())) {
-					email.moveMessage(entry.getKey(), ApplicationConstants.INBOX_FOLDER, entry.getValue());
-				} else {
-					email.moveMessage(entry.getKey(), ApplicationConstants.INBOX_FOLDER, entry.getValue());
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("AutomationServiceImpl.extractInvoiceFromEmail():::" + e.getMessage());
-			response = new ResponseDto("Failed", "500", e.getMessage(),null);
-		}
-		return response;
-	}
-
+	
 	@Override
-	public ResponseDto downloadFilesFromSFTPABBYYServer() {
+	public ResponseDto downloadFilesFromSFTPABBYYServer(SchedulerConfigurationDo entity) {
 		ResponseDto response = new ResponseDto();
 		List<InvoiceHeaderDto> headerList = new ArrayList<>();
-
+		int noOfJSONFiles = 0;
+		SchedulerCycleDo cycleEntity = new SchedulerCycleDo();
+		cycleEntity.setStartDateTime(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
+		
+		
 		List<JSONObject> fileNmaes = new ArrayList<>();
 
 		List<JSONObject> jsonList = new ArrayList<JSONObject>();
@@ -247,9 +151,9 @@ public class AutomationServiceImpl implements AutomationService {
 				// channelSftp.ls("*.json");
 				Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
 				logger.error("Vector<ChannelSftp.LsEntry> filelist" + filelist.size());
-				if(!ServiceUtil.isEmpty(filelist)){
+				if (!ServiceUtil.isEmpty(filelist)) {
 					for (int i = 0; i < 2; i++) {
-						if(i<=filelist.size()){
+						if (i <= filelist.size()) {
 							ChannelSftp.LsEntry entry = filelist.get(i);
 							try {
 								logger.error("INSIDE JSON " + entry.getFilename());
@@ -260,32 +164,56 @@ public class AutomationServiceImpl implements AutomationService {
 									Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
 									JSONObject jsonObject = new JSONObject(jsonMap);
 									if (jsonObject.has("Documents")) {
-										InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
-										if(!ServiceUtil.isEmpty(output)){
+										InvoiceHeaderDto output = ABBYYJSONConverter
+												.abbyyJSONOutputToInvoiceObject(jsonObject);
+										if (!ServiceUtil.isEmpty(output)) {
+//											String reqIdFromFileName = FilenameUtils.removeExtension(entry.getFilename());
+//											output.setRequestId(reqIdFromFileName);
 											headerList.add(output);
 											is.close();
+											// cd
+											// put
 											channelSftp.rm(entry.getFilename());
-										}else {
-											 // checking if json is thrwoing error 
-											// will move the json to UNPROCESSED folder 
-											// notify the sender with email to check the json 
-												
+										} else {
+											// checking if json is thrwoing
+											// error
+											// will move the json to UNPROCESSED
+											// folder
+											// notify the sender with email to
+											// check the json
 											is.close();
+											response.setMessage("Error in JSON");
 										}
-										
-										
+
 									}
 								}
-								
+
 							} catch (Exception e) {
 								e.printStackTrace();
 								response.setMessage("Error while reading json" + e.getMessage());
 
 							}
-						
+
 						}
 					}
 				}
+				
+				
+				
+				
+				
+				SchedulerRunDo schedulerRun = schedulerRunRepository.getBySchedulerConfigID(entity.getScId());
+				cycleEntity .setNOfEmailspicked(0);
+				cycleEntity.setNoOfAttachements(0);
+				cycleEntity.setNoOfEmailsReadSuccessfully(0);
+				cycleEntity.setNoOfPDFs(0);
+				cycleEntity.setSchedulerRunID(schedulerRun.getSchedulerRunID());
+				cycleEntity.setEndDatetime(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
+				cycleEntity.setSchedulerCycleID(UUID.randomUUID().toString());
+				cycleEntity.setNoOfJSONFiles(noOfJSONFiles);
+//				
+				
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -306,7 +234,7 @@ public class AutomationServiceImpl implements AutomationService {
 
 	private ResponseDto saveAllInvoiceDetails(List<InvoiceHeaderDto> headerList) {
 		ResponseDto response = null;
-		ResponseDto responseAutoPosting  = null;
+		ResponseDto responseAutoPosting = null;
 		try {
 			for (InvoiceHeaderDto invoiceHeaderDto : headerList) {
 				invoiceHeaderDto.setChannelType(ApplicationConstants.CHANEL_TYPE_EMAIL);
@@ -317,57 +245,60 @@ public class AutomationServiceImpl implements AutomationService {
 					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
 				}
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
-				System.err.println("InvoiceHeader "+response );
-//				InvoiceHeaderDto    invoiceHeaderAutoPost = (InvoiceHeaderDto) response.getObject();
-				// call autoposting method 
-				InvoiceHeaderDto  invoiceHeaderAutoPost =  purchaseHeaderService.autoPostApi((InvoiceHeaderDto) response.getObject());
-				System.err.println("InvoiceHeaderAutoPost "+invoiceHeaderAutoPost);
-				// calling rule file and worklfow 
+				System.err.println("InvoiceHeader " + response);
+				// InvoiceHeaderDto invoiceHeaderAutoPost = (InvoiceHeaderDto)
+				// response.getObject();
+				// call autoposting method
+				InvoiceHeaderDto invoiceHeaderAutoPost = purchaseHeaderService
+						.autoPostApi((InvoiceHeaderDto) response.getObject());
+				System.err.println("InvoiceHeaderAutoPost " + invoiceHeaderAutoPost);
+				// calling rule file and worklfow
 				AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
 				determination.setCompCode(invoiceHeaderAutoPost.getCompCode());
 				determination.setVednorId(invoiceHeaderAutoPost.getVendorId());
 				ResponseEntity<?> responseRules = invoiceHeaderService.triggerRuleService(determination);
-				System.err.println("responseRules Scheduler "+ responseRules);
+				System.err.println("responseRules Scheduler " + responseRules);
 				@SuppressWarnings("unchecked")
 				List<ApproverDataOutputDto> lists = (List<ApproverDataOutputDto>) responseRules.getBody();
-				System.err.println("ApproverList scheduler"+lists);
-				if(!ServiceUtil.isEmpty(lists)){
-				// trigger workflow 
-				TriggerWorkflowContext context = new TriggerWorkflowContext();
-				context.setRequestId(invoiceHeaderAutoPost.getRequestId());
-				context.setInvoice_ref_number(invoiceHeaderAutoPost.getInvoice_ref_number());
-				context.setNonPo(false);
-				context.setManualNonPo(false);
-				context.setAccountantUser(lists.get(0).getUserOrGroup());
-				context.setAccountantGroup(invoiceHeaderAutoPost.getTaskGroup());
-				context.setProcessLead(lists.get(0).getUserOrGroup());
-				context.setAccountantAction("");
-				context.setInvoiceStatus(invoiceHeaderAutoPost.getInvoiceStatus());
-				context.setInvoiceStatusText(invoiceHeaderAutoPost.getInvoiceStatusText());
-				context.setInvoiceType(invoiceHeaderAutoPost.getInvoiceType());
-				context.setProcessLeadAction("");
-				context.setRemediationUser("");
-				context.setRemediationUserAction("");
-				ResponseEntity<?> responseWorkflow = invoiceHeaderService.triggerWorkflow((WorkflowContextDto) context,
-						"triggerresolutionworkflow.triggerresolutionworkflow");
-				System.err.println("response of workflow Trigger scheduler" + response);
-				WorkflowTaskOutputDto taskOutputDto = (WorkflowTaskOutputDto) responseWorkflow.getBody();
-				// save invoice header
-				invoiceHeaderAutoPost.setWorkflowId(taskOutputDto.getId());
-				invoiceHeaderAutoPost.setTaskStatus("READY");
-				responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
-				System.err.println("invoiceHeaderAutoPost responseAutoPosting ="+responseAutoPosting);
-				response.setObject(invoiceHeaderDto);
-			}else {
-				response = new ResponseDto("400", "0", "Error no default user maintained in url file."+lists.toString() ,invoiceHeaderDto);
-			}
-				
+				System.err.println("ApproverList scheduler" + lists);
+				if (!ServiceUtil.isEmpty(lists)) {
+					// trigger workflow
+					TriggerWorkflowContext context = new TriggerWorkflowContext();
+					context.setRequestId(invoiceHeaderAutoPost.getRequestId());
+					context.setInvoice_ref_number(invoiceHeaderAutoPost.getInvoice_ref_number());
+					context.setNonPo(false);
+					context.setManualNonPo(false);
+					context.setAccountantUser(lists.get(0).getUserOrGroup());
+					context.setAccountantGroup(invoiceHeaderAutoPost.getTaskGroup());
+					context.setProcessLead(lists.get(0).getUserOrGroup());
+					context.setAccountantAction("");
+					context.setInvoiceStatus(invoiceHeaderAutoPost.getInvoiceStatus());
+					context.setInvoiceStatusText(invoiceHeaderAutoPost.getInvoiceStatusText());
+					context.setInvoiceType(invoiceHeaderAutoPost.getInvoiceType());
+					context.setProcessLeadAction("");
+					context.setRemediationUser("");
+					context.setRemediationUserAction("");
+					ResponseEntity<?> responseWorkflow = invoiceHeaderService.triggerWorkflow(
+							(WorkflowContextDto) context, "triggerresolutionworkflow.triggerresolutionworkflow");
+					System.err.println("response of workflow Trigger scheduler" + response);
+					WorkflowTaskOutputDto taskOutputDto = (WorkflowTaskOutputDto) responseWorkflow.getBody();
+					// save invoice header
+					invoiceHeaderAutoPost.setWorkflowId(taskOutputDto.getId());
+					invoiceHeaderAutoPost.setTaskStatus("READY");
+					responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
+					System.err.println("invoiceHeaderAutoPost responseAutoPosting =" + responseAutoPosting);
+					response.setObject(invoiceHeaderDto);
+				} else {
+					response = new ResponseDto("400", "0",
+							"Error no default user maintained in url file." + lists.toString(), invoiceHeaderDto);
+				}
+
 			}
 			return response;
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			return new ResponseDto("500", "0", "Error " + e.getMessage(),null);
+			return new ResponseDto("500", "0", "Error " + e.getMessage(), null);
 
 		}
 
@@ -384,7 +315,7 @@ public class AutomationServiceImpl implements AutomationService {
 					ApplicationConstants.UNSEEN_FLAGTERM, ApplicationConstants.EMAIL_FROM);
 
 			logger.error(emailMessages.length + "After reading email");
-			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders",null);
+			response = new ResponseDto("Success", "200", "Uploaded files to abbyy and moved messages to folders", null);
 			// Step 2 : Get the attachment pdf file from a message
 			List<File> files = new ArrayList<File>();
 			// map to move messages to processed/unprocessed folder
@@ -399,17 +330,24 @@ public class AutomationServiceImpl implements AutomationService {
 			if (!ServiceUtil.isEmpty(channelSftp)) {
 				channelSftp.connect();
 				if (!ServiceUtil.isEmpty(emailMessages)) {
-
+					List<String> logMsgs = new ArrayList<>();
 					for (Message message : emailMessages) {
 						String contentType = message.getContentType();
 						if (contentType.contains("multipart")) {
 							files = email.getAttachmentFromEmail(message);
-							System.err.println("330 files count= "+files.size());
+							System.err.println("330 files count= " + files.size());
 							if (!ServiceUtil.isEmpty(files)) {
 								// Step 3 : Put the files into abbyy.
 								try {
-									abbyyIntegration.putInvoiceInAbbyy(files,
-											ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
+									for (File file : files) {
+										String requestId = seqService
+												.getSequenceNoByMappingId(ApplicationConstants.INVOICE_SEQUENCE, "INV");
+										String responseSFTP = abbyyIntegration.putInvoiceInAbbyy(file,
+												ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp,
+												requestId);
+										logMsgs.add("Failed to upload " + file.getName() + " from "
+												+ message.getAllRecipients()[0].toString());
+									}
 									messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
 								} catch (Exception e) {
 									System.err.println("AutomationServiceImpl.extractInvoiceFromEmail()");
@@ -421,45 +359,60 @@ public class AutomationServiceImpl implements AutomationService {
 
 								}
 							} else {
-								response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
+								response = new ResponseDto("Done", "200", "No PDF in the Attacment found ", null);
 							}
 						} else {
-							response = new ResponseDto("Done", "200", "No Attacment found ",null);
+							response = new ResponseDto("Done", "200", "No Attacment found ", null);
 						}
 
 					}
 				} else {
-					response = new ResponseDto("Failed", "400", "Message is null or empty",null);
+					response = new ResponseDto("Failed", "400", "Message is null or empty", null);
 				}
 
 			} else {
 				channelSftp = SFTPChannelUtil.getJschChannel(session);
-				for (Message message : emailMessages) {
-					String contentType = message.getContentType();
-					if (contentType.contains("multipart")) {
-						files = email.getAttachmentFromEmail(message);
-						if (!ServiceUtil.isEmpty(files)) {
-							// Step 3 : Put the files into abbyy.
-							try {
-								abbyyIntegration.putInvoiceInAbbyy(files,
-										ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
-								messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
-							} catch (Exception e) {
-								System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
-								logger.error(
-										"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
-												+ e.getMessage());
-								e.printStackTrace();
-								messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
 
+				channelSftp.connect();
+				if (!ServiceUtil.isEmpty(emailMessages)) {
+					List<String> logMsgs = new ArrayList<>();
+					for (Message message : emailMessages) {
+						String contentType = message.getContentType();
+						if (contentType.contains("multipart")) {
+							files = email.getAttachmentFromEmail(message);
+							System.err.println("330 files count= " + files.size());
+							if (!ServiceUtil.isEmpty(files)) {
+								// Step 3 : Put the files into abbyy.
+								try {
+									for (File file : files) {
+
+										String responseSFTP = abbyyIntegration.putInvoiceInAbbyy(file,
+												ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp,
+												seqService.getSequenceNoByMappingId(
+														ApplicationConstants.INVOICE_SEQUENCE, "INV"));
+										logMsgs.add("Failed to upload " + file.getName() + " from "
+												+ message.getAllRecipients()[0].toString());
+									}
+									messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
+								} catch (Exception e) {
+									System.err.println("AutomationServiceImpl.extractInvoiceFromEmail()");
+									logger.error(
+											"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
+													+ e.getMessage());
+									e.printStackTrace();
+									messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
+
+								}
+							} else {
+								response = new ResponseDto("Done", "200", "No PDF in the Attacment found ", null);
 							}
 						} else {
-							response = new ResponseDto("Done", "200", "No PDF in the Attacment found ",null);
+							response = new ResponseDto("Done", "200", "No Attacment found ", null);
 						}
-					} else {
-						response = new ResponseDto("Done", "200", "No Attacment found ",null);
-					}
 
+					}
+				} else {
+					response = new ResponseDto("Failed", "400", "Message is null or empty", null);
 				}
 
 			}
@@ -477,7 +430,7 @@ public class AutomationServiceImpl implements AutomationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("AutomationServiceImpl.extractInvoiceFromEmail():::" + e.getMessage());
-			response = new ResponseDto("Failed", "500", e.getMessage(),null);
+			response = new ResponseDto("Failed", "500", e.getMessage(), null);
 		}
 		return response;
 	}
@@ -535,7 +488,7 @@ public class AutomationServiceImpl implements AutomationService {
 				if (!ServiceUtil.isEmpty(emailMessages)) {
 
 					for (Message message : emailMessages) {
-						noOfEmailsReadSuccessfully = noOfEmailsReadSuccessfully ++;
+						noOfEmailsReadSuccessfully = noOfEmailsReadSuccessfully++;
 						String contentType = message.getContentType();
 						if (contentType.contains("multipart")) {
 							Multipart multiPart = (Multipart) message.getContent();
@@ -545,19 +498,46 @@ public class AutomationServiceImpl implements AutomationService {
 								// Step 3 : Put the files into abbyy.
 								noOfPDFs = files.size();
 								try {
-									abbyyIntegration.putInvoiceInAbbyy(files,
-											ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
+									channelSftp.cd("\\Input\\");
+									for (File file : files) {
+										String requestId = seqService.getSequenceNoByMappingId(
+												ApplicationConstants.INVOICE_SEQUENCE, "INV");
+										String sftpPutResponse = abbyyIntegration.putInvoiceInAbbyy(file,
+												ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp,
+												requestId);
+										
+										DmsResponseDto dmsResponse = documentManagementService.uploadDocument(file, requestId);
+										if(!ServiceUtil.isEmpty(dmsResponse) && "Success".equalsIgnoreCase(dmsResponse.getResponse().getStatus())){
+											SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+											cycleLogDo.setUuId(UUID.randomUUID().toString());
+											cycleLogDo
+													.setLogMsgText(file.getName()+" with reference of "+requestId+" "+dmsResponse.getResponse().getMessage()+" to DMS");
+											cycleLogDo.setTimestampIST(
+													ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+											cycleLogDo.setTimestampKSA(
+													ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+											schedulerCycleLogDoList.add(cycleLogDo);
+										}
+										SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+										cycleLogDo.setUuId(UUID.randomUUID().toString());
+										cycleLogDo
+												.setLogMsgText(sftpPutResponse + " from email " + message.getFrom()[0]);
+										cycleLogDo.setTimestampIST(
+												ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+										cycleLogDo.setTimestampKSA(
+												ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+										schedulerCycleLogDoList.add(cycleLogDo);
+									}
 									messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
-									SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-									cycleLogDo.setUuId(UUID.randomUUID().toString());
-									cycleLogDo.setLogMsgText("File uploaded Successfully from message "
-											+ message.getFrom()[0] + " with message subject :" + message.getSubject());
-									schedulerCycleLogDoList.add(cycleLogDo);
 								} catch (Exception e) {
 									SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
 									cycleLogDo.setUuId(UUID.randomUUID().toString());
 									cycleLogDo.setLogMsgText("Error while upload file from message"
 											+ message.getFrom()[0] + " with message subject :" + message.getSubject());
+									cycleLogDo.setTimestampIST(
+											ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+									cycleLogDo.setTimestampKSA(
+											ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
 									schedulerCycleLogDoList.add(cycleLogDo);
 									System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
 									logger.error(
@@ -572,6 +552,10 @@ public class AutomationServiceImpl implements AutomationService {
 								cycleLogDo.setUuId(UUID.randomUUID().toString());
 								cycleLogDo.setLogMsgText("No PDF in the Attacment found for " + message.getFrom()[0]
 										+ " with message subject :" + message.getSubject());
+								cycleLogDo.setTimestampIST(
+										ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+								cycleLogDo.setTimestampKSA(
+										ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
 								schedulerCycleLogDoList.add(cycleLogDo);
 								response.setMessage("No PDF in the Attacment found for " + message.getFrom()[0]
 										+ " with message subject :" + message.getSubject());
@@ -585,6 +569,10 @@ public class AutomationServiceImpl implements AutomationService {
 							cycleLogDo.setUuId(UUID.randomUUID().toString());
 							cycleLogDo.setLogMsgText("No Attacment found for " + message.getFrom()[0]
 									+ " with message subject :" + message.getSubject());
+							cycleLogDo.setTimestampIST(
+									ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+							cycleLogDo.setTimestampKSA(
+									ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
 							schedulerCycleLogDoList.add(cycleLogDo);
 							response.setMessage("No Attacment found for " + message.getFrom()[0]
 									+ " with message subject :" + message.getSubject());
@@ -599,6 +587,8 @@ public class AutomationServiceImpl implements AutomationService {
 					SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
 					cycleLogDo.setUuId(UUID.randomUUID().toString());
 					cycleLogDo.setLogMsgText("Message is null or empty");
+					cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+					cycleLogDo.setTimestampKSA(ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
 					schedulerCycleLogDoList.add(cycleLogDo);
 					response.setMessage("Message is null or empty");
 					response.setNoOfAttachement(noOfAttachement);
@@ -609,68 +599,108 @@ public class AutomationServiceImpl implements AutomationService {
 
 			} else {
 				channelSftp = SFTPChannelUtil.getJschChannel(session);
-				for (Message message : emailMessages) {
-					noOfEmailsReadSuccessfully = noOfEmailsReadSuccessfully + 1;
-					String contentType = message.getContentType();
-					if (contentType.contains("multipart")) {
-						Multipart multiPart = (Multipart) message.getContent();
-						noOfAttachement = multiPart.getCount();
-						files = email.getAttachmentFromEmail(message);
-						if (!ServiceUtil.isEmpty(files)) {
-							noOfPDFs = files.size();
-							// Step 3 : Put the files into abbyy.
-							try {
-								abbyyIntegration.putInvoiceInAbbyy(files,
-										ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
-								messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
-								SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-								cycleLogDo.setUuId(UUID.randomUUID().toString());
-								cycleLogDo.setLogMsgText("File uploaded Successfully from message "
-										+ message.getFrom()[0] + " with message subject :" + message.getSubject());
-								schedulerCycleLogDoList.add(cycleLogDo);
-							} catch (Exception e) {
-								SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-								cycleLogDo.setUuId(UUID.randomUUID().toString());
-								cycleLogDo.setLogMsgText("Error while upload file from message" + message.getFrom()[0]
-										+ " with message subject :" + message.getSubject());
-								schedulerCycleLogDoList.add(cycleLogDo);
-								System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
-								logger.error(
-										"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
-												+ e.getMessage());
-								e.printStackTrace();
-								messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
 
+				channelSftp.connect();
+				if (!ServiceUtil.isEmpty(emailMessages)) {
+
+					for (Message message : emailMessages) {
+						noOfEmailsReadSuccessfully = noOfEmailsReadSuccessfully++;
+						String contentType = message.getContentType();
+						if (contentType.contains("multipart")) {
+							Multipart multiPart = (Multipart) message.getContent();
+							noOfAttachement = multiPart.getCount();
+							files = email.getAttachmentFromEmail(message);
+							if (!ServiceUtil.isEmpty(files)) {
+								// Step 3 : Put the files into abbyy.
+								noOfPDFs = files.size();
+								try {
+									for (File file : files) {
+										String requestId=seqService.getSequenceNoByMappingId(
+												ApplicationConstants.INVOICE_SEQUENCE, "INV");
+										String sftpPutResponse = abbyyIntegration.putInvoiceInAbbyy(file,
+												ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp,
+												requestId);
+										
+										DmsResponseDto dmsResponse = documentManagementService.uploadDocument(file, requestId);
+										if(!ServiceUtil.isEmpty(dmsResponse) && "Success".equalsIgnoreCase(dmsResponse.getResponse().getStatus())){
+											SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+											cycleLogDo.setUuId(UUID.randomUUID().toString());
+											cycleLogDo
+													.setLogMsgText(file.getName()+" with reference of "+requestId+" "+dmsResponse.getResponse().getMessage()+" to DMS");
+											cycleLogDo.setTimestampIST(
+													ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+											cycleLogDo.setTimestampKSA(
+													ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+											schedulerCycleLogDoList.add(cycleLogDo);
+										}
+										SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+										cycleLogDo.setUuId(UUID.randomUUID().toString());
+										cycleLogDo
+												.setLogMsgText(sftpPutResponse + " from email " + message.getFrom()[0]);
+										cycleLogDo.setTimestampIST(
+												ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+										schedulerCycleLogDoList.add(cycleLogDo);
+									}
+									messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
+								} catch (Exception e) {
+									SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+									cycleLogDo.setUuId(UUID.randomUUID().toString());
+									cycleLogDo.setLogMsgText("Error while upload file from message"
+											+ message.getFrom()[0] + " with message subject :" + message.getSubject());
+									cycleLogDo.setTimestampIST(
+											ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+									schedulerCycleLogDoList.add(cycleLogDo);
+									System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
+									logger.error(
+											"Error while upload file from message AutomationServiceImpl.extractInvoiceFromEmail() "
+													+ e.getMessage());
+									e.printStackTrace();
+									messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
+
+								}
+							} else {
+								SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+								cycleLogDo.setUuId(UUID.randomUUID().toString());
+								cycleLogDo.setLogMsgText("No PDF in the Attacment found for " + message.getFrom()[0]
+										+ " with message subject :" + message.getSubject());
+								cycleLogDo.setTimestampIST(
+										ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+								schedulerCycleLogDoList.add(cycleLogDo);
+								response.setMessage("No PDF in the Attacment found for " + message.getFrom()[0]
+										+ " with message subject :" + message.getSubject());
+								response.setNoOfAttachement(noOfAttachement);
+								response.setNoOfEmailspicked(noOfEmailspicked);
+								response.setNoOfEmailsReadSuccessfully(noOfEmailsReadSuccessfully);
+								response.setNoOfPDFs(noOfPDFs);
 							}
 						} else {
 							SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
 							cycleLogDo.setUuId(UUID.randomUUID().toString());
-							cycleLogDo.setLogMsgText("No PDF in the Attacment found for " + message.getFrom()[0]
+							cycleLogDo.setLogMsgText("No Attacment found for " + message.getFrom()[0]
 									+ " with message subject :" + message.getSubject());
+							cycleLogDo.setTimestampIST(
+									ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
 							schedulerCycleLogDoList.add(cycleLogDo);
-							response.setMessage("No PDF in the Attacment found for " + message.getFrom()[0]
+							response.setMessage("No Attacment found for " + message.getFrom()[0]
 									+ " with message subject :" + message.getSubject());
 							response.setNoOfAttachement(noOfAttachement);
 							response.setNoOfEmailspicked(noOfEmailspicked);
 							response.setNoOfEmailsReadSuccessfully(noOfEmailsReadSuccessfully);
 							response.setNoOfPDFs(noOfPDFs);
 						}
-					} else {
-
-						SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-						cycleLogDo.setUuId(UUID.randomUUID().toString());
-						cycleLogDo.setLogMsgText("No Attacment found for " + message.getFrom()[0]
-								+ " with message subject :" + message.getSubject());
-						schedulerCycleLogDoList.add(cycleLogDo);
-						response.setMessage("No Attacment found for " + message.getFrom()[0] + " with message subject :"
-								+ message.getSubject());
-						response.setNoOfAttachement(noOfAttachement);
-						response.setNoOfEmailspicked(noOfEmailspicked);
-						response.setNoOfEmailsReadSuccessfully(noOfEmailsReadSuccessfully);
-						response.setNoOfPDFs(noOfPDFs);
 
 					}
-
+				} else {
+					SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+					cycleLogDo.setUuId(UUID.randomUUID().toString());
+					cycleLogDo.setLogMsgText("Message is null or empty");
+					cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+					schedulerCycleLogDoList.add(cycleLogDo);
+					response.setMessage("Message is null or empty");
+					response.setNoOfAttachement(noOfAttachement);
+					response.setNoOfEmailspicked(noOfEmailspicked);
+					response.setNoOfEmailsReadSuccessfully(noOfEmailsReadSuccessfully);
+					response.setNoOfPDFs(noOfPDFs);
 				}
 
 			}
@@ -685,6 +715,7 @@ public class AutomationServiceImpl implements AutomationService {
 						cycleLogDo.setUuId(UUID.randomUUID().toString());
 						cycleLogDo.setLogMsgText("Email from " + entry.getKey().getFrom()[0] + " with message subject :"
 								+ entry.getKey().getSubject() + " moved to " + ApplicationConstants.PROCESSED_FOLDER);
+						cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
 						schedulerCycleLogDoList.add(cycleLogDo);
 					} else {
 						email.moveMessage(entry.getKey(), ApplicationConstants.INBOX_FOLDER, entry.getValue());
@@ -692,6 +723,7 @@ public class AutomationServiceImpl implements AutomationService {
 						cycleLogDo.setUuId(UUID.randomUUID().toString());
 						cycleLogDo.setLogMsgText("Email from " + entry.getKey().getFrom()[0] + " with message subject :"
 								+ entry.getKey().getSubject() + " moved to " + entry.getValue());
+						cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
 						schedulerCycleLogDoList.add(cycleLogDo);
 					}
 				} catch (Exception e) {
@@ -717,19 +749,20 @@ public class AutomationServiceImpl implements AutomationService {
 		}
 
 		SchedulerRunDo schedulerRun = schedulerRunRepository.getBySchedulerConfigID(entity.getScId());
-//		List<Object[]> oldCycle = schedulerCycleRepository.getMaxResultsBySchedulerRunId(schedulerRun.getSchedulerRunID());
-//		int savedNoOfEmailspicked = 0;
-//		int saveNoOfAttachements = 0;
-//		int saveNoOfEmailsReadSuccessfully = 0;
-//		int saveNoOfPDFs = 0;
-//		int savenoOfJSONFiles = 0;
-//		for (Object[] oldCycleEntity:oldCycle) {
-//			savedNoOfEmailspicked = (int) oldCycleEntity[0];
-//			saveNoOfEmailsReadSuccessfully = (int) oldCycleEntity[1];
-//			saveNoOfAttachements = (int) oldCycleEntity[2];
-//			saveNoOfPDFs = (int) oldCycleEntity[3];
-//			savenoOfJSONFiles = (int) oldCycleEntity[4];
-//		}
+		// List<Object[]> oldCycle =
+		// schedulerCycleRepository.getMaxResultsBySchedulerRunId(schedulerRun.getSchedulerRunID());
+		// int savedNoOfEmailspicked = 0;
+		// int saveNoOfAttachements = 0;
+		// int saveNoOfEmailsReadSuccessfully = 0;
+		// int saveNoOfPDFs = 0;
+		// int savenoOfJSONFiles = 0;
+		// for (Object[] oldCycleEntity:oldCycle) {
+		// savedNoOfEmailspicked = (int) oldCycleEntity[0];
+		// saveNoOfEmailsReadSuccessfully = (int) oldCycleEntity[1];
+		// saveNoOfAttachements = (int) oldCycleEntity[2];
+		// saveNoOfPDFs = (int) oldCycleEntity[3];
+		// savenoOfJSONFiles = (int) oldCycleEntity[4];
+		// }
 		cycleEntity.setNOfEmailspicked(noOfEmailspicked);
 		cycleEntity.setNoOfAttachements(noOfAttachement);
 		cycleEntity.setNoOfEmailsReadSuccessfully(noOfEmailsReadSuccessfully);
@@ -740,13 +773,13 @@ public class AutomationServiceImpl implements AutomationService {
 		cycleEntity.setNoOfJSONFiles(noOfJSONFiles);
 		SchedulerCycleDo savedCycleEntity = schedulerCycleRepository.save(cycleEntity);
 		for (SchedulerCycleLogDo cycleLogDo : schedulerCycleLogDoList) {
-			cycleLogDo.setLogMsgNo(String.valueOf(logMsgNo+1));
+			cycleLogDo.setLogMsgNo(String.valueOf(logMsgNo + 1));
 			cycleLogDo.setCycleID(savedCycleEntity.getSchedulerCycleID());
 			cycleLogDo.setRunID(schedulerRun.getSchedulerRunID());
 		}
 
 		schedulerCycleLogRepository.saveAll(schedulerCycleLogDoList);
-		schedulerRun.setNoOfCycles((schedulerRun.getNoOfCycles()== null ? 0 : schedulerRun.getNoOfCycles())+1);
+		schedulerRun.setNoOfCycles((schedulerRun.getNoOfCycles() == null ? 0 : schedulerRun.getNoOfCycles()) + 1);
 		schedulerRunRepository.save(schedulerRun);
 	}
 
@@ -761,63 +794,178 @@ public class AutomationServiceImpl implements AutomationService {
 			logger.error("Errorrrrrrrrrrrr" + ServiceUtil.isEmpty(channelSftp));
 			channelSftp.cd("\\Output\\");
 			Vector<String> files = channelSftp.ls("*");
-			for (int i = 0; i < files.size(); i++)
-			{
-			    Object obj = files.elementAt(i);
-			    logger.error("Objet  "+obj.toString());
-			    if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry)
-			    {
-			        LsEntry entry = (LsEntry) obj;
-			        if (true && !entry.getAttrs().isDir())
-			        {
-			        	logger.error("line 1"+entry.getFilename());
-			            ret.add(entry.getFilename());
-			        }
-			        if (true && entry.getAttrs().isDir())
-			        {
-			        	
-			            if (!entry.getFilename().equals(".") && !entry.getFilename().equals(".."))
-			            {
-			            	logger.error("line 2"+entry.getFilename());
-			            	
-			            	if(entry.getFilename().contains("Batch")){
-			            		logger.error("INSIDE Batch" );
-//			            		channelSftp.cd(entry.getFilename()+"\\");
-//			            		channelSftp.
-			            		Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
-			            		for (ChannelSftp.LsEntry fileEntry : filelist) {
-			    					try {
-			    						logger.error("INSIDE JSON " + fileEntry.getFilename());
-			    						if (fileEntry.getFilename().contains(".json")) {
-			    							logger.error("INSIDE JSON ");
-			    							InputStream is = channelSftp.get(fileEntry.getFilename());
-			    							ObjectMapper mapper = new ObjectMapper();
-			    							Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
-			    							JSONObject jsonObject = new JSONObject(jsonMap);
-			    							if (jsonObject.has("Documents")) {
-			    								InvoiceHeaderDto output = ABBYYJSONConverter.abbyyJSONOutputToInvoiceObject(jsonObject);
-			    								logger.error("InvoiceHeaderDto  :"+output);
-			    							}
-			    							is.close();
-			    						}
-			    					} catch (Exception e) {
-			    						e.printStackTrace();
-			    						
+			for (int i = 0; i < files.size(); i++) {
+				Object obj = files.elementAt(i);
+				logger.error("Objet  " + obj.toString());
+				if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry) {
+					LsEntry entry = (LsEntry) obj;
+					if (true && !entry.getAttrs().isDir()) {
+						logger.error("line 1" + entry.getFilename());
+						ret.add(entry.getFilename());
+					}
+					if (true && entry.getAttrs().isDir()) {
 
-			    					}
-			    				}
-			            	}
-			                ret.add(entry.getFilename());
-			            }
-			        }
-			    }
+						if (!entry.getFilename().equals(".") && !entry.getFilename().equals("..")) {
+							logger.error("line 2" + entry.getFilename());
+
+							if (entry.getFilename().contains("Batch")) {
+								logger.error("INSIDE Batch");
+								// channelSftp.cd(entry.getFilename()+"\\");
+								// channelSftp.
+								Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
+								for (ChannelSftp.LsEntry fileEntry : filelist) {
+									try {
+										logger.error("INSIDE JSON " + fileEntry.getFilename());
+										if (fileEntry.getFilename().contains(".json")) {
+											logger.error("INSIDE JSON ");
+											InputStream is = channelSftp.get(fileEntry.getFilename());
+											ObjectMapper mapper = new ObjectMapper();
+											Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
+											JSONObject jsonObject = new JSONObject(jsonMap);
+											if (jsonObject.has("Documents")) {
+												InvoiceHeaderDto output = ABBYYJSONConverter
+														.abbyyJSONOutputToInvoiceObject(jsonObject);
+												logger.error("InvoiceHeaderDto  :" + output);
+											}
+											is.close();
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+
+									}
+								}
+							}
+							ret.add(entry.getFilename());
+						}
+					}
+				}
 			}
 			return ret;
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			logger.error("Error in "+e.getMessage());
+			logger.error("Error in " + e.getMessage());
 			return null;
 		}
 	}
+
+	@Override
+	public ResponseDto downloadFilesFromSFTPABBYYServer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// public ResponseDto extractInvoiceFromEmail() {
+	// ResponseDto response = null;
+	// try {
+	// response = new ResponseDto("Success", "200", "Uploaded files to abbyy and
+	// moved messages to folders", null);
+	// // Step 1 : Get unread emails/messages from specific sender !
+	// // input parameters email host,email id,password,email ids,flag,
+	// Message[] emailMessages =
+	// email.readEmail(ApplicationConstants.OUTLOOK_HOST,
+	// ApplicationConstants.ACCPAY_EMAIL_ID,
+	// ApplicationConstants.ACCPAY_EMAIL_PASSWORD,
+	// ApplicationConstants.INBOX_FOLDER, ApplicationConstants.UNSEEN_FLAGTERM);
+	//
+	// // Step 2 : Get the attachment pdf file from a message
+	// List<File> files = new ArrayList<File>();
+	// // map to move messages to processed/unprocessed folder
+	// Map<Message, String> messageMap = new HashMap<>();
+	//
+	// // setup channel connect channel pass the same channel for every put
+	// // get session for SFTP
+	// Session session = SFTPChannelUtil.getSession();
+	//
+	// ChannelSftp channelSftp = null;
+	// channelSftp = SFTPChannelUtil.getJschChannel(session);
+	// if (!ServiceUtil.isEmpty(channelSftp)) {
+	// channelSftp.connect();
+	// for (Message message : emailMessages) {
+	// String contentType = message.getContentType();
+	// if (contentType.contains("multipart")) {
+	// files = email.getAttachmentFromEmail(message);
+	// if (!ServiceUtil.isEmpty(files)) {
+	// // Step 3 : Put the files into abbyy.
+	// try {
+	// abbyyIntegration.putInvoiceInAbbyy(files,
+	// ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
+	// messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
+	// } catch (Exception e) {
+	// System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
+	// logger.error(
+	// "Error while upload file from message
+	// AutomationServiceImpl.extractInvoiceFromEmail() "
+	// + e.getMessage());
+	// e.printStackTrace();
+	// messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
+	//
+	// }
+	// } else {
+	// response = new ResponseDto("Done", "200", "No PDF in the Attacment found
+	// ", null);
+	// }
+	// } else {
+	// response = new ResponseDto("Done", "200", "No Attacment found ", null);
+	// }
+	//
+	// }
+	//
+	// } else {
+	// channelSftp = SFTPChannelUtil.getJschChannel(session);
+	// for (Message message : emailMessages) {
+	// String contentType = message.getContentType();
+	// if (contentType.contains("multipart")) {
+	// files = email.getAttachmentFromEmail(message);
+	// if (!ServiceUtil.isEmpty(files)) {
+	// // Step 3 : Put the files into abbyy.
+	// try {
+	// abbyyIntegration.putInvoiceInAbbyy(files,
+	// ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp);
+	// messageMap.put(message, ApplicationConstants.PROCESSED_FOLDER);
+	// } catch (Exception e) {
+	// System.out.println("AutomationServiceImpl.extractInvoiceFromEmail()");
+	// logger.error(
+	// "Error while upload file from message
+	// AutomationServiceImpl.extractInvoiceFromEmail() "
+	// + e.getMessage());
+	// e.printStackTrace();
+	// messageMap.put(message, ApplicationConstants.UNPROCESSED_FOLDER);
+	//
+	// }
+	// } else {
+	// response = new ResponseDto("Done", "200", "No PDF in the Attacment found
+	// ", null);
+	// }
+	// } else {
+	// response = new ResponseDto("Done", "200", "No Attacment found ", null);
+	// }
+	//
+	// }
+	//
+	// }
+	// // disconnect the channel
+	// SFTPChannelUtil.disconnect(session, channelSftp);
+	// // NOW MOVE THE MESSAGES TO THE RESPECTIVE FOLDERS.
+	// for (Map.Entry<Message, String> entry : messageMap.entrySet()) {
+	// if
+	// (ApplicationConstants.PROCESSED_FOLDER.equalsIgnoreCase(entry.getValue()))
+	// {
+	// email.moveMessage(entry.getKey(), ApplicationConstants.INBOX_FOLDER,
+	// entry.getValue());
+	// } else {
+	// email.moveMessage(entry.getKey(), ApplicationConstants.INBOX_FOLDER,
+	// entry.getValue());
+	// }
+	// }
+	//
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// logger.error("AutomationServiceImpl.extractInvoiceFromEmail():::" +
+	// e.getMessage());
+	// response = new ResponseDto("Failed", "500", e.getMessage(), null);
+	// }
+	// return response;
+	// }
+
 }

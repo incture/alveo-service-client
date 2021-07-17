@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
@@ -75,10 +76,11 @@ public class ServiceUtil {
 		}
 		return false;
 	}
-	public static String getFormattedDateinString(String format){
-		String formattedDate =  null;
+
+	public static String getFormattedDateinString(String format) {
+		String formattedDate = null;
 		Date date = new Date();
-		SimpleDateFormat formatter =null;
+		SimpleDateFormat formatter = null;
 		try {
 			formatter = new SimpleDateFormat(format);
 			formattedDate = formatter.format(date);
@@ -90,7 +92,6 @@ public class ServiceUtil {
 		}
 		return formattedDate;
 	}
-	
 
 	// public static ResponseDto updateWorkflowTaskStatus(String taskId, String
 	// recipientUsers, String taskStatus,
@@ -244,14 +245,14 @@ public class ServiceUtil {
 		String formatted = format.format(date);
 		return formatted;
 	}
-	
-	public static String getDateByEpoc(Long epoc,String pattern) {
+
+	public static String getDateByEpoc(Long epoc, String pattern) {
 		Date date = new Date(epoc);
 		DateFormat format = new SimpleDateFormat(pattern);
 		String formatted = format.format(date);
 		return formatted;
 	}
-	
+
 	public static Long getEpocTime() {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss:sss");
 		Date dateToBeFormatted = new Date();
@@ -856,15 +857,21 @@ public class ServiceUtil {
 	public static Long getStringToEpoch(String invDateString) {
 		// TODO Auto-generated method stub
 		try {
-			Long epoch =  new SimpleDateFormat("yyyy-MM-dd").parse(invDateString).getTime();
+			Long epoch = new SimpleDateFormat("yyyy-MM-dd").parse(invDateString).getTime();
 			Long epochLong = epoch;
 			return epochLong;
 		} catch (Exception e) {
 			return 0L;
 		}
 	}
+
 	
-	
+	public static Date getCurrentDateByZone(String timezone) {
+		TimeZone.setDefault(TimeZone.getTimeZone(timezone));
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");  
+		Date date = new Date(System.currentTimeMillis());  // GMT+5:30
+		return date;
+	}
 
 	// delay execution code.
 
@@ -876,6 +883,5 @@ public class ServiceUtil {
 	 * // after the delayed job done we have shut the ScheduledExecutorService
 	 * down. executorService.shutdown(); }
 	 */
-	
-	
+
 }

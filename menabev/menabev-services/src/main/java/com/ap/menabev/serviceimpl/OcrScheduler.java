@@ -43,7 +43,7 @@ public class OcrScheduler  implements Runnable {
 		logger.error("SchedulerConfigurationDo entity  inside ocrrrrrrrrrrrrrrrrrrrrrr" + entity);
 		if (!ServiceUtil.isEmpty(entity)) {
 			logger.error("inside ocr scheduler");
-			automationService.downloadFilesFromSFTPABBYYServer();
+			automationService.downloadFilesFromSFTPABBYYServer(entity);
 		} else {
 			// complete the sch run
 			this.scheduledFuture.cancel(true);
