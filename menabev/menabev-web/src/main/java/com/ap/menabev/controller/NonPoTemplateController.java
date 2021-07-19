@@ -24,7 +24,6 @@ import com.ap.menabev.dto.NonPoTemplateFilterDto;
 import com.ap.menabev.dto.NonPoTemplateHIDto;
 import com.ap.menabev.dto.NonPoTemplateItemsDto;
 import com.ap.menabev.service.NonPoTemplateService;
-import com.ap.menabev.soap.service.JournalEntryService;
 import com.ap.menabev.util.ServiceUtil;
 import com.ap.menabev.dto.ResponseDto;
 

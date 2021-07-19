@@ -1,72 +1,44 @@
 package com.ap.menabev.soap.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.ap.menabev.soap.journalcreatebinding.ChartOfAccountsItemCode;
-import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmationBulkMessage;
-import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateConfirmationMessage;
 import com.ap.menabev.soap.journalcreatebinding.JournalEntryCreateRequestBulkMessage;
-import com.ap.menabev.soap.service.JournalEntryService;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 @RestController
 @RequestMapping("/soap")
 public class JournalEntryController {
-	@Autowired
-	JournalEntryService journalEntryService;
+	//@Autowired
+	//JournalEntryService journalEntryService;
 	
 	
-
+/*
 	@PostMapping("/postJournalEntryNonPo")
 	public ResponseEntity<?> postJournalEntryToSapHttpClient(@RequestBody JournalEntryCreateRequestBulkMessage requestMessage) throws URISyntaxException, IOException, JAXBException, SOAPException{
 		System.out.println("ReQUEST PAyloaD sOAP::::::"+requestMessage.getMessageHeader().getCreationDateTime());
 		return journalEntryService.postNonPoItemsToSAP(requestMessage);
 	}
-	
+	*/
 	@PostMapping("/postJournalEntryString")
 	public ResponseEntity<Resource> postJournalEntryStringEntity(@RequestBody JournalEntryCreateRequestBulkMessage requestMessage) throws URISyntaxException, IOException, JAXBException, SOAPException{
 		System.out.println("ReQUEST PAyloaD sOAP::::::"+requestMessage.getMessageHeader().getCreationDateTime());

@@ -148,7 +148,6 @@ import com.ap.menabev.soap.journalcreatebinding.LogItem;
 import com.ap.menabev.soap.journalcreatebinding.ProductTaxationCharacteristicsCode;
 import com.ap.menabev.soap.journalcreatebinding.Root;
 import com.ap.menabev.soap.journalcreatebinding.SLog;
-import com.ap.menabev.soap.service.JournalEntryService;
 import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.DestinationReaderUtil;
 import com.ap.menabev.util.HelperClass;
@@ -3238,7 +3237,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceSubmit.setUserList(userList);
 				System.err.println("Remediation User Response " + invoiceSubmit);
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION").getObject();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
 				System.out.println("ActivityLogSave ::::" + activitySave);
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3273,7 +3272,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceSubmit.setUserList(userList);
 				System.err.println("ProcessLead User Response " + invoiceSubmit);
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL").getObject();
+				ActivityLogDto activitySave =  activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
 				System.out.println("ActivityLogSave ::::" + activitySave);
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3306,7 +3305,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			invoiceSubmit.setUserList(userList);
 			System.err.println("ProcessLead User Response " + invoiceSubmit);
 			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT").getObject();
+			ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
 			System.out.println("ActivityLogSave ::::" + activitySave);
 			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3335,9 +3334,15 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
 //						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
 				//Added By Lakhu
+				// complete the acvity of the Accoutant .
 				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL").getObject();
-				activity.add(activitySave);
+				ActivityLogDto activityAccoutantUpdate = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
+				activity.add(activityAccoutantUpdate);
+				// complete  activity log for Process Lead task 
+				                         
+                
+				
+				
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all the things - activity log and comments
 				if (invoiceSubmitOk.getInvoice().getChangeIndicators() != null) {
@@ -3375,7 +3380,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
 				//Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION").getObject();
+				ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
 				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all the things - activity log and comments
@@ -3407,7 +3412,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
 				//Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT").getObject();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
 				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all things - activity log and comments
@@ -3506,7 +3511,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //					"BUYER_APPROVE");
 			//Added By Lakhu
 			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_APPROVE").getObject();
+			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_APPROVE");
 			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
@@ -3542,7 +3547,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //						"BUYER_REJECT");
 				//Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_REJECT").getObject();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_REJECT");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3823,7 +3828,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //						"PROCESS_LEAD_APPROVAL");
 				//Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL").getObject();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
@@ -3865,7 +3870,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //					"PROCESS_LEAD_APPROVAL");
 			//Added By Lakhu
 			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL").getObject();
+			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL");
 			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
@@ -3906,7 +3911,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //						"PROCESS_LEAD_REJECTION");
 				//Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_REJECTION").getObject();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_REJECTION");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
@@ -3939,7 +3944,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 //						"PROCESS_REJECTION");
 				//Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_REJECTION").getObject();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_REJECTION");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
@@ -4220,6 +4225,9 @@ XMLGregorianCalendar date2
                  return number;           	
            }
 	}
+	
+	
+	
 	
 	public static void main(String[] args) throws ParseException, DatatypeConfigurationException, IOException, SOAPException, JAXBException {
 		

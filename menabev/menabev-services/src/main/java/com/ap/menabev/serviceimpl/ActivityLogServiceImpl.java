@@ -107,8 +107,9 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 		activity.setWorkflowStatus("IN-PROGRESS");
 	    return activity;
 	}
-	
-	public ResponseDto saveOrUpdateActivityLog(InvoiceSubmitDto invoiceSubmit,String actionCode,String actionCodeText){
+
+	// use for both completi
+	public ActivityLogDto saveOrUpdateActivityLog(InvoiceSubmitDto invoiceSubmit,String actionCode,String actionCodeText){
 		ResponseDto response = new ResponseDto();
 		ActivityLogDto activity = new ActivityLogDto();
 		try {
@@ -143,17 +144,15 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 			activity.setWorkflowCreatedAt(invoiceSubmit.getInvoice().getRequest_created_at());
 			activity.setWorkflowId(invoiceSubmit.getInvoice().getWorkflowId());
 			activity.setWorkflowStatus("IN-PROGRESS");
-			ActivityLogDo activityDo = ObjectMapperUtils.map(activity, ActivityLogDo.class);
+			//ActivityLogDo activityDo = ObjectMapperUtils.map(activity, ActivityLogDo.class);
 			response.setObject(activity);
-			repo.save(activityDo);
-			
+			//repo.save(activityDo);
+			return activity;
 		} catch (Exception e) {
-			response.setCode(ApplicationConstants.CODE_FAILURE);
-			response.setMessage("Creation or Update Failed due to "+ e.getMessage());
-			response.setStatus(ApplicationConstants.CREATE_FAILURE);
-			response.setObject(activity);
+		       System.err.println("Exception activityLog "+e);
+			return activity;
 		}
-		return response;
+	
 	}
 	
 	@Override
@@ -174,8 +173,10 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 		
 	}
 	
-
+	// create activity log for invocie Recivied , which we will return dto to be saved
 	
+    // create Activity Log for completing the activity of the current user 
+		
 	
 	
 
