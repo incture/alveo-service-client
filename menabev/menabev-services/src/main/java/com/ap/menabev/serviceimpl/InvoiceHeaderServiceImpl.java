@@ -4118,9 +4118,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				   String itemTaxCode = item.getTaxCode();
 				   String currency = invoiceHeader.getCurrency();
 				   System.err.println("currency "+currency);
-				   //String conditionType = item.getConditionType();
+				   String conditionType = item.getConditionType();
 				   
-				   String conditionType = "MWVS";
+				   //String conditionType = "MWVS";
 				if (!ServiceUtil.isEmpty(itemTaxCode) || itemTaxCode != null) {
 					if (productTaxMap.containsKey(itemTaxCode)) {
 						ProductTaxDto  valueDto = productTaxMap.get(itemTaxCode);
