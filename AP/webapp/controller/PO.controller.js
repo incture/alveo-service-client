@@ -68,25 +68,25 @@ sap.ui.define([
 			var oLanguage = "E";
 			var countryKey = "SA";
 			//To load all OData lookups
-			// this.getPaymentTerm(oHeader, oLanguage);
-			// this.getPaymentMethod(oHeader, oLanguage);
-			// this.getPaymentBlock(oHeader, oLanguage);
-			// this.getTaxCode(oHeader, oLanguage, countryKey);
-			// this.getCostCenter("1010", oLanguage);
-		},
-
-		onAfterRendering: function () {
-			var oHeader = {
-				"Content-Type": "application/json; charset=utf-8"
-			};
-			var oLanguage = "E";
-			var countryKey = "SA";
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
 			this.getTaxCode(oHeader, oLanguage, countryKey);
 			this.getCostCenter("1010", oLanguage);
 		},
+
+		// onAfterRendering: function () {
+		// 	var oHeader = {
+		// 		"Content-Type": "application/json; charset=utf-8"
+		// 	};
+		// 	var oLanguage = "E";
+		// 	var countryKey = "SA";
+		// 	this.getPaymentTerm(oHeader, oLanguage);
+		// 	this.getPaymentMethod(oHeader, oLanguage);
+		// 	this.getPaymentBlock(oHeader, oLanguage);
+		// 	this.getTaxCode(oHeader, oLanguage, countryKey);
+		// 	this.getCostCenter("1010", oLanguage);
+		// },
 
 		hdrInvAmtCalu: function (oEvent) {
 			POServices.calculateGross(oEvent, this);
@@ -397,6 +397,17 @@ sap.ui.define([
 			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
+		onApprove: function (oEvent) {
+			var threewayMatch;
+			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
+			if (changeIndicators && changeIndicators.itemChange) {
+				threewayMatch = true;
+			}
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/NonPo");
+			POServices.onPoSubmit(oEvent, this, MandatoryFileds, "PA", "/menabevdev/invoiceHeader/processLead/processLeadSubmit", "Saving....",
+				"", threewayMatch);
+		},
+
 		onSubmitBuyerTask: function (oEvent) {
 			var oPOModel = this.oPOModel;
 			var oMandatoryModel = this.oMandatoryModel;
@@ -560,6 +571,11 @@ sap.ui.define([
 				oMandatoryModel.setProperty("/NonPO/reasonForRejectionState", "None");
 				oMandatoryModel.setProperty("/NonPO/commmentsState", "None");
 			}
+			if (actionCode === "AR") {
+				this.RejectDialog.close();
+			} else {
+				this.SubmitDialog.close();
+			}
 			if (userList) {
 				var oPayload = {
 					"invoice": oData,
@@ -571,7 +587,6 @@ sap.ui.define([
 				};
 				oPayload.invoice.taskOwner = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
-				this.SubmitDialog.close();
 				POServices.onAccSubmit(this, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmitOk", actionCode, userList, "ok");
 			}
 
@@ -782,6 +797,134 @@ sap.ui.define([
 
 		onCloseFragment: function (oEvent) {
 			this.userGroup.close();
+		},
+
+		onPOItemSelct: function (oEvent) {
+			var oPOModel = this.oPOModel;
+			var selected = oEvent.getSource().getSelected();
+			var bindingObject = oEvent.getSource().getBindingContext("oPOModel").getObject();
+			var sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
+			var docNo = bindingObject.documentNumber;
+			var docItem = bindingObject.documentItem;
+			var docItemList = oPOModel.getProperty("/" + docNo);
+			var selectedPOItem = oPOModel.getProperty("/selectedPOItem");
+			if (!selectedPOItem) {
+				selectedPOItem = [];
+			}
+			var index, poIndex, count = 0;
+			if (docItemList) {
+				index = docItemList.indexOf(docItem);
+				if (index >= 0) {
+					oEvent.getSource().setSelected(false);
+					return;
+				}
+			}
+			if (!selected) {
+				poIndex = selectedPOItem.indexOf(docItem);
+				if (poIndex >= 0) {
+					selectedPOItem.slice(poIndex, 1);
+				}
+			} else {
+				selectedPOItem.push(sPath);
+			}
+			oPOModel.setProperty("/selectedPOItem", selectedPOItem);
+		},
+
+		onCopyItems: function () {
+			var oPOModel = this.oPOModel;
+			var invoiceItems = oPOModel.getProperty("/invoiceItems");
+			if (!invoiceItems) {
+				invoiceItems = [];
+			}
+			var poItems = oPOModel.getProperty("/selectedPOItem");
+			var len = poItems.length;
+			var data, oData;
+			for (var i = 0; i < len; i++) {
+				data = oPOModel.getProperty(poItems[i]);
+				oData = {
+					"accAssignmentCat": null,
+					"accountAssignmentCat": data.accountAssCat,
+					"alvQtyOPU": null,
+					"alvQtyOU": null,
+					"alvQtyUOM": null,
+					"articleNum": data.vendMat,
+					"contractItem": data.contractItm,
+					"contractNum": data.contractNum,
+					"convDen1": null,
+					"convNum1": null,
+					"currency": oPOModel.currency,
+					"customerItemId": data.material,
+					"disPerentage": 0,
+					"discountValue": 0,
+					"distributionInd": data.distribution,
+					"extItemId": "",
+					"grNonValInd": data.gr_non_val,
+					"grBsdIv": data.grBsdIVInd,
+					"grFlag": data.grInd,
+					"grossPrice": 0,
+					"guid": "",
+					"invItemAcctDtoList": data.poAccountAssigment,
+					"invQty": data.quantity,
+					"invoiceItemMessages": [],
+					"isAccAssigned": false,
+					"isDeleted": false,
+					"isSelected": false,
+					"isThreewayMatched": false,
+					"isTwowayMatched": true,
+					"itemCategory": data.itemCategory,
+					"itemCode": "",
+					"itemRequisationNum": null,
+					"itemStatusCode": "",
+					"itemStatusText": "",
+					"itemText": data.shortText,
+					"ivFlag": null,
+					"matchDocItem": data.documentItem,
+					"matchDocNum": data.documentNumber,
+					"matchParam": null,
+					"matchType": null,
+					"matchedBy": null,
+					"matchpackageNumber": null,
+					"matchserviceNumber": null,
+					"netWorth": 0,
+					"orderPriceUnit": data.orderPriceUnit,
+					"orderPriceUnitISO": null,
+					"orderUnit": null,
+					"orderUnitISO": null,
+					"partialInvInd": data.partInv,
+					"poItemText": null,
+					"poMatNum": null,
+					"poQtyOPU": null,
+					"poQtyOU": data.quantity,
+					"poTaxCode": null,
+					"poUnitPriceOPU": data.priceUnit,
+					"poUnitPriceOU": data.priceUnit,
+					"poUnitPriceUOM": data.priceUnit,
+					"pricingUnit": data.priceUnit,
+					"productType": data.productType,
+					"refDocCat": null,
+					"refDocNum": data.documentNumber,
+					"requestId": oPOModel.requestId,
+					"requisationNum": null,
+					"setPoMaterialNum": null,
+					"srvBsdIv": data.srvBsdIVInd,
+					"sysSuggTax": null,
+					"taxCode": data.taxCode,
+					"taxPercentage": 0,
+					"taxValue": 0,
+					"unitPrice": data.netPrice,
+					"uom": "",
+					"upcCode": null,
+					"updatedAt": null,
+					"updatedBy": null
+				};
+				invoiceItems.unshift(oData);
+				oPOModel.setProperty(poItems[i] + "/isSelected", false);
+			}
+			oPOModel.setProperty("/invoiceItems", invoiceItems);
+			oPOModel.setProperty("/selectedPOItem", []);
+			POServices.formatUOMList(oPOModel.getProperty("/invoiceItems"), this);
+			POServices.setChangeInd("", this, "itemChange");
+			oPOModel.refresh();
 		},
 
 		onClickAddInvoiceItem: function (oEvent) {

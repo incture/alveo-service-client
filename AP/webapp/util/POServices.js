@@ -417,7 +417,7 @@ com.menabev.AP.util.POServices = {
 	},
 
 	//Called on click of Submit Button.
-	onNonPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode) {
+	onNonPoSubmit: function (oEvent, oController, MandatoryFileds, actionCode, sUrl) {
 		var oPOModel = oController.oPOModel;
 		var oMandatoryModel = oController.oMandatoryModel;
 		var oSubmitData = oPOModel.getData();
@@ -501,16 +501,28 @@ com.menabev.AP.util.POServices = {
 				if (!oSubmitData.invoiceTotal) {
 					oSubmitData.invoiceTotal = 0;
 				}
+
+				var sUrl;
 				var sMethod = "POST";
 				var oPayload = {
 					"invoiceHeaderDto": oSubmitData
 				};
-				var sUrl;
 				oPayload.invoiceHeaderDto.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
 				if (oSubmitData.invoiceType == "PO") {
 					sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
 					oPayload.invoiceHeaderDto.purchaseOrder = jQuery.extend(true, [], oData.purchaseOrder);
 					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "", "", "", "Saving...");
+				} else if (actionCode) {
+					sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
+					var sMethod = "POST";
+					var oPayload = {
+						"invoice": oSubmitData,
+						"requestId": oSubmitData.requestId,
+						"taskId": oController.taskId,
+						"actionCode": actionCode
+					};
+					oPayload.invoice.taskOwner = oController.oUserDetailModel.getProperty("/loggedInUserMail");
+					this.onAccSubmit(oController, oPayload, sMethod, sUrl, actionCode, "", "", "", "Saving..");
 				} else {
 					var sUrl = "/menabevdev/invoiceHeader/accountantSubmit";
 					this.saveSubmitServiceCall(oController, oPayload, sMethod, sUrl, "", "Saving...");
@@ -829,6 +841,7 @@ com.menabev.AP.util.POServices = {
 				oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
 				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPercentage);
 				oPOModel.setProperty("/costAllocation/" + i + "/conditionType", taxDetails.TaxConditionType);
+				oPOModel.setProperty("/costAllocation/" + i + "/currency", oPOModel.currency);
 			}
 		}
 		if (taxDetails) {
@@ -866,6 +879,7 @@ com.menabev.AP.util.POServices = {
 				oPOModel.setProperty("/invoiceItems/" + i + "/taxCode", taxCode);
 				oPOModel.setProperty("/invoiceItems/" + i + "/taxPercentage", taxPercentage);
 				oPOModel.setProperty("/invoiceItems/" + i + "/taxConditionType", taxDetails.TaxConditionType);
+
 				itemTaxPercentage = this.nanValCheck(taxPercentage);
 				itemGrossPrice = this.nanValCheck(oPOModel.getProperty("/invoiceItems/" + i + "/grossPrice"));
 				itemTaxAmount = (taxPercentage * itemGrossPrice) / 100;
@@ -873,6 +887,7 @@ com.menabev.AP.util.POServices = {
 				itemNetWorth = this.nanValCheck(itemTaxAmount) + this.nanValCheck(itemGrossPrice);
 				oPOModel.setProperty("/invoiceItems/" + i + "/taxValue", itemTaxAmount);
 				oPOModel.setProperty("/invoiceItems/" + i + "/netWorth", itemNetWorth);
+
 			}
 		}
 		var selectedItems = oPOModel.getProperty("/");
@@ -1055,13 +1070,16 @@ com.menabev.AP.util.POServices = {
 			grossTotal += this.nanValCheck(gross);
 
 			//PO Match
-			matchDocNumber = itemDetails[i].matchDocNumber;
-			matchDocNumberObject = oPOModel.getProperty("/" + matchDocNumber);
-			if (!matchDocNumberObject) {
-				matchDocNumberObject = [];
+			matchDocNumber = itemDetails[i].matchDocNum;
+
+			if (matchDocNumber) {
+				matchDocNumberObject = oPOModel.getProperty("/" + matchDocNumber);
+				if (!matchDocNumberObject) {
+					matchDocNumberObject = [];
+				}
+				matchDocNumberObject.push(itemDetails[i].matchDocItem);
+				oPOModel.setProperty("/" + matchDocNumber, matchDocNumberObject);
 			}
-			matchDocNumberObject.push(itemDetails[i].matchDocItem);
-			oPOModel.setProperty("/" + matchDocNumber, matchDocNumberObject);
 		}
 		var unplannedCost = oPOModel.getProperty("/unplannedCost");
 		var invoiceTotal = oPOModel.getProperty("/invoiceTotal");

@@ -64,26 +64,26 @@ sap.ui.define([
 			};
 			var oLanguage = "E";
 			var countryKey = "SA";
-			// this.getPaymentTerm(oHeader, oLanguage);
-			// this.getPaymentMethod(oHeader, oLanguage);
-			// this.getPaymentBlock(oHeader, oLanguage);
-			// this.getTaxCode(oHeader, oLanguage, countryKey);
-			// this.getCostCenter("1010", oLanguage);
-			//To load all OData lookups
-		},
-
-		onAfterRendering: function () {
-			var oHeader = {
-				"Content-Type": "application/json; charset=utf-8"
-			};
-			var oLanguage = "E";
-			var countryKey = "SA";
 			this.getPaymentTerm(oHeader, oLanguage);
 			this.getPaymentMethod(oHeader, oLanguage);
 			this.getPaymentBlock(oHeader, oLanguage);
 			this.getTaxCode(oHeader, oLanguage, countryKey);
 			this.getCostCenter("1010", oLanguage);
+			//To load all OData lookups
 		},
+
+		// onAfterRendering: function () {
+		// 	var oHeader = {
+		// 		"Content-Type": "application/json; charset=utf-8"
+		// 	};
+		// 	var oLanguage = "E";
+		// 	var countryKey = "SA";
+		// 	this.getPaymentTerm(oHeader, oLanguage);
+		// 	this.getPaymentMethod(oHeader, oLanguage);
+		// 	this.getPaymentBlock(oHeader, oLanguage);
+		// 	this.getTaxCode(oHeader, oLanguage, countryKey);
+		// 	this.getCostCenter("1010", oLanguage);
+		// },
 
 		onRouteMatched: function (oEvent) {
 			//reading the Arguments from url
@@ -305,7 +305,7 @@ sap.ui.define([
 				sPath = oEvent.getSource().getBindingContext("oPOModel").getPath();
 			var oPOModel = this.getOwnerComponent().getModel("oPOModel");
 			oPOModel.setProperty(sPath + "/taxPer", taxDetails.TaxRate);
-			oPOModel.setProperty(sPath + "/taxConditionType", taxDetails.TaxConditionType);
+			oPOModel.setProperty(sPath + "/conditionType", taxDetails.TaxConditionType);
 			this.amountCal(oEvent);
 		},
 
@@ -505,11 +505,13 @@ sap.ui.define([
 			var oPOModel = this.oPOModel;
 			var taxCode = oPOModel.getProperty("/taxCode"),
 				taxPercentage = oPOModel.getProperty("/taxPercentage"),
-				taxConditionType = oPOModel.getProperty("/taxConditionType");
+				taxConditionType = oPOModel.getProperty("/taxConditionType"),
+				currency = oPOModel.getProperty("/currency");
 			for (var i = 0; i < arr.length; i++) {
 				oPOModel.setProperty("/costAllocation/" + i + "/taxCode", taxCode);
 				oPOModel.setProperty("/costAllocation/" + i + "/taxPer", taxPercentage);
-				oPOModel.setProperty("/costAllocation/" + i + "/taxConditionType", taxConditionType);
+				oPOModel.setProperty("/costAllocation/" + i + "/conditionType", taxConditionType);
+				oPOModel.setProperty("/costAllocation/" + i + "/currency", currency);
 			}
 			oPOModel.refresh();
 			POServices.costAllocationTaxCalc("", this);
@@ -721,7 +723,7 @@ sap.ui.define([
 		//Called when the save button is clicked.
 		onNonPoSave: function (oEvent) {
 			if (!this.oPOModel.getProperty("/invoiceType")) {
-				this.oPOModel.setProperty("/invoiceType", "NON-PO")
+				this.oPOModel.setProperty("/invoiceType", "NON-PO");
 			}
 			POServices.onNonPoSave(oEvent, this);
 		},
@@ -729,6 +731,30 @@ sap.ui.define([
 		onNonPoSubmit: function (oEvent) {
 			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/NonPo");
 			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds);
+		},
+		onApprove: function (oEvent) {
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/NonPo");
+			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds, "PA", "/menabevdev/invoiceHeader/processLead/processLeadSubmit");
+		},
+
+		onNonPoReSend: function (oEvent) {
+			var userGroup = this.oUserDetailModel.getProperty("/loggedinUserGroup");
+			var MandatoryFileds = this.StaticDataModel.getProperty("/mandatoryFields/NonPo");
+			var sUrl, actionCode;
+			var loggedinUser = this.oUserDetailModel.getProperty("/loggedInUserMail");
+			if (userGroup === "Accountant") {
+				sUrl = "/menabevdev/invoiceHeader/accountant/invoiceSubmit";
+				actionCode = "ASA";
+			} else if (userGroup === "Buyer") {
+				sUrl = "/menabevdev/invoiceHeader/buyer/buyerSubmit";
+				actionCode = "A";
+			} else if (userGroup === "Process_Lead") {
+				sUrl = "/menabevdev/invoiceHeader/processLead/processLeadSubmit";
+				actionCode = "PRS";
+			}
+
+			POServices.onNonPoSubmit(oEvent, this, MandatoryFileds, actionCode, sUrl, "Saving....");
+			// POServices.onAccSubmit(oEvent, oPayload, "POST", "/menabevdev/invoiceHeader/accountant/invoiceSubmit", "ASA");
 		},
 
 		//Called on click of Reject Button.

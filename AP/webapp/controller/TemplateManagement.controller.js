@@ -26,6 +26,10 @@ sap.ui.define([
 		},
 
 		onRouteMatched: function (oEvent) {
+			var oArgs = oEvent.getParameter("arguments");
+			this.requestId = oArgs.id;
+			this.status = oArgs.status;
+			this.taskId = oArgs.taskId;
 			var templateModel = this.getModel("templateModel");
 			templateModel.setData({});
 			templateModel.setProperty("/tempDeleteBtnEnabled", false);
@@ -467,7 +471,9 @@ sap.ui.define([
 
 		onNavBack: function () {
 			this.oRouter.navTo("NonPOInvoice", {
-				id: "NonPOEdited"
+				id: this.requestId,
+				status: this.status,
+				taskId: this.taskId
 			});
 		},
 

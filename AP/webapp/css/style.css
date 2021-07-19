@@ -89,9 +89,9 @@
     background-color: #f7f7f7;
 }
 
-.sapUiSizeCompact .sapMTB.sapMTBHeader-CTX {
-    height: 1.75rem;
-}
+/*.sapUiSizeCompact .sapMTB.sapMTBHeader-CTX {*/
+/*    height: 1.75rem;*/
+/*}*/
 
 .Messageboxtitle .sapMDialog>header.sapMDialogTitle .sapMTitle {
     color: #fff;
