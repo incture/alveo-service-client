@@ -2,12 +2,14 @@ package com.ap.menabev.dms.serviceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +42,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 
 import com.ap.menabev.dms.dto.DmsGetResponseDto;
 import com.ap.menabev.dms.dto.DmsResponseDto;
@@ -168,7 +171,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 					}
 
 				}
-				if (Integer.parseInt(value.toString()) > 0) {
+				if (Integer.parseInt(value.toString()) > 0 && !file.getName().replace("." + getFileExtension(file.getName()), "").equals(requestId) ) {
 
 					Map<String, Object> properties2 = new HashMap<String, Object>();
 					properties2.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
@@ -254,6 +257,133 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		System.out.println("DMS Get Response::::::" + response);
 		return response;
 	}
+	
+	@Override
+	public List<DmsGetResponseDto> getDocumentByFolderName(String folderName, String documentName) throws IOException{
+		
+		List<DmsGetResponseDto> response  = new ArrayList<>();
+		SessionFactory factory = SessionFactoryImpl.newInstance();
+		Map<String, String> parameter = getRepositorySessionConnection();
+		Session session = factory.getRepositories(parameter).get(0).createSession();
+		
+		if(!ServiceUtil.isEmpty(folderName) && !ServiceUtil.isEmpty(documentName)){
+			String setParentByFolderId = null;
+			ItemIterable<QueryResult> folderIdByQuerry = session.query(
+					"SELECT cmis:objectId FROM cmis:folder where cmis:name like '%" + folderName + "'",
+					false);
+			System.out.println(folderIdByQuerry.getTotalNumItems());
+			Object value = null;
+			for (QueryResult hit : folderIdByQuerry) {
+				if (!ServiceUtil.isEmpty(hit)) {
+					for (PropertyData<?> property : hit.getProperties()) {
+						if (!ServiceUtil.isEmpty(property)) {
+							String queryName = property.getQueryName();
+							value = property.getFirstValue();
+
+							System.out.println(queryName + ": " + value);
+							break;
+
+						}
+
+					}
+					System.out.println("--------------------------------------");
+				}
+
+			}
+			setParentByFolderId = String.valueOf(value);
+            if(!ServiceUtil.isEmpty(setParentByFolderId)){
+            	Folder parent = (Folder) session.getObject(setParentByFolderId);
+    			ItemIterable<CmisObject> files = parent.getChildren();
+    			
+    			for(CmisObject obj : files){
+    				if(documentName.equals(obj.getName())){
+    					DmsGetResponseDto responseIf = new DmsGetResponseDto();
+    					Document doc = (Document) session.getObject(obj.getId());
+    					System.out.println();
+    					ContentStream contentStream = doc.getContentStream(); // returns
+
+    					if (contentStream != null) {
+
+    						InputStream is = contentStream.getStream();
+    						byte[] bytes = IOUtils.toByteArray(is);
+    						String encoded = Base64.getEncoder().encodeToString(bytes);
+    						responseIf.setBase64(encoded);
+    						responseIf.setMimeType(contentStream.getMimeType());
+    						responseIf.setDocumentName(doc.getName());
+    						responseIf.setFileAvailability(true);
+    					} else {
+    						responseIf.setBase64(null);
+    						responseIf.setMimeType(null);
+    						responseIf.setFileAvailability(false);
+    					}
+    					response.add(responseIf);
+    					System.out.println(response);
+    				}
+    			}
+            }
+		}
+		else if(!ServiceUtil.isEmpty(folderName)){
+			String setParentByFolderId = null;
+			ItemIterable<QueryResult> folderIdByQuerry = session.query(
+					"SELECT cmis:objectId FROM cmis:folder where cmis:name like '%" + folderName + "'",
+					false);
+			System.out.println(folderIdByQuerry.getTotalNumItems());
+			Object value = null;
+			for (QueryResult hit : folderIdByQuerry) {
+				if (!ServiceUtil.isEmpty(hit)) {
+					for (PropertyData<?> property : hit.getProperties()) {
+						if (!ServiceUtil.isEmpty(property)) {
+							String queryName = property.getQueryName();
+							value = property.getFirstValue();
+
+							System.out.println(queryName + ": " + value);
+							break;
+
+						}
+
+					}
+					System.out.println("--------------------------------------");
+				}
+
+			}
+			setParentByFolderId = String.valueOf(value);
+			 if(!ServiceUtil.isEmpty(setParentByFolderId)){
+	            	Folder parent = (Folder) session.getObject(setParentByFolderId);
+	    			ItemIterable<CmisObject> files = parent.getChildren();
+	    			
+	    			for(CmisObject obj : files){
+	    					DmsGetResponseDto responseIf = new DmsGetResponseDto();
+	    					Document doc = (Document) session.getObject(obj.getId());
+	    					ContentStream contentStream = doc.getContentStream(); // returns
+
+	    					if (contentStream != null) {
+	    					
+	    						InputStream is = contentStream.getStream();
+	    						byte[] bytes = IOUtils.toByteArray(is);
+	    						String encoded = Base64.getEncoder().encodeToString(bytes);
+	    						responseIf.setBase64(encoded);
+	    						responseIf.setMimeType(contentStream.getMimeType());
+	    						responseIf.setDocumentName(doc.getName());
+	    						responseIf.setFileAvailability(true);
+	    					} else {
+	    						responseIf.setBase64(null);
+	    						responseIf.setMimeType(null);
+	    						responseIf.setFileAvailability(false);
+	    					}
+	    					response.add(responseIf);
+	    					System.out.println(responseIf.getDocumentName());
+	    				
+	    			}
+	            }
+		}else{
+			DmsGetResponseDto responseElse = new DmsGetResponseDto();
+			responseElse.setFileAvailability(false);
+			response.add(responseElse);
+		}
+		System.out.println(response);
+		return response;
+	}
+	
 
 	@Override
 	public ResponseDto deleteDocument(String fileId) {
@@ -699,12 +829,13 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 //	public static void main(String[] args) throws FileNotFoundException, IOException, SAXException {
 //		DocumentManagementServiceImpl dms = new DocumentManagementServiceImpl();
 //		// dms.getAccessToken();
-//		File file = new File("C:\\Users\\Lakhu D\\Downloads\\exampleXml (1).xlsx");
-//		 dms.uploadDocument(file,"APA-05142021-00000004");
+////		File file = new File("C:\\Users\\Lakhu D\\Downloads\\APA-07192021-00000004.pdf");
+////		 dms.uploadDocument(file,"APA-07192021-00000004");
 ////		 dms.downloadDocument("jBwOUb1oXWQMnm_D_RNryrVPH9_aheSqT-vrHj5qteM");
 //		// dms.deleteDocument("qtpIma2YOLbRxsvFpYeD26ujU2EkWk_qsc7YCAWqd4s");
 //		// dms.extraxtXml(file);
 ////		dms.uploadXml(file);
+//		dms.getDocumentByFolderName("APA-07192021-00000004",null);
 //	}
 
 }

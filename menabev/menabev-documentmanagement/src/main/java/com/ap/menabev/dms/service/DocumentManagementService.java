@@ -1,6 +1,8 @@
 package com.ap.menabev.dms.service;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import com.ap.menabev.dms.dto.DmsGetResponseDto;
 import com.ap.menabev.dms.dto.DmsResponseDto;
@@ -13,5 +15,6 @@ public interface DocumentManagementService {
 	//DashBoardDetailsDto extraxtXml(File file) throws ParserConfigurationException, SAXException, IOException;
 	String getTest();
 	String getToken();
+	List<DmsGetResponseDto> getDocumentByFolderName(String folderName, String documentName) throws IOException;
 
 }

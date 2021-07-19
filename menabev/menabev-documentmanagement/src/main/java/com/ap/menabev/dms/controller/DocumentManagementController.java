@@ -2,6 +2,7 @@ package com.ap.menabev.dms.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,6 +54,12 @@ public class DocumentManagementController {
 	@ResponseBody
 	DmsGetResponseDto download(@PathVariable String fileId) {
 		return documentManagementService.downloadDocument(fileId);
+	}
+	
+	@GetMapping(value = "/downloadByFolderId/{folderName}/{fileName}")
+	@ResponseBody
+	List<DmsGetResponseDto> downloadByFolder(@PathVariable(name = "folderName", required = true) String folderName ,@PathVariable(name = "fileName", required = false) String fileName ) throws IOException {
+		return documentManagementService.getDocumentByFolderName(folderName, fileName);
 	}
 
 	@DeleteMapping(value = "/delete/{fileId}")
