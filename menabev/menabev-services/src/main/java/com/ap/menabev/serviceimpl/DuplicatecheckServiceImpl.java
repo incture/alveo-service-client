@@ -774,7 +774,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 			Double invoiced_qty = null;
 			if (!ServiceUtil.isEmpty(dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals())) {
 				for(PoHistoryTotalsDto history :  dto.getPurchaseDocumentHeader().get(0).getPoHistoryTotals()){
-					if(poItem.getDocumentItem().equals(history.getDocumentItem())){
+					if(poItem.getDocumentItem().equals(history.getDocumentItem()) && "00".equals(history.getSerialNo())){
 						deliv_qty = history.getDelivQty();
 						invoiced_qty = history.getIvQty();
 					}
