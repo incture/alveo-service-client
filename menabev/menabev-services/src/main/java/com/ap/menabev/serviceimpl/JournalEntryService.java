@@ -83,8 +83,8 @@ public class JournalEntryService extends WebServiceGatewaySupport {
 	
 		String entity = formXmlPayload(requestMessage);
 		   
-		String url = "http://sd4.menabev.com:443"
-				+"/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/100/journalcreateservice/journalcreatebinding";
+		String url = "http://sq4.menabev.com:443"
+				+"/sap/bc/srt/xip/sap/journalentrycreaterequestconfi/300/journalcreateservice/journalcreatebinding";
 		   // String entity  = new String(fs.toByteArray());
 		// call odata method 
 		ResponseEntity<?> responseFromOdata = consumingOdataService(url, entity, "POST", null);
@@ -184,7 +184,7 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 			    ((HttpPost) httpRequestBase).setEntity(stringEntity);
 				
 			}
-				httpRequestBase.addHeader("sap-client", "100");
+				httpRequestBase.addHeader("sap-client", "300");
 		        httpRequestBase.addHeader("Content-Type", "text/xml");
 		        httpRequestBase.addHeader("SOAPAction","http://sap.com/xi/SAPSCORE/SFIN/JournalEntryCreateRequestConfirmation_In/JournalEntryCreateRequestConfirmation_InRequest");
 				String encoded = encodeUsernameAndPassword("Syuvraj","Incture@123");
@@ -224,17 +224,17 @@ public String formXmlPayload(JournalEntryCreateRequestBulkMessage requestMessage
 	public static String getConectivityProxy() throws URISyntaxException, IOException {
 		System.err.println("77 destination");
 		HttpClient client = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost("https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
-		//HttpPost httpPost = new HttpPost("https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+		//HttpPost httpPost = new HttpPost("https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+		HttpPost httpPost = new HttpPost("https://menabev-p2pautomation-test.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
 		httpPost.addHeader("Content-Type", "application/json");
 		// Encoding username and password
 		//Dev
-		String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
+		/*String auth = encodeUsernameAndPassword("sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5",
 				"d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=");
-		//qa
-		/*String auth = encodeUsernameAndPassword("sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5",
+	*/	//qa
+		String auth = encodeUsernameAndPassword("sb-clone38f786be563c4447b1ac03fe5831a53f!b3073|connectivity!b5",
 				"9c5a2d59-abb3-4c8f-bdba-c3b0222ceb25$iBxUjgTsDHnBRBuByPBR7qfSnY77pLPYV-_QZkhzC5I=");
-		*/
+		
 		httpPost.addHeader("Authorization", auth);
 		HttpResponse res = client.execute(httpPost);
 		System.err.println( " 92 rest" + res);

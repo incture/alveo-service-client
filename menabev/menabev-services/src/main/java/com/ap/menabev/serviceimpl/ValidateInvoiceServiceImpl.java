@@ -531,9 +531,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				List<PoHistoryDto> poHistoryDtoList = ObjectMapperUtils.mapAll(poHistoryDoList, PoHistoryDto.class);
 
 				// pass serial_no if required in poHistoryTotal
-				PoHistoryTotalsDo poHistoryTotalsDo = poHistoryTotalsRepository.getHistoryTotals(matchedItem,
+				List<PoHistoryTotalsDo> poHistoryTotalsDo = poHistoryTotalsRepository.getHistoryTotals(matchedItem,
 						matchedPo);
-				PoHistoryTotalsDto poHistoryTotalsDto = ObjectMapperUtils.map(poHistoryTotalsDo,
+				List<PoHistoryTotalsDto> poHistoryTotalsDto = ObjectMapperUtils.mapAll(poHistoryTotalsDo,
 						PoHistoryTotalsDto.class);
 				ConsumtionLogicOutputDto consumtionLogicOutputDto = cosumptionLogic(invoiceHeaderDto,
 						threeWayInvoiceItemDto, poHistoryDtoList, poHistoryTotalsDto,itemId);
@@ -743,10 +743,10 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 					List<PoHistoryDto> poHistoryDtoList = ObjectMapperUtils.mapAll(poHistoryDoList, PoHistoryDto.class);
 					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					// pass serial_no if required in poHistoryTotal
-					PoHistoryTotalsDo poHistoryTotalsDo = poHistoryTotalsRepository.getHistoryTotals(matchedItem,
+					List<PoHistoryTotalsDo> poHistoryTotalsDo = poHistoryTotalsRepository.getHistoryTotals(matchedItem,
 							matchedPo);
 					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
-					PoHistoryTotalsDto poHistoryTotalsDto = ObjectMapperUtils.map(poHistoryTotalsDo,
+					List<PoHistoryTotalsDto> poHistoryTotalsDto = ObjectMapperUtils.mapAll(poHistoryTotalsDo,
 							PoHistoryTotalsDto.class);
 					logger.error("ValidateInvoiceServiceImpl.threeWayMatch()------>");
 					ConsumtionLogicOutputDto consumtionLogicOutput = cosumptionLogic(invoiceHeaderDto, invoiceItemDto,
@@ -1071,7 +1071,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 	public static ConsumtionLogicOutputDto cosumptionLogic(InvoiceHeaderDto invoiceHeaderDto,
 			ThreeWayInvoiceItemDto invoiceItemDto, List<PoHistoryDto> poHistoryDtoList,
-			PoHistoryTotalsDto poHistoryTotalsDto,String itemId) {
+			List<PoHistoryTotalsDto> poHistoryTotalsDto,String itemId) {
 		ConsumtionLogicOutputDto consumtionLogicOutputDto = new ConsumtionLogicOutputDto();
 		List<ItemThreeWayMatchPaylod> threeWayInputPayloadList = new ArrayList<>();
 		List<ItemThreeWayAccAssgnPaylod> itemThreeWayAccAssgnPaylod = new ArrayList<>();
@@ -1162,6 +1162,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 				Double unSettledQTY = 0.00;
 
 				List<GRDto> grDtoList = new ArrayList<>();
+				 
+				System.err.println("PoHistoryDtoList ="+poHistoryDtoList);
+				
 				for (int i = 0; i < poHistoryDtoList.size(); i++) {
 
 					PoHistoryDto poHistoryDto = poHistoryDtoList.get(i);
@@ -1185,17 +1188,20 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						grDto.setRefDocYear(poHistoryDto.getRefDocYear());
 						grDto.setHDocYear(poHistoryDto.getHistoryYear());
 						grDtoList.add(grDto);
-
-					} else if ("Q".equalsIgnoreCase(poHistoryDto.getHistoryType())) {
+						System.err.println("GR DTO LIST::::: E" + grDtoList);
+						
+					} else if ("Q".equalsIgnoreCase(poHistoryDto.getHistoryCategory())) {
 						// IR
 						for (GRDto grDto : grDtoList) {
 							String docItem = grDto.getHDocItem();
 							String docNum = grDto.getHdocNum();
-							String rDocItem = grDto.getRefDoc();
-							String rDocNum = grDto.getRefDocItem();
+							String rDocItem = grDto.getRefDocItem();
+							String rDocNum = grDto.getRefDoc();
+							System.err.println("GR DTO LIST:::::  outside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
 							if (invoiceItemDto.getProductType().equalsIgnoreCase("2")) {
 								if (poHistoryDto.getRefDocItem().equals(rDocItem)
 										&& poHistoryDto.getRefDocNum().equals(rDocNum)) {
+									System.err.println("GR DTO LIST:::::  inside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
 									grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
 									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
 								}
@@ -1208,9 +1214,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							}
 
 						}
-
+						System.err.println("GR DTO LIST::::: Q" + grDtoList);
 					}
-
+                             
 				}
 				System.err.println("GR DTO LIST:::::" + grDtoList);
 				for (int i = 0; i < grDtoList.size(); i++) {

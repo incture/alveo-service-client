@@ -21,6 +21,6 @@ public interface PoHistoryTotalsRepository extends JpaRepository<PoHistoryTotals
 	public List<PoHistoryTotalsDo> getHistoryTotals(String documentNumber);
 	
 	@Query("select ph from PoHistoryTotalsDo ph where ph.documentItem=?1 and ph.documentNumber= ?2")
-	public PoHistoryTotalsDo getHistoryTotals(String matchedItem, String matchedPo);
+	public List<PoHistoryTotalsDo> getHistoryTotals(String matchedItem, String matchedPo);
 
 }

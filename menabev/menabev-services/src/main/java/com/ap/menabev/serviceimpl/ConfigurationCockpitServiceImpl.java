@@ -169,18 +169,18 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 				// if email sch
 				SchedulerConfigurationDo entity = null;
 
-				if (ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())) {
+				/*if (ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())) {
 					// new sch rec
 					schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
 					schedulerConfigurationDto.setConfigurationId(configId);
 					entity = schedulerconfigurationRepository
 							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-				} else {
+				} else {*/
 					// update the record with new fields
 					schedulerConfigurationDto.setConfigurationId(configId);
 					entity = schedulerconfigurationRepository
 							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-				}
+				//}
 
 				// then anyways start/stop the scheduler for email
 				schedulerconfigurationRepository.resetFlagIsActive(configId, entity.getScId());
