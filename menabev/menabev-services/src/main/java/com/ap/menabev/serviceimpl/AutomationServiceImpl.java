@@ -245,6 +245,7 @@ public class AutomationServiceImpl implements AutomationService {
 	private ResponseDto saveAllInvoiceDetails(List<InvoiceHeaderDto> headerList) {
 		ResponseDto response = null;
 		ResponseDto responseAutoPosting = null;
+		List<ActivityLogDto> activity = new ArrayList<>();
 		try {
 			for (InvoiceHeaderDto invoiceHeaderDto : headerList) {
 				invoiceHeaderDto.setChannelType(ApplicationConstants.CHANEL_TYPE_EMAIL);
@@ -254,6 +255,16 @@ public class AutomationServiceImpl implements AutomationService {
 				for (InvoiceItemDto invoiceItemDto : invoiceItemList) {
 					invoiceItemDto.setCurrency(invoiceHeaderDto.getCurrency());
 				}
+				InvoiceSubmitDto activitySubmitAfterJsonConversion = new InvoiceSubmitDto();
+				activitySubmitAfterJsonConversion.setActionCode(ApplicationConstants.INVOICE_RECEIVED);
+				activitySubmitAfterJsonConversion.setRequestId(invoiceHeaderDto.getRequestId());
+				activitySubmitAfterJsonConversion.setInvoice(invoiceHeaderDto);
+				activitySubmitAfterJsonConversion.getInvoice().setTaskOwner("SYSTEM");
+				activitySubmitAfterJsonConversion.getInvoice().setRequestId(invoiceHeaderDto.getRequestId());
+				
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(activitySubmitAfterJsonConversion, activitySubmitAfterJsonConversion.getActionCode(), "INVOICE_RECEIVED");
+				activity.add(activitySave);
+				invoiceHeaderDto.setActivityLog(activity);
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
 				System.err.println("InvoiceHeader " + response);
 				// InvoiceHeaderDto invoiceHeaderAutoPost = (InvoiceHeaderDto)
@@ -278,10 +289,10 @@ public class AutomationServiceImpl implements AutomationService {
 					context.setInvoice_ref_number(invoiceHeaderAutoPost.getInvoice_ref_number());
 					context.setNonPo(false);
 					context.setManualNonPo(false);
-					context.setAccountantUser(lists.get(0).getUserOrGroup());
+					context.setAccountantUser(lists.get(0).getAccountant());
 					context.setAccountantGroup(invoiceHeaderAutoPost.getTaskGroup());
-					context.setProcessLead(lists.get(0).getUserOrGroup());
-					context.setAccountantAction("");
+					context.setProcessLead(lists.get(0).getProcessLead());
+					context.setAccountantAction(ApplicationConstants.WORKFLOW_TRIGER);
 					context.setInvoiceStatus(invoiceHeaderAutoPost.getInvoiceStatus());
 					context.setInvoiceStatusText(invoiceHeaderAutoPost.getInvoiceStatusText());
 					context.setInvoiceType(invoiceHeaderAutoPost.getInvoiceType());
@@ -295,14 +306,16 @@ public class AutomationServiceImpl implements AutomationService {
 					// save invoice header
 					invoiceHeaderAutoPost.setWorkflowId(taskOutputDto.getId());
 					invoiceHeaderAutoPost.setTaskStatus("READY");
-					List<ActivityLogDto> activity = invoiceHeaderAutoPost.getActivityLog();
+					
+					// save for activity Log for Accountant Workflow Triggers
 					InvoiceSubmitDto invoiceSubmit = new InvoiceSubmitDto();
-					invoiceSubmit.setActionCode(ApplicationConstants.INVOICE_RECEIVED);
+					invoiceSubmit.setActionCode(ApplicationConstants.WORKFLOW_TRIGER);
 					invoiceSubmit.setRequestId(invoiceHeaderAutoPost.getRequestId());
 					invoiceSubmit.setInvoice(invoiceHeaderAutoPost);
-					ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "INVOICE_RECEIVED").getObject();
-					System.out.println("Saved ActivityLog:::" + activitySave);
-					activity.add(activitySave);
+				    invoiceSubmit.getInvoice().setTaskOwner(lists.get(0).getAccountant());
+					ActivityLogDto activitySaveForAccoutnant =  activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "WORKFLOW_TRIGGER");
+					System.out.println("Saved ActivityLog:::" + activitySaveForAccoutnant);
+					activity.add(activitySaveForAccoutnant);
 					invoiceHeaderAutoPost.setActivityLog(activity);
 					responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
 					System.err.println("invoiceHeaderAutoPost responseAutoPosting =" + responseAutoPosting);
