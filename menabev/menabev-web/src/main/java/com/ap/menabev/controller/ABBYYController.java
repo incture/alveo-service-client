@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.email.Email;
+import com.ap.menabev.entity.SchedulerConfigurationDo;
 import com.ap.menabev.service.AutomationService;
 
 @RestController
@@ -34,8 +35,9 @@ public class ABBYYController {
 //		}
 //	}
 	@GetMapping("/shared")
-	public ResponseDto putFileInSFTPServerFromSharedEmailBox() {
-		return automationService.extractInvoiceFromSharedEmailBox();
+	public void putFileInSFTPServerFromSharedEmailBox() {
+		SchedulerConfigurationDo entity = new SchedulerConfigurationDo();
+		automationService.extractInvoiceFromSharedEmailBoxInScheduler(entity);
 	}
 	@GetMapping("/check")
 	public Message[] getEmail(){

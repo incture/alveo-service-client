@@ -15,7 +15,7 @@ import com.ap.menabev.entity.SchedulerConfigurationDo;
 
 @Repository
 public interface SchedulerConfigurationRepository extends JpaRepository<SchedulerConfigurationDo, String> {
-	@Query("select sDo from SchedulerConfigurationDo sDo where sDo.configurationId=:configurationId")
+	@Query("select sDo from SchedulerConfigurationDo sDo where sDo.configurationId=:configurationId and actionType!='OCR Scheduler Configuration'")
 	public List<SchedulerConfigurationDo> getSchedulerConfiguration(@Param("configurationId") String configurationId);
 
 	@Query(value = "select to_varchar(current_timestamp) as t from dummy", nativeQuery = true)

@@ -515,13 +515,20 @@ public class AutomationServiceImpl implements AutomationService {
 								try {
 									channelSftp.cd("\\Input\\");
 									for (File file : files) {
+										
+										
 										String requestId = seqService.getSequenceNoByMappingId(
 												ApplicationConstants.INVOICE_SEQUENCE, "INV");
 										String sftpPutResponse = abbyyIntegration.putInvoiceInAbbyy(file,
 												ApplicationConstants.ABBYY_REMOTE_INPUT_FILE_DIRECTORY, channelSftp,
 												requestId);
-										
-										DmsResponseDto dmsResponse = documentManagementService.uploadDocument(file, requestId);
+										logger.error("sftpPutResponse"+sftpPutResponse);
+										File toUploadFIle = new File(requestId + "." + FilenameUtils.getExtension(file.getAbsolutePath()));
+										file.renameTo(toUploadFIle);
+										DmsResponseDto dmsResponse = documentManagementService.uploadDocument(toUploadFIle, requestId);
+										toUploadFIle.delete();
+										logger.error("dmsResponse"+dmsResponse);
+										logger.error("dmsResponse.getResponse().getStatus()"+dmsResponse.getResponse().getStatus());
 										if(!ServiceUtil.isEmpty(dmsResponse) && "Success".equalsIgnoreCase(dmsResponse.getResponse().getStatus())){
 											SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
 											cycleLogDo.setUuId(UUID.randomUUID().toString());

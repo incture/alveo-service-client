@@ -235,8 +235,7 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 			SchedulerConfigurationDo entity = null;
 			ModelMapper mapper = new ModelMapper();
 			// new sch rec
-			if("OCR Scheduler Configuration".equalsIgnoreCase(schedulerConfigurationDto.getActionType())){
-				if(!ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())){
+//				if(!ServiceUtil.isEmpty(schedulerConfigurationDto.getScId())){
 					schedulerConfigurationDto.setScId(UUID.randomUUID().toString());
 					schedulerConfigurationDto.setConfigurationId(configId);
 					schedulerConfigurationDto.setActionType("OCR Scheduler Configuration");
@@ -244,14 +243,13 @@ public class ConfigurationCockpitServiceImpl implements ConfigurationCockpitServ
 							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
 					logger.error("Inside isOcrScheduler Scheduler Configuration" + entity);
 					
-				}else{
-					schedulerConfigurationDto.setConfigurationId(configId);
-					schedulerConfigurationDto.setActionType("OCR Scheduler Configuration");
-					entity = schedulerconfigurationRepository
-							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
-					logger.error("Inside isOcrScheduler Scheduler Configuration" + entity);
-				}
-			}
+//				}else{
+//					schedulerConfigurationDto.setConfigurationId(configId);
+//					schedulerConfigurationDto.setActionType("OCR Scheduler Configuration");
+//					entity = schedulerconfigurationRepository
+//							.save(mapper.map(schedulerConfigurationDto, SchedulerConfigurationDo.class));
+//					logger.error("Inside isOcrScheduler Scheduler Configuration" + entity);
+//				}
 
 			Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(entity.getStartDate());
 			Long period = null;
