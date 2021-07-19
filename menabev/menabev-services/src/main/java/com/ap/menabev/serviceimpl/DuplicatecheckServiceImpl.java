@@ -904,7 +904,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 						}
 						// For multiple with % distribution
-						else if ("2".equals(poItem.getDistribution())) {
+						else if ("1".equals(poItem.getDistribution()) || "2".equals(poItem.getDistribution()) || "3".equals(poItem.getDistribution())) {
 							int i = 0;
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 								for (PoItemAccountAssignDto poAccAssignment : poItem.getPoAccountAssigment()) {
@@ -1181,7 +1181,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 						}
 						// For multiple with % distribution
-						else if ("2".equals(poItem.getDistribution())) {
+						else if ("1".equals(poItem.getDistribution()) || "2".equals(poItem.getDistribution()) || "3".equals(poItem.getDistribution())) {
 							int i = 0;
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 								for (PoItemAccountAssignDto poAccAssignment : poItem.getPoAccountAssigment()) {

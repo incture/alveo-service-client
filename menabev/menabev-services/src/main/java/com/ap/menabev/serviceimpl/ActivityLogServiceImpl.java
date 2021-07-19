@@ -108,41 +108,40 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 	    return activity;
 	}
 	
-	public ResponseDto saveOrUpdateActivityLog(InvoiceHeaderDto invoiceHeaderDto,String actionCode,String actionCodeText){
+	public ResponseDto saveOrUpdateActivityLog(InvoiceSubmitDto invoiceSubmit,String actionCode,String actionCodeText){
 		ResponseDto response = new ResponseDto();
 		ActivityLogDto activity = new ActivityLogDto();
 		try {
-			String uuid = repo.getUUID(invoiceHeaderDto.getRequestId(), invoiceHeaderDto.getTaskOwner());
+			String uuid = repo.getUUID(invoiceSubmit.getInvoice().getRequestId(), invoiceSubmit.getInvoice().getTaskOwner());
 			
 			if(!ServiceUtil.isEmpty(uuid)){
 				activity.setGuid(uuid);
 				activity.setTaskStatus("COMPLETED");
 				response.setCode(ApplicationConstants.CODE_SUCCESS);
 				response.setStatus(ApplicationConstants.UPDATE_SUCCESS);
-				response.setMessage(invoiceHeaderDto.getRequestId() + " "+ ApplicationConstants.UPDATE_SUCCESS);
+				response.setMessage(invoiceSubmit.getInvoice().getRequestId() + " "+ ApplicationConstants.UPDATE_SUCCESS);
 			}else{
 				activity.setTaskStatus("READY");
 				response.setCode(ApplicationConstants.CODE_SUCCESS);
 				response.setStatus(ApplicationConstants.CREATED_SUCCESS);
-				response.setMessage(invoiceHeaderDto.getRequestId() + " " + ApplicationConstants.CREATED_SUCCESS);
+				response.setMessage(invoiceSubmit.getInvoice().getRequestId() + " " + ApplicationConstants.CREATED_SUCCESS);
 			}
 			activity.setActionCode(actionCode);
 			activity.setActionCodeText(actionCodeText);
 			if(ServiceUtil.isEmpty(activity.getCompletedAt())){
 			activity.setCompletedAt(ServiceUtil.getEpocTime());
 			}
-			activity.setCreatedBy(invoiceHeaderDto.getTaskOwner());
-			activity.setInvoiceStatusCode(invoiceHeaderDto.getInvoiceStatus());
-			activity.setInvoiceStatusText(invoiceHeaderDto.getInvoiceStatusText());
-			activity.setProcessor(invoiceHeaderDto.getProcessor());
-			activity.setRequestId(invoiceHeaderDto.getRequestId());
-			activity.setGuid(activity.getGuid());
-			activity.setTaskCreatedAt(invoiceHeaderDto.getRequest_created_at());
-			activity.setTaskId(invoiceHeaderDto.getTaskId());
-			activity.setTaskOwner(invoiceHeaderDto.getTaskOwner());
-			activity.setWorkflowCreateBy(invoiceHeaderDto.getRequest_created_by());
-			activity.setWorkflowCreatedAt(invoiceHeaderDto.getRequest_created_at());
-			activity.setWorkflowId(invoiceHeaderDto.getWorkflowId());
+			activity.setCreatedBy(invoiceSubmit.getInvoice().getTaskOwner());
+			activity.setInvoiceStatusCode(invoiceSubmit.getInvoice().getInvoiceStatus());
+			activity.setInvoiceStatusText(invoiceSubmit.getInvoice().getInvoiceStatusText());
+			activity.setProcessor(invoiceSubmit.getInvoice().getProcessor());
+			activity.setRequestId(invoiceSubmit.getInvoice().getRequestId());
+			activity.setTaskCreatedAt(invoiceSubmit.getInvoice().getRequest_created_at());
+			activity.setTaskId(invoiceSubmit.getInvoice().getTaskId());
+			activity.setTaskOwner(invoiceSubmit.getInvoice().getTaskOwner());
+			activity.setWorkflowCreateBy(invoiceSubmit.getInvoice().getRequest_created_by());
+			activity.setWorkflowCreatedAt(invoiceSubmit.getInvoice().getRequest_created_at());
+			activity.setWorkflowId(invoiceSubmit.getInvoice().getWorkflowId());
 			activity.setWorkflowStatus("IN-PROGRESS");
 			ActivityLogDo activityDo = ObjectMapperUtils.map(activity, ActivityLogDo.class);
 			response.setObject(activity);
@@ -157,6 +156,7 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 		return response;
 	}
 	
+	@Override
 	public List<ActivityLogDto> getByRequestId(InvoiceHeaderDto dto){
 		List<ActivityLogDto> activityDto = new ArrayList<>();
 		List<ActivityLogDo> activityDo = new ArrayList<>();

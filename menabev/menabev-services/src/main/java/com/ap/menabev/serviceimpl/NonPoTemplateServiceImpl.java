@@ -564,7 +564,17 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 				System.out.println("CELL: " + cn + " --> " + cell.toString());
 				if (i != 0) {
 					if (cn == 0) {
-						newDto.setGlAccount(cell.toString());
+						switch (cell.getCellType())               
+						{  
+						case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
+							newDto.setGlAccount(String.valueOf(cell.getStringCellValue()));
+						break;  
+						case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
+							System.out.println("Here   "+ cell.getNumericCellValue());
+							newDto.setGlAccount(String.valueOf(Integer.valueOf((int) cell.getNumericCellValue())));
+						break;  
+						default: 
+						}
 					} else if (cn == 1) {
 						switch (cell.getCellType())               
 						{  
@@ -579,7 +589,18 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 						}
 						
 					} else if (cn == 2) {
-						newDto.setCostCenter((cell.toString()));
+//						newDto.setCostCenter((cell.toString()));
+						switch (cell.getCellType())               
+						{  
+						case Cell.CELL_TYPE_STRING:    //field that represents string cell type  
+							newDto.setCostCenter(String.valueOf(cell.getStringCellValue()));
+						break;  
+						case Cell.CELL_TYPE_NUMERIC:    //field that represents number cell type  
+							System.out.println("Here   "+ cell.getNumericCellValue());
+							newDto.setCostCenter(String.valueOf(Integer.valueOf((int) cell.getNumericCellValue())));
+						break;  
+						default: 
+						}
 					} else if (cn == 3) {
 						newDto.setMaterialDescription((cell.toString()));
 					} else if (cn == 4) {
@@ -970,7 +991,7 @@ public class NonPoTemplateServiceImpl implements NonPoTemplateService {
 	}
 //	public static void main(String[] args) throws IOException, URISyntaxException {
 //		NonPoTemplateServiceImpl obj = new NonPoTemplateServiceImpl();
-//		File file = new File("C:\\Users\\Lakhu D\\Downloads\\exampleXml.xlsx");
+//		File file = new File("C:\\Users\\Lakhu D\\Downloads\\exampleXml (5).xlsx");
 //		obj.uploadExcel(file);
 //	}
 	

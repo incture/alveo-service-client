@@ -25,8 +25,10 @@ import com.ap.menabev.abbyy.ABBYYJSONConverter;
 import com.ap.menabev.dms.dto.DmsResponseDto;
 import com.ap.menabev.dms.service.DocumentManagementService;
 import com.ap.menabev.dto.AcountOrProcessLeadDetermination;
+import com.ap.menabev.dto.ActivityLogDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceItemDto;
+import com.ap.menabev.dto.InvoiceSubmitDto;
 import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.dto.SchedulerResponseDto;
 import com.ap.menabev.dto.TriggerWorkflowContext;
@@ -126,6 +128,10 @@ public class AutomationServiceImpl implements AutomationService {
 	@Autowired
 	private SequenceGeneratorService seqService;
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AutomationServiceImpl.class);
+	
+	
+	@Autowired 
+	ActivityLogServiceImpl activityLogServiceImpl;
 	
 	@Override
 	public ResponseDto downloadFilesFromSFTPABBYYServer(SchedulerConfigurationDo entity) {
@@ -285,6 +291,15 @@ public class AutomationServiceImpl implements AutomationService {
 					// save invoice header
 					invoiceHeaderAutoPost.setWorkflowId(taskOutputDto.getId());
 					invoiceHeaderAutoPost.setTaskStatus("READY");
+					List<ActivityLogDto> activity = invoiceHeaderAutoPost.getActivityLog();
+					InvoiceSubmitDto invoiceSubmit = new InvoiceSubmitDto();
+					invoiceSubmit.setActionCode(ApplicationConstants.INVOICE_RECEIVED);
+					invoiceSubmit.setRequestId(invoiceHeaderAutoPost.getRequestId());
+					invoiceSubmit.setInvoice(invoiceHeaderAutoPost);
+					ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "INVOICE_RECEIVED").getObject();
+					System.out.println("Saved ActivityLog:::" + activitySave);
+					activity.add(activitySave);
+					invoiceHeaderAutoPost.setActivityLog(activity);
 					responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
 					System.err.println("invoiceHeaderAutoPost responseAutoPosting =" + responseAutoPosting);
 					response.setObject(invoiceHeaderDto);

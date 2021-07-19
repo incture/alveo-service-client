@@ -226,6 +226,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	@Autowired
 	JournalEntryService journalEntryService;
+	
+	@Autowired 
+	ActivityLogServiceImpl activityLogServiceImpl;
 
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String AUTHORIZATION = "Authorization";
@@ -3234,6 +3237,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				// get overal respons e
 				invoiceSubmit.setUserList(userList);
 				System.err.println("Remediation User Response " + invoiceSubmit);
+				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION").getObject();
+				System.out.println("ActivityLogSave ::::" + activitySave);
+				activity.add(activitySave);
+				invoiceSubmit.getInvoice().setActivityLog(activity);
 				return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
 			}
 			// Accountant Submit For Approval
@@ -3264,6 +3272,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				// update the Process lead user list in Invoice Object
 				invoiceSubmit.setUserList(userList);
 				System.err.println("ProcessLead User Response " + invoiceSubmit);
+				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL").getObject();
+				System.out.println("ActivityLogSave ::::" + activitySave);
+				activity.add(activitySave);
+				invoiceSubmit.getInvoice().setActivityLog(activity);
 				return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
 			} else {
 				// Accountant Submit For Reject
@@ -3292,6 +3305,11 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			// update the Process lead user list in Invoice Object
 			invoiceSubmit.setUserList(userList);
 			System.err.println("ProcessLead User Response " + invoiceSubmit);
+			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT").getObject();
+			System.out.println("ActivityLogSave ::::" + activitySave);
+			activity.add(activitySave);
+			invoiceSubmit.getInvoice().setActivityLog(activity);
 			return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
 		} else {
 			invoiceSubmit.setMessage("Po Object List IS MISSING");
@@ -3314,8 +3332,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmitOk.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
-						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
+//						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL").getObject();
+				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all the things - activity log and comments
 				if (invoiceSubmitOk.getInvoice().getChangeIndicators() != null) {
@@ -3349,8 +3371,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmitOk.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
-						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
+//						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION").getObject();
+				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all the things - activity log and comments
 				if (invoiceSubmitOk.getInvoice().getChangeIndicators() != null) {
@@ -3377,8 +3403,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmitOk.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
-						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
+//						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT").getObject();
+				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all things - activity log and comments
 				if (invoiceSubmitOk.getInvoice().getChangeIndicators() != null) {
@@ -3472,8 +3502,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		if (invoiceSubmit.getActionCode().equals(ApplicationConstants.BUYER_APPROVE)) {
 			payload = formUpdateTaskContextForBuyer(invoiceSubmit);
 			// complete task
-			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-					"BUYER_APPROVE");
+//			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
+//					"BUYER_APPROVE");
+			//Added By Lakhu
+			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_APPROVE").getObject();
+			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
@@ -3504,8 +3538,13 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
 				// save all things - activity log and comments
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-						"BUYER_REJECT");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
+//						"BUYER_REJECT");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_REJECT").getObject();
+				activity.add(activitySave);
+				invoiceSubmit.getInvoice().setActivityLog(activity);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
 					InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
@@ -3780,8 +3819,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				 if("200".equalsIgnoreCase(invoiceSubmit.getInvoice().getHeaderMessages().get(0).getMessageNumber())){
 				payload = formUpdateTaskContextForProcessLeadOnApprove(invoiceSubmit);
 				// complete task
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-						"PROCESS_LEAD_APPROVAL");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
+//						"PROCESS_LEAD_APPROVAL");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL").getObject();
+				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
 				if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
@@ -3818,8 +3861,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if(!ServiceUtil.isEmpty(messageList) && "SU".equalsIgnoreCase(messageList.get(0).getMessageType())){ 
 			payload = formUpdateTaskContextForProcessLeadOnApprove(invoiceSubmit);
 			// complete task
-			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-					"PROCESS_LEAD_APPROVAL");
+//			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
+//					"PROCESS_LEAD_APPROVAL");
+			//Added By Lakhu
+			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL").getObject();
+			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
@@ -3855,8 +3902,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
 				// save all the things - activity log and comments
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-						"PROCESS_LEAD_REJECTION");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
+//						"PROCESS_LEAD_REJECTION");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_REJECTION").getObject();
+				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
 					InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
@@ -3884,8 +3935,12 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
 				// save all things - activity log and comments
-				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-						"PROCESS_REJECTION");
+//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
+//						"PROCESS_REJECTION");
+				//Added By Lakhu
+				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_REJECTION").getObject();
+				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
 					InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();

@@ -15,6 +15,7 @@ public interface ActivityLogService {
 	List<ActivityLogDto> createActivityLogForSubmit(InvoiceHeaderDto invoiceHeaderDto, String actionCode,
 			String actionCodeText);
 	ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader);
+	List<ActivityLogDto> getByRequestId(InvoiceHeaderDto dto);
 
 	
 

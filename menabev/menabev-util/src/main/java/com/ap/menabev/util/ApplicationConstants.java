@@ -105,6 +105,7 @@ public interface ApplicationConstants {
 	String PROCESS_LEAD_APPROVAL = "PA";
 	String PROCESS_LEAD_REJECTION = "PR";
 	String PROCESS_LEAD_RESEND = "PRS";
+	String INVOICE_RECEIVED = "IR";
 	String BUYER_APPROVE = "A";
 	String BUYER_REJECT ="R";
 	String NEW_INVOICE = "0";
@@ -220,6 +221,7 @@ public interface ApplicationConstants {
 //					public static final String CONECTIVITY_CLIENT_ID = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
 //					public static final String CONECTIVITY_CLIENT_SECRET = "d56e99cf-76a5-4751-b16b-5e912f1483dc$iVWHjYhERnR-9oYc_ffRYWShcnGbdSdLQ4DOnPcpc5I=";
 //					public static final String CONECTIVITY_TOKEN_URL = "https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials";
+		
 			
 		
 //----------------------------------------------------------------------------------------->	

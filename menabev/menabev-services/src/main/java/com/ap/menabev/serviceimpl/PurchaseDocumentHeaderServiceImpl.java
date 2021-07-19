@@ -409,13 +409,12 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 					if (!ServiceUtil.isEmpty(dto.getInvoiceHeader().getVendorId())) {
 						twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
 					}
-
-					InvoiceItemDto twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
-					System.out.println("MATCH :::: " + twowayMatchUpdatedItem.getIsTwowayMatched());
-					if (!twowayMatchUpdatedItem.getIsTwowayMatched()) {
-						twoWayMatch = true;
+					InvoiceItemDto twowayMatchUpdatedItem = item;
+					if(!item.getIsTwowayMatched()){
+						twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
 					}
 					
+					System.out.println("MATCH :::: " + twowayMatchUpdatedItem.getIsTwowayMatched());
 					//Gross Amount Calculation and SysSugg Tax Amount
 					if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
 						if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
@@ -429,9 +428,26 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 								dto.getInvoiceHeader().setSysSusgestedTaxAmount(sysSuggTaxAmt);
 							}
 							
+							if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getInvoiceTotal()) && !ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount())){
+								Double balance = dto.getInvoiceHeader().getInvoiceTotal() - dto.getInvoiceHeader().getGrossAmount();
+								dto.getInvoiceHeader().setBalanceAmount(balance);
+							}
+							
+							
 						}
 						
 						
+					}
+					if(twowayMatchUpdatedItem.getIsTwowayMatched() && ApplicationConstants.NO_GRN.equals(twowayMatchUpdatedItem.getItemStatusCode())){
+						for(int i=0;i<headerDto.size();i++){
+							for(PoHistoryDto history : headerDto.get(i).getPoHistory()){
+								if(twowayMatchUpdatedItem.getMatchDocNum().equals(history.getDocumentItem())){
+									twowayMatchUpdatedItem.setItemStatusCode(ApplicationConstants.GRN_PASSED);
+									twowayMatchUpdatedItem.setItemStatusText("GRN Passed");
+									
+								}
+							}
+						}
 					}
 					updatedItems.add(twowayMatchUpdatedItem);
 
