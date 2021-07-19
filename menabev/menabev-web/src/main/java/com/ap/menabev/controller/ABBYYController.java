@@ -37,6 +37,7 @@ public class ABBYYController {
 	@GetMapping("/shared")
 	public void putFileInSFTPServerFromSharedEmailBox() {
 		SchedulerConfigurationDo entity = new SchedulerConfigurationDo();
+//		entity.setConfigurationId("3856f277-6bc4-44a8-a415-32d13010d207");
 		automationService.extractInvoiceFromSharedEmailBoxInScheduler(entity);
 	}
 	@GetMapping("/check")

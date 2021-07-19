@@ -1,7 +1,6 @@
 package com.ap.menabev.serviceimpl;
 
 import java.io.File;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import com.ap.menabev.dto.TriggerWorkflowContext;
 import com.ap.menabev.dto.WorkflowContextDto;
 import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.email.Email;
+import com.ap.menabev.entity.EmailTeamAPDo;
 import com.ap.menabev.entity.SchedulerConfigurationDo;
 import com.ap.menabev.entity.SchedulerCycleDo;
 import com.ap.menabev.entity.SchedulerCycleLogDo;
@@ -42,6 +42,7 @@ import com.ap.menabev.entity.SchedulerRunDo;
 import com.ap.menabev.invoice.AttachmentRepository;
 import com.ap.menabev.invoice.CommentRepository;
 import com.ap.menabev.invoice.CostAllocationRepository;
+import com.ap.menabev.invoice.EmailTeamApRepository;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.invoice.InvoiceItemAcctAssignmentRepository;
 import com.ap.menabev.invoice.InvoiceItemRepository;
@@ -136,7 +137,7 @@ public class AutomationServiceImpl implements AutomationService {
 	@Override
 	public ResponseDto downloadFilesFromSFTPABBYYServer(SchedulerConfigurationDo entity) {
 		ResponseDto response = new ResponseDto();
-		List<InvoiceHeaderDto> headerList = new ArrayList<>();
+		
 		int noOfJSONFiles = 0;
 		SchedulerCycleDo cycleEntity = new SchedulerCycleDo();
 		cycleEntity.setStartDateTime(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
@@ -173,9 +174,12 @@ public class AutomationServiceImpl implements AutomationService {
 										InvoiceHeaderDto output = ABBYYJSONConverter
 												.abbyyJSONOutputToInvoiceObject(jsonObject);
 										if (!ServiceUtil.isEmpty(output)) {
+//											DmsResponseDto dmsResponse = documentManagementService.uploadDocument(toUploadFIle, requestId);
+											List<InvoiceHeaderDto> headerList = new ArrayList<>();
 //											String reqIdFromFileName = FilenameUtils.removeExtension(entry.getFilename());
 //											output.setRequestId(reqIdFromFileName);
 											headerList.add(output);
+											response = saveAllInvoiceDetails(headerList);
 											is.close();
 											// cd
 											// put
@@ -230,7 +234,7 @@ public class AutomationServiceImpl implements AutomationService {
 
 			SFTPChannelUtil.disconnect(session, channelSftp);
 
-			response = saveAllInvoiceDetails(headerList);
+		
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -449,7 +453,8 @@ public class AutomationServiceImpl implements AutomationService {
 		}
 		return response;
 	}
-
+	@Autowired
+	EmailTeamApRepository emailTeamApRepository;
 	@Override
 	public void extractInvoiceFromSharedEmailBoxInScheduler(SchedulerConfigurationDo entity) {
 		// TODO Auto-generated method stub
@@ -477,11 +482,13 @@ public class AutomationServiceImpl implements AutomationService {
 			// schedulerRunDo.setSchedulerName("Email Reader");
 			// schedulerRunDo.setSwichtedONby(entity.getCreatedBy());
 			// schedulerRunDo = schedulerRunRepository.save(schedulerRunDo);
-
+			
+			List<String> emailFrom = emailTeamApRepository.getScanningTemaEmail(entity.getConfigurationId(), "APScanningTeam");
+			logger.error("list of emails"+emailFrom);
 			Message[] emailMessages = email.fetchUnReadMessagesFromSharedMailBox(ApplicationConstants.OUTLOOK_HOST,
 					ApplicationConstants.OUTLOOK_PORT, ApplicationConstants.SHARED_MAIL_ID_ALLIAS,
 					ApplicationConstants.ACCPAY_EMAIL_PASSWORD, ApplicationConstants.INBOX_FOLDER,
-					ApplicationConstants.UNSEEN_FLAGTERM, ApplicationConstants.EMAIL_FROM);
+					ApplicationConstants.UNSEEN_FLAGTERM, emailFrom);
 
 			noOfEmailspicked = emailMessages.length;
 

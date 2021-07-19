@@ -17,5 +17,8 @@ public interface EmailTeamApRepository extends JpaRepository<EmailTeamAPDo, Stri
 	
 	@Query("select eDo from EmailTeamAPDo eDo where eDo.configurationId=:configurationId and Upper(eDo.actionType) in(:actionType1,:actionType2)")
 	public List<EmailTeamAPDo> getEmailTeamAP(@Param("configurationId") String configurationId , @Param("actionType1") String actionType1, @Param("actionType2") String actionType2);
+	
+	@Query("select eDo.emailId from EmailTeamAPDo eDo where eDo.configurationId=:configurationId and Upper(eDo.actionType)=Upper(:actionType)")
+	public List<String> getScanningTemaEmail(@Param("configurationId") String configurationId , @Param("actionType") String actionType);
 
 }
