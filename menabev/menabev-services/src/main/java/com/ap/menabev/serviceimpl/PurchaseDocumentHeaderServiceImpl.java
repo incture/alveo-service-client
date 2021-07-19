@@ -412,29 +412,30 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 					InvoiceItemDto twowayMatchUpdatedItem = item;
 					if(!item.getIsTwowayMatched()){
 						twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
+						if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
+							if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
+								if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
+									Double grossAmount = dto.getInvoiceHeader().getGrossAmount() + twowayMatchUpdatedItem.getGrossPrice();
+									dto.getInvoiceHeader().setGrossAmount(grossAmount);
+								}
+								
+								if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getTaxValue())){
+									Double sysSuggTaxAmt =  dto.getInvoiceHeader().getSysSusgestedTaxAmount() + twowayMatchUpdatedItem.getTaxValue();
+									dto.getInvoiceHeader().setSysSusgestedTaxAmount(sysSuggTaxAmt);
+								}
+								
+								if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getInvoiceTotal()) && !ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount())){
+									Double balance = dto.getInvoiceHeader().getInvoiceTotal() - dto.getInvoiceHeader().getGrossAmount();
+									dto.getInvoiceHeader().setBalanceAmount(balance);
+								}
+								
+								
+							}
 					}
 					
 					System.out.println("MATCH :::: " + twowayMatchUpdatedItem.getIsTwowayMatched());
 					//Gross Amount Calculation and SysSugg Tax Amount
-					if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
-						if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
-							if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
-								Double grossAmount = dto.getInvoiceHeader().getGrossAmount() + twowayMatchUpdatedItem.getGrossPrice();
-								dto.getInvoiceHeader().setGrossAmount(grossAmount);
-							}
-							
-							if(!ServiceUtil.isEmpty(twowayMatchUpdatedItem.getTaxValue())){
-								Double sysSuggTaxAmt =  dto.getInvoiceHeader().getSysSusgestedTaxAmount() + twowayMatchUpdatedItem.getTaxValue();
-								dto.getInvoiceHeader().setSysSusgestedTaxAmount(sysSuggTaxAmt);
-							}
-							
-							if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getInvoiceTotal()) && !ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount())){
-								Double balance = dto.getInvoiceHeader().getInvoiceTotal() - dto.getInvoiceHeader().getGrossAmount();
-								dto.getInvoiceHeader().setBalanceAmount(balance);
-							}
-							
-							
-						}
+					
 						
 						
 					}
