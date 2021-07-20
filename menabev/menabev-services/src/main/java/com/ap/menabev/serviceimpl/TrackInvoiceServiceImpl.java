@@ -74,6 +74,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		ModelMapper modelMapper = new ModelMapper();
 		List<InvoiceHeaderDto> sapPostedList = new ArrayList<>();
 		List<InvoiceHeaderDto> unPaidList = new ArrayList<>();
+		List<InvoiceHeaderDto> paidList = new ArrayList<>();
+
 		List<InvoiceHeaderDto> pendingApprovalList = new ArrayList<>();
 		List<InvoiceHeaderDto> rejectedList = new ArrayList<>();
 		List<String> invoiceReferenceNumberList = new ArrayList<>();
@@ -82,8 +84,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		if (!ServiceUtil.isEmpty(headerList)) {
 			System.err.println("headerList invoiceNumber:" + headerList.get(0).getInvoice_ref_number());
 			for (InvoiceHeaderDo invoiceHeaderDo : headerList) {
-				if (invoiceHeaderDo.getInvoiceStatus().equals("13")
-						|| invoiceHeaderDo.getInvoiceStatus().equals("14")) {
+				if (invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.UNPAID)
+						|| invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.PAID)) {
 					System.err.println("headerList sapPostedDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
@@ -96,7 +98,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList sapPostedDto:" + sapPostedDto);
 
 					sapPostedList.add(sapPostedDto);
-				} else if (invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)) {
+				} else if (invoiceHeaderDo.getInvoiceStatus().equals("22")) {
 					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
@@ -116,7 +118,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					}
 					InvoiceHeaderDto sapPendingApprovaldDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
 					sapPendingApprovaldDto.setInvoiceTotal(total);
-					sapPendingApprovaldDto.setInvoiceStatus("16");
+					sapPendingApprovaldDto.setInvoiceStatus(ApplicationConstants.PENDING_APPROVAL);
 					sapPendingApprovaldDto.setInvoiceStatusText("Pending Approval");
 					System.err.println("headerList pendingApprovalDto:" + sapPendingApprovaldDto);
 
@@ -164,18 +166,18 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 								if (!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate()) && odataTrackInvoiceObject.getClearingDate()!=0 && !ServiceUtil.isEmpty(odataTrackInvoiceObject.getPaymentReference())) {
 
 									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
-										invoiceHeaderDto.setInvoiceStatus("14");
+										invoiceHeaderDto.setInvoiceStatus(ApplicationConstants.PAID);
 										invoiceHeaderDto.setInvoiceStatusText("Paid");
 										invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
 										invoiceHeaderDto
 												.setPaymentReference(odataTrackInvoiceObject.getPaymentReference());
-										sapPostedList.add(invoiceHeaderDto);
+										paidList.add(invoiceHeaderDto);
 									}
 								}
 								else{
 									
 									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
-										invoiceHeaderDto.setInvoiceStatus("13");
+										invoiceHeaderDto.setInvoiceStatus(ApplicationConstants.UNPAID);
 										invoiceHeaderDto.setInvoiceStatusText("UnPaid");
 										unPaidList.add(invoiceHeaderDto);
 									}
@@ -204,7 +206,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				// return new
 				// ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
 			}
-			List<InvoiceHeaderDto> newList = Stream.of(sapPostedList,unPaidList, pendingApprovalList, rejectedList)
+			List<InvoiceHeaderDto> newList = Stream.of(paidList,unPaidList, pendingApprovalList, rejectedList)
 					.flatMap(Collection::stream).collect(Collectors.toList());
 			System.err.println("newList:" + newList);
 			TrackInvoiceOutputPayload trackInvoiceOutputPayload = new TrackInvoiceOutputPayload();
