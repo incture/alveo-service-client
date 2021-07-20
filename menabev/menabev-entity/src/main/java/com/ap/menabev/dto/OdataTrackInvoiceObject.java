@@ -1,4 +1,4 @@
-package com.ap.menabev.dto; 
+package com.ap.menabev.dto;  
 
 import lombok.Getter;
 import lombok.Setter;
