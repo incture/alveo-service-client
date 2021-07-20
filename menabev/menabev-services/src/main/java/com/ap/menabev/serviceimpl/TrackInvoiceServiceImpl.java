@@ -81,7 +81,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			System.err.println("headerList invoiceNumber:" + headerList.get(0).getInvoice_ref_number());
 			for (InvoiceHeaderDo invoiceHeaderDo : headerList) {
 				if (invoiceHeaderDo.getInvoiceStatus().equals("13")
-						&& invoiceHeaderDo.getInvoiceStatus().equals("14")) {
+						|| invoiceHeaderDo.getInvoiceStatus().equals("14")) {
 					System.err.println("headerList sapPostedDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
@@ -155,7 +155,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 										invoiceHeaderDto.setInvoiceStatusText("Paid");
 										invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
 										invoiceHeaderDto
-												.setPaymentReference(odataTrackInvoiceObject.getPaymentStatus());
+												.setPaymentReference(odataTrackInvoiceObject.getPaymentReference());
 										sapPostedList.add(invoiceHeaderDto);
 									}
 								}

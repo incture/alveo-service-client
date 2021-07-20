@@ -20,4 +20,5 @@ public class OdataTrackInvoiceObject {
 	private String paymentStatus;
 	private String blockKey;
 	private String blockDescription;
+	private String paymentReference;
 }
