@@ -1,0 +1,47 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:html="http://www.w3.org/1999/xhtml">
+	<Dialog title="{i18n>SchedulerCycleLogs}" contentWidth="85%">
+		<content>
+			<Table items="{oSchedulerLogsModel>/schedulerCycleLogs}" class="sapUiSizeCompact">
+				<columns>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>cycleID}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>logMsgNo}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>logMsgText}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>runID}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>timestampIST}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>timestampKSA}" design="Bold"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Small" demandPopin="true">
+						<Label text="{i18n>uuId}" design="Bold"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{oSchedulerLogsModel>cycleID}" textAlign="Center"/>
+							<Text text="{oSchedulerLogsModel>logMsgNo}" textAlign="Center"/>
+							<Text text="{oSchedulerLogsModel>logMsgText}" textAlign="Center" wrapping="true"/>
+							<Text text="{oSchedulerLogsModel>runID}" textAlign="Center"/>
+							<Text text="{oSchedulerLogsModel>timestampIST}" textAlign="Center"/>
+							<Text text="{oSchedulerLogsModel>timestampKSA}" textAlign="Center"/>
+							<Text text="{oSchedulerLogsModel>uuId}" textAlign="Center"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<endButton>
+			<Button text="{i18n>OK}" press="onCloseSchedulerCycleLogs"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

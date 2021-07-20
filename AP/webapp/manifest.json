@@ -116,6 +116,9 @@
 			"mDashboardModel": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
+			"oSchedulerLogsModel": {
+				"type": "sap.ui.model.json.JSONModel"
+			},
 			"oDataModel": {
 				"type": "sap.ui.model.odata.ODataModel",
 				"settings": {
