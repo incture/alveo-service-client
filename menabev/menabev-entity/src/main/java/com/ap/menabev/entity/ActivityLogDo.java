@@ -1,5 +1,6 @@
 package com.ap.menabev.entity;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -79,5 +80,19 @@ private Long updatedAt;
 
 @Column(name = "UPDATED_BY")
 private String updatedBy;
+
+//test 
+@Column(name = "DECI_TEST")
+private Double deciCheck;
+
+@Column(name = "DEC_TEST2",precision=2)
+private Double deciTest2;
+
+@Column(name = "DEC_TEST3",scale = 2)
+private Double deciTest3;
+
+@Column(name = "DEC_TEST4",scale = 2)
+private BigDecimal deciTest4;
+
 
 }

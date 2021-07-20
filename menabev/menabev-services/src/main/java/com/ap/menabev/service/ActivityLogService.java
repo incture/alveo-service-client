@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import com.ap.menabev.dto.ActivityLogDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceSubmitDto;
+import com.ap.menabev.serviceimpl.ActivityLogResponseDto;
 
 public interface ActivityLogService {
 	
@@ -16,6 +17,7 @@ public interface ActivityLogService {
 			String actionCodeText);
 	ActivityLogDto createActivityLogForPoOrNonPo(InvoiceHeaderDto invoiceHeader);
 	List<ActivityLogDto> getByRequestId(InvoiceHeaderDto dto);
+	ActivityLogResponseDto getWorkflowActivityLog(String requestId);
 
 	
 

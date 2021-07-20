@@ -97,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
 		ModelMapper mapper = new ModelMapper();
 		List<CommentDto> commentDtotList = new ArrayList<>();
 		try {
-			List<CommentDo> commentDoList = commentRepository.getCommentsByRequestIdAndUser(requestId);
+			List<CommentDo> commentDoList = commentRepository.getAllCommentsForRequestId(requestId);
 			for (CommentDo commentDo : commentDoList) {
 				CommentDto commentDto = mapper.map(commentDo, CommentDto.class);
 				commentDtotList.add(commentDto);

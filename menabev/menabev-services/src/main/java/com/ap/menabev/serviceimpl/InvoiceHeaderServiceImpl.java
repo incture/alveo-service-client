@@ -2340,7 +2340,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	@Override
 	public ResponseEntity<?> getInvoiceComments(String requestId) {
 		// get Comments
-		List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId);
+		List<CommentDo> commentDo = commentRepository.getAllCommentsForRequestId(requestId);
 		List<CommentDto> commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);
 		return new ResponseEntity<>(commentDto, HttpStatus.OK);
 	}
@@ -3769,7 +3769,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
 				List<AttachmentDto> AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);
 				// get Comments
-				List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId);
+				List<CommentDo> commentDo = commentRepository.getAllCommentsForRequestId(requestId);
 				List<CommentDto> commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);
 				// get Activity Log
 				List<ActivityLogDo> activityLogDo = activityLogRepo.getAllActivityForRequestId(requestId);

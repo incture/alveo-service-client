@@ -1,24 +1,44 @@
 package com.ap.menabev.serviceimpl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ap.menabev.dto.ActivityLogDto;
+import com.ap.menabev.dto.AttachmentDto;
+import com.ap.menabev.dto.CommentDto;
 import com.ap.menabev.dto.InvoiceHeaderDto;
 import com.ap.menabev.dto.InvoiceSubmitDto;
 import com.ap.menabev.dto.ResponseDto;
+import com.ap.menabev.dto.WorkflowTaskOutputDto;
 import com.ap.menabev.entity.ActivityLogDo;
+import com.ap.menabev.entity.AttachmentDo;
+import com.ap.menabev.entity.CommentDo;
+import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.ActivityLogRepository;
+import com.ap.menabev.invoice.AttachmentRepository;
+import com.ap.menabev.invoice.CommentRepository;
+import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.service.ActivityLogService;
 import com.ap.menabev.util.ApplicationConstants;
+import com.ap.menabev.util.DestinationReaderUtil;
 import com.ap.menabev.util.ObjectMapperUtils;
 import com.ap.menabev.util.ServiceUtil;
+import com.google.gson.Gson;
 
 @Service
 public class ActivityLogServiceImpl implements ActivityLogService{
@@ -26,6 +46,15 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 	
 	@Autowired
 	private ActivityLogRepository repo ;
+	
+	@Autowired
+	private InvoiceHeaderRepository invocieRepo;
+	
+	@Autowired
+	private CommentRepository commentRepository;
+	
+	@Autowired
+	AttachmentRepository attachmentRepository;
 
 	@Override
 	public List<ActivityLogDto>  getLogs(String requestId) {
@@ -173,11 +202,121 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 		
 	}
 	
-	// create activity log for invocie Recivied , which we will return dto to be saved
+	@Override
+	// get activityLog from the workflow api using requestId and WorkfowId
+	public ActivityLogResponseDto getWorkflowActivityLog(String requestId){
+		ActivityLogResponseDto activity = new ActivityLogResponseDto();   
+		try{
+		// call invoice header Table get workflowId  and comments and attachement details
+		   InvoiceHeaderDo invoice = invocieRepo.getInvoiceHeader(requestId);
+             // get attachment 	 
+		    	List<AttachmentDto> AttachementDto = getInvoiceAttachment(requestId);
+
+		    	InvoiceHeaderDto invoiceDto = ObjectMapperUtils.map(invoice, InvoiceHeaderDto.class);
+	               if(ServiceUtil.isEmpty(invoiceDto)){
+		   InvoiceReceivedDto received = new InvoiceReceivedDto();
+		   received.setInvocieChannelType(invoiceDto.getChannelType());
+		   received.setInvocieReceived(invoiceDto.getRequest_created_at());
+		   activity.setInvoiceReceived(received);
+		// call worklfow api to get the acivity log from worklfow 
+		   ResponseEntity<?>  workflowResponse = getWorkflowActivityTaskDetails(invoiceDto.getWorkflowId());
+		  if( workflowResponse.getStatusCodeValue()==200){
+			   @SuppressWarnings("unchecked")
+			List<WorkflowTaskOutputDto> listOfWorkflwoTask = (List<WorkflowTaskOutputDto>) workflowResponse.getBody();
+			   listOfWorkflwoTask.stream().forEach(w->{
+                    List<String> workflwoUser = w.getRecipientUsers();		
+                         // get the comment for each activityId
+                  List<CommentDto> commentList =  getInvoiceComments(requestId,workflwoUser);
+                    w.setComment(commentList);
+			   });         
+			   activity.setApproval(listOfWorkflwoTask);
+			   activity.setStatusCode("200");
+			   activity.setMessage("SUCCESS");
+			   activity.setAttachment(AttachementDto);
+			   return activity;
+		  }else {
+			  activity.setApproval(null);
+			   activity.setStatusCode("400");
+			   activity.setMessage(workflowResponse.toString());
+			  return activity;
+		  } 
+	    }
+		}catch (Exception e){
+	    	System.err.println("ActityLog Exception "+ e);
+	    	activity.setApproval(null);
+			   activity.setStatusCode("500");
+			   activity.setMessage("Failed due to "+e.getMessage());
+	    }
+		// form the payload respectively
+		  activity.setApproval(null);
+		   activity.setStatusCode("404");
+		   activity.setMessage("Activity log for Request Id ="+requestId+" not found ");
+		  return activity;   
+	}
 	
-    // create Activity Log for completing the activity of the current user 
-		
 	
+	public static ResponseEntity<?> getWorkflowActivityTaskDetails(String workflowInstanceId) {
+
+		try {
+			List<WorkflowTaskOutputDto> listOfWorkflowTasks = new ArrayList<WorkflowTaskOutputDto>();
+			HttpClient client = HttpClientBuilder.create().build();
+			String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
+			String url = ApplicationConstants.WORKFLOW_REST_BASE_URL + "/v1/task-instances?workflowInstanceId="+workflowInstanceId;
+			HttpGet httpGet = new HttpGet(url);
+			httpGet.addHeader("Authorization", "Bearer " + jwToken);
+			httpGet.addHeader("Content-Type", "application/json");
+				HttpResponse response = client.execute(httpGet);
+				String dataFromStream = getDataFromStream(response.getEntity().getContent());
+				if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+					JSONArray jsonArray = new JSONArray(dataFromStream);
+					for (int i = 0; i < jsonArray.length(); i++) {
+						Object jsonObject = jsonArray.get(i);
+						WorkflowTaskOutputDto taskDto = new Gson().fromJson(jsonObject.toString(),
+								WorkflowTaskOutputDto.class);
+						taskDto.setRequestIds(taskDto.getSubject());
+						listOfWorkflowTasks.add(taskDto);
+					}
+					if (!listOfWorkflowTasks.isEmpty()) {
+						return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
+					} else {
+						return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
+					}
+				} else {
+					return new ResponseEntity<String>("FETCHING FAILED", HttpStatus.CONFLICT);
+				}
+		} catch (Exception e) {
+			return new ResponseEntity<>("EXCEPTION_GET_MSG" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+}
 	
+	public static String getDataFromStream(InputStream stream) throws IOException {
+		StringBuilder dataBuffer = new StringBuilder();
+		BufferedReader inStream = new BufferedReader(new InputStreamReader(stream));
+		String data = "";
+		while ((data = inStream.readLine()) != null) {
+			dataBuffer.append(data);
+		}
+		inStream.close();
+		return dataBuffer.toString();
+	}
+	
+	public List<CommentDto> getInvoiceComments(String requestId,List<String> emailId) {
+		// get Comments
+		List<CommentDo> commentDo = commentRepository.getCommentsByRequestIdAndUser(requestId,emailId);
+		List<CommentDto> commentDto = ObjectMapperUtils.mapAll(commentDo, CommentDto.class);
+		return commentDto;
+	}
+
+	public List<AttachmentDto> getInvoiceAttachment(String requestId) {
+		// get Attachements
+		List<AttachmentDo> attachementDo = attachmentRepository.getAllAttachmentsForRequestId(requestId);
+		List<AttachmentDto> AttachementDto = ObjectMapperUtils.mapAll(attachementDo, AttachmentDto.class);
+	   return AttachementDto;
+	}
+
+
 
 }
+	
+
+

@@ -39,6 +39,7 @@ import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.service.InvoiceHeaderService;
 import com.ap.menabev.service.SequenceGeneratorService;
+import com.ap.menabev.serviceimpl.ActivityLogResponseDto;
 import com.ap.menabev.serviceimpl.ActivityLogServiceImpl;
 import com.ap.menabev.serviceimpl.FilterMultipleHeaderSearchDto;
 import com.ap.menabev.util.ApplicationConstants;
@@ -80,8 +81,8 @@ public class InvoiceHeaderController {
 
 	@GetMapping("/getActivtiyByReqId/{requestId}")
 	@ResponseBody
-	public List<ActivityLogDto> getByActivityRequestId(@PathVariable String requestId) {
-		return activity.getLogs(requestId);
+	public ActivityLogResponseDto getByActivityRequestId(@PathVariable String requestId) {
+		return activity.getWorkflowActivityLog(requestId);
 	}
 	@GetMapping("/getInvoiceByReqId/{requestId}/item")
 	public ResponseEntity<?> getByInvoiceRequestIdItem(@PathVariable String requestId) {

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -883,5 +885,16 @@ public class ServiceUtil {
 	 * // after the delayed job done we have shut the ScheduledExecutorService
 	 * down. executorService.shutdown(); }
 	 */
+	
+	public static Double getDoubleWithScale(Double in){
+		if(!ServiceUtil.isEmpty(in)){
+			BigDecimal bd = new BigDecimal(in);
+			bd.setScale(2, RoundingMode.CEILING);
+			return bd.doubleValue();
+		}else{
+			Double d = new Double(0.00);
+			return d;
+		}
+	}
 
 }

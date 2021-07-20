@@ -30,11 +30,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
+import com.google.gson.Gson;
 
 
 @Component
@@ -297,5 +300,9 @@ public class HelperClass {
 		}
 
 	}
+	
+	// get task details 
+
+	
 
 }

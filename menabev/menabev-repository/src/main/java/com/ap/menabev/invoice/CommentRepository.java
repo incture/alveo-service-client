@@ -22,8 +22,8 @@ public interface CommentRepository extends JpaRepository<CommentDo, String> {
 	@Query("Delete from CommentDo i where i.commentId=:commentId")
 	int deleteByCommentId(@Param("commentId") String commentId);
 
-	@Query(value = "select i from CommentDo i where i.requestId=:requestId order by i.createdAt desc")
-	List<CommentDo> getCommentsByRequestIdAndUser(@Param("requestId") String requestId);
+	@Query(value = "select i from CommentDo i where i.requestId=:requestId and i.user IN (:user) order by i.createdAt desc")
+	List<CommentDo> getCommentsByRequestIdAndUser(@Param("requestId") String requestId,@Param("user") List<String> user);
 	
 	@Query(value = "select i from CommentDo i where i.requestId=:requestId order by i.createdAt desc")
 	List<CommentDo> getAllCommentsForRequestId(@Param("requestId") String requestId);
