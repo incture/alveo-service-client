@@ -86,6 +86,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
 							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+						
 						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
 					}
 					InvoiceHeaderDto sapPostedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
