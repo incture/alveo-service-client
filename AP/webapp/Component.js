@@ -77,21 +77,21 @@ sap.ui.define([
 						}
 
 					}
-					if (loggedinUserGroup === "IT_Admin") {
-						this.oRouter.navTo("UserManagement");
-					} else if (loggedinUserGroup === "Accountant") {
-						this.oRouter.navTo("Inbox");
-					} else if (loggedinUserGroup === "Buyer") {
-						this.oRouter.navTo("Inbox");
-					} else if (loggedinUserGroup === "Process_Lead") {
-						this.oRouter.navTo("Inbox");
-					} else if (loggedinUserGroup === "Supplier_Admin") {
-						this.oRouter.navTo("TrackInvoice");
-					} else if (loggedinUserGroup === "Supplier_Executive") {
-						this.oRouter.navTo("TrackInvoice");
-					} else {
-						this._oRouter.navTo("MessagePage");
-					}
+					// if (loggedinUserGroup === "IT_Admin") {
+					// 	this.oRouter.navTo("UserManagement");
+					// } else if (loggedinUserGroup === "Accountant") {
+					// 	this.oRouter.navTo("Inbox");
+					// } else if (loggedinUserGroup === "Buyer") {
+					// 	this.oRouter.navTo("Inbox");
+					// } else if (loggedinUserGroup === "Process_Lead") {
+					// 	this.oRouter.navTo("Inbox");
+					// } else if (loggedinUserGroup === "Supplier_Admin") {
+					// 	this.oRouter.navTo("TrackInvoice");
+					// } else if (loggedinUserGroup === "Supplier_Executive") {
+					// 	this.oRouter.navTo("TrackInvoice");
+					// } else {
+					// 	this._oRouter.navTo("MessagePage");
+					// }
 				}
 				oUserDetailModel.setProperty("/loggedinUserDetail", data);
 			} else {
