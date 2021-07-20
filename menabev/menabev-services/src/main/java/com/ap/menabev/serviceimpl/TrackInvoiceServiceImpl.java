@@ -72,6 +72,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		System.err.println("headerList :" + headerList);
 		ModelMapper modelMapper = new ModelMapper();
 		List<InvoiceHeaderDto> sapPostedList = new ArrayList<>();
+		List<InvoiceHeaderDto> unPaidList = new ArrayList<>();
 		List<InvoiceHeaderDto> pendingApprovalList = new ArrayList<>();
 		List<InvoiceHeaderDto> rejectedList = new ArrayList<>();
 		List<String> invoiceReferenceNumberList = new ArrayList<>();
@@ -105,7 +106,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList rejectedDto:" + sapRejectedDto);
 					sapRejectedDto.setInvoiceTotal(total);
 					rejectedList.add(sapRejectedDto);
-				} else {
+				} else  {
 					System.err.println("headerList pendingApprovalDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
@@ -170,6 +171,15 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 										sapPostedList.add(invoiceHeaderDto);
 									}
 								}
+								else{
+									
+									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
+										invoiceHeaderDto.setInvoiceStatus("13");
+										invoiceHeaderDto.setInvoiceStatusText("UnPaid");
+										unPaidList.add(invoiceHeaderDto);
+									}
+									
+								}
 							}
 						}
 					} else {
@@ -193,7 +203,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				// return new
 				// ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
 			}
-			List<InvoiceHeaderDto> newList = Stream.of(sapPostedList, pendingApprovalList, rejectedList)
+			List<InvoiceHeaderDto> newList = Stream.of(sapPostedList,unPaidList, pendingApprovalList, rejectedList)
 					.flatMap(Collection::stream).collect(Collectors.toList());
 			System.err.println("newList:" + newList);
 			TrackInvoiceOutputPayload trackInvoiceOutputPayload = new TrackInvoiceOutputPayload();
