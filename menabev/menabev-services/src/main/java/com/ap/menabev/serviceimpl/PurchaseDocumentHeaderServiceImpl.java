@@ -410,7 +410,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 						twoWayMatchDto.setVendorId(dto.getInvoiceHeader().getVendorId());
 					}
 					InvoiceItemDto twowayMatchUpdatedItem = item;
-					if(!item.getIsTwowayMatched()){
+					if(!item.getIsTwowayMatched() && !ServiceUtil.isEmpty(item.getItemText()) && !ServiceUtil.isEmpty(item.getCustomerItemId())){
 						twowayMatchUpdatedItem = duplicatecheckServiceImpl.twoWayMatch(twoWayMatchDto);
 						if(twowayMatchUpdatedItem.getIsTwowayMatched() && twowayMatchUpdatedItem.getIsSelected()){
 							if(!ServiceUtil.isEmpty(dto.getInvoiceHeader().getGrossAmount()) && !ServiceUtil.isEmpty(twowayMatchUpdatedItem.getGrossPrice())){
@@ -1290,7 +1290,7 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			if (!ServiceUtil.isEmpty(obj.getNumber())) {
 				forResponse.setDocumentNumber(obj.getNumber());
 			}
-			if (!ServiceUtil.isEmpty(obj.getEntryDate())) {
+			if (!ServiceUtil.isEmpty(obj.getAccountingDocumentCreationDate())) {
 				SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 				Date date = df.parse(obj.getAccountingDocumentCreationDate());
 				forResponse.setEntryDate(date.getTime());

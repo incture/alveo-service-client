@@ -296,7 +296,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
             if(!ServiceUtil.isEmpty(setParentByFolderId)){
             	Folder parent = (Folder) session.getObject(setParentByFolderId);
     			ItemIterable<CmisObject> files = parent.getChildren();
-    			
+    			Boolean documentFound = false;
     			for(CmisObject obj : files){
     				if(documentName.equals(obj.getName())){
     					
@@ -305,7 +305,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     					ContentStream contentStream = doc.getContentStream(); // returns
 
     					if (contentStream != null) {
-
+    						documentFound = true;
     						InputStream is = contentStream.getStream();
     						byte[] bytes = IOUtils.toByteArray(is);
     						String encoded = Base64.getEncoder().encodeToString(bytes);
@@ -320,12 +320,15 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     					}
     					response.add(responseIf);
     					System.out.println(response);
-    				}else{
-    					responseIf.setBase64(null);
-						responseIf.setMimeType(null);
-						responseIf.setFileAvailability(false);
-						response.add(responseIf);
     				}
+    				
+    				
+    			}
+    			if(!documentFound){
+    				responseIf.setBase64(null);
+    				responseIf.setMimeType(null);
+                	responseIf.setFileAvailability(false);
+                	response.add(responseIf);
     			}
             }else{
             	responseIf.setBase64(null);
