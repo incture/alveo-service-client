@@ -180,4 +180,6 @@ public class InvoiceItemDo implements Serializable {
 	//CRDBINDICATOR
 	@Column (name = "CR_DB_INDICATOR", length = 1)
 	private String crDbIndicator;
+	@Column (name =  "RETURN_ITEM_IND")
+	private Boolean returnItemInd;
 }

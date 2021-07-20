@@ -93,6 +93,7 @@ public class InvoiceItemDto {
 	private String partialInvInd;
 	private List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload;
 	private String crDbIndicator;
+	private Boolean returnItemInd;
 	
 	
 

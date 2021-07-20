@@ -70,4 +70,5 @@ public class PurchaseDocumentItemDto {
 	private List<PoItemServicesDto> poItemServices;
 	private List<PoItemAccountAssignDto> poAccountAssigment;
 	private List<PoSchedulesDto> Schedules;
+	private Boolean returnItemInd;
 }
