@@ -1108,6 +1108,8 @@ sap.ui.define([
 			}
 			var value = oEvent.getParameter("suggestValue");
 			oDropDownModel.setProperty("/VendorIdSuggest", {});
+			oEvent.getSource().setSelectedKey("");
+			oEvent.getSource().setValue(value);
 			if (value && value.length > 2) {
 				var url = "/A_Supplier?$format=json&$filter=substringof('" + value + "',Supplier) eq true or substringof('" + value +
 					"',SupplierName) eq true";

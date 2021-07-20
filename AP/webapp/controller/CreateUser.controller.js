@@ -34,6 +34,7 @@ sap.ui.define([
 					oVisibilityModel.setProperty("/createUser", {});
 					oMandatoryModel.setProperty("/createUser", {});
 					oUserDetailModel.setProperty("/createUser", {});
+					oUserDetailModel.setProperty("/createUser/companyCode", "1010");
 					if (userGroup === "IT_Admin" || userGroup === "Supplier_Admin") {
 						if (that.id !== "new") {
 							that.fetchUser(that.id);
@@ -144,6 +145,12 @@ sap.ui.define([
 			var manLength = manFields.length;
 			var data, count = 0,
 				sUrl;
+			var vendor = oUserDetailModel.getProperty("/createUser/selectedVendorId");
+			if (!vendor) {
+				var message = "Please select a vendor from suggestion";
+				sap.m.MessageToast.show(message);
+				return;
+			}
 			for (var i = 0; i < manLength; i++) {
 				data = oUserDetailModel.getProperty("/createUser/" + manFields[i]);
 				if (data) {

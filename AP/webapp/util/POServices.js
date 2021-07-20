@@ -2,6 +2,18 @@ jQuery.sap.declare("com.menabev.AP.util.POServices");
 com.menabev.AP.util.POServices = {
 	onTransactionChange: function (oEvent, oController) {
 		var oPOModel = oController.oPOModel;
+		var value = oEvent.getSource().getSelectedKey();
+		var invoiceItems = oPOModel.setProperty("/invoiceItems");
+		var length = invoiceItems.length;
+		var crDbIndicator;
+		if (value === "credit") {
+			crDbIndicator = "H";
+		} else {
+			crDbIndicator = "S";
+		}
+		for (var i = 0; i < length; i++) {
+			invoiceItems[i].crDbIndicator = crDbIndicator;
+		}
 		oController.errorHandlerselect(oEvent);
 	},
 
@@ -1064,10 +1076,12 @@ com.menabev.AP.util.POServices = {
 			}
 			//Calculations
 			itemDetails[i].UOMList = UOMList;
-			tax = this.nanValCheck(itemDetails[i].taxValue);
-			totalVax += this.nanValCheck(tax);
-			gross = this.nanValCheck(itemDetails[i].grossPrice);
-			grossTotal += this.nanValCheck(gross);
+			if (itemDetails[i].isSelected && !itemDetails[i].isDeleted) {
+				tax = this.nanValCheck(itemDetails[i].taxValue);
+				totalVax += this.nanValCheck(tax);
+				gross = this.nanValCheck(itemDetails[i].grossPrice);
+				grossTotal += this.nanValCheck(gross);
+			}
 
 			//PO Match
 			matchDocNumber = itemDetails[i].matchDocNum;
@@ -1125,6 +1139,7 @@ com.menabev.AP.util.POServices = {
 		var unplannedCost = oController.oPOModel.getProperty("/unplannedCost");
 		var invoiceTotal = oController.oPOModel.getProperty("/invoiceTotal");
 		var taxValue = oController.oPOModel.getProperty("/taxValue");
+		var transType = oController.oPOModel.getProperty("/transactionType");
 		var tax, gross, totalVax = 0,
 			grossTotal = 0,
 			isSelected;
@@ -1140,6 +1155,9 @@ com.menabev.AP.util.POServices = {
 		}
 		var headerGross = this.nanValCheck(taxValue) + this.nanValCheck(grossTotal) + this.nanValCheck(unplannedCost);
 		var bal = this.nanValCheck(invoiceTotal) - this.nanValCheck(headerGross);
+		if (transType == "credit" && bal != 0) {
+			bal = -bal;
+		}
 		var obj = {
 			"totalVax": totalVax,
 			"gross": grossTotal,

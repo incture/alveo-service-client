@@ -216,10 +216,6 @@ sap.ui.define([
 			POServices.hdrInvAmtCalu(oEvent, this);
 		},
 
-		onVendorIdChange: function (oEvent) {
-
-		},
-
 		onVendorNameChange: function (oEvent) {
 
 		},

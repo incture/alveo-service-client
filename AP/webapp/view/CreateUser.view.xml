@@ -12,29 +12,30 @@
 						<Label text="{i18n>GROUP}" required="true"></Label>
 						<!--<Input value="{oUserDetailModel>/createUser/userGroup}" valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}"></Input>-->
 						<Select forceSelection="false" width="100%" items="{StaticDataModel>/userGroups}" selectedKey="{oUserDetailModel>/createUser/userGroup}"
-							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect"
-							enabled="false">
+							valueStateText=" " valueState="{oMandatoryModel>/createUser/userGroupState}" change="onGroupSelect" enabled="false">
 							<core:ListItem key="{StaticDataModel>key}" text="{StaticDataModel>value}"/>
 						</Select>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>FIRSTNAME}"  required="true"></Label>
-						<Input value="{oUserDetailModel>/createUser/firstName}" maxLength="64" valueStateText=" " valueState="{oMandatoryModel>/createUser/firstNameState}"></Input>
+						<Label text="{i18n>FIRSTNAME}" required="true"></Label>
+						<Input value="{oUserDetailModel>/createUser/firstName}" maxLength="64" valueStateText=" "
+							valueState="{oMandatoryModel>/createUser/firstNameState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>LASTNAME}"  required="true"></Label>
-						<Input value="{oUserDetailModel>/createUser/lastName}" maxLength="46" valueStateText=" " valueState="{oMandatoryModel>/createUser/lastNameState}"></Input>
+						<Label text="{i18n>LASTNAME}" required="true"></Label>
+						<Input value="{oUserDetailModel>/createUser/lastName}" maxLength="46" valueStateText=" "
+							valueState="{oMandatoryModel>/createUser/lastNameState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>EMAIL}"  required="true"></Label>
+						<Label text="{i18n>EMAIL}" required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/Email}" valueStateText=" " valueState="{oMandatoryModel>/createUser/EmailState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>PHONENO}"  required="false"></Label>
+						<Label text="{i18n>PHONENO}" required="false"></Label>
 						<Input value="{oUserDetailModel>/createUser/phoneNum}" valueStateText=" " valueState="{oMandatoryModel>/createUser/phoneNumState}"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>COUNTRY}"  required="true"></Label>
+						<Label text="{i18n>COUNTRY}" required="true"></Label>
 						<!--<Input value="{oUserDetailModel>/createUser/country}" valueStateText=" " valueState="{oMandatoryModel>/createUser/countryState}"></Input>-->
 						<Select forceSelection="false" width="100%" items="{oDropDownModel>/country}" selectedKey="{oUserDetailModel>/createUser/country}"
 							valueStateText=" " valueState="{oMandatoryModel>/createUser/countryState}">
@@ -42,17 +43,24 @@
 						</Select>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>VENDORID}"  required="true"></Label>
-						<Input value="{oUserDetailModel>/createUser/vendorId}" valueStateText=" " valueState="{oMandatoryModel>/createUser/vendorIdState}"
-							editable="{oVisibilityModel>/createUser/editable}"></Input>
+						<Label text="{i18n>VENDORID}" required="true"></Label>
+						<!--<Input value="{oUserDetailModel>/createUser/vendorId}" valueStateText=" " valueState="{oMandatoryModel>/createUser/vendorIdState}"-->
+						<!--	editable="{oVisibilityModel>/createUser/editable}"></Input>-->
+						<Input filterSuggests="false" value="{oUserDetailModel>/createUser/vendorId}" selectedKey="{oUserDetailModel>/createUser/selectedVendorId}" showSuggestion="true" suggest="VendorIdSuggest"
+							suggestionItemSelected="vendorIdSelected" change="onVendorIdChange" suggestionItems="{oDropDownModel>/VendorIdSuggest}" maxLength="10"
+							editable="{oVisibilityModel>/createUser/editable}">
+							<suggestionItems>
+								<core:ListItem text="{oDropDownModel>Supplier}" additionalText="{oDropDownModel>SupplierName}"/>
+							</suggestionItems>
+						</Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>COMPANYCODE}"  required="true"></Label>
+						<Label text="{i18n>COMPANYCODE}" required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/companyCode}" valueStateText=" " valueState="{oMandatoryModel>/createUser/companyCodeState}"
-							editable="{oVisibilityModel>/createUser/editable}"></Input>
+							editable="{oVisibilityModel>/createUser/editable}" enabled="false"></Input>
 					</VBox>
 					<VBox>
-						<Label text="{i18n>PURCHASEORGANISATION}"  required="true"></Label>
+						<Label text="{i18n>PURCHASEORGANISATION}" required="true"></Label>
 						<Input value="{oUserDetailModel>/createUser/purchaseOrg}" valueStateText=" " valueState="{oMandatoryModel>/createUser/purchaseOrgState}"
 							editable="{oVisibilityModel>/createUser/editable}"></Input>
 					</VBox>
@@ -63,7 +71,7 @@
 			<OverflowToolbar class="footerClass">
 				<ToolbarSpacer/>
 				<Button type="Emphasized" text="{i18n>CANCEL}" press="onNavBack"></Button>
-				<Button type="Emphasized" text="{oUserDetailModel>/createUsertitle}" press="onCreateUser" ></Button>
+				<Button type="Emphasized" text="{oUserDetailModel>/createUsertitle}" press="onCreateUser"></Button>
 			</OverflowToolbar>
 		</footer>
 	</Page>

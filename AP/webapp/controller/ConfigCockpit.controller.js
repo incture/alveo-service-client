@@ -23,8 +23,6 @@ sap.ui.define([
 			var baseModel = new sap.ui.model.json.JSONModel(baseData);
 			this.getView().setModel(baseModel, "baseModel");
 			baseModel.refresh();
-			var oPODetailModel = new sap.ui.model.odata.ODataModel("DEC_NEW/sap/opu/odata/sap/Z_ODATA_SERV_OPEN_PO_SRV");
-			this.getView().setModel(oPODetailModel, "oPODetailModel");
 			this.handleLoadCompany();
 			oMasterModel.refresh();
 			this.oRouter.attachRoutePatternMatched(function (oEvent) {
@@ -45,8 +43,7 @@ sap.ui.define([
 					// sap.m.MessageToast.show("Destination Failed");
 				},
 				success: function (data, textStatus, jqXHR) {
-					if (!data.schedulerConfigurationdto) {
-					}
+					if (!data.schedulerConfigurationdto) {}
 					masterModel.setData(data);
 					masterModel.refresh();
 				}
@@ -105,33 +102,6 @@ sap.ui.define([
 			});
 		},
 
-		onCompanySelect: function (oEvent) {
-			var that = this;
-			var sKey = oEvent.getSource().getSelectedKey();
-			var oMasterModel = this.getView().getModel("oMasterModel");
-			oMasterModel.getData().companyCode = sKey;
-			var taxUrl = "DEC_NEW/sap/opu/odata/sap/ZRTV_RETURN_DELIVERY_SRV/TaxCodeSet?$filter=companyCode eq '" + sKey + "'";
-			$.ajax({
-				type: "GET",
-				url: taxUrl,
-				async: true,
-				dataType: "json",
-				contentType: "application/json; charset=utf-8",
-				error: function (err) {
-
-				},
-				success: function (data, textStatus, jqXHR) {
-					var mTaxModel = new JSONModel({
-						"results": data.d.results
-					});
-
-					that.getView().setModel(mTaxModel, "mTaxModel");
-					oMasterModel.getData().configurationDto.defaultTaxCode = data.d.results[0].taxCode;
-					oMasterModel.refresh();
-				}
-
-			});
-		},
 		/* ************************ Scheduler Configuration :START *********************************************** */
 		fnValidateEmail: function (oEvent) {
 			var mail = oEvent.getSource().getValue();
@@ -139,7 +109,6 @@ sap.ui.define([
 			if (!mailregex.test(mail)) {
 				sap.m.MessageToast.show(mail + " is not a valid email address.");
 				oEvent.getSource().setValueState("Error");
-				oEvent.getSource().setValue("");
 			} else {
 				oEvent.getSource().setValueState("None");
 			}
@@ -208,20 +177,6 @@ sap.ui.define([
 			this.vendorFlag = true;
 		},
 
-		searchVendorId: function (oEvent) {
-			oEvent.getSource().setValueState("None");
-			this.vendorFlag = false;
-			var searchVendorModel = new sap.ui.model.json.JSONModel();
-			this.getView().setModel(searchVendorModel, "suggestionModel");
-			var value = oEvent.getParameter("suggestValue").trim();
-			if (value && value.length > 2) {
-				var url = "DEC_NEW/sap/opu/odata/sap/ZAP_VENDOR_SRV/VendSearchSet?$filter=SearchString eq '" + value + "'";
-				searchVendorModel.loadData(url, null, true);
-				searchVendorModel.attachRequestCompleted(null, function () {
-					searchVendorModel.refresh();
-				});
-			}
-		},
 		chkSelectedVendor: function (oEvent) {
 			if (this.vendorFlag) {
 				oEvent.getSource().setValueState("None");
@@ -392,6 +347,8 @@ sap.ui.define([
 				MasterData.schedulerConfigurationdto[1].endDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].endDate);
 				MasterData.schedulerConfigurationdto[0].startDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].startDate);
 				MasterData.schedulerConfigurationdto[1].startDate = formatter.formatSchedulerDate(schedulerConfigurationdto[0].startDate);
+				MasterData.schedulerConfigurationdto[0].createdBy = this.oUserDetailModel.getProperty("/loggedInUserMail");
+				MasterData.schedulerConfigurationdto[1].createdBy = this.oUserDetailModel.getProperty("/loggedInUserMail");
 				var busy = new sap.m.BusyDialog();
 				busy.open();
 				$.ajax({

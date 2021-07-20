@@ -55,11 +55,11 @@ sap.ui.define([
 				"Content-Type": "application/scim+json"
 			};
 			var data, userGroup = [],
-				vendorId, groupData;
+				vendorId, groupData, loggedinUserGroup;
 			oServiceModel.loadData(sUrl, "", false, "GET", false, false, oHeader);
 			// oServiceModel.attachRequestCompleted(function (oEvent) {
 			var data = oServiceModel.getData().Resources[0];
-			if (data) {
+			if (data && data.groups) {
 				var group = data.groups,
 					length = data.groups.length;
 				if (data.groups) {
@@ -70,14 +70,32 @@ sap.ui.define([
 								.attributes) {
 								vendorId = data["urn:sap:cloud:scim:schemas:extension:custom:2.0:User"].attributes[0].value;
 							}
+							loggedinUserGroup = data.groups[i].value;
 							oUserDetailModel.setProperty("/loggedinUserGroup", data.groups[i].value);
 							oUserDetailModel.setProperty("/loggedinUserVendorId", vendorId);
 							break;
 						}
 
 					}
+					if (loggedinUserGroup === "IT_Admin") {
+						this.oRouter.navTo("UserManagement");
+					} else if (loggedinUserGroup === "Accountant") {
+						this.oRouter.navTo("Inbox");
+					} else if (loggedinUserGroup === "Buyer") {
+						this.oRouter.navTo("Inbox");
+					} else if (loggedinUserGroup === "Process_Lead") {
+						this.oRouter.navTo("Inbox");
+					} else if (loggedinUserGroup === "Supplier_Admin") {
+						this.oRouter.navTo("TrackInvoice");
+					} else if (loggedinUserGroup === "Supplier_Executive") {
+						this.oRouter.navTo("TrackInvoice");
+					} else {
+						this._oRouter.navTo("MessagePage");
+					}
 				}
 				oUserDetailModel.setProperty("/loggedinUserDetail", data);
+			} else {
+				this._oRouter.navTo("MessagePage");
 			}
 			// });
 		}

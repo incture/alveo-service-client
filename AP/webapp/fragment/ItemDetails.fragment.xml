@@ -127,6 +127,10 @@
 						</Column>
 						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7%"
 							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
+							<Label design="Bold" text="{i18n>CRDB}" tooltip="{i18n>CRDB}"/>
+						</Column>
+						<Column demandPopin="true" minScreenWidth="Tablet" popinDisplay="Inline" width="7%"
+							visible="{parts:['oVisibilityModel>/POINVToggle'],formatter:'com.menabev.AP.formatter.formatter.formatPOInvVisible'}">
 							<Label design="Bold" text="{i18n>ACCASSGN}" tooltip="{i18n>ACCASSGN}"/>
 						</Column>
 					</columns>
@@ -183,6 +187,7 @@
 								<Text text="{oPOModel>poTaxCode}"/>
 								<Text text="{oPOModel>matchserviceNumber}"/>
 								<Text text="{oPOModel>matchpackageNumber}"/>
+								<Text text="{oPOModel>crDbIndicator}"/>
 								<HBox>
 									<core:Icon src="sap-icon://edit" press="onClickInvoiceAccAssignment" class="sapUiTinyMarginTop"
 										visible="{path:'oPOModel>accountAssignmentCat',formatter:'com.menabev.AP.formatter.formatter.AccAsssVisible'}"/>
@@ -329,7 +334,7 @@
 							<Table items="{oPOModel>poItem}" alternateRowColors="true" growing="true" growingThreshold="20">
 								<headerToolbar>
 									<OverflowToolbar>
-										<Button text="{i18n>Copy}" press="onCopyItems" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}" />
+										<Button text="{i18n>Copy}" press="onCopyItems" type="Emphasized" icon="sap-icon://duplicate" tooltip="{i18n>Copy}"/>
 										<ToolbarSpacer/>
 									</OverflowToolbar>
 								</headerToolbar>

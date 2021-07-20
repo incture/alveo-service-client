@@ -920,6 +920,17 @@ sap.ui.define([
 				invoiceItems.unshift(oData);
 				oPOModel.setProperty(poItems[i] + "/isSelected", false);
 			}
+			var quantity = POServices.nanValCheck(oData.invQty);
+			var gross = POServices.calculateGrossAmount(oData);
+			oData.grossPrice = gross;
+			var taxAmount = POServices.calculateLineItemTax(oData);
+			oData.taxValue = taxAmount;
+			var netWorth = parseFloat(gross) + parseFloat(oData);
+			netWorth = netWorth.toFixed(2);
+			oData.netWorth = netWorth;
+			var distributionInd = oData.invItemAcctDtoList;
+			var GL = oData.invItemAcctDtoList;
+			var quantity = POServices.nanValCheck(oData.invQty);
 			oPOModel.setProperty("/invoiceItems", invoiceItems);
 			oPOModel.setProperty("/selectedPOItem", []);
 			POServices.formatUOMList(oPOModel.getProperty("/invoiceItems"), this);

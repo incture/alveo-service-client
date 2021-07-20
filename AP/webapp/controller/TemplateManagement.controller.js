@@ -50,6 +50,7 @@ sap.ui.define([
 			};
 			var url = "/menabevdev/NonPoTemplate/getAll";
 			var busy = new sap.m.BusyDialog();
+			this.getModel("templateModel").setProperty("/aNonPoTemplate", {});
 			busy.open();
 			jQuery.ajax({
 				type: "POST",
@@ -79,9 +80,27 @@ sap.ui.define([
 					if (result.status === 504) {
 						errorMsg = "Request timed-out. Please refresh page";
 						this.errorMsg(errorMsg);
-					} else {
-						errorMsg = data;
-						this.errorMsg(errorMsg);
+					} else if (result.status == 401) {
+						var message = "Session Lost. Press OK to refresh the page";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK],
+							onClose: function (sAction) {
+								location.reload(true);
+							}
+						});
+					} else if (result.status == 400 || result.status == 404) {
+						var message = "Service Unavailable. Please try after sometime";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
+					} else if (result.status == 500) {
+						var message = "Service Unavailable. Please contact administrator";
+						sap.m.MessageBox.information(message, {
+							styleClass: "sapUiSizeCompact",
+							actions: [sap.m.MessageBox.Action.OK]
+						});
 					}
 				}.bind(this)
 			});
@@ -348,6 +367,7 @@ sap.ui.define([
 						sType = "PUT";
 					}
 					var that = this;
+					var message;
 					$.ajax({
 						url: sUrl,
 						method: sType,
@@ -379,7 +399,23 @@ sap.ui.define([
 							}
 						}.bind(this),
 						error: function (result, xhr, data) {
-							sap.m.MessageToast.show("Failed");
+							var statusCode = result.response.statusCode;
+							if (statusCode == "400") {
+								if (result.response.body) {
+									var response = JSON.parse(result.response.body);
+									message = response.error.message.value;
+									sap.m.MessageToast.show(message);
+								}
+							} else if (statusCode == "401") {
+								message = "Service Unavailable. Please contact administrator";
+								sap.m.MessageToast.show(message);
+							} else if (statusCode == "500") {
+								var message = "Service Unavailable. Please try after sometime";
+								sap.m.MessageBox.information(message, {
+									styleClass: "sapUiSizeCompact",
+									actions: [sap.m.MessageBox.Action.OK]
+								});
+							}
 						}.bind(this)
 					});
 

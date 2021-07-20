@@ -59,7 +59,7 @@ sap.ui.define([
 					that.getView().byId("sideNav").getItems()[1].addStyleClass("sideNavItemSelected");
 					var text = that.getView().byId("sideNav").getItems()[1].getItems()[1].getText();
 					StaticDataModel.setProperty("/selectedApp", text);
-				} else if (userGroup === "IT_Admin"){
+				} else if (userGroup === "IT_Admin") {
 					that.getView().byId("sideNav").getItems()[3].addStyleClass("sideNavItemSelected");
 					var text = that.getView().byId("sideNav").getItems()[3].getItems()[1].getText();
 					StaticDataModel.setProperty("/selectedApp", text);

@@ -180,7 +180,7 @@
 				]
 			}, {
 				"name": "UserManagement",
-				"pattern": "",
+				"pattern": "UserManagement",
 				"target": [
 					"UserManagement"
 				]
@@ -227,7 +227,7 @@
 					"NonPOInvoice"
 				]
 			}, {
-				"name": "PO",	
+				"name": "PO",
 				"pattern": "PO/:id:/:status:/:taskId:/:source:",
 				"target": [
 					"PO"
@@ -249,6 +249,12 @@
 				"pattern": "TrackInvoice",
 				"target": [
 					"TrackInvoice"
+				]
+			}, {
+				"name": "MessagePage",
+				"pattern": "NotFound",
+				"target": [
+					"MessagePage"
 				]
 			}],
 			"targets": {
@@ -303,6 +309,10 @@
 				"TrackInvoice": {
 					"viewType": "XML",
 					"viewName": "TrackInvoice"
+				},
+				"MessagePage": {
+					"viewType": "XML",
+					"viewName": "MessagePage"
 				}
 			}
 		}

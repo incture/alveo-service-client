@@ -1,6 +1,12 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.TemplateManagement"
 	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:l="sap.ui.layout">
-	<Page title="{i18n>TemplateManagement}" showNavButton="true" navButtonPress="onNavBack" class="sapUiSizeCompact">
+	<Page class="sapUiSizeCompact TaskPage">
+			<customHeader>
+			<OverflowToolbar>
+				<Button icon="sap-icon://nav-back" press="onNavback"/>
+				<Title text="{i18n>TemplateManagement}"></Title>
+			</OverflowToolbar>
+		</customHeader>
 		<content>
 			<VBox>
 				<l:Grid defaultSpan="L3 M6 S12" width="100%">

@@ -26,5 +26,18 @@
 				</VBox>
 			</content>
 		</Page>
+		<Page>
+			<customHeader>
+				<OverflowToolbar>
+					<Image src="images/menabevLogo.jpg" height="1.6rem" class="sapUiMediumMarginTopBottom"/>
+					<Label text="MenaBev" design="Bold"/>
+					<Label text="{StaticDataModel>/selectedApp}"></Label>
+					<ToolbarSpacer/>
+					<Button icon="sap-icon://customer" type="Emphasized" class="UserIcon" tooltip="{i18n>PROFILE}" press="onUserDetailPressed"></Button>
+				</OverflowToolbar>
+			</customHeader>
+			<content>
+			</content>
+		</Page>
 	</App>
 </mvc:View>

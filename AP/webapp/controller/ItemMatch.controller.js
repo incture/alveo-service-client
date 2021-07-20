@@ -65,9 +65,14 @@ sap.ui.define([
 		},
 
 		onNavback: function () {
+			var oPOModel = this.oPOModel;
 			var reqId = this.oPOModel.getProperty("/requestId");
 			var changeIndicators = this.oPOModel.getProperty("/changeIndicators");
-			POServices.formatUOMList(this.oPOModel.getProperty("/invoiceItems"), this);
+			var tax = POServices.formatUOMList(this.oPOModel.getProperty("/invoiceItems"), this);
+			oPOModel.setProperty("/sysSusgestedTaxAmount", this.nanValCheck(tax.totalVax));
+			oPOModel.setProperty("/totalBaseRate", this.nanValCheck(tax.gross));
+			oPOModel.setProperty("/grossAmount", this.nanValCheck(tax.headerGross));
+			oPOModel.setProperty("/balanceAmount", this.nanValCheck(tax.bal));
 			if (changeIndicators && changeIndicators.itemChange) {
 				this.onClickThreeWayMatch("", true);
 			}
