@@ -56,9 +56,13 @@ public class DocumentManagementController {
 		return documentManagementService.downloadDocument(fileId);
 	}
 	
-	@GetMapping(value = "/downloadByFolderId/{folderName}/{fileName}")
+	@GetMapping(value = "/downloadByFolderId/folderName={folderName}/fileName={fileName}")
 	@ResponseBody
 	List<DmsGetResponseDto> downloadByFolder(@PathVariable(name = "folderName", required = true) String folderName ,@PathVariable(name = "fileName", required = false) String fileName ) throws IOException {
+		if(!ServiceUtil.isEmpty(folderName) && !ServiceUtil.isEmpty(fileName)){
+			System.out.println("FolderName = " + folderName +" FIleName "+ fileName);
+		}
+		
 		return documentManagementService.getDocumentByFolderName(folderName, fileName);
 	}
 

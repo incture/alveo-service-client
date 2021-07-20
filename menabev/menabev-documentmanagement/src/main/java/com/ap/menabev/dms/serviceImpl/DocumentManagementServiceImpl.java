@@ -267,6 +267,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 		Session session = factory.getRepositories(parameter).get(0).createSession();
 		
 		if(!ServiceUtil.isEmpty(folderName) && !ServiceUtil.isEmpty(documentName)){
+			System.out.println("FolderName = " + folderName + "DOcumentNAme :: "  + documentName);
 			String setParentByFolderId = null;
 			ItemIterable<QueryResult> folderIdByQuerry = session.query(
 					"SELECT cmis:objectId FROM cmis:folder where cmis:name like '%" + folderName + "'",
@@ -291,13 +292,14 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 
 			}
 			setParentByFolderId = String.valueOf(value);
+			DmsGetResponseDto responseIf = new DmsGetResponseDto();
             if(!ServiceUtil.isEmpty(setParentByFolderId)){
             	Folder parent = (Folder) session.getObject(setParentByFolderId);
     			ItemIterable<CmisObject> files = parent.getChildren();
     			
     			for(CmisObject obj : files){
     				if(documentName.equals(obj.getName())){
-    					DmsGetResponseDto responseIf = new DmsGetResponseDto();
+    					
     					Document doc = (Document) session.getObject(obj.getId());
     					System.out.println();
     					ContentStream contentStream = doc.getContentStream(); // returns
@@ -318,8 +320,18 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     					}
     					response.add(responseIf);
     					System.out.println(response);
+    				}else{
+    					responseIf.setBase64(null);
+						responseIf.setMimeType(null);
+						responseIf.setFileAvailability(false);
+						response.add(responseIf);
     				}
     			}
+            }else{
+            	responseIf.setBase64(null);
+				responseIf.setMimeType(null);
+            	responseIf.setFileAvailability(false);
+            	response.add(responseIf);
             }
 		}
 		else if(!ServiceUtil.isEmpty(folderName)){
@@ -374,6 +386,10 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 	    					System.out.println(responseIf.getDocumentName());
 	    				
 	    			}
+	            }else{
+	            	DmsGetResponseDto responseElse = new DmsGetResponseDto();
+	    			responseElse.setFileAvailability(false);
+	    			response.add(responseElse);
 	            }
 		}else{
 			DmsGetResponseDto responseElse = new DmsGetResponseDto();
