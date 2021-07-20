@@ -119,5 +119,7 @@ public class PurchaseDocumentItemDo{
 	private Long itemChangedAt;
 	@Column(name="PRODUCT_TYPE", length=2)
 	private String productType;
+	@Column (name =  "RETURN_ITEM_IND")
+	private Boolean returnItemInd;
 
 }

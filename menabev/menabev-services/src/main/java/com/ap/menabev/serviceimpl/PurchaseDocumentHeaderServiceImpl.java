@@ -719,6 +719,9 @@ public class PurchaseDocumentHeaderServiceImpl implements PurchaseDocumentHeader
 			if (!ServiceUtil.isEmpty(obj.getInterArticleNum())) {
 				item.setInterArticleNum(obj.getInterArticleNum());
 			}
+			if(!ServiceUtil.isEmpty(obj.isRetItem())){
+				item.setReturnItemInd(obj.isRetItem());
+			}
 			if (!ServiceUtil.isEmpty(obj.getItemNo())) {
 				item.setDocumentItem(obj.getItemNo());
 			}
