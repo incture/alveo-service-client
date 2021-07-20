@@ -11,7 +11,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ap.menabev.dto.InvoiceHeaderDto;
+import com.ap.menabev.dto.InvoiceItemDto;
 import com.ap.menabev.dto.MatchingHistoryDto;
+import com.ap.menabev.dto.ResponseDto;
 import com.ap.menabev.entity.MatchingHistoryDo;
 import com.ap.menabev.invoice.MatchingHistoryRepository;
 import com.ap.menabev.service.MatchingHistoryService;
@@ -113,5 +116,59 @@ public class MatchingHistoryServiceImpl implements MatchingHistoryService {
 
 		return query;
 	}
-
+	
+	@SuppressWarnings("unused")
+	private List<MatchingHistoryDto> saveToMatchingHistoryTable(InvoiceHeaderDto dto){
+		List<MatchingHistoryDto> matchingHistoryDto = new ArrayList<>();
+		try {
+			
+			if(!ServiceUtil.isEmpty(dto)){
+				for(InvoiceItemDto item : dto.getInvoiceItems()){
+					if(ApplicationConstants.MANUAL_MATCH.equals(item.getMatchType())){
+						MatchingHistoryDto matchingHistoryObject = new MatchingHistoryDto();
+						if (!ServiceUtil.isEmpty(item.getCustomerItemId())) {
+							matchingHistoryObject .setCustomerItemIdVmn(item.getCustomerItemId());
+						}
+						if (!ServiceUtil.isEmpty(item.getItemCode())) {
+							matchingHistoryObject.setIMatNo(item.getItemCode());
+						}
+						if (!ServiceUtil.isEmpty(item.getItemText())) {
+							matchingHistoryObject.setIText(item.getItemText());
+						}
+						if (!ServiceUtil.isEmpty(item.getUpcCode())) {
+							matchingHistoryObject.setIUpcCode(item.getUpcCode());
+						}
+						if (!ServiceUtil.isEmpty(item.getMatchedBy())) {
+							matchingHistoryObject.setLastMatchedBy(item.getMatchedBy());
+						}
+						if (!ServiceUtil.isEmpty(item.getPoMatNum())) {
+							matchingHistoryObject.setPMatNo(item.getPoMatNum());
+						}
+						if (!ServiceUtil.isEmpty(item.getPoItemText())) {
+							matchingHistoryObject.setPText(item.getPoItemText());
+						}
+						if (!ServiceUtil.isEmpty(item.getItemCode())) {
+							matchingHistoryObject.setPUpcCode(item.getArticleNum());
+						}
+						if (!ServiceUtil.isEmpty(item.getItemCode())) {
+							matchingHistoryObject.setPVMN(item.getSetPoMaterialNum());
+						}
+						if (!ServiceUtil.isEmpty(dto.getVendorId())) {
+							matchingHistoryObject.setVendorId(dto.getVendorId());
+							
+						}
+						matchingHistoryDto.add(matchingHistoryObject);
+						
+					}
+				}
+				List<MatchingHistoryDto> response = saveOrUpdate(matchingHistoryDto);
+				return response;
+			}
+		} catch (Exception e) {
+			System.out.println("EXECPTION OCCUR IN MANUAL MATCH TABLE SAVE " + e.getMessage());
+			return matchingHistoryDto;
+		}
+		return null;
+	}
+	
 }
