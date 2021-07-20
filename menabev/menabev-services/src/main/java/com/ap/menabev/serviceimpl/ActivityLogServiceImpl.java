@@ -205,7 +205,10 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 	@Override
 	// get activityLog from the workflow api using requestId and WorkfowId
 	public ActivityLogResponseDto getWorkflowActivityLog(String requestId){
-		ActivityLogResponseDto activity = new ActivityLogResponseDto();   
+		ActivityLogResponseDto activity = new ActivityLogResponseDto();  
+		List<WorkflowTaskOutputDto> listOfWorkflwoTaskValidation  = new ArrayList<WorkflowTaskOutputDto>();
+		List<WorkflowTaskOutputDto> listOfWorkflwoTaskApproval  = new ArrayList<WorkflowTaskOutputDto>();
+		
 		try{
 		// call invoice header Table get workflowId  and comments and attachement details
 		   InvoiceHeaderDo invoice = invocieRepo.getInvoiceHeader(requestId);
@@ -213,23 +216,40 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 		    	List<AttachmentDto> AttachementDto = getInvoiceAttachment(requestId);
 
 		    	InvoiceHeaderDto invoiceDto = ObjectMapperUtils.map(invoice, InvoiceHeaderDto.class);
-	               if(ServiceUtil.isEmpty(invoiceDto)){
+	             System.err.println("InvoiceHeaderDto "+invoiceDto); 
+		    	if(!ServiceUtil.isEmpty(invoiceDto)){
 		   InvoiceReceivedDto received = new InvoiceReceivedDto();
 		   received.setInvocieChannelType(invoiceDto.getChannelType());
 		   received.setInvocieReceived(invoiceDto.getRequest_created_at());
 		   activity.setInvoiceReceived(received);
 		// call worklfow api to get the acivity log from worklfow 
-		   ResponseEntity<?>  workflowResponse = getWorkflowActivityTaskDetails(invoiceDto.getWorkflowId());
+		   ResponseEntity<?>  workflowResponse = getWorkflowActivityTaskDetails(requestId);
 		  if( workflowResponse.getStatusCodeValue()==200){
 			   @SuppressWarnings("unchecked")
 			List<WorkflowTaskOutputDto> listOfWorkflwoTask = (List<WorkflowTaskOutputDto>) workflowResponse.getBody();
 			   listOfWorkflwoTask.stream().forEach(w->{
+				   if(w.getActivityId().equalsIgnoreCase("usertask4")){
+				   WorkflowTaskOutputDto approval = new WorkflowTaskOutputDto();
+				   approval =      ObjectMapperUtils.map(w,WorkflowTaskOutputDto.class);
                     List<String> workflwoUser = w.getRecipientUsers();		
                          // get the comment for each activityId
                   List<CommentDto> commentList =  getInvoiceComments(requestId,workflwoUser);
-                    w.setComment(commentList);
+                  approval.setComment(commentList);
+                  listOfWorkflwoTaskApproval.add(approval);
+				   }else {
+					   WorkflowTaskOutputDto  validation = new WorkflowTaskOutputDto();
+					   validation =      ObjectMapperUtils.map(w,WorkflowTaskOutputDto.class);
+	                    List<String> workflwoUser = w.getRecipientUsers();		
+	                         // get the comment for each activityId
+	                  List<CommentDto> commentList =  getInvoiceComments(requestId,workflwoUser);
+	                  validation.setComment(commentList);
+	                  listOfWorkflwoTaskValidation.add(validation); 
+					   
+				   }
+                    
 			   });         
-			   activity.setApproval(listOfWorkflwoTask);
+			   activity.setValidation(listOfWorkflwoTaskValidation);
+               activity.setApproval(listOfWorkflwoTaskApproval);			   
 			   activity.setStatusCode("200");
 			   activity.setMessage("SUCCESS");
 			   activity.setAttachment(AttachementDto);
@@ -261,12 +281,14 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 			List<WorkflowTaskOutputDto> listOfWorkflowTasks = new ArrayList<WorkflowTaskOutputDto>();
 			HttpClient client = HttpClientBuilder.create().build();
 			String jwToken = DestinationReaderUtil.getJwtTokenForAuthenticationForSapApi();
-			String url = ApplicationConstants.WORKFLOW_REST_BASE_URL + "/v1/task-instances?workflowInstanceId="+workflowInstanceId;
+			String url = ApplicationConstants.WORKFLOW_REST_BASE_URL + "/v1/task-instances?subject="+workflowInstanceId;
+			System.err.println("urlFOrActivityLog "+ url);
 			HttpGet httpGet = new HttpGet(url);
 			httpGet.addHeader("Authorization", "Bearer " + jwToken);
 			httpGet.addHeader("Content-Type", "application/json");
 				HttpResponse response = client.execute(httpGet);
 				String dataFromStream = getDataFromStream(response.getEntity().getContent());
+				System.err.println("getWorkflow dataFromStream"+dataFromStream);
 				if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 					JSONArray jsonArray = new JSONArray(dataFromStream);
 					for (int i = 0; i < jsonArray.length(); i++) {
@@ -282,10 +304,10 @@ public class ActivityLogServiceImpl implements ActivityLogService{
 						return new ResponseEntity<>(listOfWorkflowTasks, HttpStatus.OK);
 					}
 				} else {
-					return new ResponseEntity<String>("FETCHING FAILED", HttpStatus.CONFLICT);
+					return new ResponseEntity<String>("FETCHING FAILED :"+dataFromStream, HttpStatus.CONFLICT);
 				}
 		} catch (Exception e) {
-			return new ResponseEntity<>("EXCEPTION_GET_MSG" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>("EXCEPTION_GET_MSG :" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 }
 	
