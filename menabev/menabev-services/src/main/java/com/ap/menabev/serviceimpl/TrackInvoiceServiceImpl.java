@@ -283,7 +283,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			} else {
 				url.append(key + "%20eq%20" + "%27" + value.get(i) + "%27" + "%20or%20");
 				System.out.println("29 ");
- 
+    
 			}
 		}
 	}
