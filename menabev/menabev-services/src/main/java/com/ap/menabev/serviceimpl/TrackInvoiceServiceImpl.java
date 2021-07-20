@@ -71,6 +71,8 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 	public ResponseEntity<?> fetchTrackInvoice(TrackInvoiceInputDto trackInvoiceInputDto) {
 		List<InvoiceHeaderDo> headerList = filterInvoicesMultiple(trackInvoiceInputDto);
 		System.err.println("headerList :" + headerList);
+		System.err.println("headerList size :" + headerList.size());
+
 		ModelMapper modelMapper = new ModelMapper();
 		List<InvoiceHeaderDto> sapPostedList = new ArrayList<>();
 		List<InvoiceHeaderDto> unPaidList = new ArrayList<>();
@@ -98,6 +100,10 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList sapPostedDto:" + sapPostedDto);
 
 					sapPostedList.add(sapPostedDto);
+					System.err.println("sapPostedList :" + sapPostedList);
+					System.err.println("sapPostedList size :" + sapPostedList.size());
+
+
 				} else if (invoiceHeaderDo.getInvoiceStatus().equals("22")) {
 					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
@@ -109,6 +115,10 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList rejectedDto:" + sapRejectedDto);
 					sapRejectedDto.setInvoiceTotal(total);
 					rejectedList.add(sapRejectedDto);
+					System.err.println("rejectedList :" + rejectedList);
+					System.err.println("rejectedList size :" + rejectedList.size());
+
+
 				} else  {
 					System.err.println("headerList pendingApprovalDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
@@ -123,6 +133,10 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList pendingApprovalDto:" + sapPendingApprovaldDto);
 
 					pendingApprovalList.add(sapPendingApprovaldDto);
+					System.err.println("pendingApprovalList :" + pendingApprovalList);
+					System.err.println("pendingApprovalList size :" + pendingApprovalList.size());
+
+
 				}
 			}
 			if (!ServiceUtil.isEmpty(sapPostedList)) {
@@ -172,7 +186,11 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 										invoiceHeaderDto
 												.setPaymentReference(odataTrackInvoiceObject.getPaymentReference());
 										paidList.add(invoiceHeaderDto);
+										
 									}
+									System.err.println("paidList :" + paidList);
+									System.err.println("paidList size :" + paidList.size());
+
 								}
 								else{
 									
@@ -180,8 +198,11 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 										invoiceHeaderDto.setInvoiceStatus(ApplicationConstants.UNPAID);
 										invoiceHeaderDto.setInvoiceStatusText("UnPaid");
 										unPaidList.add(invoiceHeaderDto);
+										
 									}
-									
+									System.err.println("unPaidList :" + unPaidList);
+									System.err.println("unPaidList size :" + unPaidList.size());
+
 								}
 							}
 						}
@@ -206,6 +227,19 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				// return new
 				// ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
 			}
+			System.out.println("paidList:"+paidList);
+			System.out.println("paidList size:"+paidList.size());
+
+			System.out.println("unPaidList:"+unPaidList);
+			System.out.println("unPaidList size:"+unPaidList.size());
+
+			System.out.println("pendingApprovalList:"+pendingApprovalList);
+			System.out.println("pendingApprovalList size:"+pendingApprovalList.size());
+
+			System.out.println("rejectedList:"+rejectedList);
+			System.out.println("rejectedList size:"+rejectedList.size());
+
+
 			List<InvoiceHeaderDto> newList = Stream.of(paidList,unPaidList, pendingApprovalList, rejectedList)
 					.flatMap(Collection::stream).collect(Collectors.toList());
 			System.err.println("newList:" + newList);
