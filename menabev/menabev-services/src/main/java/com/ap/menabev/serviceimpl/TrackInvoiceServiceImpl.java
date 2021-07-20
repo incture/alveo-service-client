@@ -96,7 +96,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList sapPostedDto:" + sapPostedDto);
 
 					sapPostedList.add(sapPostedDto);
-				} else if (invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.ACCOUNTANT_REJECT) || invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.BUYER_REJECT) || invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)) {
+				} else if (invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)) {
 					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
