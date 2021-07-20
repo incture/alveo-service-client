@@ -145,11 +145,21 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 						// convert OuputResponse
 						TrackInvoiceOdataOutputResponse trackInvoiceOdataOutputResponse = formOutPutSuccessResponse(
 								jsonOutputString);
-						System.err.println("convertedResponse " + trackInvoiceOdataOutputResponse);
+						System.err.println("trackInvoiceOdataOutputResponse" + trackInvoiceOdataOutputResponse.getUsers());
 						if (!ServiceUtil.isEmpty(trackInvoiceOdataOutputResponse.getUsers())) {
 							for (OdataTrackInvoiceObject odataTrackInvoiceObject : trackInvoiceOdataOutputResponse
 									.getUsers()) {
-								if (!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate())) {
+								try{
+									System.err.println("odataTrackInvoiceObject clearingDate:" + odataTrackInvoiceObject.getClearingDate());
+									System.err.println("odataTrackInvoiceObject paymentRef" + odataTrackInvoiceObject.getPaymentReference());
+
+								}
+								catch(NullPointerException e)
+								{
+									System.err.println("odataTrackInvoiceObject NullPointerException message" + e.getMessage());
+
+								}
+								if (!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate()) && odataTrackInvoiceObject.getClearingDate()!=0 && !ServiceUtil.isEmpty(odataTrackInvoiceObject.getPaymentReference())) {
 
 									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
 										invoiceHeaderDto.setInvoiceStatus("14");
