@@ -45,6 +45,7 @@ import com.ap.menabev.entity.InvoiceHeaderDo;
 import com.ap.menabev.invoice.InvoiceHeaderRepoFilter;
 import com.ap.menabev.invoice.InvoiceHeaderRepository;
 import com.ap.menabev.service.TrackInvoiceService;
+import com.ap.menabev.util.ApplicationConstants;
 import com.ap.menabev.util.OdataHelperClass;
 import com.ap.menabev.util.ServiceUtil;
 import com.google.gson.Gson;
@@ -95,7 +96,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					System.err.println("headerList sapPostedDto:" + sapPostedDto);
 
 					sapPostedList.add(sapPostedDto);
-				} else if (invoiceHeaderDo.getInvoiceStatus().equals("15")) {
+				} else if (invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.ACCOUNTANT_REJECT) || invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.BUYER_REJECT) || invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)) {
 					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
 					double total = 0;
 					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
@@ -283,7 +284,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 			} else {
 				url.append(key + "%20eq%20" + "%27" + value.get(i) + "%27" + "%20or%20");
 				System.out.println("29 ");
-     
+ 
 			}
 		}
 	}
