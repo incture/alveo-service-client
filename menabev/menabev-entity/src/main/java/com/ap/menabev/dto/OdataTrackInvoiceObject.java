@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString 
 public class OdataTrackInvoiceObject {
 
 	private String referenceInvoiceNumber;
