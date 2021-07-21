@@ -1,32 +1,16 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="com.menabev.AP.controller.SchedulerLogs"
 	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout" xmlns:ui="sap.ui.table">
-	<Page title="{i18n>SchedulerLogs}" class="sapUiSizeCompact" titleAlignment="Center">
+	<Page title="{i18n>SchedulerLogs}" class="sapUiSizeCompact" showHeader="false">
 		<content>
-			<!--<l:Grid vSpacing="1" hSpacing="0" defaultSpan="L2 M2 S12">-->
-			<!--	<l:content>-->
-			<!--		<VBox>-->
-			<!--			<Label text="{i18n>FromDate}" design="Bold"/>-->
-			<!--			<DateTimePicker placeholder="Enter Date" change="handleChange"/>-->
-			<!--		</VBox>-->
-			<!--		<VBox>-->
-			<!--			<Label text="{i18n>ToDate}" design="Bold"/>-->
-			<!--			<DateTimePicker placeholder="Enter Date" change="handleChange"/>-->
-			<!--		</VBox>-->
-			<!--		<CheckBox text="{i18n>EmailReader}"/>-->
-			<!--		<CheckBox text="{i18n>OutputReader}"/>-->
-			<!--		<CheckBox text="{i18n>PORefresh}"/>-->
-			<!--		<CheckBox text="{i18n>All}" selected="true"/>-->
-			<!--	</l:content>-->
-			<!--</l:Grid>-->
 			<fb:FilterBar id="SchedulerFilterBarId" search="onSearchSchedulerLogs" clear="onPressClear" showClearButton="true" class="sapUiSizeCompact">
 				<fb:filterItems>
-					<fb:FilterItem name="A" label="{i18n>FromDate}">
+					<fb:FilterItem name="A" label="{i18n>fromDate}">
 						<fb:control>
 							<DateTimePicker placeholder="Enter From Date" value="{oSchedulerLogsModel>/fromdate}" change="handleDateChange"
 								valueFormat="yyyy-MM-dd hh:mm:ss" tooltip="{oSchedulerLogsModel>/fromdate}"/>
 						</fb:control>
 					</fb:FilterItem>
-					<fb:FilterItem name="B" label="{i18n>ToDate}">
+					<fb:FilterItem name="B" label="{i18n>toDate}">
 						<fb:control>
 							<DateTimePicker placeholder="Enter To Date" value="{oSchedulerLogsModel>/toDate}" change="handleDateChange"
 								tooltip="{oSchedulerLogsModel>/toDate}"/>
