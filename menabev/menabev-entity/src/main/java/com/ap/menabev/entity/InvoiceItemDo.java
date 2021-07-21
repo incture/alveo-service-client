@@ -182,4 +182,17 @@ public class InvoiceItemDo implements Serializable {
 	private String crDbIndicator;
 	@Column (name =  "RETURN_ITEM_IND")
 	private Boolean returnItemInd;
+	//Added On 21/07/2021
+	@Column(name = "COND_TYPE" , length = 4)
+	private String condType; 
+	@Column(name = "COND_ST_NO" , length = 3)
+	private String condStNo;  
+	@Column(name = "COND_COUNT" , length = 2)
+	private String condCount;
+	@Column(name = "SHEET_NO" , length = 10)
+	private String sheetNo;
+	@Column(name = "FREIGHT_VEN" , length = 10)
+	private String freightVen;
+	@Column(name = "COND_COUNT_LONG" , length = 3)
+	private String condCountLong;
 }

@@ -94,6 +94,12 @@ public class InvoiceItemDto {
 	private List<ItemThreeWayMatchPaylod> itemThreeWayMatchPayload;
 	private String crDbIndicator;
 	private Boolean returnItemInd;
+	private String condType;
+	private String condStNo;
+	private String condCount;
+	private String sheetNo;
+	private String freightVen;
+	private String condCountLong;
 	
 	
 
