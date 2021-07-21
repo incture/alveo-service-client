@@ -114,8 +114,8 @@ public class OdataAPICall {
 
 		// Encoding username and password
 		String auth = encodeUsernameAndPassword(
-				"sb-clone4768d4738f4b49498258b8a01b20230a!b3189|destination-xsappname!b2",
-				"f845b3d5-4cc9-443e-8d29-fb6bf26d5dbc$kZHRRKM05NdJ6i-B6QqdOyM7UuN-qvyiVkMpY0dBqnY=");
+				ApplicationConstants.DESTINATION_CLIENT_ID,
+				ApplicationConstants.DESTINATION_CLIENT_SECRET);
 
 		httpPost.addHeader("Authorization", auth);
 
@@ -153,8 +153,6 @@ public class OdataAPICall {
 	}
 
 	public static ResponseEntity<?> getOdata() throws URISyntaxException, IOException {
-		String clientid = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
-		String clientsecret = "cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=";
 		String proxyHost = "10.0.4.5";
 		int proxyPort = 20003;
 		final SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
