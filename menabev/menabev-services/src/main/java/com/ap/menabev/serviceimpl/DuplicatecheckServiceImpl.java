@@ -813,7 +813,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					if ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())) {
 						List<InvoiceItemAcctAssignmentDto> accountAssignmentArray = new ArrayList<>();
 						// For Single
-						if (ServiceUtil.isEmpty(poItem.getDistribution())) {
+						if (ServiceUtil.isEmpty(poItem.getDistribution()) && ServiceUtil.isEmpty(poItem.getPartInv())) {
 							InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
 							if (!ServiceUtil.isEmpty(itemReturn.getCrDbIndicator())) {
 								accountAssignment.setCrDbIndicator(itemReturn.getCrDbIndicator());
@@ -911,8 +911,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 						}
 						// For multiple with % distribution
-						else if ("1".equals(poItem.getDistribution()) || "2".equals(poItem.getDistribution())
-								|| "3".equals(poItem.getDistribution())) {
+						else if (("1".equals(poItem.getDistribution()) || "2".equals(poItem.getDistribution())
+								|| "3".equals(poItem.getDistribution())) && "2".equals(poItem.getPartInv())) {
 							int i = 0;
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 								for (PoItemAccountAssignDto poAccAssignment : poItem.getPoAccountAssigment()) {
@@ -1085,7 +1085,7 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 					if ("K".equals(poItem.getAccountAssCat()) || "F".equals(poItem.getAccountAssCat())) {
 						List<InvoiceItemAcctAssignmentDto> accountAssignmentArray = new ArrayList<>();
 						// For Single
-						if (ServiceUtil.isEmpty(poItem.getDistribution())) {
+						if (ServiceUtil.isEmpty(poItem.getDistribution()) && ServiceUtil.isEmpty(poItem.getPartInv())) {
 							InvoiceItemAcctAssignmentDto accountAssignment = new InvoiceItemAcctAssignmentDto();
 							if (!ServiceUtil.isEmpty(itemReturn.getPricingUnit())) {
 								accountAssignment.setPricingUnit(itemReturn.getPricingUnit());
@@ -1177,8 +1177,8 @@ public class DuplicatecheckServiceImpl implements DuplicateCheckService {
 
 						}
 						// For multiple with % distribution
-						else if ("1".equals(poItem.getDistribution()) || "2".equals(poItem.getDistribution())
-								|| "3".equals(poItem.getDistribution())) {
+						else if (("1".equals(poItem.getDistribution()) || "2".equals(poItem.getDistribution())
+								|| "3".equals(poItem.getDistribution())) && "2".equals(poItem.getPartInv())   ) {
 							int i = 0;
 							if (!ServiceUtil.isEmpty(poItem.getPoAccountAssigment())) {
 								for (PoItemAccountAssignDto poAccAssignment : poItem.getPoAccountAssigment()) {
