@@ -225,8 +225,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	@Autowired
 	JournalEntryService journalEntryService;
-	
-	@Autowired 
+
+	@Autowired
 	ActivityLogServiceImpl activityLogServiceImpl;
 
 	public static final String CONTENT_TYPE = "Content-Type";
@@ -588,13 +588,19 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		InvoiceHeaderDto invoiceHeaderSave = new InvoiceHeaderDto();
 		try {
 			String requestId = null;
-			if (!ServiceUtil.isEmpty(dto.getRequestId())) {
+			if(!ServiceUtil.isEmpty(dto.getRequestId()))
 				requestId = dto.getRequestId();
+			else
+				requestId = seqService.getSequenceNoByMappingId(ApplicationConstants.INVOICE_SEQUENCE, "INV");
+			
+			
+			if (!ServiceUtil.isEmpty(dto.getGuid())) {
+//				requestId = dto.getRequestId();
 				InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
 				invoiceHeaderDo.setUpdatedAt(ServiceUtil.getEpocTime());
 				invoiceSavedDo = invoiceHeaderRepository.save(invoiceHeaderDo);
 			} else {
-				requestId = seqService.getSequenceNoByMappingId(ApplicationConstants.INVOICE_SEQUENCE, "INV");
+//				requestId = seqService.getSequenceNoByMappingId(ApplicationConstants.INVOICE_SEQUENCE, "INV");
 				InvoiceHeaderDo invoiceHeaderDo = ObjectMapperUtils.map(dto, InvoiceHeaderDo.class);
 				invoiceHeaderDo.setRequestId(requestId);
 				invoiceHeaderDo.setGuid(UUID.randomUUID().toString());
@@ -644,7 +650,18 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 						logger.error("line no 267 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 						itemDo.setRequestId(requestId);
 						itemDo.setGuid(UUID.randomUUID().toString());
-						itemDo.setItemCode(invoiceItemServiceImpl.getItemId(requestId));
+						String itemCode = invoiceItemServiceImpl.getItemId(requestId);
+						if (!ServiceUtil.isEmpty(itemCode))
+							itemDo.setItemCode(itemCode);
+						else{
+							response.setCode(ApplicationConstants.CODE_FAILURE);
+							response.setStatus(ApplicationConstants.FAILURE);
+							response.setMessage("Failed to add new task as ITEM_CODE is null/empty");
+							response.setObject(null);
+							System.err.println("SaveOrUpdate InvoiceHeaderSave" + invoiceHeaderSave);
+							return response;
+						}
+							
 						// itemDo.setItem(invoiceItemServiceImpl.getItemId());
 						logger.error("line no 271 of InvoiceHeaderServiceImpl.saveOrUpdate()");
 						logger.error("line no 273 of InvoiceHeaderServiceImpl.saveOrUpdate()  requestId " + requestId
@@ -3237,7 +3254,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceSubmit.setUserList(userList);
 				System.err.println("Remediation User Response " + invoiceSubmit);
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(
+						invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
 				System.out.println("ActivityLogSave ::::" + activitySave);
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3272,7 +3290,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 				invoiceSubmit.setUserList(userList);
 				System.err.println("ProcessLead User Response " + invoiceSubmit);
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave =  activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
+				ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit,
+						invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
 				System.out.println("ActivityLogSave ::::" + activitySave);
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3305,7 +3324,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			invoiceSubmit.setUserList(userList);
 			System.err.println("ProcessLead User Response " + invoiceSubmit);
 			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-			ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
+			ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit,
+					invoiceSubmit.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
 			System.out.println("ActivityLogSave ::::" + activitySave);
 			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3331,18 +3351,18 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmitOk.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
-//						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmitOk,
+				// invoiceSubmitOk.getActionCode(),
+				// "ACCOUNTTANT_SUBMIT_APPROVAL");
+				// Added By Lakhu
 				// complete the acvity of the Accoutant .
 				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
-				ActivityLogDto activityAccoutantUpdate = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
+				ActivityLogDto activityAccoutantUpdate = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk,
+						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_APPROVAL");
 				activity.add(activityAccoutantUpdate);
-				// complete  activity log for Process Lead task 
-				                         
-                
-				
-				
+				// complete activity log for Process Lead task
+
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all the things - activity log and comments
 				if (invoiceSubmitOk.getInvoice().getChangeIndicators() != null) {
@@ -3376,11 +3396,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmitOk.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
-//						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmitOk,
+				// invoiceSubmitOk.getActionCode(),
+				// "ACCOUNTTANT_SUBMIT_REMEDIATION");
+				// Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
+				ActivityLogDto activitySave = activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk,
+						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REMEDIATION");
 				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all the things - activity log and comments
@@ -3408,11 +3431,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmitOk.getTaskId(), payload);
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmitOk,
-//						invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmitOk,
+				// invoiceSubmitOk.getActionCode(),
+				// "ACCOUNTTANT_SUBMIT_REJECT");
+				// Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmitOk.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(
+						invoiceSubmitOk, invoiceSubmitOk.getActionCode(), "ACCOUNTTANT_SUBMIT_REJECT");
 				activity.add(activitySave);
 				invoiceSubmitOk.getInvoice().setActivityLog(activity);
 				// save all things - activity log and comments
@@ -3444,8 +3470,9 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		List<ActivityLogDto> activitLogs = invoiceSubmitOk.getInvoice().getActivityLog();
 		if (!activitLogs.isEmpty()) {
 			// update activity log of the previous values
-			// get the activty log of particular user and request id of current task and update the current activity log 
-			
+			// get the activty log of particular user and request id of current
+			// task and update the current activity log
+
 			activitLogs.stream().forEach(activity -> {
 				activity.setActionCode(actionCode);
 				activity.setActionCodeText(actionCodeText);
@@ -3507,11 +3534,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		if (invoiceSubmit.getActionCode().equals(ApplicationConstants.BUYER_APPROVE)) {
 			payload = formUpdateTaskContextForBuyer(invoiceSubmit);
 			// complete task
-//			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-//					"BUYER_APPROVE");
-			//Added By Lakhu
+			// List<ActivityLogDto> activity =
+			// createActivityLogForSubmit(invoiceSubmit,
+			// invoiceSubmit.getActionCode(),
+			// "BUYER_APPROVE");
+			// Added By Lakhu
 			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_APPROVE");
+			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit,
+					invoiceSubmit.getActionCode(), "BUYER_APPROVE");
 			activity.add(activitySave);
 			invoiceSubmit.getInvoice().setActivityLog(activity);
 			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
@@ -3543,11 +3573,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
 				// save all things - activity log and comments
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-//						"BUYER_REJECT");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmit,
+				// invoiceSubmit.getActionCode(),
+				// "BUYER_REJECT");
+				// Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_REJECT");
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl
+						.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "BUYER_REJECT");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
@@ -3653,6 +3686,7 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 		return context.toUpdateTaskString();
 	}
+
 	public String formUpdateTaskContextForProcessLeadOnApprove(InvoiceSubmitDto invoiceSubmit) {
 		ContextDto context = new ContextDto();
 		context.setAccountantAction(invoiceSubmit.getActionCode());
@@ -3665,10 +3699,10 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		context.setInvoiceType(invoiceSubmit.getInvoice().getInvoiceType());
 		context.setNonPo(false);
 		context.setManualNonPo(false);
-		
 
 		return context.toUpdateTaskString();
 	}
+
 	public String formUpdateTaskContextForProcessLeadOnResend(InvoiceSubmitDto invoiceSubmit) {
 		ContextDto context = new ContextDto();
 		context.setAccountantAction(invoiceSubmit.getActionCode());
@@ -3681,7 +3715,6 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 		context.setInvoiceType(invoiceSubmit.getInvoice().getInvoiceType());
 		context.setNonPo(false);
 		context.setManualNonPo(false);
-		
 
 		return context.toUpdateTaskString();
 	}
@@ -3801,7 +3834,8 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 
 	// process Lead Submit
 	@Override
-	public ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
+	public ResponseEntity<?> processLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException, URISyntaxException,
+			JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
 
 		System.err.println("Process Lead Submit InputDto Ui " + invoiceSubmit);
 		String payload = null;
@@ -3817,18 +3851,67 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			} else {
 				// else itsa non po type invoice
 				// call SOAP api post of NON- PO
-				
-				invoiceSubmit  =  NonPoProcessLeadSubmit(invoiceSubmit);
-				System.err.println("NonPo ProcessLead Submit "+invoiceSubmit );
-				//invoice  documentnumber 
-				 if("200".equalsIgnoreCase(invoiceSubmit.getInvoice().getHeaderMessages().get(0).getMessageNumber())){
+
+				invoiceSubmit = NonPoProcessLeadSubmit(invoiceSubmit);
+				System.err.println("NonPo ProcessLead Submit " + invoiceSubmit);
+				// invoice documentnumber
+				if ("200".equalsIgnoreCase(invoiceSubmit.getInvoice().getHeaderMessages().get(0).getMessageNumber())) {
+					payload = formUpdateTaskContextForProcessLeadOnApprove(invoiceSubmit);
+					// complete task
+					// List<ActivityLogDto> activity =
+					// createActivityLogForSubmit(invoiceSubmit,
+					// invoiceSubmit.getActionCode(),
+					// "PROCESS_LEAD_APPROVAL");
+					// Added By Lakhu
+					List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
+					ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(
+							invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL");
+					activity.add(activitySave);
+					invoiceSubmit.getInvoice().setActivityLog(activity);
+					ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
+					if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
+						// success
+						// save all the things - activity log and comments
+						// set all change indiactos
+						if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
+							InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
+							changesIndicators.setActivityLog(true);
+							changesIndicators.setHeaderChange(true);
+							invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+						} else {
+							InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
+							changesIndicators.setActivityLog(true);
+							changesIndicators.setHeaderChange(true);
+							invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+						}
+						InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
+
+						System.err.println("invoiceHeader Update in process lead Submit " + invoiceHeader);
+						invoiceSubmit.setInvoice(invoicePostErpResponse);
+						invoiceSubmit.setMessage("Task Completed ," + invoiceSubmit.getMessage());
+
+					}
+				} else {
+					invoiceSubmit.setMessage(invoiceSubmit.getMessage());
+				}
+
+				return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
+				// fisacal year
+			}
+			// get MessageList
+			List<HeaderMessageDto> messageList = invoicePostErpResponse.getHeaderMessages();
+
+			if (!ServiceUtil.isEmpty(messageList) && "SU".equalsIgnoreCase(messageList.get(0).getMessageType())) {
 				payload = formUpdateTaskContextForProcessLeadOnApprove(invoiceSubmit);
 				// complete task
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-//						"PROCESS_LEAD_APPROVAL");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmit,
+				// invoiceSubmit.getActionCode(),
+				// "PROCESS_LEAD_APPROVAL");
+				// Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL");
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl
+						.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
@@ -3839,65 +3922,24 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 					if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
 						InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
 						changesIndicators.setActivityLog(true);
-						changesIndicators.setHeaderChange(true);
 						invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
 					} else {
 						InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
 						changesIndicators.setActivityLog(true);
-						changesIndicators.setHeaderChange(true);
 						invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
 					}
 					InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
-				
 					System.err.println("invoiceHeader Update in process lead Submit " + invoiceHeader);
 					invoiceSubmit.setInvoice(invoicePostErpResponse);
-					invoiceSubmit.setMessage("Task Completed ,"+invoiceSubmit.getMessage());
-					
-				}}else{
-					invoiceSubmit.setMessage(invoiceSubmit.getMessage());
-				}
-				
-				return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
-				 // fisacal year 
-			}
-			// get MessageList 
-			  List<HeaderMessageDto> messageList = invoicePostErpResponse.getHeaderMessages();
-			
-			if(!ServiceUtil.isEmpty(messageList) && "SU".equalsIgnoreCase(messageList.get(0).getMessageType())){ 
-			payload = formUpdateTaskContextForProcessLeadOnApprove(invoiceSubmit);
-			// complete task
-//			List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-//					"PROCESS_LEAD_APPROVAL");
-			//Added By Lakhu
-			List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-			ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_APPROVAL");
-			activity.add(activitySave);
-			invoiceSubmit.getInvoice().setActivityLog(activity);
-			ResponseEntity<?> response = HelperClass.completeTask(invoiceSubmit.getTaskId(), payload);
-			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
-				// success
-				// save all the things - activity log and comments
-				// set all change indiactos
-				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
-					InvoiceChangeIndicator changesIndicators = invoiceSubmit.getInvoice().getChangeIndicators();
-					changesIndicators.setActivityLog(true);
-					invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+					invoiceSubmit.setMessage("Task Completed ," + messageList.get(0).getMessageText());
+
 				} else {
-					InvoiceChangeIndicator changesIndicators = new InvoiceChangeIndicator();
-					changesIndicators.setActivityLog(true);
-					invoiceSubmit.getInvoice().setChangeIndicators(changesIndicators);
+					// failed
+					invoiceSubmit.setMessage(messageList.get(0).getMessageText()
+							+ " ,but Task Failed To Complete due to =" + response.getBody().toString());
 				}
-				InvoiceHeaderDto invoiceHeader = saveAPI(invoiceSubmit.getInvoice());
-				System.err.println("invoiceHeader Update in process lead Submit " + invoiceHeader);
-				invoiceSubmit.setInvoice(invoicePostErpResponse);
-				invoiceSubmit.setMessage("Task Completed ," + messageList.get(0).getMessageText());
-				
 			} else {
-				// failed
-				invoiceSubmit.setMessage(messageList.get(0).getMessageText() +" ,but Task Failed To Complete due to =" + response.getBody().toString());
-			}
-			} else {
-			invoiceSubmit.setMessage("Post To ERP Failed ");
+				invoiceSubmit.setMessage("Post To ERP Failed ");
 			}
 			return new ResponseEntity<InvoiceSubmitDto>(invoiceSubmit, HttpStatus.OK);
 		} else if (invoiceSubmit.getActionCode().equals(ApplicationConstants.PROCESS_LEAD_REJECTION)) {
@@ -3907,11 +3949,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
 				// save all the things - activity log and comments
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-//						"PROCESS_LEAD_REJECTION");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmit,
+				// invoiceSubmit.getActionCode(),
+				// "PROCESS_LEAD_REJECTION");
+				// Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_REJECTION");
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(
+						invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_LEAD_REJECTION");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
@@ -3940,11 +3985,14 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 			if (response.getStatusCodeValue() == HttpStatus.NO_CONTENT.value()) {
 				// success
 				// save all things - activity log and comments
-//				List<ActivityLogDto> activity = createActivityLogForSubmit(invoiceSubmit, invoiceSubmit.getActionCode(),
-//						"PROCESS_REJECTION");
-				//Added By Lakhu
+				// List<ActivityLogDto> activity =
+				// createActivityLogForSubmit(invoiceSubmit,
+				// invoiceSubmit.getActionCode(),
+				// "PROCESS_REJECTION");
+				// Added By Lakhu
 				List<ActivityLogDto> activity = invoiceSubmit.getInvoice().getActivityLog();
-				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_REJECTION");
+				ActivityLogDto activitySave = (ActivityLogDto) activityLogServiceImpl
+						.saveOrUpdateActivityLog(invoiceSubmit, invoiceSubmit.getActionCode(), "PROCESS_REJECTION");
 				activity.add(activitySave);
 				invoiceSubmit.getInvoice().setActivityLog(activity);
 				if (invoiceSubmit.getInvoice().getChangeIndicators() != null) {
@@ -3971,232 +4019,245 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	// non-po process lead submit
 	@SuppressWarnings("unchecked")
 	@Override
-	public InvoiceSubmitDto NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit)
-			throws IOException, URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
+	public InvoiceSubmitDto NonPoProcessLeadSubmit(InvoiceSubmitDto invoiceSubmit) throws IOException,
+			URISyntaxException, JAXBException, SOAPException, DatatypeConfigurationException, ParseException {
 		// form input payload for the invoice
 		JournalEntryCreateRequestBulkMessage requestMessage = formInputPayloadForInvoiceNonPo(invoiceSubmit);
-	                     
-		// call soap api to post to ERP S4
-		 ResponseEntity<?> responseEntity  =  journalEntryService.postNonPoItemsToSAP(requestMessage);
-		 System.err.println("responseEntity "+responseEntity);
-		 if(responseEntity.getStatusCodeValue()==200){
-             // if success save it in invoice header as sucess response 
-		String outputResponse = 	 responseEntity.getBody().toString();
-		System.err.println("soapResponse "+outputResponse);
-		Root    responseSoap  = journalEntryService.outPutResponseFromOdataResponse(outputResponse);
-		System.err.println("OutPutConverted responseSoap "+responseSoap);
-		
-		JournalEntryCreateConfirmation journalEntryResponse  =responseSoap.getSoapEnvEnvelope().getSoapEnvBody().getN0JournalEntryBulkCreateConfirmation().getJournalEntryCreateConfirmation().getJournalEntryCreateConfirmation();
-		 System.err.println("journalEntryResponse = "+journalEntryResponse );
-		 
-		SLog log  =responseSoap.getSoapEnvEnvelope().getSoapEnvBody().getN0JournalEntryBulkCreateConfirmation().getJournalEntryCreateConfirmation().getLog();
-		  List<Item> logItems =  log.getItem();
-		  System.err.println("logItem "+logItems);
-		String accountingDocument = journalEntryResponse.getAccountingDocument();
-		    String fiscalYear = journalEntryResponse.getFiscalYear();
 
-		            List<HeaderMessageDto> listsHeaderMessage = new ArrayList<HeaderMessageDto>();
-		               if(!ServiceUtil.isEmpty(fiscalYear)&& "0000".equalsIgnoreCase(fiscalYear) ){
-		// convert log error to headerMessages
-		            	   StringBuilder sb = new StringBuilder();
-		            	   if(!ServiceUtil.isEmpty(logItems)){
-		            		  
-		            		   for (Item logItem : logItems) {
-		            		  HeaderMessageDto headerMessage  = new HeaderMessageDto();
-		            		  sb.append(logItem.getNote()+"||");
-							headerMessage.setMessageId(0);
-							headerMessage.setMessageType("SOAP");
-							headerMessage.setMessageText(logItem.getNote());
-							headerMessage.setMessageNumber("400");
-							headerMessage.setMsgClass("SAOP API");
-							 listsHeaderMessage.add(headerMessage);	 
-		            		   }}
-		            	invoiceSubmit.getInvoice().setHeaderMessages(listsHeaderMessage);
-		                invoiceSubmit.setMessage("Failed To Post ERP, No Accountanting Document Created. Error ="+sb.toString());
-		            }else {
-		            	 HeaderMessageDto headerMessage  = new HeaderMessageDto();
-		  		       headerMessage.setMsgClass(responseSoap.toString());
-		  		       headerMessage.setMessageText("SucessFully Posted ,Accountanting Document =" +accountingDocument+",Fiscal Year =" +fiscalYear);
-		  		     headerMessage.setMessageNumber("200");
-		  		       listsHeaderMessage.add(headerMessage);
-		            	// if log is empty 
-		  		     invoiceSubmit.getInvoice().setHeaderMessages(listsHeaderMessage);
-		  		     invoiceSubmit.getInvoice().setSapInvocieNumber(accountingDocument);
-		             invoiceSubmit.getInvoice().setFiscalYear(fiscalYear);  
-		             invoiceSubmit.getInvoice().setInvoiceStatus("13");
-		             invoiceSubmit.getInvoice().setInvoiceStatusText("Posted (Unpaid)");
-		  		     invoiceSubmit.setMessage("SucessFully Posted ,Accountanting Document =" +accountingDocument+",Fiscal Year =" +fiscalYear);
-		            }
-		                
-		
-			 return invoiceSubmit;
-		 }else {
-			 // set the header message as for failure message 
-			 HeaderMessageDto headerMessage  = new HeaderMessageDto();
-				headerMessage.setMessageText("Failed Due to Exception in the forming XML Payload");
-				headerMessage.setMessageNumber("500");
-				List<HeaderMessageDto> listsHeaderMessage = new ArrayList<HeaderMessageDto>();
-				listsHeaderMessage.add(headerMessage);
+		// call soap api to post to ERP S4
+		ResponseEntity<?> responseEntity = journalEntryService.postNonPoItemsToSAP(requestMessage);
+		System.err.println("responseEntity " + responseEntity);
+		if (responseEntity.getStatusCodeValue() == 200) {
+			// if success save it in invoice header as sucess response
+			String outputResponse = responseEntity.getBody().toString();
+			System.err.println("soapResponse " + outputResponse);
+			Root responseSoap = journalEntryService.outPutResponseFromOdataResponse(outputResponse);
+			System.err.println("OutPutConverted responseSoap " + responseSoap);
+
+			JournalEntryCreateConfirmation journalEntryResponse = responseSoap.getSoapEnvEnvelope().getSoapEnvBody()
+					.getN0JournalEntryBulkCreateConfirmation().getJournalEntryCreateConfirmation()
+					.getJournalEntryCreateConfirmation();
+			System.err.println("journalEntryResponse = " + journalEntryResponse);
+
+			SLog log = responseSoap.getSoapEnvEnvelope().getSoapEnvBody().getN0JournalEntryBulkCreateConfirmation()
+					.getJournalEntryCreateConfirmation().getLog();
+			List<Item> logItems = log.getItem();
+			System.err.println("logItem " + logItems);
+			String accountingDocument = journalEntryResponse.getAccountingDocument();
+			String fiscalYear = journalEntryResponse.getFiscalYear();
+
+			List<HeaderMessageDto> listsHeaderMessage = new ArrayList<HeaderMessageDto>();
+			if (!ServiceUtil.isEmpty(fiscalYear) && "0000".equalsIgnoreCase(fiscalYear)) {
+				// convert log error to headerMessages
+				StringBuilder sb = new StringBuilder();
+				if (!ServiceUtil.isEmpty(logItems)) {
+
+					for (Item logItem : logItems) {
+						HeaderMessageDto headerMessage = new HeaderMessageDto();
+						sb.append(logItem.getNote() + "||");
+						headerMessage.setMessageId(0);
+						headerMessage.setMessageType("SOAP");
+						headerMessage.setMessageText(logItem.getNote());
+						headerMessage.setMessageNumber("400");
+						headerMessage.setMsgClass("SAOP API");
+						listsHeaderMessage.add(headerMessage);
+					}
+				}
 				invoiceSubmit.getInvoice().setHeaderMessages(listsHeaderMessage);
-				invoiceSubmit.setMessage("Failed Due to Exception in the forming XML Payload or Check the Credentials");
-			 return  invoiceSubmit; 
-		 }
-		
+				invoiceSubmit
+						.setMessage("Failed To Post ERP, No Accountanting Document Created. Error =" + sb.toString());
+			} else {
+				HeaderMessageDto headerMessage = new HeaderMessageDto();
+				headerMessage.setMsgClass(responseSoap.toString());
+				headerMessage.setMessageText("SucessFully Posted ,Accountanting Document =" + accountingDocument
+						+ ",Fiscal Year =" + fiscalYear);
+				headerMessage.setMessageNumber("200");
+				listsHeaderMessage.add(headerMessage);
+				// if log is empty
+				invoiceSubmit.getInvoice().setHeaderMessages(listsHeaderMessage);
+				invoiceSubmit.getInvoice().setSapInvocieNumber(accountingDocument);
+				invoiceSubmit.getInvoice().setFiscalYear(fiscalYear);
+				invoiceSubmit.getInvoice().setInvoiceStatus("13");
+				invoiceSubmit.getInvoice().setInvoiceStatusText("Posted (Unpaid)");
+				invoiceSubmit.setMessage("SucessFully Posted ,Accountanting Document =" + accountingDocument
+						+ ",Fiscal Year =" + fiscalYear);
+			}
+
+			return invoiceSubmit;
+		} else {
+			// set the header message as for failure message
+			HeaderMessageDto headerMessage = new HeaderMessageDto();
+			headerMessage.setMessageText("Failed Due to Exception in the forming XML Payload");
+			headerMessage.setMessageNumber("500");
+			List<HeaderMessageDto> listsHeaderMessage = new ArrayList<HeaderMessageDto>();
+			listsHeaderMessage.add(headerMessage);
+			invoiceSubmit.getInvoice().setHeaderMessages(listsHeaderMessage);
+			invoiceSubmit.setMessage("Failed Due to Exception in the forming XML Payload or Check the Credentials");
+			return invoiceSubmit;
+		}
+
 	}
 
 	// forming input payload for the invoice type non-po
 	public JournalEntryCreateRequestBulkMessage formInputPayloadForInvoiceNonPo(InvoiceSubmitDto invoiceSubmit)
 			throws DatatypeConfigurationException, ParseException {
 		JournalEntryCreateRequestBulkMessage requestMessage = new JournalEntryCreateRequestBulkMessage();
-		
+
 		JournalEntryCreateRequestMessage journalEntryCreateRequestMessage = new JournalEntryCreateRequestMessage();
 		JournalEntryCreateRequestJournalEntry journalEntryCreateRequestJournalEntry = new JournalEntryCreateRequestJournalEntry();
-		JournalEntryCreateRequestJournalEntryCreditorItem  journalEntryCreateRequestJournalEntryCreditorItem = new  JournalEntryCreateRequestJournalEntryCreditorItem();
+		JournalEntryCreateRequestJournalEntryCreditorItem journalEntryCreateRequestJournalEntryCreditorItem = new JournalEntryCreateRequestJournalEntryCreditorItem();
 		// set BusinessDocumentMessageHeader
-		BusinessDocumentMessageHeader businessDocumentMessageHeader =  new BusinessDocumentMessageHeader();
-		
+		BusinessDocumentMessageHeader businessDocumentMessageHeader = new BusinessDocumentMessageHeader();
+
 		businessDocumentMessageHeader.setCreationDateTime(getCurrentUtcDate());
-		// set 
+		// set
 		InvoiceHeaderDto invoiceHeader = invoiceSubmit.getInvoice();
-		System.err.println("invoiceHeader "+invoiceHeader);
-		if(!ServiceUtil.isEmpty(invoiceHeader)){
-		// settting the value of journalEntryCreateRequestJournalEntry
-			
-		journalEntryCreateRequestJournalEntry.setOriginalReferenceDocumentType("BKPFF");
-		journalEntryCreateRequestJournalEntry.setOriginalReferenceDocumentLogicalSystem("");
-		journalEntryCreateRequestJournalEntry.setOriginalReferenceDocument("");
-		journalEntryCreateRequestJournalEntry.setBusinessTransactionType("RFBU");
-		journalEntryCreateRequestJournalEntry.setAccountingDocumentType("KR");
-		journalEntryCreateRequestJournalEntry.setDocumentReferenceID(invoiceHeader.getExtInvNum());
-		journalEntryCreateRequestJournalEntry.setCreatedByUser("SYUVRAJ");
-		XMLGregorianCalendar documentDate = DatatypeFactory.newInstance()
-				.newXMLGregorianCalendar(ServiceUtil.getDateByEpoc(invoiceHeader.getInvoiceDate()));
-		System.err.println("DocumentDate " + documentDate);
-		journalEntryCreateRequestJournalEntry.setDocumentDate(documentDate);
-		
-		XMLGregorianCalendar setPostingDate = DatatypeFactory.newInstance()
-				.newXMLGregorianCalendar(ServiceUtil.getDateByEpoc(invoiceHeader.getPostingDate()));
-		System.err.println("PostingDate " + setPostingDate);
-		journalEntryCreateRequestJournalEntry.setPostingDate(setPostingDate);
-		journalEntryCreateRequestJournalEntry.setCompanyCode(invoiceHeader.getCompCode());
-		Map<String, ProductTaxDto> productTaxMap = new HashMap<>();
-		// item details
-		List<CostAllocationDto> items = invoiceHeader.getCostAllocation();
-		if (!ServiceUtil.isEmpty(items)) {
-			
-			for(CostAllocationDto item : items ){
-				JournalEntryCreateRequestJournalEntryItem journalEntryCreateRequestJournalEntryItem = new JournalEntryCreateRequestJournalEntryItem();
-				JournalEntryCreateRequestJournalEntryTaxDetails tax = new JournalEntryCreateRequestJournalEntryTaxDetails();
-				ProductTaxationCharacteristicsCode taxValueCode = new ProductTaxationCharacteristicsCode();
-				JournalEntryCreateRequestJournalEntryItemAccountAssignment journalItemAcctAssignment = new JournalEntryCreateRequestJournalEntryItemAccountAssignment();
-				
-				journalEntryCreateRequestJournalEntryItem.setCompanyCode(invoiceHeader.getCompCode());
-				ChartOfAccountsItemCode chartVale1 = new ChartOfAccountsItemCode();
-				if(!ServiceUtil.isEmpty(item.getGlAccount())){
-				chartVale1.setValue(addBeginingZero(item.getGlAccount())); //GLAccount
-				}else {
-				chartVale1.setValue("");
-				}
-				journalEntryCreateRequestJournalEntryItem.setGLAccount(chartVale1);
-				Amount amount = new Amount();
-				amount.setCurrencyCode(invoiceHeader.getCurrency());
-				amount.setValue(new BigDecimal(item.getBaseRate()));
-				journalEntryCreateRequestJournalEntryItem.setAmountInTransactionCurrency(amount);
-				taxValueCode.setValue(item.getTaxCode());
-				tax.setTaxCode(taxValueCode);
-				journalEntryCreateRequestJournalEntryItem.setTax(tax);
-				// set accountAssignment
-				if(!ServiceUtil.isEmpty(item.getCostCenter())){
-					journalItemAcctAssignment.setCostCenter(addBeginingZero(item.getCostCenter()));
-				}
-				else {
-					journalItemAcctAssignment.setCostCenter("");
-				}
-				 // CostCenter
-				journalEntryCreateRequestJournalEntryItem.setAccountAssignment(journalItemAcctAssignment);
-				// product Tax Item 
-				// Start - creating tax map
-				   Double  taxValue  = Double.parseDouble(item.getTaxValue());
-				   System.err.println("taxValue "+taxValue);
-				   Double  baseRate  =  Double.parseDouble(item.getBaseRate());
-				   System.err.println("baseRate "+baseRate);
-				   String itemTaxCode = item.getTaxCode();
-				   String currency = invoiceHeader.getCurrency();
-				   System.err.println("currency "+currency);
-				   String conditionType = item.getConditionType();
-				   
-				   //String conditionType = "MWVS";
-				if (!ServiceUtil.isEmpty(itemTaxCode) || itemTaxCode != null) {
-					if (productTaxMap.containsKey(itemTaxCode)) {
-						ProductTaxDto  valueDto = productTaxMap.get(itemTaxCode);
-						valueDto.setTaxCode(itemTaxCode);
-						valueDto.setSumOfTax(Double.valueOf(valueDto.getSumOfTax() + taxValue));
-						valueDto.setSumOfBaseRate(Double.valueOf(valueDto.getSumOfBaseRate() + baseRate));
-						valueDto.setCurrency(currency);
-						valueDto.setConditionType(conditionType);
-						productTaxMap.put(itemTaxCode, valueDto);
+		System.err.println("invoiceHeader " + invoiceHeader);
+		if (!ServiceUtil.isEmpty(invoiceHeader)) {
+			// settting the value of journalEntryCreateRequestJournalEntry
+
+			journalEntryCreateRequestJournalEntry.setOriginalReferenceDocumentType("BKPFF");
+			journalEntryCreateRequestJournalEntry.setOriginalReferenceDocumentLogicalSystem("");
+			journalEntryCreateRequestJournalEntry.setOriginalReferenceDocument("");
+			journalEntryCreateRequestJournalEntry.setBusinessTransactionType("RFBU");
+			journalEntryCreateRequestJournalEntry.setAccountingDocumentType("KR");
+			journalEntryCreateRequestJournalEntry.setDocumentReferenceID(invoiceHeader.getExtInvNum());
+			journalEntryCreateRequestJournalEntry.setCreatedByUser("SYUVRAJ");
+			XMLGregorianCalendar documentDate = DatatypeFactory.newInstance()
+					.newXMLGregorianCalendar(ServiceUtil.getDateByEpoc(invoiceHeader.getInvoiceDate()));
+			System.err.println("DocumentDate " + documentDate);
+			journalEntryCreateRequestJournalEntry.setDocumentDate(documentDate);
+
+			XMLGregorianCalendar setPostingDate = DatatypeFactory.newInstance()
+					.newXMLGregorianCalendar(ServiceUtil.getDateByEpoc(invoiceHeader.getPostingDate()));
+			System.err.println("PostingDate " + setPostingDate);
+			journalEntryCreateRequestJournalEntry.setPostingDate(setPostingDate);
+			journalEntryCreateRequestJournalEntry.setCompanyCode(invoiceHeader.getCompCode());
+			Map<String, ProductTaxDto> productTaxMap = new HashMap<>();
+			// item details
+			List<CostAllocationDto> items = invoiceHeader.getCostAllocation();
+			if (!ServiceUtil.isEmpty(items)) {
+
+				for (CostAllocationDto item : items) {
+					JournalEntryCreateRequestJournalEntryItem journalEntryCreateRequestJournalEntryItem = new JournalEntryCreateRequestJournalEntryItem();
+					JournalEntryCreateRequestJournalEntryTaxDetails tax = new JournalEntryCreateRequestJournalEntryTaxDetails();
+					ProductTaxationCharacteristicsCode taxValueCode = new ProductTaxationCharacteristicsCode();
+					JournalEntryCreateRequestJournalEntryItemAccountAssignment journalItemAcctAssignment = new JournalEntryCreateRequestJournalEntryItemAccountAssignment();
+
+					journalEntryCreateRequestJournalEntryItem.setCompanyCode(invoiceHeader.getCompCode());
+					ChartOfAccountsItemCode chartVale1 = new ChartOfAccountsItemCode();
+					if (!ServiceUtil.isEmpty(item.getGlAccount())) {
+						chartVale1.setValue(addBeginingZero(item.getGlAccount())); // GLAccount
 					} else {
-						ProductTaxDto valueDto = new ProductTaxDto();
-						valueDto.setTaxCode(itemTaxCode);
-						valueDto.setSumOfTax(taxValue);
-						valueDto.setSumOfBaseRate(baseRate);
-						valueDto.setCurrency(currency);
-						valueDto.setConditionType(conditionType);
-						productTaxMap.put(itemTaxCode, valueDto);
+						chartVale1.setValue("");
 					}
-               }
-				// add item 
-				journalEntryCreateRequestJournalEntry.getItem().add(journalEntryCreateRequestJournalEntryItem);
+					journalEntryCreateRequestJournalEntryItem.setGLAccount(chartVale1);
+					Amount amount = new Amount();
+					amount.setCurrencyCode(invoiceHeader.getCurrency());
+					amount.setValue(new BigDecimal(item.getBaseRate()));
+					journalEntryCreateRequestJournalEntryItem.setAmountInTransactionCurrency(amount);
+					taxValueCode.setValue(item.getTaxCode());
+					tax.setTaxCode(taxValueCode);
+					journalEntryCreateRequestJournalEntryItem.setTax(tax);
+					// set accountAssignment
+					if (!ServiceUtil.isEmpty(item.getCostCenter())) {
+						journalItemAcctAssignment.setCostCenter(addBeginingZero(item.getCostCenter()));
+					} else {
+						journalItemAcctAssignment.setCostCenter("");
+					}
+					// CostCenter
+					journalEntryCreateRequestJournalEntryItem.setAccountAssignment(journalItemAcctAssignment);
+					// product Tax Item
+					// Start - creating tax map
+					Double taxValue = Double.parseDouble(item.getTaxValue());
+					System.err.println("taxValue " + taxValue);
+					Double baseRate = Double.parseDouble(item.getBaseRate());
+					System.err.println("baseRate " + baseRate);
+					String itemTaxCode = item.getTaxCode();
+					String currency = invoiceHeader.getCurrency();
+					System.err.println("currency " + currency);
+					String conditionType = item.getConditionType();
+
+					// String conditionType = "MWVS";
+					if (!ServiceUtil.isEmpty(itemTaxCode) || itemTaxCode != null) {
+						if (productTaxMap.containsKey(itemTaxCode)) {
+							ProductTaxDto valueDto = productTaxMap.get(itemTaxCode);
+							valueDto.setTaxCode(itemTaxCode);
+							valueDto.setSumOfTax(Double.valueOf(valueDto.getSumOfTax() + taxValue));
+							valueDto.setSumOfBaseRate(Double.valueOf(valueDto.getSumOfBaseRate() + baseRate));
+							valueDto.setCurrency(currency);
+							valueDto.setConditionType(conditionType);
+							productTaxMap.put(itemTaxCode, valueDto);
+						} else {
+							ProductTaxDto valueDto = new ProductTaxDto();
+							valueDto.setTaxCode(itemTaxCode);
+							valueDto.setSumOfTax(taxValue);
+							valueDto.setSumOfBaseRate(baseRate);
+							valueDto.setCurrency(currency);
+							valueDto.setConditionType(conditionType);
+							productTaxMap.put(itemTaxCode, valueDto);
+						}
+					}
+					// add item
+					journalEntryCreateRequestJournalEntry.getItem().add(journalEntryCreateRequestJournalEntryItem);
+				}
 			}
-		}
-		// Set CreditorItem
-		journalEntryCreateRequestJournalEntryCreditorItem.setReferenceDocumentItem("1");
-		if(!ServiceUtil.isEmpty(invoiceHeader.getVendorId())){
-		journalEntryCreateRequestJournalEntryCreditorItem.setCreditor(addBeginingZero(invoiceHeader.getVendorId())); // Creditor
-		}
-		else {
-			journalEntryCreateRequestJournalEntryCreditorItem.setCreditor("");	
-		}
-		 Amount amount = new Amount();
-   	  amount.setCurrencyCode(invoiceHeader.getCurrency());
-   	  System.err.println("valueForAmountCreditor"+new BigDecimal(invoiceHeader.getInvoiceTotal()).setScale(2, RoundingMode.CEILING).negate());
-   	  amount.setValue(new BigDecimal(invoiceHeader.getInvoiceTotal()).setScale(2, RoundingMode.CEILING).negate());
-   	  
-		journalEntryCreateRequestJournalEntryCreditorItem.setAmountInTransactionCurrency(amount);
-		journalEntryCreateRequestJournalEntry.getCreditorItem().add(journalEntryCreateRequestJournalEntryCreditorItem);
-	   // Set ProductTaxItem
-		 for (Map.Entry<String, ProductTaxDto> e: productTaxMap.entrySet()) {
-			  JournalEntryCreateRequestJournalEntryProductTaxItem productTax = new    JournalEntryCreateRequestJournalEntryProductTaxItem();
-	    	  ProductTaxationCharacteristicsCode taxCode = new ProductTaxationCharacteristicsCode();
-	    	  taxCode.setValue(e.getKey());
-	    	  productTax.setTaxCode(taxCode);
-	    	  Amount setAmountInTransactionCurrency = new Amount();
-	    	  setAmountInTransactionCurrency.setCurrencyCode(e.getValue().getCurrency());
-	    	  setAmountInTransactionCurrency.setValue(new BigDecimal(e.getValue().getSumOfTax()).setScale(2, RoundingMode.CEILING));
-	    	  System.err.println("setAmountInTransactionCurrency " +new BigDecimal(e.getValue().getSumOfTax()).setScale(2, RoundingMode.CEILING) +"sumOfTax" +e.getValue().getSumOfTax());
-	    	 // need to send with devcimals here in amountInTransactionCurrency 
-	    	  productTax.setAmountInTransactionCurrency(setAmountInTransactionCurrency);
-	    	  Amount setTaxBaseAmountInTransCrcy = new Amount();
-	    	  setTaxBaseAmountInTransCrcy.setCurrencyCode(e.getValue().getCurrency());
-	    	  setTaxBaseAmountInTransCrcy.setValue(new BigDecimal(e.getValue().getSumOfBaseRate()).setScale(2, RoundingMode.CEILING));
-	    	  System.err.println("setTaxBaseAmountInTransCrcy "+setTaxBaseAmountInTransCrcy);
-	    	  productTax.setTaxBaseAmountInTransCrcy(setTaxBaseAmountInTransCrcy);
-	    	  // conditionType to be sent from the UI 
-	    	  productTax.setConditionType(e.getValue().getConditionType()); 
-	    	  journalEntryCreateRequestJournalEntry.getProductTaxItem().add(productTax);;
-	    	  
-	    	}
-		 // set all the object 
-		
-		 journalEntryCreateRequestMessage.setJournalEntry(journalEntryCreateRequestJournalEntry);
-		 journalEntryCreateRequestMessage.setMessageHeader(businessDocumentMessageHeader);
-		 requestMessage.getJournalEntryCreateRequest().add(journalEntryCreateRequestMessage);
-		 requestMessage.setMessageHeader(businessDocumentMessageHeader);
-		 requestMessage.getJournalEntryCreateRequest().add(journalEntryCreateRequestMessage);
-		 
-		 System.err.println("RequestMessaeg soapPayload "+requestMessage);
-		return requestMessage;
-		
+			// Set CreditorItem
+			journalEntryCreateRequestJournalEntryCreditorItem.setReferenceDocumentItem("1");
+			if (!ServiceUtil.isEmpty(invoiceHeader.getVendorId())) {
+				journalEntryCreateRequestJournalEntryCreditorItem
+						.setCreditor(addBeginingZero(invoiceHeader.getVendorId())); // Creditor
+			} else {
+				journalEntryCreateRequestJournalEntryCreditorItem.setCreditor("");
+			}
+			Amount amount = new Amount();
+			amount.setCurrencyCode(invoiceHeader.getCurrency());
+			System.err.println("valueForAmountCreditor"
+					+ new BigDecimal(invoiceHeader.getInvoiceTotal()).setScale(2, RoundingMode.CEILING).negate());
+			amount.setValue(new BigDecimal(invoiceHeader.getInvoiceTotal()).setScale(2, RoundingMode.CEILING).negate());
+
+			journalEntryCreateRequestJournalEntryCreditorItem.setAmountInTransactionCurrency(amount);
+			journalEntryCreateRequestJournalEntry.getCreditorItem()
+					.add(journalEntryCreateRequestJournalEntryCreditorItem);
+			// Set ProductTaxItem
+			for (Map.Entry<String, ProductTaxDto> e : productTaxMap.entrySet()) {
+				JournalEntryCreateRequestJournalEntryProductTaxItem productTax = new JournalEntryCreateRequestJournalEntryProductTaxItem();
+				ProductTaxationCharacteristicsCode taxCode = new ProductTaxationCharacteristicsCode();
+				taxCode.setValue(e.getKey());
+				productTax.setTaxCode(taxCode);
+				Amount setAmountInTransactionCurrency = new Amount();
+				setAmountInTransactionCurrency.setCurrencyCode(e.getValue().getCurrency());
+				setAmountInTransactionCurrency
+						.setValue(new BigDecimal(e.getValue().getSumOfTax()).setScale(2, RoundingMode.CEILING));
+				System.err.println("setAmountInTransactionCurrency "
+						+ new BigDecimal(e.getValue().getSumOfTax()).setScale(2, RoundingMode.CEILING) + "sumOfTax"
+						+ e.getValue().getSumOfTax());
+				// need to send with devcimals here in
+				// amountInTransactionCurrency
+				productTax.setAmountInTransactionCurrency(setAmountInTransactionCurrency);
+				Amount setTaxBaseAmountInTransCrcy = new Amount();
+				setTaxBaseAmountInTransCrcy.setCurrencyCode(e.getValue().getCurrency());
+				setTaxBaseAmountInTransCrcy
+						.setValue(new BigDecimal(e.getValue().getSumOfBaseRate()).setScale(2, RoundingMode.CEILING));
+				System.err.println("setTaxBaseAmountInTransCrcy " + setTaxBaseAmountInTransCrcy);
+				productTax.setTaxBaseAmountInTransCrcy(setTaxBaseAmountInTransCrcy);
+				// conditionType to be sent from the UI
+				productTax.setConditionType(e.getValue().getConditionType());
+				journalEntryCreateRequestJournalEntry.getProductTaxItem().add(productTax);
+				;
+
+			}
+			// set all the object
+
+			journalEntryCreateRequestMessage.setJournalEntry(journalEntryCreateRequestJournalEntry);
+			journalEntryCreateRequestMessage.setMessageHeader(businessDocumentMessageHeader);
+			requestMessage.getJournalEntryCreateRequest().add(journalEntryCreateRequestMessage);
+			requestMessage.setMessageHeader(businessDocumentMessageHeader);
+			requestMessage.getJournalEntryCreateRequest().add(journalEntryCreateRequestMessage);
+
+			System.err.println("RequestMessaeg soapPayload " + requestMessage);
+			return requestMessage;
+
 		}
 		return null;
 	}
@@ -4204,105 +4265,112 @@ public class InvoiceHeaderServiceImpl implements InvoiceHeaderService {
 	public XMLGregorianCalendar getCurrentUtcDate() throws ParseException, DatatypeConfigurationException {
 
 		Instant instant = Instant.now();
-String dateTimeString = instant.toString();
-XMLGregorianCalendar date2
-        = DatatypeFactory.newInstance().newXMLGregorianCalendar(dateTimeString);
-			
-	System.err.println("resultDate" + date2);
-	return date2;
+		String dateTimeString = instant.toString();
+		XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(dateTimeString);
+
+		System.err.println("resultDate" + date2);
+		return date2;
 	}
-	
-	public String addBeginingZero(String number){
-		  StringBuilder sb = new StringBuilder();
-		   if( number.length() <10 ){
-           	int append  =Math.abs(10- number.length());
-           	for(int i=0;i<append;i++){
-           		sb.append("0");
-           	}
-           	sb.append(number);
-           	return sb.toString();
-           }else {
-                 return number;           	
-           }
+
+	public String addBeginingZero(String number) {
+		StringBuilder sb = new StringBuilder();
+		if (number.length() < 10) {
+			int append = Math.abs(10 - number.length());
+			for (int i = 0; i < append; i++) {
+				sb.append("0");
+			}
+			sb.append(number);
+			return sb.toString();
+		} else {
+			return number;
+		}
 	}
-	
-	
-	
-	
-	public static void main(String[] args) throws ParseException, DatatypeConfigurationException, IOException, SOAPException, JAXBException {
-		
-		
+
+	public static void main(String[] args)
+			throws ParseException, DatatypeConfigurationException, IOException, SOAPException, JAXBException {
+
 		String doubleVale = "40.00";
-		
+
 		Double doubleValue = Double.valueOf(doubleVale);
 		Double parseDoubleValue = Double.parseDouble(doubleVale);
-		
-		System.err.println("double Value "+ doubleValue);
-		System.err.println("double prase value "+parseDoubleValue );
+
+		System.err.println("double Value " + doubleValue);
+		System.err.println("double prase value " + parseDoubleValue);
 		Instant instant = Instant.now();
-String dateTimeString = instant.toString();
-XMLGregorianCalendar date2
-        = DatatypeFactory.newInstance().newXMLGregorianCalendar(dateTimeString);
-System.out.println(date2);
-                             String number = "123456798787878";
-                             StringBuilder sb = new StringBuilder();
-                            
-                             
-                            if( number.length() <10 ){
-                            	
-                            	int append  =Math.abs(10- number.length());
-                            	for(int i=0;i<append;i++){
-                            		sb.append("0");
-                            		System.err.println("inside loop " + sb);
-                            	}
-                            	sb.append(number);
-                            	System.err.println("appendedNumber "+sb);
-                            }else {
-                            	
-                            	System.err.println("number "+ number);
-                            	
-                            }
-                            
-                            
-                            double no=12.786;
-                            DecimalFormat dec = new DecimalFormat("#0.00");
-                            System.out.println(dec.format(no));
-                            		 
-                            
-                   String xml ="<soap-env:Envelope xmlns:soap-env="+"\""+"http://schemas.xmlsoap.org/soap/envelope/>"+"\""+
-                   
-              "<soap-env:Header/><soap-env:Body><n0:JournalEntryBulkCreateConfirmation xmlns:n0="+
-                   "http://sap.com/xi/SAPSCORE/SFIN"+
-              " xmlns:prx="+
-              		"urn:sap.com:proxy:SD4:/1SAI/TAS3D871C7855B59197A671:754"+
-              "><MessageHeader><UUID>0022486f-cc22-1eeb-b9bf-ff827b35fefd</UUID>"
-              + "<CreationDateTime>2021-07-16T06:35:17.421752Z</CreationDateTime>"
-              + "</MessageHeader><JournalEntryCreateConfirmation><MessageHeader>"
-              + "<UUID>0022486f-cc22-1eeb-b9bf-ff827b361efd</UUID>"
-              + "<CreationDateTime>2021-07-16T06:35:17.421775Z</CreationDateTime></MessageHeader><JournalEntryCreateConfirmation><AccountingDocument> </AccountingDocument><CompanyCode> </CompanyCode><FiscalYear>0000</FiscalYear></JournalEntryCreateConfirmation><Log><MaximumLogItemSeverityCode>3</MaximumLogItemSeverityCode><Item><TypeID>609(RW)</TypeID><SeverityCode>3</SeverityCode>"
-              + "<Note>Error in document: BKPFF $ SD4CLNT100</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=RW609&amp;LANGUAGE=E&amp;MSGV1=BKPFF&amp;MSGV2=%24&amp;MSGV3=SD4CLNT100</WebURI></Item><Item><TypeID>602(RW)</TypeID><SeverityCode>3</SeverityCode><Note>Required field GL_ACCOUNT was not transferred in parameter ACCOUNTGL</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=RW602&amp;LANGUAGE=E&amp;MSGV1=GL_ACCOUNT&amp;MSGV2=ACCOUNTGL</WebURI>"
-              + "</Item><Item><TypeID>602(RW)</TypeID><SeverityCode>3</SeverityCode><Note>Required field GL_ACCOUNT was not transferred in parameter ACCOUNTGL</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=RW602&amp;LANGUAGE=E&amp;MSGV1=GL_ACCOUNT&amp;MSGV2=ACCOUNTGL</WebURI></Item><Item><TypeID>507(F5)</TypeID><SeverityCode>3</SeverityCode><Note>G/L account is not defined in chart of accounts 1000</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=F5507&amp;LANGUAGE=E&amp;MSGV2=1000</WebURI></Item><Item><TypeID>222(KI)</TypeID><SeverityCode>3</SeverityCode><Note>Cost center 1000/000000cc19 does not exist on 15.07.2021.</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=KI222&amp;LANGUAGE=E&amp;MSGV1=1000&amp;MSGV2=000000cc19&amp;MSGV3=15.07.2021</WebURI></Item><Item><TypeID>507(F5)</TypeID><SeverityCode>3</SeverityCode><Note>G/L account is not defined in chart of accounts 1000</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=F5507&amp;LANGUAGE=E&amp;MSGV2=1000</WebURI></Item><Item><TypeID>222(KI)</TypeID><SeverityCode>3</SeverityCode><Note>Cost center 1000/000000cc19 does not exist on 15.07.2021.</Note>"
-              + "<WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=KI222&amp;LANGUAGE=E&amp;MSGV1=1000&amp;MSGV2=000000cc19&amp;MSGV3=15.07.2021</WebURI></Item></Log></JournalEntryCreateConfirmation><Log/></n0:JournalEntryBulkCreateConfirmation></soap-env:Body></soap-env:Envelope>";
+		String dateTimeString = instant.toString();
+		XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(dateTimeString);
+		System.out.println(date2);
+		String number = "123456798787878";
+		StringBuilder sb = new StringBuilder();
 
-             /*  	StringReader sr = new StringReader(xml);
-       		 System.err.println("responsePayload OdataSoap "+ xml);
-       		 SOAPMessage message = MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(xml.getBytes()));
-       		System.err.println("soap message "+ message );
-       		 JAXBContext jaxbContext = JAXBContext.newInstance(JournalEntryCreateConfirmationBulkMessage.class);
-       		 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-       		 JournalEntryCreateConfirmationBulkMessage response = (JournalEntryCreateConfirmationBulkMessage) unmarshaller.unmarshal(message.getSOAPBody().extractContentAsDocument());
-       		   System.err.println("convertedResponse "+response); */
-                   
-            JSONObject json      =   XML.toJSONObject(xml); 
-            System.err.println("parsedJson "+json);
-            
-            
-              // String parsingError = "{\"soap-env:Envelope\":{\"soap-env:Body\":{\"n0:JournalEntryBulkCreateConfirmation\":{\"Log\":\"\",\"MessageHeader\":{\"CreationDateTime\":\"2021-07-16T09:22:06.322193Z\",\"UUID\":\"0022486f-cc22-1edb-b9c2-e93adfe72687\"},\"JournalEntryCreateConfirmation\":{\"Log\":{\"Item\":[{\"TypeID\":\"609(RW)\",\"SeverityCode\":3,\"Note\":\"Error in document: BKPFF $ SD4CLNT100\"},{\"TypeID\":\"602(RW)\",\"SeverityCode\":3,\"Note\":\"Required field GL_ACCOUNT was not transferred in parameter ACCOUNTGL\"},{\"TypeID\":\"602(RW)\",\"SeverityCode\":3,\"Note\":\"Required field GL_ACCOUNT was not transferred in parameter ACCOUNTGL\"},{\"TypeID\":\"507(F5)\",\"SeverityCode\":3,\"Note\":\"GL account is not defined in chart of accounts 1000\"},{\"TypeID\":\"222(KI)\",\"SeverityCode\":3,\"Note\":\"Cost center 1000\000000cc19 does not exist on 15.07.2021.\"},{\"TypeID\":\"507(F5)\",\"SeverityCode\":3,\"Note\":\"\GL account is not defined in chart of accounts 1000\"},{\"TypeID\":\"222(KI)\",\"SeverityCode\":3,\"Note\":\"Cost center 1000\/000000cc19 does not exist on 15.07.2021.\"}],\"MaximumLogItemSeverityCode\":3},\"MessageHeader\":{\"CreationDateTime\":\"2021-07-16T09:22:06.322209Z\",\"UUID\":\"0022486f-cc22-1edb-b9c2-e93adfe74687\"},\"JournalEntryCreateConfirmation\":{\"FiscalYear\":\"0000\",\"AccountingDocument\":\"\",\"CompanyCode\":\"\"}}}},\"soap-env:Header\":\"\"}}";    
+		if (number.length() < 10) {
 
+			int append = Math.abs(10 - number.length());
+			for (int i = 0; i < append; i++) {
+				sb.append("0");
+				System.err.println("inside loop " + sb);
+			}
+			sb.append(number);
+			System.err.println("appendedNumber " + sb);
+		} else {
+
+			System.err.println("number " + number);
+
+		}
+
+		double no = 12.786;
+		DecimalFormat dec = new DecimalFormat("#0.00");
+		System.out.println(dec.format(no));
+
+		String xml = "<soap-env:Envelope xmlns:soap-env=" + "\"" + "http://schemas.xmlsoap.org/soap/envelope/>" + "\"" +
+
+				"<soap-env:Header/><soap-env:Body><n0:JournalEntryBulkCreateConfirmation xmlns:n0="
+				+ "http://sap.com/xi/SAPSCORE/SFIN" + " xmlns:prx="
+				+ "urn:sap.com:proxy:SD4:/1SAI/TAS3D871C7855B59197A671:754"
+				+ "><MessageHeader><UUID>0022486f-cc22-1eeb-b9bf-ff827b35fefd</UUID>"
+				+ "<CreationDateTime>2021-07-16T06:35:17.421752Z</CreationDateTime>"
+				+ "</MessageHeader><JournalEntryCreateConfirmation><MessageHeader>"
+				+ "<UUID>0022486f-cc22-1eeb-b9bf-ff827b361efd</UUID>"
+				+ "<CreationDateTime>2021-07-16T06:35:17.421775Z</CreationDateTime></MessageHeader><JournalEntryCreateConfirmation><AccountingDocument> </AccountingDocument><CompanyCode> </CompanyCode><FiscalYear>0000</FiscalYear></JournalEntryCreateConfirmation><Log><MaximumLogItemSeverityCode>3</MaximumLogItemSeverityCode><Item><TypeID>609(RW)</TypeID><SeverityCode>3</SeverityCode>"
+				+ "<Note>Error in document: BKPFF $ SD4CLNT100</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=RW609&amp;LANGUAGE=E&amp;MSGV1=BKPFF&amp;MSGV2=%24&amp;MSGV3=SD4CLNT100</WebURI></Item><Item><TypeID>602(RW)</TypeID><SeverityCode>3</SeverityCode><Note>Required field GL_ACCOUNT was not transferred in parameter ACCOUNTGL</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=RW602&amp;LANGUAGE=E&amp;MSGV1=GL_ACCOUNT&amp;MSGV2=ACCOUNTGL</WebURI>"
+				+ "</Item><Item><TypeID>602(RW)</TypeID><SeverityCode>3</SeverityCode><Note>Required field GL_ACCOUNT was not transferred in parameter ACCOUNTGL</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=RW602&amp;LANGUAGE=E&amp;MSGV1=GL_ACCOUNT&amp;MSGV2=ACCOUNTGL</WebURI></Item><Item><TypeID>507(F5)</TypeID><SeverityCode>3</SeverityCode><Note>G/L account is not defined in chart of accounts 1000</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=F5507&amp;LANGUAGE=E&amp;MSGV2=1000</WebURI></Item><Item><TypeID>222(KI)</TypeID><SeverityCode>3</SeverityCode><Note>Cost center 1000/000000cc19 does not exist on 15.07.2021.</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=KI222&amp;LANGUAGE=E&amp;MSGV1=1000&amp;MSGV2=000000cc19&amp;MSGV3=15.07.2021</WebURI></Item><Item><TypeID>507(F5)</TypeID><SeverityCode>3</SeverityCode><Note>G/L account is not defined in chart of accounts 1000</Note><WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=F5507&amp;LANGUAGE=E&amp;MSGV2=1000</WebURI></Item><Item><TypeID>222(KI)</TypeID><SeverityCode>3</SeverityCode><Note>Cost center 1000/000000cc19 does not exist on 15.07.2021.</Note>"
+				+ "<WebURI>http://vhmeasd4ci.hec.menabev.com:8000/sap/xi/docu_apperror?ID=NA&amp;OBJECT=KI222&amp;LANGUAGE=E&amp;MSGV1=1000&amp;MSGV2=000000cc19&amp;MSGV3=15.07.2021</WebURI></Item></Log></JournalEntryCreateConfirmation><Log/></n0:JournalEntryBulkCreateConfirmation></soap-env:Body></soap-env:Envelope>";
+
+		/*
+		 * StringReader sr = new StringReader(xml);
+		 * System.err.println("responsePayload OdataSoap "+ xml); SOAPMessage
+		 * message = MessageFactory.newInstance().createMessage(null, new
+		 * ByteArrayInputStream(xml.getBytes()));
+		 * System.err.println("soap message "+ message ); JAXBContext
+		 * jaxbContext =
+		 * JAXBContext.newInstance(JournalEntryCreateConfirmationBulkMessage.
+		 * class); Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		 * JournalEntryCreateConfirmationBulkMessage response =
+		 * (JournalEntryCreateConfirmationBulkMessage)
+		 * unmarshaller.unmarshal(message.getSOAPBody().extractContentAsDocument
+		 * ()); System.err.println("convertedResponse "+response);
+		 */
+
+		JSONObject json = XML.toJSONObject(xml);
+		System.err.println("parsedJson " + json);
+
+		// String parsingError =
+		// "{\"soap-env:Envelope\":{\"soap-env:Body\":{\"n0:JournalEntryBulkCreateConfirmation\":{\"Log\":\"\",\"MessageHeader\":{\"CreationDateTime\":\"2021-07-16T09:22:06.322193Z\",\"UUID\":\"0022486f-cc22-1edb-b9c2-e93adfe72687\"},\"JournalEntryCreateConfirmation\":{\"Log\":{\"Item\":[{\"TypeID\":\"609(RW)\",\"SeverityCode\":3,\"Note\":\"Error
+		// in document: BKPFF $
+		// SD4CLNT100\"},{\"TypeID\":\"602(RW)\",\"SeverityCode\":3,\"Note\":\"Required
+		// field GL_ACCOUNT was not transferred in parameter
+		// ACCOUNTGL\"},{\"TypeID\":\"602(RW)\",\"SeverityCode\":3,\"Note\":\"Required
+		// field GL_ACCOUNT was not transferred in parameter
+		// ACCOUNTGL\"},{\"TypeID\":\"507(F5)\",\"SeverityCode\":3,\"Note\":\"GL
+		// account is not defined in chart of accounts
+		// 1000\"},{\"TypeID\":\"222(KI)\",\"SeverityCode\":3,\"Note\":\"Cost
+		// center 1000\000000cc19 does not exist on
+		// 15.07.2021.\"},{\"TypeID\":\"507(F5)\",\"SeverityCode\":3,\"Note\":\"\GL
+		// account is not defined in chart of accounts
+		// 1000\"},{\"TypeID\":\"222(KI)\",\"SeverityCode\":3,\"Note\":\"Cost
+		// center 1000\/000000cc19 does not exist on
+		// 15.07.2021.\"}],\"MaximumLogItemSeverityCode\":3},\"MessageHeader\":{\"CreationDateTime\":\"2021-07-16T09:22:06.322209Z\",\"UUID\":\"0022486f-cc22-1edb-b9c2-e93adfe74687\"},\"JournalEntryCreateConfirmation\":{\"FiscalYear\":\"0000\",\"AccountingDocument\":\"\",\"CompanyCode\":\"\"}}}},\"soap-env:Header\":\"\"}}";
 
 	}
-	
-	
-
 
 }

@@ -133,6 +133,7 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 			}
 			return String.format("%04d", Integer.parseInt(itemId) + 1);
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error(
 					"[ApAutomation][InvoiceHeaderServiceImpl][getDetailsForFilter][Exception] = " + e.getMessage());
 		}
