@@ -1215,6 +1215,32 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 
 						}
 						System.err.println("GR DTO LIST::::: Q" + grDtoList);
+					}else if ("E".equalsIgnoreCase(poHistoryDto.getHistoryCategory())
+							&& ("102".equals(poHistoryDto.getGoodsMvmtType()) || "122".equals(poHistoryDto.getGoodsMvmtType()))){
+						
+						for (GRDto grDto : grDtoList) {
+							String docItem = grDto.getHDocItem();
+							String docNum = grDto.getHdocNum();
+							String rDocItem = grDto.getRefDocItem();
+							String rDocNum = grDto.getRefDoc();
+							if (invoiceItemDto.getProductType().equalsIgnoreCase("2")) {
+								if (poHistoryDto.getRefDocItem().equals(rDocItem)
+										&& poHistoryDto.getRefDocNum().equals(rDocNum)) {
+									//grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
+									grDto.setHDocQty(grDto.getHDocQty() - poHistoryDto.getQuantity()); 
+									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+								}
+							} else {
+								if (poHistoryDto.getRefDocItem().equals(docItem)
+										&& poHistoryDto.getRefDocNum().equals(docNum)) {
+									//grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
+									grDto.setHDocQty(grDto.getHDocQty() - poHistoryDto.getQuantity()); 
+									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+								}
+							}
+
+						}
+						
 					}
                              
 				}
@@ -1420,7 +1446,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 									toAccAssgnDto.setItemAmount(inputPayload.getAmtDC());
 									toAccAssgnDto.setQuantity(inputPayload.getQuantity());
 									toAccAssgnDto.setPoPrQnt(inputPayload.getQtyOpu());
-								} else if ("2".equalsIgnoreCase(invoiceItemDto.getDistributionInd())
+								} else if (("1".equalsIgnoreCase(invoiceItemDto.getDistributionInd()) || 
+										"2".equalsIgnoreCase(invoiceItemDto.getDistributionInd()) ||
+										"3".equalsIgnoreCase(invoiceItemDto.getDistributionInd()))
 										&& "2".equalsIgnoreCase(invoiceItemDto.getPartialInvInd())) {
 									// if in item distribution filed is "2" &
 									// partial inv indicator is "2" --- > then
