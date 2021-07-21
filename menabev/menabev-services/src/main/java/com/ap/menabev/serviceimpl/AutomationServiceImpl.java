@@ -136,7 +136,7 @@ public class AutomationServiceImpl implements AutomationService {
 
 	@Autowired
 	ActivityLogServiceImpl activityLogServiceImpl;
-
+	
 	@Override
 	public ResponseDto downloadFilesFromSFTPABBYYServer(SchedulerConfigurationDo entity) {
 		ResponseDto response = new ResponseDto();
@@ -167,7 +167,7 @@ public class AutomationServiceImpl implements AutomationService {
 							ChannelSftp.LsEntry entry = filelist.get(i);
 							try {
 								logger.error("INSIDE JSON " + entry.getFilename());
-								if (entry.getFilename().contains(".json")) {
+								if (entry.getFilename().contains(".json") && entry.getFilename().contains("APA-")) {
 									noOfJSONFiles++;
 									logger.error("INSIDE JSON ");
 									InputStream is = channelSftp.get(entry.getFilename());
