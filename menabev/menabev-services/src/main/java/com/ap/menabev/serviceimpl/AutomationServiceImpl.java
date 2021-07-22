@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +137,7 @@ public class AutomationServiceImpl implements AutomationService {
 
 	@Autowired
 	ActivityLogServiceImpl activityLogServiceImpl;
-	
+
 	@Override
 	public ResponseDto downloadFilesFromSFTPABBYYServer(SchedulerConfigurationDo entity) {
 		ResponseDto response = new ResponseDto();
@@ -146,200 +147,240 @@ public class AutomationServiceImpl implements AutomationService {
 		cycleEntity.setStartDateTime(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
 
 		List<SchedulerCycleLogDo> schedulerCycleLogDoList = new ArrayList<>();
-		List<JSONObject> fileNmaes = new ArrayList<>();
-
-		List<JSONObject> jsonList = new ArrayList<JSONObject>();
+		List<File> proccessedFileList = new ArrayList<>();
 		try {
 			Session session = SFTPChannelUtil.getSession();
 			ChannelSftp channelSftp = null;
 			channelSftp = SFTPChannelUtil.getJschChannel(session);
 			channelSftp.connect();
-			try {
-				logger.error("Errorrrrrrrrrrrr" + ServiceUtil.isEmpty(channelSftp));
-				channelSftp.cd("\\Output\\");
-				// Vector<ChannelSftp.LsEntry> filelist =
-				// channelSftp.ls("*.json");
-				Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
-				logger.error("Vector<ChannelSftp.LsEntry> filelist" + filelist.size());
-				if (!ServiceUtil.isEmpty(filelist)) {
-					for (int i = 0; i < 2; i++) {
-						if (i <= filelist.size()) {
-							ChannelSftp.LsEntry entry = filelist.get(i);
-							try {
-								logger.error("INSIDE JSON " + entry.getFilename());
-								if (entry.getFilename().contains(".json") && entry.getFilename().contains("APA-")) {
-									noOfJSONFiles++;
-									logger.error("INSIDE JSON ");
-									InputStream is = channelSftp.get(entry.getFilename());
-									ObjectMapper mapper = new ObjectMapper();
-									Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
-									JSONObject jsonObject = new JSONObject(jsonMap);
-									if (jsonObject.has("Documents")) {
-										InvoiceHeaderDto output = ABBYYJSONConverter
-												.abbyyJSONOutputToInvoiceObject(jsonObject);
-										if (!ServiceUtil.isEmpty(output)) {
-											File toUploadFile = new File(entry.getFilename());
-											String reqIdFromFileName = FilenameUtils
-													.removeExtension(entry.getFilename());
-											output.setRequestId(reqIdFromFileName);
-											logger.error("inside if of output " + toUploadFile.getName());
+			logger.error("Errorrrrrrrrrrrr" + ServiceUtil.isEmpty(channelSftp));
+			channelSftp.cd("\\Output\\");
+			// Vector<ChannelSftp.LsEntry> filelist =
+			// channelSftp.ls("*.json");
+			Vector<ChannelSftp.LsEntry> filelist = channelSftp.ls("*.json");
+			logger.error("Vector<ChannelSftp.LsEntry> filelist" + filelist.size());
+			if (!ServiceUtil.isEmpty(filelist)) {
+				for (int i = 0; i < 2; i++) {
+					if (i <= filelist.size()) {
+						ChannelSftp.LsEntry entry = filelist.get(i);
+						try {
+							logger.error("INSIDE JSON " + entry.getFilename());
+							if (entry.getFilename().contains(".json") && entry.getFilename().contains("APA-")) {
+								noOfJSONFiles++;
+								logger.error("INSIDE JSON ");
+								InputStream is = channelSftp.get(entry.getFilename());
+								ObjectMapper mapper = new ObjectMapper();
+								Map<String, Object> jsonMap = mapper.readValue(is, Map.class);
+								JSONObject jsonObject = new JSONObject(jsonMap);
+								if (jsonObject.has("Documents")) {
+									InvoiceHeaderDto output = ABBYYJSONConverter
+											.abbyyJSONOutputToInvoiceObject(jsonObject);
+									if (!ServiceUtil.isEmpty(output)) {
+										File toUploadFile = new File(entry.getFilename());
+										String reqIdFromFileName = FilenameUtils.removeExtension(entry.getFilename());
+										output.setRequestId(reqIdFromFileName);
+										logger.error("inside if of output " + toUploadFile.getName());
 
-											try (OutputStream outputStream = new FileOutputStream(toUploadFile)) {
-												logger.error(
-														"OutputStream outputStream = new FileOutputStream(toUploadFile)");
-												IOUtils.copy(is, outputStream);
+										try (OutputStream outputStream = new FileOutputStream(toUploadFile)) {
+											logger.error(
+													"OutputStream outputStream = new FileOutputStream(toUploadFile)");
+											IOUtils.copy(is, outputStream);
 
-											} catch (FileNotFoundException e) {
-												// handle exception here
-												e.printStackTrace();
-												logger.error("FileNotFoundException e" + e.getMessage());
-											} catch (IOException e) {
-												// handle exception here
-												e.printStackTrace();
-												logger.error("IOException e" + e.getMessage());
-											}
+										} catch (FileNotFoundException e) {
+											// handle exception here
+											e.printStackTrace();
+											logger.error("FileNotFoundException e" + e.getMessage());
+										} catch (IOException e) {
+											// handle exception here
+											e.printStackTrace();
+											logger.error("IOException e" + e.getMessage());
+										}
 
-											List<InvoiceHeaderDto> headerList = new ArrayList<>();
-											headerList.add(output);
-											response = saveAllInvoiceDetails(headerList);
-											if (!ServiceUtil.isEmpty(response.getObject())) {
-												InvoiceHeaderDto dto = (InvoiceHeaderDto) response.getObject();
-												SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-												cycleLogDo.setUuId(UUID.randomUUID().toString());
-												cycleLogDo.setLogMsgText(dto.getRequestId() + " task created");
-												cycleLogDo.setTimestampIST(ServiceUtil
-														.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
-												cycleLogDo.setTimestampKSA(ServiceUtil
-														.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
-												schedulerCycleLogDoList.add(cycleLogDo);
+										List<InvoiceHeaderDto> headerList = new ArrayList<>();
+										headerList.add(output);
+										response = saveAllInvoiceDetails(headerList);
+										if (!ServiceUtil.isEmpty(response) && !ServiceUtil.isEmpty(response.getObject())) {
 
-												DmsResponseDto dmsResponse = documentManagementService
-														.uploadDocument(toUploadFile, reqIdFromFileName);
-												if (!ServiceUtil.isEmpty(dmsResponse)
-														&& !ServiceUtil.isEmpty(dmsResponse.getResponse())
-														&& "Success".equalsIgnoreCase(
-																dmsResponse.getResponse().getStatus())) {
-													logger.error(
-															"OutputStream outputStream = new FileOutputStream(toUploadFile)");
-													// SchedulerCycleLogDo
-													// cycleLogDo = new
-													// SchedulerCycleLogDo();
-													cycleLogDo.setUuId(UUID.randomUUID().toString());
-													cycleLogDo.setLogMsgText(dmsResponse.getDocumentName()
-															+ " uploaded successfully to DMS");
-													cycleLogDo.setTimestampIST(ServiceUtil
-															.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
-													cycleLogDo.setTimestampKSA(ServiceUtil
-															.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
-													schedulerCycleLogDoList.add(cycleLogDo);
-												} else {
-													// SchedulerCycleLogDo
-													// cycleLogDo = new
-													// SchedulerCycleLogDo();
-													cycleLogDo.setUuId(UUID.randomUUID().toString());
-													cycleLogDo.setLogMsgText("Failed to upload " + entry.getFilename()
-															+ " on DMS/" + toUploadFile.getName() + " already exists");
-													cycleLogDo.setTimestampIST(ServiceUtil
-															.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
-													cycleLogDo.setTimestampKSA(ServiceUtil
-															.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
-													schedulerCycleLogDoList.add(cycleLogDo);
-												}
-
-											} else {
-												SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-												cycleLogDo.setUuId(UUID.randomUUID().toString());
-												cycleLogDo
-														.setLogMsgText("Failed to create task in Database for the file "
-																+ entry.getFilename());
-												cycleLogDo.setTimestampIST(ServiceUtil
-														.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
-												cycleLogDo.setTimestampKSA(ServiceUtil
-														.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
-												schedulerCycleLogDoList.add(cycleLogDo);
-											}
-											is.close();
-											// cd
-											// put
-
-											channelSftp.rm(entry.getFilename());
-
-										} else {
-											// checking if json is thrwoing
-											// error
-											// will move the json to UNPROCESSED
-											// folder
-											// notify the sender with email to
-											// check the json
+											InvoiceHeaderDto dto = (InvoiceHeaderDto) response.getObject();
 											SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
 											cycleLogDo.setUuId(UUID.randomUUID().toString());
-											cycleLogDo.setLogMsgText("Error in json ,please check the json file");
+											cycleLogDo.setLogMsgText(dto.getRequestId() + " task created");
 											cycleLogDo.setTimestampIST(ServiceUtil
 													.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
 											cycleLogDo.setTimestampKSA(ServiceUtil
 													.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
 											schedulerCycleLogDoList.add(cycleLogDo);
 
-											is.close();
-											response.setMessage("Error in JSON");
+											proccessedFileList.add(toUploadFile);
+											DmsResponseDto dmsResponse = documentManagementService
+													.uploadDocument(toUploadFile, reqIdFromFileName);
+											if (!ServiceUtil.isEmpty(dmsResponse)
+													&& !ServiceUtil.isEmpty(dmsResponse.getResponse()) && "Success"
+															.equalsIgnoreCase(dmsResponse.getResponse().getStatus())) {
+												logger.error(
+														"OutputStream outputStream = new FileOutputStream(toUploadFile)");
+												// SchedulerCycleLogDo
+												// cycleLogDo = new
+												// SchedulerCycleLogDo();
+												cycleLogDo.setUuId(UUID.randomUUID().toString());
+												cycleLogDo.setLogMsgText(dmsResponse.getDocumentName()
+														+ " uploaded successfully to DMS");
+												cycleLogDo.setTimestampIST(ServiceUtil
+														.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+												cycleLogDo.setTimestampKSA(ServiceUtil
+														.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+												schedulerCycleLogDoList.add(cycleLogDo);
+											} else {
+												// SchedulerCycleLogDo
+												// cycleLogDo = new
+												// SchedulerCycleLogDo();
+												cycleLogDo.setUuId(UUID.randomUUID().toString());
+												cycleLogDo.setLogMsgText("Failed to upload " + entry.getFilename()
+														+ " on DMS/" + toUploadFile.getName() + " already exists");
+												cycleLogDo.setTimestampIST(ServiceUtil
+														.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+												cycleLogDo.setTimestampKSA(ServiceUtil
+														.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+												schedulerCycleLogDoList.add(cycleLogDo);
+											}
+											channelSftp.rm(entry.getFilename());
+										} else {
+											SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+											cycleLogDo.setUuId(UUID.randomUUID().toString());
+											cycleLogDo.setLogMsgText("Failed to create task in Database for the file "
+													+ entry.getFilename());
+											cycleLogDo.setTimestampIST(ServiceUtil
+													.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+											cycleLogDo.setTimestampKSA(ServiceUtil
+													.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+											schedulerCycleLogDoList.add(cycleLogDo);
 										}
+										is.close();
 
+									} else {
+										// checking if json is thrwoing
+										// error
+										// will move the json to UNPROCESSED
+										// folder
+										// notify the sender with email to
+										// check the json
+										SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+										cycleLogDo.setUuId(UUID.randomUUID().toString());
+										cycleLogDo.setLogMsgText("Error in json ,please check the json file");
+										cycleLogDo.setTimestampIST(
+												ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+										cycleLogDo.setTimestampKSA(
+												ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+										schedulerCycleLogDoList.add(cycleLogDo);
+
+										is.close();
+										response.setMessage("Error in JSON");
 									}
+
 								}
-
-							} catch (Exception e) {
-								SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
-								cycleLogDo.setUuId(UUID.randomUUID().toString());
-								cycleLogDo.setLogMsgText("");
-								cycleLogDo.setTimestampIST(
-										ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
-								cycleLogDo.setTimestampKSA(
-										ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
-								schedulerCycleLogDoList.add(cycleLogDo);
-								e.printStackTrace();
-								response.setMessage("Error while reading json" + e.getMessage());
-
 							}
 
+						} catch (Exception e) {
+							// un proccessed
+							SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+							cycleLogDo.setUuId(UUID.randomUUID().toString());
+							cycleLogDo.setLogMsgText("Error while reading json");
+							cycleLogDo.setTimestampIST(
+									ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+							cycleLogDo.setTimestampKSA(
+									ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+							schedulerCycleLogDoList.add(cycleLogDo);
+							e.printStackTrace();
+							response.setMessage("Error while reading json" + e.getMessage());
+
 						}
+
 					}
 				}
+			}
+			SFTPChannelUtil.disconnect(session, channelSftp);
+//			List<SchedulerCycleLogDo> list = moveFilesToFolder("Proccessed", proccessedFileList);
+//			if (list.size() > 0)
+//				schedulerCycleLogDoList.addAll(list);
 
-				SchedulerRunDo schedulerRun = schedulerRunRepository.getBySchedulerConfigID(entity.getScId());
-				cycleEntity.setNOfEmailspicked(0);
-				cycleEntity.setNoOfAttachements(0);
-				cycleEntity.setNoOfEmailsReadSuccessfully(0);
-				cycleEntity.setNoOfPDFs(0);
-				cycleEntity.setSchedulerRunID(schedulerRun.getSchedulerRunID());
-				cycleEntity.setEndDatetime(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
-				cycleEntity.setSchedulerCycleID(UUID.randomUUID().toString());
-				cycleEntity.setNoOfJSONFiles(noOfJSONFiles);
-				//
-				SchedulerCycleDo savedCycleEntity = schedulerCycleRepository.save(cycleEntity);
-				for (SchedulerCycleLogDo cycleLogDo : schedulerCycleLogDoList) {
-					cycleLogDo.setLogMsgNo(String.valueOf(logMsgNo++));
-					cycleLogDo.setCycleID(savedCycleEntity.getSchedulerCycleID());
-					cycleLogDo.setRunID(schedulerRun.getSchedulerRunID());
-				}
-
-				schedulerCycleLogRepository.saveAll(schedulerCycleLogDoList);
-				schedulerRun
-						.setNoOfCycles((schedulerRun.getNoOfCycles() == null ? 0 : schedulerRun.getNoOfCycles()) + 1);
-				schedulerRunRepository.save(schedulerRun);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				response.setMessage("Error while opening sftp" + e.getMessage());
+			SchedulerRunDo schedulerRun = schedulerRunRepository.getBySchedulerConfigID(entity.getScId());
+			cycleEntity.setNOfEmailspicked(0);
+			cycleEntity.setNoOfAttachements(0);
+			cycleEntity.setNoOfEmailsReadSuccessfully(0);
+			cycleEntity.setNoOfPDFs(0);
+			cycleEntity.setSchedulerRunID(schedulerRun.getSchedulerRunID());
+			cycleEntity.setEndDatetime(ServiceUtil.getFormattedDateinString("yyyy-MM-dd hh:mm:ss"));
+			cycleEntity.setSchedulerCycleID(UUID.randomUUID().toString());
+			cycleEntity.setNoOfJSONFiles(noOfJSONFiles);
+			//
+			SchedulerCycleDo savedCycleEntity = schedulerCycleRepository.save(cycleEntity);
+			for (SchedulerCycleLogDo cycleLogDo : schedulerCycleLogDoList) {
+				cycleLogDo.setLogMsgNo(String.valueOf(logMsgNo++));
+				cycleLogDo.setCycleID(savedCycleEntity.getSchedulerCycleID());
+				cycleLogDo.setRunID(schedulerRun.getSchedulerRunID());
 			}
 
+			schedulerCycleLogRepository.saveAll(schedulerCycleLogDoList);
+			schedulerRun.setNoOfCycles((schedulerRun.getNoOfCycles() == null ? 0 : schedulerRun.getNoOfCycles()) + 1);
+			schedulerRunRepository.save(schedulerRun);
 			// fileNmaes = abbyyIntegration.getJsonOutputFromSFTP(channelSftp);
-
-			SFTPChannelUtil.disconnect(session, channelSftp);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return response;
+	}
+
+	private List<SchedulerCycleLogDo> moveFilesToFolder(String folderName, List<File> proccessedFileList) {
+		List<SchedulerCycleLogDo> schedulerCycleLogDoList = new ArrayList<>();
+		try {
+			Session session = SFTPChannelUtil.getSession();
+			logger.error("session session " + session);
+			ChannelSftp channelSftp = null;
+			channelSftp = SFTPChannelUtil.getJschChannel(session);
+			logger.error("channelSftp" + channelSftp);
+			channelSftp.connect();
+			logger.error("inside move folder" + ServiceUtil.isEmpty(channelSftp));
+			logger.error("folder name" + folderName);
+			channelSftp.cd("\\" + folderName + "\\");
+
+			for (File file : proccessedFileList) {
+
+				try {
+					String inputFilePath = file.getAbsolutePath();
+					channelSftp.put(inputFilePath, file.getName());
+					SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+					cycleLogDo.setUuId(UUID.randomUUID().toString());
+					cycleLogDo.setLogMsgText("File " + file.getName() + " moved to " + folderName);
+					cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+					cycleLogDo.setTimestampKSA(ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+					schedulerCycleLogDoList.add(cycleLogDo);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("Error in putting file" + file.getName());
+					SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+					cycleLogDo.setUuId(UUID.randomUUID().toString());
+					cycleLogDo.setLogMsgText("Error in putting file" + file.getName());
+					cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+					cycleLogDo.setTimestampKSA(ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+					schedulerCycleLogDoList.add(cycleLogDo);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Error in openning sftp");
+			SchedulerCycleLogDo cycleLogDo = new SchedulerCycleLogDo();
+			cycleLogDo.setUuId(UUID.randomUUID().toString());
+			cycleLogDo.setLogMsgText("Error in openning sftp");
+			cycleLogDo.setTimestampIST(ServiceUtil.getCurrentDateByZone(ApplicationConstants.IST_TIMEZONE));
+			cycleLogDo.setTimestampKSA(ServiceUtil.getCurrentDateByZone(ApplicationConstants.KSA_TIMEZONE));
+			schedulerCycleLogDoList.add(cycleLogDo);
+		}
+
+		return schedulerCycleLogDoList;
 	}
 
 	private ResponseDto saveAllInvoiceDetails(List<InvoiceHeaderDto> headerList) {
@@ -368,74 +409,6 @@ public class AutomationServiceImpl implements AutomationService {
 				activity.add(activitySave);
 				invoiceHeaderDto.setActivityLog(activity);
 				response = invoiceHeaderService.saveOrUpdate(invoiceHeaderDto);
-
-				if (!ServiceUtil.isEmpty(response)) {
-					System.err.println("InvoiceHeader " + response);
-					// InvoiceHeaderDto invoiceHeaderAutoPost =
-					// (InvoiceHeaderDto)
-					// response.getObject();
-					// call autoposting method
-					InvoiceHeaderDto invoiceHeaderAutoPost = purchaseHeaderService
-							.autoPostApi((InvoiceHeaderDto) response.getObject());
-					System.err.println("InvoiceHeaderAutoPost " + invoiceHeaderAutoPost);
-					// calling rule file and worklfow
-					AcountOrProcessLeadDetermination determination = new AcountOrProcessLeadDetermination();
-					determination.setCompCode(invoiceHeaderAutoPost.getCompCode());
-					determination.setVednorId(invoiceHeaderAutoPost.getVendorId());
-					ResponseEntity<?> responseRules = invoiceHeaderService.triggerRuleService(determination);
-					System.err.println("responseRules Scheduler " + responseRules);
-					@SuppressWarnings("unchecked")
-					List<ApproverDataOutputDto> lists = (List<ApproverDataOutputDto>) responseRules.getBody();
-					System.err.println("ApproverList scheduler" + lists);
-					if (!ServiceUtil.isEmpty(lists)) {
-						// trigger workflow
-						TriggerWorkflowContext context = new TriggerWorkflowContext();
-						context.setRequestId(invoiceHeaderAutoPost.getRequestId());
-						context.setInvoice_ref_number(invoiceHeaderAutoPost.getInvoice_ref_number());
-						context.setNonPo(false);
-						context.setManualNonPo(false);
-						context.setAccountantUser(lists.get(0).getAccountant());
-						context.setAccountantGroup(invoiceHeaderAutoPost.getTaskGroup());
-						context.setProcessLead(lists.get(0).getProcessLead());
-						context.setAccountantAction(ApplicationConstants.WORKFLOW_TRIGER);
-						context.setInvoiceStatus(invoiceHeaderAutoPost.getInvoiceStatus());
-						context.setInvoiceStatusText(invoiceHeaderAutoPost.getInvoiceStatusText());
-						context.setInvoiceType(invoiceHeaderAutoPost.getInvoiceType());
-						context.setProcessLeadAction("");
-						context.setRemediationUser("");
-						context.setRemediationUserAction("");
-						ResponseEntity<?> responseWorkflow = invoiceHeaderService.triggerWorkflow(
-								(WorkflowContextDto) context, "triggerresolutionworkflow.triggerresolutionworkflow");
-						System.err.println("response of workflow Trigger scheduler" + response);
-						WorkflowTaskOutputDto taskOutputDto = (WorkflowTaskOutputDto) responseWorkflow.getBody();
-						// save invoice header
-						invoiceHeaderAutoPost.setWorkflowId(taskOutputDto.getId());
-						invoiceHeaderAutoPost.setTaskStatus("READY");
-
-						// save for activity Log for Accountant Workflow
-						// Triggers
-						InvoiceSubmitDto invoiceSubmit = new InvoiceSubmitDto();
-						invoiceSubmit.setActionCode(ApplicationConstants.WORKFLOW_TRIGER);
-						invoiceSubmit.setRequestId(invoiceHeaderAutoPost.getRequestId());
-						invoiceSubmit.setInvoice(invoiceHeaderAutoPost);
-						invoiceSubmit.getInvoice().setTaskOwner(lists.get(0).getAccountant());
-						ActivityLogDto activitySaveForAccoutnant = activityLogServiceImpl.saveOrUpdateActivityLog(
-								invoiceSubmit, invoiceSubmit.getActionCode(), "WORKFLOW_TRIGGER");
-						System.out.println("Saved ActivityLog:::" + activitySaveForAccoutnant);
-						activity.add(activitySaveForAccoutnant);
-						invoiceHeaderAutoPost.setActivityLog(activity);
-						responseAutoPosting = invoiceHeaderService.saveOrUpdate(invoiceHeaderAutoPost);
-						System.err.println("invoiceHeaderAutoPost responseAutoPosting =" + responseAutoPosting);
-						response.setObject(invoiceHeaderDto);
-					} else {
-						response = new ResponseDto("400", "0",
-								"Error no default user maintained in url file." + lists.toString(), invoiceHeaderDto);
-					}
-
-				} else {
-
-				}
-
 				System.err.println("InvoiceHeader " + response);
 				// InvoiceHeaderDto invoiceHeaderAutoPost = (InvoiceHeaderDto)
 				// response.getObject();

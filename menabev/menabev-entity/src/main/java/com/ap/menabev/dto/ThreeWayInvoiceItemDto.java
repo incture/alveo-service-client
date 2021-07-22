@@ -86,7 +86,10 @@ public class ThreeWayInvoiceItemDto {
 	private Boolean ivFlag;
 	private Integer convNum1;
 	private Integer convDen1;
-	
+	//
+	private String crDbIndicator;
+	private Boolean returnItemInd;
+	//
 	private Double sysSuggTax;
     private Boolean grNonValInd;
 	private String distributionInd;

@@ -1172,7 +1172,7 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 							"ValidateInvoiceServiceImpl.cosumptionLogic()------>" + poHistoryDto.getHistoryCategory()
 									+ "poHistoryDto.getGoodsMvmtType()" + poHistoryDto.getGoodsMvmtType());
 					if ("E".equalsIgnoreCase(poHistoryDto.getHistoryCategory())
-							&& "101".equals(poHistoryDto.getGoodsMvmtType())) {
+							&& ("101".equals(poHistoryDto.getGoodsMvmtType()) || "161".equals(poHistoryDto.getGoodsMvmtType()))) {
 
 						// GR
 						GRDto grDto = new GRDto();
@@ -1191,31 +1191,62 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						System.err.println("GR DTO LIST::::: E" + grDtoList);
 						
 					} else if ("Q".equalsIgnoreCase(poHistoryDto.getHistoryCategory())) {
-						// IR
-						for (GRDto grDto : grDtoList) {
-							String docItem = grDto.getHDocItem();
-							String docNum = grDto.getHdocNum();
-							String rDocItem = grDto.getRefDocItem();
-							String rDocNum = grDto.getRefDoc();
-							System.err.println("GR DTO LIST:::::  outside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
-							if (invoiceItemDto.getProductType().equalsIgnoreCase("2")) {
+						
+						if("S".equalsIgnoreCase(invoiceItemDto.getCrDbIndicator())){
+							
+							
+							// IR
+							for (GRDto grDto : grDtoList) {
+								String docItem = grDto.getHDocItem();
+								String docNum = grDto.getHdocNum();
+								String rDocItem = grDto.getRefDocItem();
+								String rDocNum = grDto.getRefDoc();
+								System.err.println("GR DTO LIST:::::  outside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
+								if (invoiceItemDto.getProductType().equalsIgnoreCase("2")) {
+									if (poHistoryDto.getRefDocItem().equals(rDocItem)
+											&& poHistoryDto.getRefDocNum().equals(rDocNum)) {
+										System.err.println("GR DTO LIST:::::  inside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
+										grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
+										grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+									}
+								} else {
+									if (poHistoryDto.getRefDocItem().equals(docItem)
+											&& poHistoryDto.getRefDocNum().equals(docNum)) {
+										grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
+										grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
+									}
+								}
+
+							}
+							System.err.println("GR DTO LIST::::: Q" + grDtoList);
+							
+							
+						
+						}else if("H".equalsIgnoreCase(invoiceItemDto.getCrDbIndicator()) && invoiceItemDto.getReturnItemInd()){
+
+							// credit memo
+							for (GRDto grDto : grDtoList) {
+								String docItem = grDto.getHDocItem();
+								String docNum = grDto.getHdocNum();
+								String rDocItem = grDto.getRefDocItem();
+								String rDocNum = grDto.getRefDoc();
+								System.err.println("GR DTO LIST:::::  outside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
 								if (poHistoryDto.getRefDocItem().equals(rDocItem)
 										&& poHistoryDto.getRefDocNum().equals(rDocNum)) {
 									System.err.println("GR DTO LIST:::::  inside if rDocItem = "+ rDocItem + "rDocNum ="+rDocNum  + "poHistoryDto.getRefDocItem() ="+poHistoryDto.getRefDocItem() + "poHistoryDto.getRefDocNum()="+poHistoryDto.getRefDocNum());
 									grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
 									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
 								}
-							} else {
-								if (poHistoryDto.getRefDocItem().equals(docItem)
-										&& poHistoryDto.getRefDocNum().equals(docNum)) {
-									grDto.setHDocStlQty(grDto.getHDocStlQty() + poHistoryDto.getQuantity());
-									grDto.setHDocUnStlQty(grDto.getHDocQty() - grDto.getHDocStlQty());
-								}
-							}
 
+							}
+							System.err.println("GR DTO LIST::::: Q" + grDtoList);
+							
+							
+						
+						
 						}
-						System.err.println("GR DTO LIST::::: Q" + grDtoList);
-					}else if ("E".equalsIgnoreCase(poHistoryDto.getHistoryCategory())
+						
+						}else if ("E".equalsIgnoreCase(poHistoryDto.getHistoryCategory())
 							&& ("102".equals(poHistoryDto.getGoodsMvmtType()) || "122".equals(poHistoryDto.getGoodsMvmtType()))){
 						
 						for (GRDto grDto : grDtoList) {
@@ -1312,8 +1343,18 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						inputPayload.setNoQuantityLogic("");
 						inputPayload.setItemCategory(invoiceItemDto.getItemCategory() == "0" ? "" : "");
 						inputPayload.setQtyInvoiced(String.valueOf(grDto.getHDocStlQty()));
-						inputPayload.setReturnsItem("");
-						inputPayload.setDrCrInd("S");
+						
+						if("S".equalsIgnoreCase(invoiceItemDto.getCrDbIndicator())){
+							inputPayload.setReturnsItem("");
+							inputPayload.setDrCrInd("S");
+							inputPayload.setRetAllocInd("");
+							inputPayload.setPostInvInd("X");
+						}else if("H".equalsIgnoreCase(invoiceItemDto.getCrDbIndicator()) && invoiceItemDto.getReturnItemInd()){
+							inputPayload.setReturnsItem("X");
+							inputPayload.setDrCrInd("H");
+							inputPayload.setRetAllocInd("X");
+							inputPayload.setPostInvInd("");
+						}
 						inputPayload.setSubDrCrInd("");
 						inputPayload.setCurrencyKey(invoiceHeaderDto.getCurrency());
 						inputPayload.setGrBasedIvInd(grBsdIvFlag == true ? "X" : "");
@@ -1321,9 +1362,9 @@ public class ValidateInvoiceServiceImpl implements ValidateInvoiceService {
 						inputPayload.setGoodsReceiptInd(goodsReceiptFlag == true ? "X" : "");
 						// inputPayload.setTranslationDate("");
 						inputPayload.setUpdatePODelCosts("");
-						inputPayload.setPostInvInd(invoiceReceiptFlag == true ? "X" : "");
+//						inputPayload.setPostInvInd(invoiceReceiptFlag == true ? "X" : "");
 						inputPayload.setDelItemAllocInd("");
-						inputPayload.setRetAllocInd("");
+						
 						inputPayload.setIvOrigin("");
 
 						String qtyOPU = String

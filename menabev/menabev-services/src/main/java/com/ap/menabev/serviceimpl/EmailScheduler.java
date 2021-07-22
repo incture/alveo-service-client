@@ -35,9 +35,7 @@ public class EmailScheduler implements Runnable {
 	SchedulerLogService schedulerLogService;
 
 	
-	public static void main(String[] args) {
-		System.err.println( " current time  = " + ServiceUtil.getFormattedDateinString("yyyy-MM-dd"));
-	}
+	
 	
 	@Override
 	public void run() {
@@ -50,6 +48,7 @@ public class EmailScheduler implements Runnable {
 		logger.error("SchedulerConfigurationDo entity" + entity);
 		if (!ServiceUtil.isEmpty(entity)) {
 			automationService.extractInvoiceFromSharedEmailBoxInScheduler(entity);
+			
 		} else {
 			// complete the sch run
 			this.scheduledFuture.cancel(true);

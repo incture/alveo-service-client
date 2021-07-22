@@ -198,8 +198,9 @@ public class ABBYYJSONConverter {
 				else
 					headerDto.setSurcharge(new Double(0.0));
 			} else if ("BUId".equalsIgnoreCase(name)) {
-				if (!ServiceUtil.isEmpty(headerObj.getString("Value")))
+				if (!ServiceUtil.isEmpty(headerObj.getString("Value")) && "1010".equals(headerObj.getString("Value"))){
 					headerDto.setCompCode(headerObj.getString("Value"));
+				}
 				else
 					headerDto.setCompCode("1010");
 			}
@@ -224,8 +225,6 @@ public class ABBYYJSONConverter {
 
 	}
 
-	public static void main(String[] args) {
-		System.out.println(new Double("8,511.00".replace(",", "")));
-	}
+	
 
 }

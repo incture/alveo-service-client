@@ -109,7 +109,7 @@ public class OdataAPICall {
 		HttpClient client = HttpClientBuilder.create().build();
 
 		HttpPost httpPost = new HttpPost(
-				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+				ApplicationConstants.DESTINATION_TOKEN_URL);
 		httpPost.addHeader("Content-Type", "application/json");
 
 		// Encoding username and password
@@ -129,8 +129,7 @@ public class OdataAPICall {
 
 			logger.error("jwtdestinationToken " + jwtToken);
 
-			HttpGet httpGet = new HttpGet("https://destination-configuration.cfapps.eu20.hana.ondemand.com"
-					+ "/destination-configuration/v1/destinations/" + destinationName);
+			HttpGet httpGet = new HttpGet(ApplicationConstants.DESTINATION_BASE_URL + destinationName);
 
 			httpGet.addHeader("Content-Type", "application/json");
 
@@ -153,6 +152,8 @@ public class OdataAPICall {
 	}
 
 	public static ResponseEntity<?> getOdata() throws URISyntaxException, IOException {
+		String clientid = "sb-cloneb41bf10568ca4499840711bb8a0f2de4!b3189|connectivity!b5";
+		String clientsecret = "cf792fe9-32f6-496c-aeb6-aec065a33512$WhwgyCaocXG__utqLrg1NJjS3mRwCEGW9VxWDTTniK4=";
 		String proxyHost = "10.0.4.5";
 		int proxyPort = 20003;
 		final SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -212,7 +213,7 @@ public class OdataAPICall {
 	public static String getConectivityProxy() throws URISyntaxException, IOException {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost(
-				"https://menabevdev.authentication.eu20.hana.ondemand.com/oauth/token?grant_type=client_credentials");
+				ApplicationConstants.CONECTIVITY_TOKEN_URL);
 		String auth = encodeUsernameAndPassword(ApplicationConstants.CONECTIVITY_CLIENT_ID,
 				ApplicationConstants.CONECTIVITY_CLIENT_SECRET);
 		
