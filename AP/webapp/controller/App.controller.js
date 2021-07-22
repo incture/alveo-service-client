@@ -35,12 +35,14 @@ sap.ui.define([
 					that.oRouter.navTo("UserManagement");
 				} else if (userGroup === "Accountant") {
 					obj.push(navItems[0]);
+					obj.push(navItems[4]);
 					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Buyer") {
 					obj.push(navItems[0]);
 					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Process_Lead") {
 					obj.push(navItems[0]);
+					obj.push(navItems[4]);
 					that.oRouter.navTo("Inbox");
 				} else if (userGroup === "Supplier_Admin") {
 					obj.push(navItems[5]);

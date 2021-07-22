@@ -90,14 +90,16 @@ sap.ui.define([
 			this.fnGetSchedulerLogs(payload);
 		},
 		
+		//time conversion to Frankfurt
+		//get UTC time and converting to frankfurt timezone (+2hrs from UTC)
 		fnGetFormatedDate:function(date){
 			var aDate = new Date(date),
-				 DD = aDate.getDate(),
-				 month = aDate.getMonth() + 1,
-				 yy = aDate.getFullYear(),
-				 hh = aDate.getHours(),
-				 min = aDate.getMinutes(),
-				 ss = aDate.getSeconds();
+				 DD = aDate.getUTCDate(),
+				 month = aDate.getUTCMonth() + 1,
+				 yy = aDate.getUTCFullYear(),
+				 hh = aDate.getUTCHours() + 2, //Adding 2 for Frankfurt time 
+				 min = aDate.getUTCMinutes(),
+				 ss = aDate.getUTCSeconds();
 			var formatDate = yy + "-" + month + "-" + DD + " " + hh + ":" + min + ":" + ss;
 			return formatDate;
 		},
