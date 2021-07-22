@@ -59,4 +59,25 @@ public interface InvoiceHeaderRepository extends JpaRepository<InvoiceHeaderDo, 
 	int updateHeader(@Param("fiscalYear") String fiscalYear,
 			@Param("sapInvoiceNumber") String sapInvoiceNumber, @Param("requestId") String requestId, @Param("invst") String invst, @Param("invStext") String invStext);
 
+	
+	//added by laxmi for dashboard service
+	@Query(value = "select i from InvoiceHeaderDo i where   i.invoiceStatus IN('0','1','2','3','4','5','6','7','8','9','10','11','12','13')")
+	List<InvoiceHeaderDo> overDueInvoiceDetailsAgingReport();
+	
+	@Query(value = "select i from InvoiceHeaderDo i where  i.dueDate =:beforeTodayDueDate AND  i.invoiceStatus IN('0','1','2','3','4','5','6','7','8','9','10','11','12','13')")
+	List<InvoiceHeaderDo> todayInvoiceDetailsAgingReport(@Param("beforeTodayDueDate") Long beforeTodayDueDate );
+	
+	@Query(value = "select i from InvoiceHeaderDo i where  i.dueDate =:beforeTodayDueDate AND  i.invoiceStatus IN('0','1','2','3','4','5','6','7','8','9','10','11','12','13')")
+	List<InvoiceHeaderDo> sevenPlusInvoiceDetailsAgingReport(@Param("beforeTodayDueDate") Long beforeTodayDueDate );
+	
+	@Query(value = "select i from InvoiceHeaderDo i where  i.dueDate =:beforeTodayDueDate AND  i.invoiceStatus IN('0','1','2','3','4','5','6','7','8','9','10','11','12','13')")
+	List<InvoiceHeaderDo> fourteenPlusInvoiceDetailsAgingReport(@Param("beforeTodayDueDate") Long beforeTodayDueDate );
+	
+	@Query(value = "select i from InvoiceHeaderDo i where  i.dueDate =:beforeTodayDueDate AND  i.invoiceStatus IN('0','1','2','3','4','5','6','7','8','9','10','11','12','13')")
+	List<InvoiceHeaderDo> twentyOnePlusInvoiceDetailsAgingReport(@Param("beforeTodayDueDate") Long beforeTodayDueDate );
+	
+
+	@Query(value = "select i from InvoiceHeaderDo i where  i.dueDate =:beforeTodayDueDate AND  i.invoiceStatus IN('0','1','2','3','4','5','6','7','8','9','10','11','12','13')")
+	List<InvoiceHeaderDo> twentyEightPlusInvoiceDetailsAgingReport(@Param("beforeTodayDueDate") Long beforeTodayDueDate );
+	
 }

@@ -1,4 +1,4 @@
-package com.ap.menabev.controller;
+/*package com.ap.menabev.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,3 +36,4 @@ public class ApDashboardChartController {
 		return services.getKPIDetails(dto);
 	}
 }
+*/

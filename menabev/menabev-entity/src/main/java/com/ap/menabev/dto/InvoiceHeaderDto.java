@@ -1,6 +1,9 @@
 package com.ap.menabev.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import javax.persistence.Column;
 
 import lombok.Data;
 
@@ -80,7 +83,6 @@ public class InvoiceHeaderDto {
 	private String sapInvocieNumber;
 	private String glAccount;
 	private String conditionType;
-	
 	// not in DB
 	private String processor;
 	private Long emailReceivedAt;
@@ -97,6 +99,11 @@ public class InvoiceHeaderDto {
 	// added for track invoice by laxmi 
 	private String paymentReference;
 	private long clearingDate;
+	// added for track invoice by laxmi  on 21/07/2021
+	private BigDecimal grossAmountInBigDecimal;
+	private BigDecimal TaxAmountInBigDecimal;
+	private BigDecimal invoiceTotalInBigDecimal;
+	
 	
 
 	  

@@ -1,9 +1,10 @@
 package com.ap.menabev.serviceimpl;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -18,11 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
@@ -69,10 +70,15 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 
 	@SuppressWarnings("static-access")
 	public ResponseEntity<?> fetchTrackInvoice(TrackInvoiceInputDto trackInvoiceInputDto) {
+		
 		List<InvoiceHeaderDo> headerList = filterInvoicesMultiple(trackInvoiceInputDto);
+		try{
 		System.err.println("headerList :" + headerList);
-		System.err.println("headerList size :" + headerList.size());
+		}
+		catch(NullPointerException e){
+			System.err.println("headerList exception:" + e.getMessage());
 
+		}
 		ModelMapper modelMapper = new ModelMapper();
 		List<InvoiceHeaderDto> sapPostedList = new ArrayList<>();
 		List<InvoiceHeaderDto> unPaidList = new ArrayList<>();
@@ -86,55 +92,115 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 		if (!ServiceUtil.isEmpty(headerList)) {
 			System.err.println("headerList invoiceNumber:" + headerList.get(0).getInvoice_ref_number());
 			for (InvoiceHeaderDo invoiceHeaderDo : headerList) {
+				
+				double grossAmount	=0;
+				double taxAmount =0;
+				try{
+				 grossAmount	=invoiceHeaderDo.getGrossAmount();
+				}
+				catch(NullPointerException e)
+				{	
+						grossAmount=0;
+				}
+					try{
+						 taxAmount=invoiceHeaderDo.getTaxAmount();
+
+					}
+					catch(NullPointerException e)
+					{
+						
+						taxAmount=0;
+				}
 				if (invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.UNPAID)
 						|| invoiceHeaderDo.getInvoiceStatus().equals(ApplicationConstants.PAID)) {
 					System.err.println("headerList sapPostedDto:" + invoiceHeaderDo.getInvoiceStatus());
-					double total = 0;
-					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
-							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+					//if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
+					//		&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+				        BigDecimal grossAmountInBigDecimal=new BigDecimal(grossAmount).setScale(2,RoundingMode.HALF_DOWN);
+						System.err.println("grossAmount :" + grossAmountInBigDecimal.doubleValue());
+						double grossAmountInDouble=grossAmountInBigDecimal.doubleValue();
+
+				        BigDecimal taxAmountInBigDecimal =new BigDecimal(taxAmount).setScale(2,RoundingMode.HALF_DOWN);
+						System.err.println("taxAmount :" + taxAmountInBigDecimal.doubleValue());
+						double taxAmountInDouble=taxAmountInBigDecimal.doubleValue();
+
+				        BigDecimal invoiceTotalInBigDecimal=grossAmountInBigDecimal.add(taxAmountInBigDecimal);
+						System.err.println("invoiceTotalInBigDecimal.doubleValue() :" + invoiceTotalInBigDecimal.doubleValue());
+
+				        double invoiceTotal=invoiceTotalInBigDecimal.doubleValue();
+						System.err.println("invoiceTotal :" + invoiceTotal);
+						InvoiceHeaderDto sapPostedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+						sapPostedDto.setGrossAmountInBigDecimal(grossAmountInBigDecimal);
+						sapPostedDto.setTaxAmountInBigDecimal(taxAmountInBigDecimal);
+						sapPostedDto.setInvoiceTotalInBigDecimal(invoiceTotalInBigDecimal);
+						System.err.println("headerList sapPostedDto:" + sapPostedDto);
+
+						sapPostedList.add(sapPostedDto);
+						System.err.println("sapPostedList :" + sapPostedList);
+
 						
-						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
-					}
-					InvoiceHeaderDto sapPostedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-					sapPostedDto.setInvoiceTotal(total);
-					System.err.println("headerList sapPostedDto:" + sapPostedDto);
-
-					sapPostedList.add(sapPostedDto);
-					System.err.println("sapPostedList :" + sapPostedList);
-					System.err.println("sapPostedList size :" + sapPostedList.size());
-
+					//}
+					
+					
 
 				} else if (invoiceHeaderDo.getInvoiceStatus().equals("22")) {
 					System.err.println("headerList rejectedDto:" + invoiceHeaderDo.getInvoiceStatus());
-					double total = 0;
-					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
-							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
-						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
-					}
-					InvoiceHeaderDto sapRejectedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-					System.err.println("headerList rejectedDto:" + sapRejectedDto);
-					sapRejectedDto.setInvoiceTotal(total);
+					//if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
+						//	&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+					BigDecimal grossAmountInBigDecimal=new BigDecimal(grossAmount).setScale(2,RoundingMode.HALF_DOWN);
+					System.err.println("grossAmount :" + grossAmountInBigDecimal.doubleValue());
+					double grossAmountInDouble=grossAmountInBigDecimal.doubleValue();
+
+			        BigDecimal taxAmountInBigDecimal =new BigDecimal(taxAmount).setScale(2,RoundingMode.HALF_DOWN);
+					System.err.println("taxAmount :" + taxAmountInBigDecimal.doubleValue());
+					double taxAmountInDouble=taxAmountInBigDecimal.doubleValue();
+
+			        BigDecimal invoiceTotalInBigDecimal=grossAmountInBigDecimal.add(taxAmountInBigDecimal);
+					System.err.println("invoiceStatusInBigDecimal.doubleValue() :" + invoiceTotalInBigDecimal.doubleValue());
+
+			        double invoiceTotal=invoiceTotalInBigDecimal.doubleValue();
+					System.err.println("invoiceTotal :" + invoiceTotal);
+
+							InvoiceHeaderDto sapRejectedDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+							sapRejectedDto.setGrossAmountInBigDecimal(grossAmountInBigDecimal);
+							sapRejectedDto.setTaxAmountInBigDecimal(taxAmountInBigDecimal);
+							sapRejectedDto.setInvoiceTotalInBigDecimal(invoiceTotalInBigDecimal);
+							System.err.println("headerList sapRejectedDto:" + sapRejectedDto);	
+
 					rejectedList.add(sapRejectedDto);
 					System.err.println("rejectedList :" + rejectedList);
-					System.err.println("rejectedList size :" + rejectedList.size());
-
+					//}
 
 				} else  {
 					System.err.println("headerList pendingApprovalDto:" + invoiceHeaderDo.getInvoiceStatus());
-					double total = 0;
-					if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
-							&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
-						total = invoiceHeaderDo.getGrossAmount() + invoiceHeaderDo.getTaxAmount();
-					}
-					InvoiceHeaderDto sapPendingApprovaldDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
-					sapPendingApprovaldDto.setInvoiceTotal(total);
-					sapPendingApprovaldDto.setInvoiceStatus(ApplicationConstants.PENDING_APPROVAL);
-					sapPendingApprovaldDto.setInvoiceStatusText("Pending Approval");
-					System.err.println("headerList pendingApprovalDto:" + sapPendingApprovaldDto);
+					//if (!ServiceUtil.isEmpty(invoiceHeaderDo.getGrossAmount())
+					//		&& !ServiceUtil.isEmpty(invoiceHeaderDo.getTaxAmount())) {
+					BigDecimal grossAmountInBigDecimal=new BigDecimal(grossAmount).setScale(2,RoundingMode.HALF_DOWN);
+					double grossAmountInDouble=grossAmountInBigDecimal.doubleValue();
+					System.err.println("grossAmount :" + grossAmountInBigDecimal.doubleValue());
 
-					pendingApprovalList.add(sapPendingApprovaldDto);
-					System.err.println("pendingApprovalList :" + pendingApprovalList);
-					System.err.println("pendingApprovalList size :" + pendingApprovalList.size());
+			        BigDecimal taxAmountInBigDecimal =new BigDecimal(taxAmount).setScale(2,RoundingMode.HALF_DOWN);
+					System.err.println("taxAmount :" + taxAmountInBigDecimal.doubleValue());
+					double taxAmountInDouble=taxAmountInBigDecimal.doubleValue();
+
+			        BigDecimal invoiceTotalInBigDecimal=grossAmountInBigDecimal.add(taxAmountInBigDecimal);
+					System.err.println("invoiceStatusInBigDecimal :" + invoiceTotalInBigDecimal.doubleValue());
+
+			        double invoiceStatus=invoiceTotalInBigDecimal.doubleValue();
+					System.err.println("invoiceStatus :" + invoiceStatus);
+							InvoiceHeaderDto sapPendingApprovaldDto = modelMapper.map(invoiceHeaderDo, InvoiceHeaderDto.class);
+							sapPendingApprovaldDto.setGrossAmountInBigDecimal(grossAmountInBigDecimal);
+							sapPendingApprovaldDto.setTaxAmountInBigDecimal(taxAmountInBigDecimal);
+							sapPendingApprovaldDto.setInvoiceTotalInBigDecimal(invoiceTotalInBigDecimal);
+							sapPendingApprovaldDto.setInvoiceStatus(ApplicationConstants.PENDING_APPROVAL);
+							sapPendingApprovaldDto.setInvoiceStatusText("Pending Approval");
+							System.err.println("headerList pendingApprovalDto:" + sapPendingApprovaldDto);
+
+							pendingApprovalList.add(sapPendingApprovaldDto);
+							System.err.println("pendingApprovalList :" + pendingApprovalList);
+							
+					//}
+					
 
 
 				}
@@ -144,10 +210,7 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 					invoiceReferenceNumberList.add(headerDo.getExtInvNum());
 					System.err.println("invoiceReferenceNumberList:" + invoiceReferenceNumberList);
 				}
-				// ResponseEntity<?>
-				// odataResponse=odataHelperClass.consumingOdataServiceForTrackInvoice("/sap/opu/odata/sap/ZP2P_API_INVOICESTATUS_SRV/InvoiceStatusSet",
-				// invoiceReferenceNumberList.toString(), "GET",
-				// odataHelperClass.getDestination("SD4_DEST"));
+				
 			}
 
 			if (!ServiceUtil.isEmpty(invoiceReferenceNumberList)) {
@@ -167,9 +230,13 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 						if (!ServiceUtil.isEmpty(trackInvoiceOdataOutputResponse.getUsers())) {
 							for (OdataTrackInvoiceObject odataTrackInvoiceObject : trackInvoiceOdataOutputResponse
 									.getUsers()) {
+								InvoiceHeaderDto invoiceHeaderPaidDto=new InvoiceHeaderDto();
+								InvoiceHeaderDto invoiceHeaderUnPaidDto=new InvoiceHeaderDto();
+
 								try{
 									System.err.println("odataTrackInvoiceObject clearingDate:" + odataTrackInvoiceObject.getClearingDate());
 									System.err.println("odataTrackInvoiceObject paymentRef" + odataTrackInvoiceObject.getPaymentReference());
+									System.err.println("odataTrackInvoiceObject " + odataTrackInvoiceObject);
 
 								}
 								catch(NullPointerException e)
@@ -180,31 +247,78 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 								if (!ServiceUtil.isEmpty(odataTrackInvoiceObject.getClearingDate()) && odataTrackInvoiceObject.getClearingDate()!=0 && !ServiceUtil.isEmpty(odataTrackInvoiceObject.getPaymentReference())) {
 
 									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
-										invoiceHeaderDto.setInvoiceStatus(ApplicationConstants.PAID);
-										invoiceHeaderDto.setInvoiceStatusText("Paid");
-										invoiceHeaderDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
-										invoiceHeaderDto
+										/*invoiceHeaderPaidDto.setAccountNumber(accountNumber);
+										invoiceHeaderPaidDto.setActivityLog(activityLog);
+										invoiceHeaderPaidDto.setAmountBeforeTax(amountBeforeTax);
+										invoiceHeaderPaidDto.setApprovalStatus(approvalStatus);
+										invoiceHeaderPaidDto.setAttachment(attachment);
+										invoiceHeaderPaidDto.setBalanceAmount(balanceAmount);
+										invoiceHeaderPaidDto.setChangeIndicators(changeIndicators);
+										invoiceHeaderPaidDto.setChannelType(channelType);
+										invoiceHeaderPaidDto.setCity(city);
+										invoiceHeaderPaidDto.setComment(comment);
+										invoiceHeaderPaidDto.setCostAllocation(costAllocation);
+										invoiceHeaderPaidDto.setCompanyCode(companyCode);
+										invoiceHeaderPaidDto.setCompCode(compCode);
+										invoiceHeaderPaidDto.setConditionType(conditionType);
+										invoiceHeaderPaidDto.setCurrency(currency);
+										invoiceHeaderPaidDto.setDeliveryNote(deliveryNote);
+										invoiceHeaderPaidDto.setDiscount(discount);
+										invoiceHeaderPaidDto.setDocumentDate(documentDate);
+										invoiceHeaderPaidDto.setDueDate(dueDate);
+										invoiceHeaderPaidDto.setEmailReceivedAt(emailReceivedAt);
+										invoiceHeaderPaidDto.setExtInvNum(extInvNum);
+										invoiceHeaderPaidDto.setFiscalYear(fiscalYear);
+										invoiceHeaderPaidDto.setGlAccount(glAccount);
+										invoiceHeaderPaidDto.setGrossAmount(grossAmount);
+										invoiceHeaderPaidDto.setGuid(guid);
+										invoiceHeaderPaidDto.setHeaderMessages(headerMessages);
+										invoiceHeaderPaidDto.setInvoice_ref_number(invoice_ref_number);
+										invoiceHeaderPaidDto.setInvoiceAmount(invoiceAmount);
+										invoiceHeaderPaidDto.setInvoiceGross(invoiceGross);
+										invoiceHeaderPaidDto.setInvoiceItems(invoiceItems);
+										invoiceHeaderPaidDto.setInvoicePdfId(invoicePdfId);
+										invoiceHeaderPaidDto.setInvoiceTotal(invoiceTotal);
+										invoiceHeaderPaidDto.setInvoiceType(invoiceType);
+										invoiceHeaderPaidDto.setIsnonPoOrPo(isnonPoOrPo);
+										invoiceHeaderPaidDto.setIsRejected(isRejected);
+										invoiceHeaderPaidDto.setPaymentBlock(paymentBlock);
+										invoiceHeaderPaidDto.setPaymentBlockDesc(paymentBlockDesc);
+										invoiceHeaderPaidDto.setPaymentMethod(paymentMethod);
+										invoiceHeaderPaidDto.setPaymentReference(paymentReference);
+										invoiceHeaderPaidDto.setPaymentTerms(paymentTerms);
+										invoiceHeaderPaidDto.setPlannedCost(plannedCost);
+										invoiceHeaderPaidDto.setPostingDate(postingDate);
+										invoiceHeaderPaidDto.setProcessor(processor);
+										invoiceHeaderPaidDto.setReasonForRejection(reasonForRejection);
+										invoiceHeaderPaidDto.setRefpurchaseDoc(refpurchaseDoc);
+										invoiceHeaderPaidDto.set
+*/										invoiceHeaderPaidDto.setInvoiceStatus(ApplicationConstants.PAID);
+										invoiceHeaderPaidDto.setInvoiceStatusText("Paid");
+										invoiceHeaderPaidDto.setClearingDate(odataTrackInvoiceObject.getClearingDate());
+										invoiceHeaderPaidDto
 												.setPaymentReference(odataTrackInvoiceObject.getPaymentReference());
-										paidList.add(invoiceHeaderDto);
+										paidList.add(invoiceHeaderPaidDto);
 										
 									}
 									System.err.println("paidList :" + paidList);
-									System.err.println("paidList size :" + paidList.size());
 
 								}
 								else{
 									
 									for (InvoiceHeaderDto invoiceHeaderDto : sapPostedList) {
-										invoiceHeaderDto.setInvoiceStatus(ApplicationConstants.UNPAID);
-										invoiceHeaderDto.setInvoiceStatusText("UnPaid");
-										unPaidList.add(invoiceHeaderDto);
+										invoiceHeaderUnPaidDto.setInvoiceStatus(ApplicationConstants.UNPAID);
+										invoiceHeaderUnPaidDto.setInvoiceStatusText("UnPaid");
+										unPaidList.add(invoiceHeaderUnPaidDto);
 										
 									}
 									System.err.println("unPaidList :" + unPaidList);
-									System.err.println("unPaidList size :" + unPaidList.size());
 
 								}
 							}
+							System.err.println("after iterating odataObject unPaidList :" + unPaidList);
+							System.err.println("after iterating odataObject paidList :" + paidList);
+
 						}
 					} else {
 						String jsonOutputStr = (String) odataResponse.getBody();
@@ -228,16 +342,12 @@ public class TrackInvoiceServiceImpl implements TrackInvoiceService {
 				// ResponseEntity<TrackInvoiceOutputPayload>(trackInvoiceOutputPayload,HttpStatus.OK);
 			}
 			System.out.println("paidList:"+paidList);
-			System.out.println("paidList size:"+paidList.size());
 
 			System.out.println("unPaidList:"+unPaidList);
-			System.out.println("unPaidList size:"+unPaidList.size());
 
 			System.out.println("pendingApprovalList:"+pendingApprovalList);
-			System.out.println("pendingApprovalList size:"+pendingApprovalList.size());
 
 			System.out.println("rejectedList:"+rejectedList);
-			System.out.println("rejectedList size:"+rejectedList.size());
 
 
 			List<InvoiceHeaderDto> newList = Stream.of(paidList,unPaidList, pendingApprovalList, rejectedList)
